@@ -1,0 +1,27 @@
+[
+    {
+        "image_path": "./dummy_dataset\\val\\images\\image_000.tif",
+        "question": "Is there a water body visible in this image?",
+        "answer": "yes"
+    },
+    {
+        "image_path": "./dummy_dataset\\val\\images\\image_001.tif",
+        "question": "Is there a water body visible in this image?",
+        "answer": "yes"
+    },
+    {
+        "image_path": "./dummy_dataset\\val\\images\\image_002.tif",
+        "question": "Is there a water body visible in this image?",
+        "answer": "yes"
+    },
+    {
+        "image_path": "./dummy_dataset\\val\\images\\image_003.tif",
+        "question": "Is there a water body visible in this image?",
+        "answer": "yes"
+    },
+    {
+        "image_path": "./dummy_dataset\\val\\images\\image_004.tif",
+        "question": "Is there a water body visible in this image?",
+        "answer": "yes"
+    }
+]

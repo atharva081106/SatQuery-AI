@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-canvas-night: #000000;
+  --color-canvas-night-soft: #0a0a0a;
+  --color-canvas-light: #ffffff;
+  --color-canvas-cool: #f0f0fa;
+  --color-on-primary: #ffffff;
+  --color-on-primary-mute: #f0f0fa;
+  --color-ink: #000000;
+  --color-ink-mute: #5a5a5f;
+  --color-hairline-on-dark: #3a3a3f;
+  --color-hairline-on-light: #e0e0e8;
+  --color-link-on-dark: #ffffff;
+
+  --font-inter: 'Inter', sans-serif;
+  --font-display: 'Inter', Arial, sans-serif; /* Fallback for D-DIN */
+  --font-body: 'Inter', Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas-night);
+    color: var(--color-on-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+    scroll-behavior: auto;
+  }
+}
+
+@layer utilities {
+  /* Typography */
+  .display-xxl {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 80px);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+  }
+  
+  .display-xl {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 60px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  .display-lg {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.96px;
+    text-transform: uppercase;
+  }
+
+  .body-lg {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.7;
+    letter-spacing: 0.32px;
+  }
+
+  .body-md {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.32px;
+  }
+
+  .button-cap {
+    font-family: var(--font-body);
+    font-size: 13.008px;
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: 1.17px;
+    text-transform: uppercase;
+  }
+
+  .micro-cap {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 2.0;
+    letter-spacing: 0.96px;
+    text-transform: uppercase;
+  }
+
+  /* Component utility classes */
+  .button-ghost-on-dark {
+    background-color: transparent;
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-on-primary);
+    border-radius: 32px;
+    padding: 8px 24px;
+    transition: all 0.2s ease;
+  }
+  .button-ghost-on-dark:hover {
+    background-color: var(--color-on-primary);
+    color: var(--color-canvas-night);
+  }
+
+  .text-input-dark {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-hairline-on-dark);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .text-input-dark:focus {
+    outline: none;
+    border-color: var(--color-on-primary);
+  }
+}

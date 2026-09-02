@@ -1,0 +1,30 @@
+# Python & Virtual Environments
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Cache & Hugging Face weights cache (do not push to git)
+.huggingface_cache/
+*.safetensors
+*.bin
+checkpoints/
+ml_pipeline/satquery_finetuned_model/
+ml_pipeline/dummy_dataset/
+backend/venv/
+
+# Node & Next.js
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# OS & Environment files
+.DS_Store
+*.pem
+*.log
+.env.local
+.env*.local

@@ -1,0 +1,25 @@
+{
+    "accuracy": 0.0,
+    "details": [
+        {
+            "pred": "no",
+            "gt": "yes"
+        },
+        {
+            "pred": "no",
+            "gt": "yes"
+        },
+        {
+            "pred": "no",
+            "gt": "yes"
+        },
+        {
+            "pred": "no",
+            "gt": "yes"
+        },
+        {
+            "pred": "no",
+            "gt": "yes"
+        }
+    ]
+}
