@@ -1,5 +1,8 @@
 import os
-os.environ["HF_HOME"] = "d:\\sih26167\\.huggingface_cache"
+
+# Only set local windows cache if on windows and not provided by environment
+if os.name == "nt" and "HF_HOME" not in os.environ:
+    os.environ["HF_HOME"] = "d:\\sih26167\\.huggingface_cache"
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,6 +22,11 @@ app.add_middleware(
 )
 
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff"}
+
+@app.get("/")
+async def healthcheck():
+    """Healthcheck endpoint for Render / cloud port detection"""
+    return {"status": "online", "service": "SatQuery AI Backend"}
 
 @app.post("/api/query")
 async def process_query(
