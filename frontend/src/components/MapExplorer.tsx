@@ -1,13 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 
 // We must dynamically import leaflet to avoid SSR issues with window
 export default function MapExplorer() {
   const mapRef = useRef<any>(null);
+  const router = useRouter();
   const [L, setL] = useState<any>(null);
+  
+  // UI State
+  const [dataset, setDataset] = useState("s2");
+  
+  // Default dates (last 30 days)
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
+  const [maxCC, setMaxCC] = useState(20);
+  const [bbox, setBbox] = useState<number[] | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Dynamic import of Leaflet
@@ -82,9 +98,14 @@ export default function MapExplorer() {
       drawnItems.addLayer(layer);
       
       if (type === 'rectangle') {
-        const bounds = layer.getBounds();
-        console.log("AOI Selected:", bounds.toBBoxString());
-        // In the future, this bbox string will be sent to the backend
+        const layerBounds = layer.getBounds();
+        // Format: [min_lon, min_lat, max_lon, max_lat]
+        setBbox([
+          layerBounds.getWest(),
+          layerBounds.getSouth(),
+          layerBounds.getEast(),
+          layerBounds.getNorth()
+        ]);
       }
     });
 
@@ -92,6 +113,54 @@ export default function MapExplorer() {
       map.remove();
     };
   }, [L]);
+
+  const handleAcquire = async () => {
+    if (!bbox) {
+      alert("Please draw an Area of Interest (Bounding Box) on the map first.");
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/acquire", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          bbox,
+          start_date: startDate,
+          end_date: endDate,
+          dataset,
+          maxcc: maxCC
+        })
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Failed to acquire imagery");
+      }
+      
+      const blob = await res.blob();
+      
+      // Convert blob to base64 to store in sessionStorage (since it's a cross-page transition)
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        sessionStorage.setItem("satquery_acquired_image", base64data);
+        sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
+        
+        // Navigate to query page
+        router.push("/query");
+      };
+      reader.readAsDataURL(blob);
+      
+    } catch (e: any) {
+      alert(e.message);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full h-full relative bg-black">
@@ -105,7 +174,11 @@ export default function MapExplorer() {
           <div className="space-y-6">
             <div>
               <label className="micro-cap block text-white/50 mb-2">TARGET DATASET</label>
-              <select className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-sm focus:outline-none focus:border-white uppercase font-mono">
+              <select 
+                value={dataset}
+                onChange={(e) => setDataset(e.target.value)}
+                className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-sm focus:outline-none focus:border-white uppercase font-mono"
+              >
                 <option value="s2">Sentinel-2 (Optical)</option>
                 <option value="s1">Sentinel-1 (Radar)</option>
                 <option value="l8">Landsat 8</option>
@@ -115,24 +188,45 @@ export default function MapExplorer() {
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="micro-cap block text-white/50 mb-2">START DATE</label>
-                <input type="date" className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-xs focus:outline-none focus:border-white uppercase font-mono" />
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-xs focus:outline-none focus:border-white uppercase font-mono" 
+                />
               </div>
               <div className="flex-1">
                 <label className="micro-cap block text-white/50 mb-2">END DATE</label>
-                <input type="date" className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-xs focus:outline-none focus:border-white uppercase font-mono" />
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-xs focus:outline-none focus:border-white uppercase font-mono" 
+                />
               </div>
             </div>
 
             <div>
               <label className="micro-cap flex justify-between text-white/50 mb-2">
                 <span>MAX CLOUD COVER</span>
-                <span>20%</span>
+                <span>{maxCC}%</span>
               </label>
-              <input type="range" min="0" max="100" defaultValue="20" className="w-full accent-white" />
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={maxCC}
+                onChange={(e) => setMaxCC(parseInt(e.target.value))}
+                className="w-full accent-white" 
+              />
             </div>
 
-            <button className="w-full mt-4 py-3 border border-white text-white hover:bg-white hover:text-black transition-colors uppercase tracking-[2px] text-xs font-semibold">
-              ACQUIRE DATA
+            <button 
+              onClick={handleAcquire}
+              disabled={loading}
+              className={`w-full mt-4 py-3 border border-white text-white transition-colors uppercase tracking-[2px] text-xs font-semibold ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black cursor-pointer'}`}
+            >
+              {loading ? 'ACQUIRING...' : 'ACQUIRE DATA'}
             </button>
           </div>
         </div>

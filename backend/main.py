@@ -66,6 +66,108 @@ async def process_query(
     result = agent_controller.execute_query(query, image_bytes_list, history_list)
     return result
 
+from pydantic import BaseModel
+from fastapi import HTTPException
+from fastapi.responses import Response
+from dotenv import load_dotenv
+from sentinelhub import SHConfig, SentinelHubRequest, DataCollection, MimeType, BBox, CRS
+
+load_dotenv()
+
+class AcquireRequest(BaseModel):
+    bbox: list  # [min_lon, min_lat, max_lon, max_lat]
+    start_date: str
+    end_date: str
+    dataset: str
+    maxcc: int
+
+@app.post("/api/acquire")
+async def acquire_imagery(request: AcquireRequest):
+    """
+    Endpoint to acquire satellite imagery from Sentinel Hub.
+    """
+    client_id = os.getenv("SH_CLIENT_ID")
+    client_secret = os.getenv("SH_CLIENT_SECRET")
+    
+    if not client_id or not client_secret:
+        raise HTTPException(status_code=500, detail="Sentinel Hub credentials not configured.")
+        
+    config = SHConfig()
+    config.sh_client_id = client_id
+    config.sh_client_secret = client_secret
+    
+    try:
+        # Convert bbox array to BBox object
+        bbox_obj = BBox(bbox=request.bbox, crs=CRS.WGS84)
+        
+        # Select Data Collection
+        collection = DataCollection.SENTINEL2_L2A
+        if request.dataset == "s1":
+            collection = DataCollection.SENTINEL1_IW
+        elif request.dataset == "l8":
+            collection = DataCollection.LANDSAT_OT_L2
+            
+        # Evalscript for True Color
+        evalscript = """
+        //VERSION=3
+        function setup() {
+            return {
+                input: ["B04", "B03", "B02", "dataMask"],
+                output: { bands: 4 }
+            };
+        }
+        function evaluatePixel(sample) {
+            return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02, sample.dataMask];
+        }
+        """
+        
+        # If Sentinel 1, evalscript needs to be different (VV/VH)
+        if request.dataset == "s1":
+            evalscript = """
+            //VERSION=3
+            function setup() {
+              return {
+                input: ["VV", "VH", "dataMask"],
+                output: { bands: 4 }
+              };
+            }
+            function evaluatePixel(sample) {
+              return [2.0 * sample.VV, 2.0 * sample.VH, 1.5 * sample.VV, sample.dataMask];
+            }
+            """
+            
+        # Build Request
+        sh_request = SentinelHubRequest(
+            evalscript=evalscript,
+            input_data=[
+                {
+                    "dataCollection": collection,
+                    "timeRange": (request.start_date, request.end_date),
+                    "mosaickingOrder": "mostRecent",
+                    "maxCloudCoverage": request.maxcc
+                }
+            ],
+            responses=[
+                SentinelHubRequest.output_response("default", MimeType.PNG)
+            ],
+            bbox=bbox_obj,
+            size=[1024, 1024], # Request standard 1024x1024
+            config=config
+        )
+        
+        # Execute Request (returns a list of responses, we take the first)
+        response_list = sh_request.get_data(decode_data=False)
+        
+        if not response_list or len(response_list) == 0:
+            raise HTTPException(status_code=404, detail="No imagery found for the specified parameters.")
+            
+        raw_image_bytes = response_list[0]
+        
+        return Response(content=raw_image_bytes, media_type="image/png")
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Sentinel Hub Error: {str(e)}")
+
 @app.get("/api/sample-missions")
 async def get_sample_missions():
     """

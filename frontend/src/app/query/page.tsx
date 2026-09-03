@@ -193,6 +193,27 @@ export default function Home() {
   ];
 
   useEffect(() => {
+    // Check for acquired image from Map Explorer
+    const acquiredBase64 = sessionStorage.getItem("satquery_acquired_image");
+    if (acquiredBase64) {
+      // Convert base64 back to File
+      fetch(acquiredBase64)
+        .then(res => res.blob())
+        .then(blob => {
+          const file = new File([blob], "acquired_satellite_image.png", { type: "image/png" });
+          setImages(prev => {
+            // Avoid duplicates if effect runs twice
+            if (prev.some(f => f.name === "acquired_satellite_image.png")) return prev;
+            return [...prev, file].slice(0, 2);
+          });
+          // Clean up
+          sessionStorage.removeItem("satquery_acquired_image");
+          sessionStorage.removeItem("satquery_acquired_bbox");
+        });
+    }
+  }, []);
+
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (presetsRef.current && !presetsRef.current.contains(event.target as Node)) {
         setShowPresets(false);
