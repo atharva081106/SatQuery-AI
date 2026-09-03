@@ -168,7 +168,7 @@ async def acquire_imagery(request: AcquireRequest):
         if not response_list or len(response_list) == 0:
             raise HTTPException(status_code=404, detail="No imagery found for the specified parameters.")
             
-        raw_image_bytes = response_list[0]
+        raw_image_bytes = response_list[0].content
         
         return Response(content=raw_image_bytes, media_type="image/png")
         
