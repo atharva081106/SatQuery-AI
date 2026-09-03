@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 
-export default function MapExplorer() {
+interface MapExplorerProps {
+  onAcquire?: (base64data: string, bbox: number[]) => void;
+  onCancel?: () => void;
+}
+
+export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = {}) {
   const mapRef = useRef<any>(null);
   const router = useRouter();
   const [L, setL] = useState<any>(null);
@@ -142,10 +147,13 @@ export default function MapExplorer() {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result as string;
-        sessionStorage.setItem("satquery_acquired_image", base64data);
-        sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
-        
-        router.push("/query");
+        if (onAcquire) {
+          onAcquire(base64data, bbox);
+        } else {
+          sessionStorage.setItem("satquery_acquired_image", base64data);
+          sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
+          router.push("/query");
+        }
       };
       reader.readAsDataURL(blob);
       
@@ -239,6 +247,16 @@ export default function MapExplorer() {
         >
           {loading ? 'Initiating Scan...' : 'Acquire Data'}
         </button>
+        
+        {onCancel && (
+          <button 
+            onClick={onCancel}
+            disabled={loading}
+            className="w-full py-3 mt-2 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border border-white/20 text-white/60 hover:text-white hover:border-white"
+          >
+            Cancel
+          </button>
+        )}
         
         {/* Helper text */}
         {!bbox && (

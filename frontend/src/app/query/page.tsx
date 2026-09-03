@@ -13,6 +13,7 @@ import FadeInScroll from '@/components/FadeInScroll';
 import FramerGlobe from '@/components/FramerGlobe';
 import jsPDF from 'jspdf';
 import SwipeSlider from '@/components/SwipeSlider';
+import MapExplorer from '@/components/MapExplorer';
 
 function FormattedMessage({ content }: { content: string }) {
   if (!content) return null;
@@ -135,6 +136,7 @@ export default function Home() {
   const [showPresets, setShowPresets] = useState(false);
   const presetsRef = useRef<HTMLDivElement>(null);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [showMapExplorer, setShowMapExplorer] = useState(false);
 
   const handleDownloadGeoJSON = () => {
     if (!latestResult?.geojson_data) return;
@@ -203,16 +205,19 @@ export default function Home() {
         .then(blob => {
           const file = new File([blob], "acquired_satellite_image.png", { type: "image/png" });
           setImages(prev => {
-            // Avoid duplicates if effect runs twice
-            if (prev.some(f => f.name === "acquired_satellite_image.png")) return prev;
+            // Add a welcome message to prompt the user (only if not already there)
+            if (!prev.some(f => f.name === "acquired_satellite_image.png") && prev.length === 0) {
+              setMessages([{ 
+                role: "assistant", 
+                content: "I have successfully acquired and loaded your satellite imagery from the Map Explorer. The target area is ready for analysis. What would you like me to look for?"
+              }]);
+            }
             
-            // Add a welcome message to prompt the user
-            setMessages([{ 
-              role: "assistant", 
-              content: "I have successfully acquired and loaded your satellite imagery from the Map Explorer. The target area is ready for analysis. What would you like me to look for?"
-            }]);
+            // Generate a unique filename if adding multiple acquired images
+            const uniqueName = `acquired_satellite_image_${Date.now()}.png`;
+            const file = new File([blob], uniqueName, { type: "image/png" });
 
-            return [...prev, file].slice(0, 2);
+            return [...prev, file].slice(0, 2); // Max 2 images
           });
           // Clean up
           sessionStorage.removeItem("satquery_acquired_image");
@@ -671,6 +676,20 @@ export default function Home() {
                   </svg>
                 </button>
 
+                {/* Map Acquire Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowMapExplorer(true)}
+                  className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/10 shrink-0"
+                  title="Acquire Imagery from Map"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                    <line x1="9" y1="3" x2="9" y2="18"></line>
+                    <line x1="15" y1="6" x2="15" y2="21"></line>
+                  </svg>
+                </button>
+
                 {/* Presets Button beside Attachment Button */}
                 <div className="relative shrink-0 flex items-center ml-1 mr-1" ref={presetsRef}>
                   <button
@@ -939,6 +958,28 @@ export default function Home() {
           animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
+
+      {/* Map Explorer Modal */}
+      {showMapExplorer && (
+        <div className="fixed inset-0 z-[100] bg-black">
+          <MapExplorer 
+            onCancel={() => setShowMapExplorer(false)}
+            onAcquire={async (base64, bbox) => {
+              try {
+                const res = await fetch(base64);
+                const blob = await res.blob();
+                const uniqueName = `acquired_satellite_image_${Date.now()}.png`;
+                const file = new File([blob], uniqueName, { type: "image/png" });
+                setImages(prev => [...prev, file].slice(0, 2));
+                setShowMapExplorer(false);
+              } catch (e) {
+                console.error(e);
+              }
+            }}
+          />
+        </div>
+      )}
+
       {/* Lightbox / Modal */}
       {expandedImage && (
         <div 
