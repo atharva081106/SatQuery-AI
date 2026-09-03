@@ -2,7 +2,7 @@
 
 import React from 'react';
 import FramerGlobe from '@/components/FramerGlobe';
-import Carousel3d from '@/components/Carousel3d';
+import GlobeCarousel3d from '@/components/GlobeCarousel3d';
 
 const planetaryImages = [
   {
@@ -44,11 +44,17 @@ export default function SpaceGallery() {
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full pt-16">
-        <div className="w-full h-[60vh] max-h-[600px]">
-          <Carousel3d 
-            slides={planetaryImages} 
-            slideAspectRatio={1.5}
-            effectPreset="coverflow"
+        <div className="w-[800px] h-[800px] max-w-full max-h-[80vh]">
+          <GlobeCarousel3d 
+            images={planetaryImages} 
+            background="transparent"
+            radius={350}
+            tileWidth={210}
+            tileHeight={140}
+            count={25}
+            speed={20}
+            distance={800}
+            hideBack={true}
           />
         </div>
         
