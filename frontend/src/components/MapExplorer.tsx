@@ -90,9 +90,9 @@ export default function MapExplorer() {
         circlemarker: false,
         rectangle: {
           shapeOptions: {
-            color: '#8bc34a', // Light green Copernicus style highlight
+            color: '#00F0FF', // Neon Cyan for SpaceX styling
             weight: 2,
-            fillOpacity: 0.2
+            fillOpacity: 0.1
           }
         }
       }
@@ -170,38 +170,35 @@ export default function MapExplorer() {
   };
 
   return (
-    <div className="w-full h-full relative bg-gray-100 flex font-sans overflow-hidden">
+    <div className="w-full h-full relative bg-black flex font-mono overflow-hidden text-white">
       
-      {/* LEFT SIDEBAR (Copernicus Style) */}
-      <div className="w-[380px] h-full bg-[#f8f9fa] flex flex-col z-50 shadow-2xl shrink-0">
+      {/* LEFT SIDEBAR (SpaceX/Glassmorphism Style) */}
+      <div className="w-[380px] h-full bg-black/60 backdrop-blur-xl border-r border-white/10 flex flex-col z-[400] shrink-0">
         
-        {/* Blue Header Area */}
-        <div className="bg-[#003399] text-white flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-blue-800">
+        {/* Header Area */}
+        <div className="flex flex-col border-b border-white/10">
+          <div className="flex items-center justify-between px-6 py-5">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xl tracking-tight">Copernicus</span>
-              <span className="text-sm font-light text-blue-200 mt-1">BROWSER</span>
+              <span className="font-bold text-2xl tracking-[0.2em]">SATQUERY AI.</span>
             </div>
-            <div className="flex items-center gap-4 text-xs font-semibold">
-              <div className="flex items-center gap-1 cursor-pointer">EN <ChevronDown size={14}/></div>
-              <div className="flex items-center gap-1 cursor-pointer">User Account <ChevronDown size={14}/></div>
-              <div className="bg-blue-800 p-1 rounded cursor-pointer" onClick={() => router.push('/')} title="Back to Dashboard">
+            <div className="flex items-center gap-4 text-xs font-semibold tracking-widest text-white/50">
+              <div className="border border-white/20 p-2 hover:bg-white hover:text-black hover:border-white transition-colors cursor-pointer" onClick={() => router.push('/')} title="ABORT">
                 <ChevronLeft size={16}/>
               </div>
             </div>
           </div>
           
           {/* Tabs */}
-          <div className="flex w-full">
+          <div className="flex w-full border-t border-white/10">
             <button 
               onClick={() => setActiveTab("VISUALISE")}
-              className={`flex-1 py-3 text-sm font-bold tracking-wider ${activeTab === 'VISUALISE' ? 'bg-[#002266] text-[#8bc34a] border-b-2 border-[#8bc34a]' : 'text-white hover:bg-blue-800'}`}
+              className={`flex-1 py-4 text-xs font-bold tracking-[0.15em] transition-colors ${activeTab === 'VISUALISE' ? 'bg-white/10 text-[#00F0FF] border-b-2 border-[#00F0FF]' : 'text-white hover:bg-white/5'}`}
             >
               VISUALISE
             </button>
             <button 
               onClick={() => setActiveTab("SEARCH")}
-              className={`flex-1 py-3 text-sm font-bold tracking-wider ${activeTab === 'SEARCH' ? 'bg-[#002266] text-[#8bc34a] border-b-2 border-[#8bc34a]' : 'text-white hover:bg-blue-800'}`}
+              className={`flex-1 py-4 text-xs font-bold tracking-[0.15em] transition-colors ${activeTab === 'SEARCH' ? 'bg-white/10 text-[#00F0FF] border-b-2 border-[#00F0FF]' : 'text-white hover:bg-white/5'}`}
             >
               SEARCH
             </button>
@@ -209,123 +206,109 @@ export default function MapExplorer() {
         </div>
 
         {/* Dashboard / Workspace Links */}
-        <div className="flex bg-white border-b border-gray-200 text-xs font-semibold text-blue-700">
-          <div className="flex-1 py-2 text-center border-r border-gray-200 hover:bg-blue-50 cursor-pointer flex justify-center items-center gap-2">
+        <div className="flex bg-black/40 border-b border-white/10 text-[10px] font-bold tracking-[0.15em] text-white/60">
+          <div className="flex-1 py-3 text-center border-r border-white/10 hover:bg-white/10 hover:text-white transition-colors cursor-pointer flex justify-center items-center gap-2">
             <LayoutPanelTop size={14}/> DASHBOARD
           </div>
-          <div className="flex-1 py-2 text-center hover:bg-blue-50 cursor-pointer flex justify-center items-center gap-2">
+          <div className="flex-1 py-3 text-center hover:bg-white/10 hover:text-white transition-colors cursor-pointer flex justify-center items-center gap-2">
             <FileDown size={14}/> WORKSPACE
           </div>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6">
           
           {/* DATE ACCORDION */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
-            <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-200">
-              <span className="font-bold text-[#003399] text-sm tracking-wide">DATE: RANGE</span>
-              <div className="flex gap-1">
-                <div className="w-6 h-6 rounded bg-[#003399] flex items-center justify-center text-white"><Calendar size={14}/></div>
-                <div className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center text-gray-500"><Globe size={14}/></div>
+          <div className="bg-black/40 border border-white/10 backdrop-blur-sm overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-white/5">
+              <span className="font-bold text-xs tracking-[0.15em]">DATE: RANGE</span>
+              <div className="flex gap-2">
+                <div className="w-7 h-7 flex items-center justify-center text-[#00F0FF]"><Calendar size={16}/></div>
               </div>
             </div>
-            <div className="p-4 flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-700" />
-                <span className="text-gray-400 font-bold">-</span>
-                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-700" />
-              </div>
+            <div className="p-5 flex flex-col gap-5">
               <div className="flex items-center gap-3">
-                <Cloud size={18} className="text-gray-400"/>
-                <input type="range" min="0" max="100" value={maxCC} onChange={e => setMaxCC(parseInt(e.target.value))} className="flex-1" />
-                <span className="text-sm font-bold text-gray-500 w-8">{maxCC}%</span>
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="flex-1 bg-transparent border border-white/20 px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#00F0FF] transition-colors" />
+                <span className="text-white/40 font-bold">-</span>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="flex-1 bg-transparent border border-white/20 px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#00F0FF] transition-colors" />
+              </div>
+              <div className="flex items-center gap-4">
+                <Cloud size={18} className="text-white/40"/>
+                <input type="range" min="0" max="100" value={maxCC} onChange={e => setMaxCC(parseInt(e.target.value))} className="flex-1 accent-[#00F0FF]" />
+                <span className="text-xs font-bold text-white/60 w-8">{maxCC}%</span>
               </div>
               <button 
                 onClick={handleAcquire}
                 disabled={loading}
-                className={`w-full py-2.5 mt-2 rounded flex items-center justify-center gap-2 text-white font-bold text-sm shadow transition-colors ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#a3d166] hover:bg-[#8bc34a] cursor-pointer'}`}
+                className={`w-full py-4 mt-2 border border-white/20 tracking-[0.2em] text-xs font-bold transition-colors uppercase ${loading ? 'bg-white/10 text-white/40 cursor-not-allowed' : 'bg-transparent text-white hover:bg-white hover:text-black cursor-pointer'}`}
               >
-                {loading ? 'ACQUIRING DATA...' : 'Fetch Satellite Imagery'} <span className="text-lg leading-none">↗</span>
+                {loading ? 'ACQUIRING...' : 'FETCH IMAGERY'}
               </button>
             </div>
           </div>
 
           {/* CONFIGURATION ACCORDION */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
-            <div className="flex justify-between items-center p-3 bg-gray-50">
-              <span className="font-bold text-[#003399] text-sm tracking-wide">CONFIGURATION:</span>
+          <div className="bg-black/40 border border-white/10 backdrop-blur-sm overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-white/5">
+              <span className="font-bold text-xs tracking-[0.15em]">CONFIGURATION</span>
             </div>
-            <div className="px-4 pb-4">
-              <select className="w-full border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus:border-[#003399] appearance-none cursor-pointer">
-                <option>Default True Color</option>
-                <option>False Color (Vegetation)</option>
-                <option>NDVI</option>
+            <div className="p-4">
+              <select className="w-full bg-transparent border-b border-white/20 py-2 text-xs font-mono text-white/80 focus:outline-none focus:border-[#00F0FF] appearance-none cursor-pointer">
+                <option className="bg-black">DEFAULT TRUE COLOR</option>
+                <option className="bg-black">FALSE COLOR (VEGETATION)</option>
+                <option className="bg-black">NDVI</option>
               </select>
             </div>
           </div>
 
           {/* DATA COLLECTIONS ACCORDION */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
-            <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-200">
-              <span className="font-bold text-[#003399] text-sm tracking-wide">DATA COLLECTIONS:</span>
-              <div className="w-6 h-6 rounded bg-[#003399] flex items-center justify-center text-white"><Layers size={14}/></div>
+          <div className="bg-black/40 border border-white/10 backdrop-blur-sm overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-white/5">
+              <span className="font-bold text-xs tracking-[0.15em]">DATA COLLECTIONS</span>
+              <div className="text-[#00F0FF]"><Layers size={16}/></div>
             </div>
             
             <div className="flex flex-col">
               {/* Sentinel 2 */}
-              <div className="border-b border-gray-100">
-                <div className="px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50">
-                  <span className="font-bold text-sm text-gray-800">Sentinel-2</span>
-                  <ChevronDown size={16} className="text-gray-500"/>
+              <div className="border-b border-white/10">
+                <div className="px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
+                  <span className="font-bold text-xs tracking-wider">SENTINEL-2</span>
+                  <ChevronDown size={16} className="text-white/40"/>
                 </div>
-                <div className="bg-gray-50 px-4 py-1 flex flex-col gap-1 pb-2">
-                  <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-200 cursor-pointer text-sm text-gray-700">
-                    <span>Sentinel-2 L1C</span>
-                    <Info size={14} className="text-gray-400"/>
+                <div className="bg-black/20 px-5 py-2 flex flex-col gap-2 pb-4">
+                  <div className="flex justify-between items-center py-2 px-3 hover:bg-white/10 transition-colors cursor-pointer text-xs text-white/60">
+                    <span className="tracking-widest">L1C</span>
+                    <Info size={14} className="text-white/30"/>
                   </div>
                   <div 
                     onClick={() => setDataset("s2")}
-                    className={`flex justify-between items-center py-1.5 px-2 rounded cursor-pointer text-sm font-semibold ${dataset === 's2' ? 'bg-gray-200 text-black' : 'hover:bg-gray-200 text-gray-700'}`}
+                    className={`flex justify-between items-center py-2 px-3 transition-colors cursor-pointer text-xs font-bold ${dataset === 's2' ? 'bg-white/10 text-[#00F0FF] border border-white/10' : 'hover:bg-white/10 text-white/80'}`}
                   >
-                    <span>Sentinel-2 L2A</span>
-                    {dataset === 's2' ? <Check size={16} className="text-[#003399]"/> : <Info size={14} className="text-gray-400"/>}
+                    <span className="tracking-widest">L2A</span>
+                    {dataset === 's2' ? <Check size={16} className="text-[#00F0FF]"/> : <Info size={14} className="text-white/30"/>}
                   </div>
                 </div>
               </div>
 
               {/* Sentinel 1 */}
-              <div className="border-b border-gray-100">
-                <div className="px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50" onClick={() => setDataset("s1")}>
-                  <span className={`font-bold text-sm ${dataset === 's1' ? 'text-[#003399]' : 'text-gray-800'}`}>Sentinel-1</span>
-                  {dataset === 's1' ? <Check size={16} className="text-[#003399]"/> : <ChevronDown size={16} className="text-gray-500"/>}
+              <div className="border-b border-white/10">
+                <div className="px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setDataset("s1")}>
+                  <span className={`font-bold text-xs tracking-wider ${dataset === 's1' ? 'text-[#00F0FF]' : 'text-white'}`}>SENTINEL-1</span>
+                  {dataset === 's1' ? <Check size={16} className="text-[#00F0FF]"/> : <ChevronDown size={16} className="text-white/40"/>}
                 </div>
               </div>
 
               {/* Landsat */}
               <div>
-                <div className="px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50" onClick={() => setDataset("l8")}>
-                  <span className={`font-bold text-sm ${dataset === 'l8' ? 'text-[#003399]' : 'text-gray-800'}`}>Landsat 8-9</span>
-                  {dataset === 'l8' ? <Check size={16} className="text-[#003399]"/> : <ChevronDown size={16} className="text-gray-500"/>}
+                <div className="px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setDataset("l8")}>
+                  <span className={`font-bold text-xs tracking-wider ${dataset === 'l8' ? 'text-[#00F0FF]' : 'text-white'}`}>LANDSAT 8-9</span>
+                  {dataset === 'l8' ? <Check size={16} className="text-[#00F0FF]"/> : <ChevronDown size={16} className="text-white/40"/>}
                 </div>
               </div>
 
             </div>
           </div>
 
-        </div>
-
-        {/* Footer Logos */}
-        <div className="bg-[#003399] h-12 shrink-0 flex items-center justify-between px-4 text-white text-xs">
-          <div className="flex gap-4">
-            <span className="font-bold border border-white px-2 rounded-sm text-[10px]">EU</span>
-            <span className="font-bold tracking-tight">Copernicus</span>
-            <span className="font-bold tracking-tight">eesa</span>
-          </div>
-          <div className="flex gap-3 text-[10px] font-semibold underline">
-            <a href="#">About</a>
-            <a href="#">Support</a>
-          </div>
         </div>
 
       </div>
@@ -333,52 +316,52 @@ export default function MapExplorer() {
       {/* MAP AREA */}
       <div className="flex-1 relative z-0">
         
-        {/* Yellow Banner */}
-        <div className="absolute top-0 left-0 w-full flex justify-center mt-4 z-[400] pointer-events-none">
-          <div className="bg-[#ffcc00] text-black font-bold px-6 py-2 shadow-md">
-            Please draw a bounding box using the toolbar on the right
+        {/* Yellow/Cyan Banner */}
+        <div className="absolute top-0 left-0 w-full flex justify-center mt-6 z-[400] pointer-events-none">
+          <div className="bg-black/80 backdrop-blur-md border border-[#00F0FF]/30 text-[#00F0FF] font-bold text-xs tracking-[0.2em] px-8 py-3 uppercase">
+            Define Target Area Using The Toolbar
           </div>
         </div>
 
         <div ref={mapRef} className="absolute inset-0 z-0" />
         
-        {/* RIGHT TOOLBARS OVERLAYS */}
-        <div className="absolute top-4 right-4 z-[400] flex gap-2 pointer-events-none">
+        {/* RIGHT TOOLBARS OVERLAYS (Glassmorphism) */}
+        <div className="absolute top-6 right-6 z-[400] flex gap-3 pointer-events-none">
           
           {/* Search Bar */}
-          <div className="bg-white rounded shadow-sm h-10 w-64 flex items-center px-3 border border-gray-200 pointer-events-auto">
-            <Search size={16} className="text-[#003399] mr-2"/>
-            <input type="text" placeholder="Go to Place" className="flex-1 outline-none text-sm font-semibold text-gray-700"/>
+          <div className="bg-black/60 backdrop-blur-md border border-white/10 h-12 w-72 flex items-center px-4 pointer-events-auto hover:bg-black/80 transition-colors">
+            <Search size={18} className="text-white/50 mr-3"/>
+            <input type="text" placeholder="LOCATE TARGET..." className="flex-1 bg-transparent outline-none text-xs font-bold tracking-[0.15em] text-white placeholder-white/30"/>
           </div>
 
           {/* Toolbar Group 1 */}
           <div className="flex flex-col gap-2 pointer-events-auto">
-            <button className="w-10 h-10 bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#003399] hover:bg-gray-50"><Layers size={20}/></button>
-            <button className="w-10 h-10 bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#003399] hover:bg-gray-50"><Info size={20}/></button>
+            <button className="w-12 h-12 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Layers size={20}/></button>
+            <button className="w-12 h-12 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Info size={20}/></button>
           </div>
           
         </div>
 
-        <div className="absolute top-20 right-4 z-[400] flex flex-col gap-2 pointer-events-auto">
+        <div className="absolute top-24 right-6 z-[400] flex flex-col gap-4 pointer-events-auto mt-2">
           {/* Toolbar Group 2 */}
-          <div className="flex flex-col border border-gray-200 shadow-sm bg-white rounded overflow-hidden">
-            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><Upload size={18}/></button>
-            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><Pencil size={18}/></button>
-            <button className="w-10 h-10 flex items-center justify-center text-[#8bc34a] hover:bg-gray-50"><Ruler size={18}/></button>
+          <div className="flex flex-col border border-white/10 bg-black/60 backdrop-blur-md">
+            <button className="w-12 h-12 border-b border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Upload size={18}/></button>
+            <button className="w-12 h-12 border-b border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Pencil size={18}/></button>
+            <button className="w-12 h-12 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Ruler size={18}/></button>
           </div>
 
-          <div className="flex flex-col border border-gray-200 shadow-sm bg-white rounded overflow-hidden mt-4">
-            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><ImageIcon size={18}/></button>
-            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><Film size={18}/></button>
-            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] font-bold text-sm hover:bg-gray-50">3D</button>
-            <button className="w-10 h-10 flex items-center justify-center text-[#003399] hover:bg-gray-50"><BarChart3 size={18}/></button>
+          <div className="flex flex-col border border-white/10 bg-black/60 backdrop-blur-md">
+            <button className="w-12 h-12 border-b border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><ImageIcon size={18}/></button>
+            <button className="w-12 h-12 border-b border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Film size={18}/></button>
+            <button className="w-12 h-12 border-b border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black font-bold text-xs tracking-wider transition-colors">3D</button>
+            <button className="w-12 h-12 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><BarChart3 size={18}/></button>
           </div>
         </div>
 
         {/* BOTTOM RIGHT OVERLAYS */}
-        <div className="absolute bottom-0 right-0 z-[400] flex flex-col items-end gap-2 p-1 pointer-events-none">
-          <div className="bg-white/80 backdrop-blur text-[10px] font-mono px-2 py-0.5 border border-gray-300 text-gray-700 pointer-events-auto mr-12">
-            Lat: {mousePos.lat.toFixed(2)}, Lng: {mousePos.lng.toFixed(2)}
+        <div className="absolute bottom-6 right-20 z-[400] flex flex-col items-end gap-2 p-1 pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-md text-[10px] tracking-[0.2em] font-mono px-4 py-2 border border-white/10 text-[#00F0FF] pointer-events-auto">
+            LAT: {mousePos.lat.toFixed(4)} / LNG: {mousePos.lng.toFixed(4)}
           </div>
         </div>
       </div>
