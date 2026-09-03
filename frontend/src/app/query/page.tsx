@@ -511,41 +511,44 @@ export default function Home() {
       
       {/* HOLOGRAPHIC GLOBE BACKGROUND (EMPTY STATE) */}
       {messages.length === 0 && (
-        <div className="absolute inset-0 z-0 flex items-center justify-center mix-blend-screen transition-opacity duration-700 opacity-20 hover:opacity-100 group">
-          
-          {/* Glowing Aura behind the globe */}
-          <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
-             <div className="w-[600px] h-[600px] bg-cyan-400/40 rounded-full blur-[120px]" />
-          </div>
+        <div className="absolute inset-0 z-0 flex items-center justify-center mix-blend-screen pointer-events-none">
+          <div className="relative z-[6] group pointer-events-auto w-[600px] h-[600px] rounded-full flex items-center justify-center">
+            
+            {/* Glowing Aura behind the globe */}
+            <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+               <div className="w-full h-full bg-cyan-400/40 rounded-full blur-[120px]" />
+            </div>
 
-          {/* Hardware-accelerated desaturation overlay */}
-          <div className="absolute inset-0 z-10 bg-black mix-blend-color pointer-events-none transition-opacity duration-700 opacity-100 group-hover:opacity-0" />
-          
-          <div className="relative z-[6]">
-            <FramerGlobe />
+            {/* Hardware-accelerated desaturation overlay */}
+            <div className="absolute inset-0 z-10 bg-black mix-blend-color pointer-events-none transition-opacity duration-700 opacity-100 group-hover:opacity-0 rounded-full" />
+            
+            <div className="w-full h-full opacity-20 group-hover:opacity-100 transition-opacity duration-700">
+              <FramerGlobe />
+            </div>
+            
           </div>
         </div>
       )}
 
       {/* FIXED TOP NAV OVERLAY */}
       <nav className="w-full flex justify-between items-center px-8 py-6 z-50">
-        <a href="/" className="display-lg tracking-widest text-white hover:opacity-70 transition-opacity">
+        <a href="/" className="display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto">
           SATQUERY AI.
         </a>
         <div className="flex gap-4 items-center">
-          <a href="/" className="micro-cap text-white hover:opacity-70 transition-opacity border border-white/20 px-4 py-2 rounded-full flex items-center gap-2">
+          <a href="/" className="micro-cap text-white hover:opacity-70 transition-opacity border border-white/20 px-4 py-2 rounded-full flex items-center gap-2 pointer-events-auto">
             <span>&larr;</span> BACK TO DASHBOARD
           </a>
         </div>
       </nav>
 
       {/* MAIN APPLICATION CONTAINER */}
-      <div className={`flex-1 flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-8 gap-8 z-10 pb-8 min-h-0 transition-all duration-500 ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
+      <div className={`flex-1 flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-8 gap-8 z-10 pb-8 min-h-0 transition-all duration-500 pointer-events-none ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
         
         {/* LEFT/MAIN: CHAT & INPUT */}
         <div className="flex-1 flex flex-col justify-end relative min-h-0">
           
-          <div className="overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10">
+          <div className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-center justify-center pointer-events-none h-full mt-32">
               </div>
@@ -556,7 +559,7 @@ export default function Home() {
                 <div className="micro-cap text-white/50 mb-1">
                   {msg.role === 'user' ? 'COMMAND' : 'SYSTEM'}
                 </div>
-                <div className={`text-sm max-w-[85%] p-4 rounded-xl border shadow-lg ${
+                <div className={`text-sm max-w-[85%] p-4 rounded-xl border shadow-lg pointer-events-auto ${
                   msg.role === 'user' 
                     ? 'bg-white/5 text-white border-white/40 font-mono text-xs whitespace-pre-wrap' 
                     : 'bg-black/90 text-white border-[#3a3a3f]'
@@ -580,7 +583,7 @@ export default function Home() {
             <div ref={chatEndRef} />
           </div>
 
-          <div className="w-full relative z-50">
+          <div className="w-full relative z-50 pointer-events-auto">
             {error && (
               <div className="micro-cap text-[#ff3000] mb-3 uppercase">
                 ERROR: {error}
