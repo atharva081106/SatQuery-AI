@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { 
+  Search, Layers, Info, Upload, Edit2, Pencil, Ruler, Download, 
+  Image as ImageIcon, Film, Box, BarChart3, ChevronLeft, Calendar, 
+  Globe, Cloud, ChevronDown, Check, LayoutPanelTop, FileDown
+} from "lucide-react";
 
 // We must dynamically import leaflet to avoid SSR issues with window
 export default function MapExplorer() {
@@ -21,9 +26,12 @@ export default function MapExplorer() {
   
   const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
-  const [maxCC, setMaxCC] = useState(20);
+  const [maxCC, setMaxCC] = useState(30);
   const [bbox, setBbox] = useState<number[] | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  const [activeTab, setActiveTab] = useState("VISUALISE");
+  const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
 
   useEffect(() => {
     // Dynamic import of Leaflet
@@ -38,28 +46,31 @@ export default function MapExplorer() {
   useEffect(() => {
     if (!L || !mapRef.current) return;
     
-    // Check if map is already initialized
     const container = mapRef.current;
     if (container._leaflet_id) {
       return;
     }
 
-    // Initialize Map
+    // Initialize Map on Europe
     const map = L.map(container, {
-      center: [20, 0], // Default global view
-      zoom: 3,
+      center: [50.16, 20.78],
+      zoom: 5,
       zoomControl: false,
     });
 
-    // Dark Matter Base Map (CartoDB) - Perfect for dark space-theme
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20
+    // High Res Satellite Imagery (Esri World Imagery)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      maxZoom: 18
     }).addTo(map);
 
     // Add Zoom Control to bottom right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Track mouse position for the bottom right coordinate display
+    map.on('mousemove', (e: any) => {
+      setMousePos({ lat: e.latlng.lat, lng: e.latlng.lng });
+    });
 
     // Initialize FeatureGroup to store editable layers
     const drawnItems = new L.FeatureGroup();
@@ -79,9 +90,9 @@ export default function MapExplorer() {
         circlemarker: false,
         rectangle: {
           shapeOptions: {
-            color: '#00f0ff', // Cyan highlight for the drawn box
+            color: '#8bc34a', // Light green Copernicus style highlight
             weight: 2,
-            fillOpacity: 0.1
+            fillOpacity: 0.2
           }
         }
       }
@@ -93,13 +104,11 @@ export default function MapExplorer() {
       const type = e.layerType;
       const layer = e.layer;
       
-      // Clear previous boxes so we only have one AOI
       drawnItems.clearLayers();
       drawnItems.addLayer(layer);
       
       if (type === 'rectangle') {
         const layerBounds = layer.getBounds();
-        // Format: [min_lon, min_lat, max_lon, max_lat]
         setBbox([
           layerBounds.getWest(),
           layerBounds.getSouth(),
@@ -144,14 +153,12 @@ export default function MapExplorer() {
       
       const blob = await res.blob();
       
-      // Convert blob to base64 to store in sessionStorage (since it's a cross-page transition)
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result as string;
         sessionStorage.setItem("satquery_acquired_image", base64data);
         sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
         
-        // Navigate to query page
         router.push("/query");
       };
       reader.readAsDataURL(blob);
@@ -163,79 +170,217 @@ export default function MapExplorer() {
   };
 
   return (
-    <div className="w-full h-full relative bg-black">
-      <div ref={mapRef} className="absolute inset-0 z-0" />
+    <div className="w-full h-full relative bg-gray-100 flex font-sans overflow-hidden">
       
-      {/* SpaceX Style Overlay Control Panel */}
-      <div className="absolute top-24 left-8 z-10 w-80 pointer-events-none">
-        <div className="bg-black/90 border border-[#3a3a3f] p-6 backdrop-blur-md pointer-events-auto shadow-2xl">
-          <div className="micro-cap text-[#00f0ff] mb-6 tracking-[2px]">ACQUISITION PARAMETERS</div>
+      {/* LEFT SIDEBAR (Copernicus Style) */}
+      <div className="w-[380px] h-full bg-[#f8f9fa] flex flex-col z-50 shadow-2xl shrink-0">
+        
+        {/* Blue Header Area */}
+        <div className="bg-[#003399] text-white flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-blue-800">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xl tracking-tight">Copernicus</span>
+              <span className="text-sm font-light text-blue-200 mt-1">BROWSER</span>
+            </div>
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <div className="flex items-center gap-1 cursor-pointer">EN <ChevronDown size={14}/></div>
+              <div className="flex items-center gap-1 cursor-pointer">User Account <ChevronDown size={14}/></div>
+              <div className="bg-blue-800 p-1 rounded cursor-pointer" onClick={() => router.push('/')} title="Back to Dashboard">
+                <ChevronLeft size={16}/>
+              </div>
+            </div>
+          </div>
           
-          <div className="space-y-6">
-            <div>
-              <label className="micro-cap block text-white/50 mb-2">TARGET DATASET</label>
-              <select 
-                value={dataset}
-                onChange={(e) => setDataset(e.target.value)}
-                className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-sm focus:outline-none focus:border-white uppercase font-mono"
-              >
-                <option value="s2">Sentinel-2 (Optical)</option>
-                <option value="s1">Sentinel-1 (Radar)</option>
-                <option value="l8">Landsat 8</option>
-              </select>
-            </div>
-            
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="micro-cap block text-white/50 mb-2">START DATE</label>
-                <input 
-                  type="date" 
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-xs focus:outline-none focus:border-white uppercase font-mono" 
-                />
-              </div>
-              <div className="flex-1">
-                <label className="micro-cap block text-white/50 mb-2">END DATE</label>
-                <input 
-                  type="date" 
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full bg-transparent border border-[#3a3a3f] text-white p-2 text-xs focus:outline-none focus:border-white uppercase font-mono" 
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="micro-cap flex justify-between text-white/50 mb-2">
-                <span>MAX CLOUD COVER</span>
-                <span>{maxCC}%</span>
-              </label>
-              <input 
-                type="range" 
-                min="0" 
-                max="100" 
-                value={maxCC}
-                onChange={(e) => setMaxCC(parseInt(e.target.value))}
-                className="w-full accent-white" 
-              />
-            </div>
-
+          {/* Tabs */}
+          <div className="flex w-full">
             <button 
-              onClick={handleAcquire}
-              disabled={loading}
-              className={`w-full mt-4 py-3 border border-white text-white transition-colors uppercase tracking-[2px] text-xs font-semibold ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black cursor-pointer'}`}
+              onClick={() => setActiveTab("VISUALISE")}
+              className={`flex-1 py-3 text-sm font-bold tracking-wider ${activeTab === 'VISUALISE' ? 'bg-[#002266] text-[#8bc34a] border-b-2 border-[#8bc34a]' : 'text-white hover:bg-blue-800'}`}
             >
-              {loading ? 'ACQUIRING...' : 'ACQUIRE DATA'}
+              VISUALISE
+            </button>
+            <button 
+              onClick={() => setActiveTab("SEARCH")}
+              className={`flex-1 py-3 text-sm font-bold tracking-wider ${activeTab === 'SEARCH' ? 'bg-[#002266] text-[#8bc34a] border-b-2 border-[#8bc34a]' : 'text-white hover:bg-blue-800'}`}
+            >
+              SEARCH
             </button>
           </div>
         </div>
+
+        {/* Dashboard / Workspace Links */}
+        <div className="flex bg-white border-b border-gray-200 text-xs font-semibold text-blue-700">
+          <div className="flex-1 py-2 text-center border-r border-gray-200 hover:bg-blue-50 cursor-pointer flex justify-center items-center gap-2">
+            <LayoutPanelTop size={14}/> DASHBOARD
+          </div>
+          <div className="flex-1 py-2 text-center hover:bg-blue-50 cursor-pointer flex justify-center items-center gap-2">
+            <FileDown size={14}/> WORKSPACE
+          </div>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-4">
+          
+          {/* DATE ACCORDION */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
+            <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-200">
+              <span className="font-bold text-[#003399] text-sm tracking-wide">DATE: RANGE</span>
+              <div className="flex gap-1">
+                <div className="w-6 h-6 rounded bg-[#003399] flex items-center justify-center text-white"><Calendar size={14}/></div>
+                <div className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center text-gray-500"><Globe size={14}/></div>
+              </div>
+            </div>
+            <div className="p-4 flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-700" />
+                <span className="text-gray-400 font-bold">-</span>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-700" />
+              </div>
+              <div className="flex items-center gap-3">
+                <Cloud size={18} className="text-gray-400"/>
+                <input type="range" min="0" max="100" value={maxCC} onChange={e => setMaxCC(parseInt(e.target.value))} className="flex-1" />
+                <span className="text-sm font-bold text-gray-500 w-8">{maxCC}%</span>
+              </div>
+              <button 
+                onClick={handleAcquire}
+                disabled={loading}
+                className={`w-full py-2.5 mt-2 rounded flex items-center justify-center gap-2 text-white font-bold text-sm shadow transition-colors ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#a3d166] hover:bg-[#8bc34a] cursor-pointer'}`}
+              >
+                {loading ? 'ACQUIRING DATA...' : 'Fetch Satellite Imagery'} <span className="text-lg leading-none">↗</span>
+              </button>
+            </div>
+          </div>
+
+          {/* CONFIGURATION ACCORDION */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
+            <div className="flex justify-between items-center p-3 bg-gray-50">
+              <span className="font-bold text-[#003399] text-sm tracking-wide">CONFIGURATION:</span>
+            </div>
+            <div className="px-4 pb-4">
+              <select className="w-full border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus:border-[#003399] appearance-none cursor-pointer">
+                <option>Default True Color</option>
+                <option>False Color (Vegetation)</option>
+                <option>NDVI</option>
+              </select>
+            </div>
+          </div>
+
+          {/* DATA COLLECTIONS ACCORDION */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
+            <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-200">
+              <span className="font-bold text-[#003399] text-sm tracking-wide">DATA COLLECTIONS:</span>
+              <div className="w-6 h-6 rounded bg-[#003399] flex items-center justify-center text-white"><Layers size={14}/></div>
+            </div>
+            
+            <div className="flex flex-col">
+              {/* Sentinel 2 */}
+              <div className="border-b border-gray-100">
+                <div className="px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50">
+                  <span className="font-bold text-sm text-gray-800">Sentinel-2</span>
+                  <ChevronDown size={16} className="text-gray-500"/>
+                </div>
+                <div className="bg-gray-50 px-4 py-1 flex flex-col gap-1 pb-2">
+                  <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-200 cursor-pointer text-sm text-gray-700">
+                    <span>Sentinel-2 L1C</span>
+                    <Info size={14} className="text-gray-400"/>
+                  </div>
+                  <div 
+                    onClick={() => setDataset("s2")}
+                    className={`flex justify-between items-center py-1.5 px-2 rounded cursor-pointer text-sm font-semibold ${dataset === 's2' ? 'bg-gray-200 text-black' : 'hover:bg-gray-200 text-gray-700'}`}
+                  >
+                    <span>Sentinel-2 L2A</span>
+                    {dataset === 's2' ? <Check size={16} className="text-[#003399]"/> : <Info size={14} className="text-gray-400"/>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sentinel 1 */}
+              <div className="border-b border-gray-100">
+                <div className="px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50" onClick={() => setDataset("s1")}>
+                  <span className={`font-bold text-sm ${dataset === 's1' ? 'text-[#003399]' : 'text-gray-800'}`}>Sentinel-1</span>
+                  {dataset === 's1' ? <Check size={16} className="text-[#003399]"/> : <ChevronDown size={16} className="text-gray-500"/>}
+                </div>
+              </div>
+
+              {/* Landsat */}
+              <div>
+                <div className="px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50" onClick={() => setDataset("l8")}>
+                  <span className={`font-bold text-sm ${dataset === 'l8' ? 'text-[#003399]' : 'text-gray-800'}`}>Landsat 8-9</span>
+                  {dataset === 'l8' ? <Check size={16} className="text-[#003399]"/> : <ChevronDown size={16} className="text-gray-500"/>}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* Footer Logos */}
+        <div className="bg-[#003399] h-12 shrink-0 flex items-center justify-between px-4 text-white text-xs">
+          <div className="flex gap-4">
+            <span className="font-bold border border-white px-2 rounded-sm text-[10px]">EU</span>
+            <span className="font-bold tracking-tight">Copernicus</span>
+            <span className="font-bold tracking-tight">eesa</span>
+          </div>
+          <div className="flex gap-3 text-[10px] font-semibold underline">
+            <a href="#">About</a>
+            <a href="#">Support</a>
+          </div>
+        </div>
+
       </div>
-      
-      {/* Target Crosshair */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 opacity-20">
-        <div className="w-8 h-[1px] bg-white absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2" />
-        <div className="h-8 w-[1px] bg-white absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2" />
+
+      {/* MAP AREA */}
+      <div className="flex-1 relative z-0">
+        
+        {/* Yellow Banner */}
+        <div className="absolute top-0 left-0 w-full flex justify-center mt-4 z-[400] pointer-events-none">
+          <div className="bg-[#ffcc00] text-black font-bold px-6 py-2 shadow-md">
+            Please draw a bounding box using the toolbar on the right
+          </div>
+        </div>
+
+        <div ref={mapRef} className="absolute inset-0 z-0" />
+        
+        {/* RIGHT TOOLBARS OVERLAYS */}
+        <div className="absolute top-4 right-4 z-[400] flex gap-2 pointer-events-none">
+          
+          {/* Search Bar */}
+          <div className="bg-white rounded shadow-sm h-10 w-64 flex items-center px-3 border border-gray-200 pointer-events-auto">
+            <Search size={16} className="text-[#003399] mr-2"/>
+            <input type="text" placeholder="Go to Place" className="flex-1 outline-none text-sm font-semibold text-gray-700"/>
+          </div>
+
+          {/* Toolbar Group 1 */}
+          <div className="flex flex-col gap-2 pointer-events-auto">
+            <button className="w-10 h-10 bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#003399] hover:bg-gray-50"><Layers size={20}/></button>
+            <button className="w-10 h-10 bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[#003399] hover:bg-gray-50"><Info size={20}/></button>
+          </div>
+          
+        </div>
+
+        <div className="absolute top-20 right-4 z-[400] flex flex-col gap-2 pointer-events-auto">
+          {/* Toolbar Group 2 */}
+          <div className="flex flex-col border border-gray-200 shadow-sm bg-white rounded overflow-hidden">
+            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><Upload size={18}/></button>
+            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><Pencil size={18}/></button>
+            <button className="w-10 h-10 flex items-center justify-center text-[#8bc34a] hover:bg-gray-50"><Ruler size={18}/></button>
+          </div>
+
+          <div className="flex flex-col border border-gray-200 shadow-sm bg-white rounded overflow-hidden mt-4">
+            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><ImageIcon size={18}/></button>
+            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] hover:bg-gray-50"><Film size={18}/></button>
+            <button className="w-10 h-10 border-b border-gray-100 flex items-center justify-center text-[#003399] font-bold text-sm hover:bg-gray-50">3D</button>
+            <button className="w-10 h-10 flex items-center justify-center text-[#003399] hover:bg-gray-50"><BarChart3 size={18}/></button>
+          </div>
+        </div>
+
+        {/* BOTTOM RIGHT OVERLAYS */}
+        <div className="absolute bottom-0 right-0 z-[400] flex flex-col items-end gap-2 p-1 pointer-events-none">
+          <div className="bg-white/80 backdrop-blur text-[10px] font-mono px-2 py-0.5 border border-gray-300 text-gray-700 pointer-events-auto mr-12">
+            Lat: {mousePos.lat.toFixed(2)}, Lng: {mousePos.lng.toFixed(2)}
+          </div>
+        </div>
       </div>
     </div>
   );
