@@ -140,12 +140,12 @@ async def acquire_imagery(request: AcquireRequest):
         sh_request = SentinelHubRequest(
             evalscript=evalscript,
             input_data=[
-                {
-                    "dataCollection": collection,
-                    "timeRange": (request.start_date, request.end_date),
-                    "mosaickingOrder": "mostRecent",
-                    "maxCloudCoverage": request.maxcc
-                }
+                SentinelHubRequest.input_data(
+                    data_collection=collection,
+                    time_interval=(request.start_date, request.end_date),
+                    mosaicking_order="mostRecent",
+                    maxcc=float(request.maxcc) / 100.0
+                )
             ],
             responses=[
                 SentinelHubRequest.output_response("default", MimeType.PNG)
