@@ -175,6 +175,62 @@ export default function Dashboard() {
 
       </div>
 
+      {/* ANALYTICAL INSIGHTS SECTION */}
+      <div className="w-full max-w-[1500px] mx-auto px-8 pb-8 pt-8 relative z-10 border-t border-[#2a2a2f] mt-8">
+        <FadeInScroll delay={100}>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+            <div>
+              <div className="micro-cap text-white/50 mb-1">02. RESEARCH METRICS</div>
+              <h2 className="display-lg">ANALYTICAL INSIGHTS</h2>
+            </div>
+            <div className="micro-cap text-purple-400 bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-full">
+              • ACADEMIC SOTA BASELINES
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* VQA Insight */}
+            <div className="bg-[#0a0a0a] border border-[#2a2a2f] rounded-lg p-6 hover:border-purple-500/50 transition-colors">
+              <h3 className="text-white font-mono text-sm mb-3 flex items-center gap-2">
+                <span className="text-purple-400">🎯</span> Single-Image VQA
+              </h3>
+              <p className="text-white/70 text-xs leading-relaxed mb-4">
+                <strong>The Benchmark:</strong> Evaluates ability to count objects, identify presence, and compare rural/urban classes (RSVQA & VRSBench).
+              </p>
+              <p className="text-white/70 text-xs leading-relaxed">
+                <strong>SOTA Baseline:</strong> Recent domain-adapted models achieve an <strong className="text-white">Overall Accuracy (OA) of 82% to 86%</strong> on high-resolution sets. By routing directly to fine-tuned RS foundation models, we target this baseline while eliminating the "spatial hallucination" noise common in generic LLMs.
+              </p>
+            </div>
+
+            {/* CDVQA Insight */}
+            <div className="bg-[#0a0a0a] border border-[#2a2a2f] rounded-lg p-6 hover:border-emerald-500/50 transition-colors">
+              <h3 className="text-white font-mono text-sm mb-3 flex items-center gap-2">
+                <span className="text-emerald-400">🗺️</span> Multi-Temporal Change (CDVQA)
+              </h3>
+              <p className="text-white/70 text-xs leading-relaxed mb-4">
+                <strong>The Benchmark:</strong> Evaluates ability to identify structural changes between two time-stamped images.
+              </p>
+              <p className="text-white/70 text-xs leading-relaxed">
+                <strong>Evaluation Edge:</strong> Change Detection is measured using both <strong>Average Accuracy (AA)</strong> for text, and <strong>Spatial Grounding Metrics (Mask IoU)</strong>. SatQuery AI doesn't just output text; it physically draws structural difference contours to verify the AI looked at the correct pixels.
+              </p>
+            </div>
+
+            {/* Latency Insight */}
+            <div className="bg-[#0a0a0a] border border-[#2a2a2f] rounded-lg p-6 hover:border-blue-500/50 transition-colors">
+              <h3 className="text-white font-mono text-sm mb-3 flex items-center gap-2">
+                <span className="text-blue-400">⚡</span> Execution Latency
+              </h3>
+              <p className="text-white/70 text-xs leading-relaxed mb-4">
+                <strong>Standard VLM:</strong> Sending two 1024x1024 satellite images to a heavy generic VLM (like GPT-4V) takes <strong className="text-red-400">15+ seconds</strong> with massive compute costs.
+              </p>
+              <p className="text-white/70 text-xs leading-relaxed">
+                <strong>Agentic Advantage:</strong> By intercepting queries with a lightweight local controller and running specialized heuristics (e.g., OpenCV structural differencing), our targeted response time drops to <strong className="text-blue-400">&lt; 3 seconds</strong> on standard hardware.
+              </p>
+            </div>
+          </div>
+        </FadeInScroll>
+      </div>
+
       {/* EVALUATION / JUDGING CRITERIA SECTION */}
       <div className="w-full max-w-[1500px] mx-auto px-8 pb-16 pt-8 relative z-10 border-t border-[#2a2a2f] mt-8">
         <FadeInScroll delay={200}>

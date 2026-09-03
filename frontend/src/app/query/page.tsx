@@ -310,13 +310,27 @@ export default function Home() {
     }
   };
 
-  const latestAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant' && m.result);
+    const latestAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant' && m.result);
   const latestResult = latestAssistantMessage?.result;
 
   const handleDownloadReport = () => {
-    if (!latestResult) return;
-    const summary = latestResult.execution_summary || {};
-    
+    // Collect all queries and their corresponding results
+    const allResults = messages.reduce<{query: string, result: any}[]>((acc, msg, idx, arr) => {
+      if (msg.role === 'assistant' && msg.result) {
+        let queryStr = "N/A";
+        for (let i = idx - 1; i >= 0; i--) {
+          if (arr[i].role === 'user') {
+            queryStr = arr[i].content;
+            break;
+          }
+        }
+        acc.push({ query: queryStr, result: msg.result });
+      }
+      return acc;
+    }, []);
+
+    if (allResults.length === 0) return;
+
     try {
       const doc = new jsPDF({
         orientation: "portrait",
@@ -339,117 +353,137 @@ export default function Home() {
       doc.setTextColor(170, 170, 185);
       doc.text("OPERATIONAL MISSION AUDIT | ISRO/SAC & BENCHMARK SUITE", 14, 22);
       doc.text(`TIMESTAMP: ${new Date().toISOString()}`, 14, 28);
-
+      
       let y = 46;
 
-      // 1. Mission Overview Table/Box
-      doc.setFillColor(246, 246, 249);
-      doc.roundedRect(14, y, 182, 36, 2, 2, "F");
-      doc.setDrawColor(215, 215, 222);
-      doc.roundedRect(14, y, 182, 36, 2, 2, "D");
+      allResults.forEach((item, index) => {
+        const { query, result } = item;
+        const summary = result.execution_summary || {};
 
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      doc.setTextColor(20, 20, 25);
-      doc.text("1. MISSION OVERVIEW & TASK ROUTING", 18, y + 7);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
-      doc.setTextColor(60, 60, 70);
-      doc.text(`Selected Task: ${summary.selected_task || "N/A"}`, 18, y + 14);
-      doc.text(`Specialist Tool: ${summary.tool_used || "N/A"}`, 18, y + 20);
-      doc.text(`Model Provenance: ${summary.model_provenance || "SatQuery-RS-Adapted-v1.2 (Fine-tuned)"}`, 18, y + 26);
-      doc.text(`Input Configuration: ${summary.input_scope || "Standard Input"}`, 18, y + 32);
-
-      y += 44;
-
-      // 2. Input Compatibility & Coherence Box
-      const isFailed = latestResult.compatibility_status === "FAILED";
-      if (isFailed) {
-        doc.setFillColor(254, 242, 242);
-        doc.setDrawColor(248, 113, 113);
-      } else {
-        doc.setFillColor(240, 253, 244);
-        doc.setDrawColor(74, 222, 128);
-      }
-      doc.roundedRect(14, y, 182, 28, 2, 2, "F");
-      doc.roundedRect(14, y, 182, 28, 2, 2, "D");
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      if (isFailed) {
-        doc.setTextColor(185, 28, 28);
-        doc.text("2. INPUT COMPATIBILITY: REJECTED (SPATIAL DISPARITY DETECTED)", 18, y + 7);
-      } else {
-        doc.setTextColor(21, 128, 61);
-        doc.text("2. INPUT COMPATIBILITY: VERIFIED (SPATIAL CO-REGISTRATION CONFIRMED)", 18, y + 7);
-      }
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
-      doc.setTextColor(50, 50, 60);
-      const coherence = ((latestResult.spatial_coherence_score ?? 1.0) * 100).toFixed(1);
-      const confidence = ((latestResult.confidence ?? 0.9) * 100).toFixed(1);
-      doc.text(`Spatial Coherence: ${coherence}% | Confidence Score: ${confidence}%`, 18, y + 14);
-      doc.text(
-        isFailed 
-          ? "Warning: Images belong to non-overlapping geographic regions. Change analysis halted to prevent hallucinated changes." 
-          : "Integrity: High keypoint spatial correlation and coordinate alignment verified across inputs.",
-        18, 
-        y + 21
-      );
-
-      y += 36;
-
-      // 3. Agentic Reasoning Trace
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      doc.setTextColor(20, 20, 25);
-      doc.text("3. AGENTIC CONTROLLER REASONING TRACE", 14, y);
-      y += 5;
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(70, 70, 80);
-      const reasoningLines = doc.splitTextToSize(summary.agent_reasoning || "Standard routing execution.", 182);
-      doc.text(reasoningLines, 14, y);
-      y += (reasoningLines.length * 4) + 6;
-
-      // 4. Analysis Synthesis & Response
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      doc.setTextColor(20, 20, 25);
-      doc.text("4. SYSTEM SYNTHESIS & INFERENCE", 14, y);
-      y += 5;
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(40, 40, 50);
-      const answerClean = (latestResult.answer || "N/A").replace(/\*\*/g, "").replace(/\n\n/g, "\n");
-      const answerLines = doc.splitTextToSize(answerClean, 182);
-      doc.text(answerLines, 14, y);
-      y += (answerLines.length * 4) + 8;
-
-      // 5. Visual Evidence (if available and base64)
-      const evidence = latestResult.visual_evidence?.[0];
-      if (evidence && evidence.image_base64 && evidence.image_base64.startsWith("data:image")) {
-        try {
-          if (y > 210) {
-            doc.addPage();
-            y = 20;
-          }
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(9.5);
-          doc.setTextColor(20, 20, 25);
-          doc.text(`5. VISUAL EVIDENCE: ${evidence.description || "Analytical Canvas"}`, 14, y);
-          y += 4;
-          
-          doc.addImage(evidence.image_base64, "PNG", 14, y, 115, 65);
-          y += 70;
-        } catch (imgErr) {
-          console.error("Could not embed evidence image into PDF:", imgErr);
+        if (index > 0) {
+          doc.addPage();
+          y = 20;
         }
-      }
+
+        // Query Header
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(20, 20, 25);
+        doc.text(`QUERY ${index + 1}: ${query}`, 14, y);
+        y += 10;
+
+        // 1. Mission Overview Table/Box
+        doc.setFillColor(246, 246, 249);
+        doc.roundedRect(14, y, 182, 36, 2, 2, "F");
+        doc.setDrawColor(215, 215, 222);
+        doc.roundedRect(14, y, 182, 36, 2, 2, "D");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(20, 20, 25);
+        doc.text("1. MISSION OVERVIEW & TASK ROUTING", 18, y + 7);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.setTextColor(60, 60, 70);
+        doc.text(`Selected Task: ${summary.selected_task || "N/A"}`, 18, y + 14);
+        doc.text(`Specialist Tool: ${summary.tool_used || "N/A"}`, 18, y + 20);
+        doc.text(`Model Provenance: ${summary.model_provenance || "SatQuery-RS-Adapted-v1.2 (Fine-tuned)"}`, 18, y + 26);
+        doc.text(`Input Configuration: ${summary.input_scope || "Standard Input"}`, 18, y + 32);
+
+        y += 44;
+
+        // 2. Input Compatibility & Coherence Box
+        const isFailed = result.compatibility_status === "FAILED";
+        if (isFailed) {
+          doc.setFillColor(254, 242, 242);
+          doc.setDrawColor(248, 113, 113);
+        } else {
+          doc.setFillColor(240, 253, 244);
+          doc.setDrawColor(74, 222, 128);
+        }
+        doc.roundedRect(14, y, 182, 28, 2, 2, "F");
+        doc.roundedRect(14, y, 182, 28, 2, 2, "D");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        if (isFailed) {
+          doc.setTextColor(185, 28, 28);
+          doc.text("2. INPUT COMPATIBILITY: REJECTED (SPATIAL DISPARITY DETECTED)", 18, y + 7);
+        } else {
+          doc.setTextColor(21, 128, 61);
+          doc.text("2. INPUT COMPATIBILITY: VERIFIED (SPATIAL CO-REGISTRATION CONFIRMED)", 18, y + 7);
+        }
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.setTextColor(50, 50, 60);
+        const coherence = ((result.spatial_coherence_score ?? 1.0) * 100).toFixed(1);
+        const confidence = ((result.confidence ?? 0.9) * 100).toFixed(1);
+        doc.text(`Spatial Coherence: ${coherence}% | Confidence Score: ${confidence}%`, 18, y + 14);
+        doc.text(
+          isFailed 
+            ? "Warning: Images belong to non-overlapping geographic regions. Change analysis halted to prevent hallucinated changes." 
+            : "Integrity: High keypoint spatial correlation and coordinate alignment verified across inputs.",
+          18, 
+          y + 21
+        );
+
+        y += 36;
+
+        // 3. Agentic Reasoning Trace
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(20, 20, 25);
+        doc.text("3. AGENTIC CONTROLLER REASONING TRACE", 14, y);
+        y += 5;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(70, 70, 80);
+        const reasoningLines = doc.splitTextToSize(summary.agent_reasoning || "Standard routing execution.", 182);
+        doc.text(reasoningLines, 14, y);
+        y += (reasoningLines.length * 4) + 6;
+
+        // 4. Analysis Synthesis & Response
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(20, 20, 25);
+        doc.text("4. SYSTEM SYNTHESIS & INFERENCE", 14, y);
+        y += 5;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(40, 40, 50);
+        const answerClean = (result.answer || "N/A").replace(/\*\*/g, "").replace(/
+
+/g, "
+");
+        const answerLines = doc.splitTextToSize(answerClean, 182);
+        doc.text(answerLines, 14, y);
+        y += (answerLines.length * 4) + 8;
+
+        // 5. Visual Evidence (if available and base64)
+        const evidence = result.visual_evidence?.[0];
+        if (evidence && evidence.image_base64 && evidence.image_base64.startsWith("data:image")) {
+          try {
+            if (y > 210) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9.5);
+            doc.setTextColor(20, 20, 25);
+            doc.text(`5. VISUAL EVIDENCE: ${evidence.description || "Analytical Canvas"}`, 14, y);
+            y += 4;
+            
+            doc.addImage(evidence.image_base64, "PNG", 14, y, 115, 65);
+            y += 70;
+          } catch (imgErr) {
+            console.error("Could not embed evidence image into PDF:", imgErr);
+          }
+        }
+      });
 
       // Page Footers
       const pageCount = doc.getNumberOfPages();
@@ -466,7 +500,7 @@ export default function Home() {
     } catch (err) {
       console.error("Failed to generate PDF:", err);
       // Fallback to text file if browser canvas fails
-      const blob = new Blob([JSON.stringify(latestResult, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(allResults, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -538,7 +572,7 @@ export default function Home() {
             <div ref={chatEndRef} />
           </div>
 
-          <div className="w-full">
+          <div className="w-full relative z-50">
             {error && (
               <div className="micro-cap text-[#ff3000] mb-3 uppercase">
                 ERROR: {error}
