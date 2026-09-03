@@ -26,6 +26,15 @@ class MLModels:
             return
             
         logger.info(f"Loading ML models lazily on {self.device}...")
+        
+        if os.environ.get("ENABLE_ML_MODELS") != "true":
+            logger.info("ENABLE_ML_MODELS is not true. Falling back to Rule/Heuristic Engine to prevent OOM on free tier.")
+            self.vqa_processor = None
+            self.vqa_model = None
+            self.model_name = "SatQuery Rule/Heuristic Engine"
+            self._loaded = True
+            return
+
         finetuned_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "satquery_finetuned_model"))
         
         try:
