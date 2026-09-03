@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import CookieConsent from "@/components/CookieConsent";
-import CometCursor from "@/components/CometCursor";
+import CursorDotTrail from "@/components/CursorDotTrail";
 
 export const metadata: Metadata = {
   title: "SatQuery AI",
@@ -18,12 +18,9 @@ export default function RootLayout({
       <body>
         {children}
         <CookieConsent />
-        <CometCursor 
-          variant="nebula" 
-          trailColor="#00f0ff" 
-          coreColor="#ffffff" 
-          hideCursor={true}
-          layer={99999}
+        <CursorDotTrail
+          color="#00f0ff"
+          colorInverted="#000000"
         />
       </body>
     </html>
