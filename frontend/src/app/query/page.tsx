@@ -777,7 +777,7 @@ export default function Home() {
 
         {/* RIGHT/TRACE: ONLY SHOWN ON RESULT */}
         {latestResult && (
-            <div className="w-full lg:w-1/3 bg-black/60 backdrop-blur-md border border-[#3a3a3f] rounded-lg p-6 flex flex-col h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up">
+            <div className="w-full lg:w-1/3 bg-black/60 backdrop-blur-md border border-[#3a3a3f] rounded-lg p-6 flex flex-col h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto">
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#2a2a2f]">
                 <h3 className="display-lg flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
@@ -785,7 +785,7 @@ export default function Home() {
                 </h3>
                 <button
                   onClick={handleDownloadReport}
-                  className="micro-cap px-3 py-1.5 rounded-full border border-white/30 text-white hover:bg-white hover:text-black transition-all flex items-center gap-1 text-[10px] cursor-pointer"
+                  className="micro-cap px-3 py-1.5 rounded-full border border-white/30 text-white hover:bg-white hover:text-black transition-all flex items-center gap-1 text-[10px] cursor-pointer pointer-events-auto"
                   title="Export Official Mission PDF Audit Report"
                 >
                   <span>&darr;</span> AUDIT PDF
