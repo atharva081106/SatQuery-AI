@@ -254,7 +254,7 @@ function GalleryItem({
         left: 0,
         willChange: "transform",
       }}
-      className="group relative cursor-pointer border border-white/20"
+      className="group relative cursor-pointer"
       onClick={() => window.open(image.src, "_blank")}
     >
       <img

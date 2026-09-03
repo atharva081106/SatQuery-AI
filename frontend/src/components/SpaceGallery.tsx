@@ -49,7 +49,7 @@ export default function SpaceGallery() {
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full pt-16">
-        <div className="w-full h-[40vh] max-h-[400px]">
+        <div className="w-full h-[55vh] max-h-[550px]">
           <MotionGallery 
             images={planetaryImages} 
             itemWidth={100} 
