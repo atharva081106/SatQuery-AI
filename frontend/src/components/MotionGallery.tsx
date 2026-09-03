@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { motion, useMotionValue, useSpring, useInView, animate, useTransform } from "framer-motion";
 
 const SNAP_TIMEOUT_MS = 150;
-const ITEM_ASPECT_RATIO = 16 / 9;
+const ITEM_ASPECT_RATIO = 1; // 1:1 Square aspect ratio prevents tall planets from being vertically cropped
 const ITEM_HEIGHT_PERCENT = 0.8; // Make slightly shorter so it fits nicely
 const ITEM_WIDTH_PERCENT = 0.8;
 
