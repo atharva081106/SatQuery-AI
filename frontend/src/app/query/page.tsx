@@ -314,7 +314,7 @@ export default function Home() {
     });
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const backendUrl = process.env.API_URL || "http://localhost:8000";
       const response = await fetch(`${backendUrl}/api/query`, {
         method: "POST",
         body: formData,
