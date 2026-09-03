@@ -455,10 +455,7 @@ export default function Home() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(40, 40, 50);
-        const answerClean = (result.answer || "N/A").replace(/\*\*/g, "").replace(/
-
-/g, "
-");
+        const answerClean = (result.answer || "N/A").replace(/\*\*/g, "").replace(/\n\n/g, "\n");
         const answerLines = doc.splitTextToSize(answerClean, 182);
         doc.text(answerLines, 14, y);
         y += (answerLines.length * 4) + 8;
@@ -514,7 +511,9 @@ export default function Home() {
       
       {/* HOLOGRAPHIC GLOBE BACKGROUND (EMPTY STATE) */}
       {messages.length === 0 && (
-        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-20 pointer-events-none mix-blend-screen grayscale">
+        <div className="absolute inset-0 z-0 flex items-center justify-center mix-blend-screen transition-opacity duration-700 opacity-20 hover:opacity-80 group">
+          {/* Hardware-accelerated desaturation overlay */}
+          <div className="absolute inset-0 z-10 bg-black mix-blend-color pointer-events-none transition-opacity duration-700 opacity-100 group-hover:opacity-0" />
           <FramerGlobe />
         </div>
       )}
