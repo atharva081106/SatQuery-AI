@@ -55,11 +55,17 @@ export default function LandingPage() {
       )}
 
       {/* FIXED TOP NAV OVERLAY */}
-      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-6 z-50 mix-blend-difference">
+      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-6 z-50 mix-blend-difference hidden md:flex">
         <div className="display-lg tracking-widest text-white">
           SATQUERY AI.
         </div>
         <div className="flex gap-8 items-center">
+          <Link href="/acquire" className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold">
+            ACQUIRE IMAGERY
+          </Link>
+          <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold cursor-pointer">
+            MISSION QUERY
+          </a>
           <Link href="/dashboard" className="micro-cap text-white hover:opacity-70 transition-opacity">
             BENCHMARKS
           </Link>
