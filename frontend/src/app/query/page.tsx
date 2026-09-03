@@ -204,6 +204,13 @@ export default function Home() {
           setImages(prev => {
             // Avoid duplicates if effect runs twice
             if (prev.some(f => f.name === "acquired_satellite_image.png")) return prev;
+            
+            // Add a welcome message to prompt the user
+            setMessages([{ 
+              role: "assistant", 
+              content: "I have successfully acquired and loaded your satellite imagery from the Map Explorer. The target area is ready for analysis. What would you like me to look for?"
+            }]);
+
             return [...prev, file].slice(0, 2);
           });
           // Clean up
