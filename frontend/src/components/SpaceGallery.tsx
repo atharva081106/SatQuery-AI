@@ -48,7 +48,7 @@ export default function SpaceGallery() {
           <Carousel3d 
             slides={planetaryImages} 
             slideAspectRatio={1.5}
-            effectPreset="cylinder"
+            effectPreset="coverflow"
           />
         </div>
         
