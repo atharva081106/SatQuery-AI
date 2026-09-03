@@ -105,12 +105,14 @@ async def acquire_imagery(request: AcquireRequest):
         # Convert bbox array to BBox object
         bbox_obj = BBox(bbox=request.bbox, crs=CRS.WGS84)
         
-        # Select Data Collection
-        collection = DataCollection.SENTINEL2_L2A
+        cdse_url = "https://sh.dataspace.copernicus.eu"
+        
+        # Select Data Collection mapped to CDSE
+        collection = DataCollection.define(name="CDSE_S2", api_id="sentinel-2-l2a", service_url=cdse_url)
         if request.dataset == "s1":
-            collection = DataCollection.SENTINEL1_IW
+            collection = DataCollection.define(name="CDSE_S1", api_id="sentinel-1-grd", service_url=cdse_url)
         elif request.dataset == "l8":
-            collection = DataCollection.LANDSAT_OT_L2
+            collection = DataCollection.define(name="CDSE_L8", api_id="landsat-ot-l2", service_url=cdse_url)
             
         # Evalscript for True Color
         evalscript = """
