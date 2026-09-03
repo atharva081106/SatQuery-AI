@@ -96,6 +96,11 @@ async def acquire_imagery(request: AcquireRequest):
     config.sh_client_id = client_id
     config.sh_client_secret = client_secret
     
+    # Use Copernicus Data Space Ecosystem (CDSE) endpoints
+    # since Sentinel Hub transitioned to CDSE and user keys are registered there.
+    config.sh_base_url = "https://sh.dataspace.copernicus.eu"
+    config.sh_token_url = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    
     try:
         # Convert bbox array to BBox object
         bbox_obj = BBox(bbox=request.bbox, crs=CRS.WGS84)
