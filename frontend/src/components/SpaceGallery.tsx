@@ -1,58 +1,58 @@
 "use client";
 
 import React, { useState } from 'react';
-import Image from 'next/image';
+import FramerGlobe from '@/components/FramerGlobe';
 
 const planetaryImages = [
   {
-    src: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=1000&auto=format&fit=crop",
-    title: "EARTH / LEO",
-    desc: "Low Earth Orbit view of cloud formations."
+    src: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg",
+    title: "EARTH / APOLLO",
+    desc: "The Blue Marble, captured by Apollo 17."
   },
   {
-    src: "https://images.unsplash.com/photo-1614729939124-03290b56c9ce?q=80&w=800&auto=format&fit=crop",
-    title: "MARS / ORBITER",
-    desc: "Martian surface topology captured by orbital reconnaissance."
+    src: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",
+    title: "MARS / ROSETTA",
+    desc: "True color image of Mars taken by the OSIRIS instrument."
   },
   {
-    src: "https://images.unsplash.com/photo-1614732414444-098e5e111a42?q=80&w=800&auto=format&fit=crop",
-    title: "JUPITER / JUNO",
-    desc: "Atmospheric storm systems and gas belts."
+    src: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg",
+    title: "JUPITER / CASSINI",
+    desc: "True color mosaic of Jupiter captured by Cassini."
   },
   {
-    src: "https://images.unsplash.com/photo-1614732484003-ef9881555dc3?q=80&w=800&auto=format&fit=crop",
-    title: "SATURN / CASSINI",
-    desc: "Ring system shadows cast across the northern hemisphere."
+    src: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg",
+    title: "SATURN / EQUINOX",
+    desc: "Saturn with its rings edge-on, captured by Cassini."
   },
   {
-    src: "https://images.unsplash.com/photo-1522030299830-16b8d3d049fe?q=80&w=600&auto=format&fit=crop",
+    src: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg",
     title: "LUNAR SURFACE",
-    desc: "Impact craters on the lunar far side."
+    desc: "High resolution mosaic of the near side of the Moon."
   },
   {
-    src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
-    title: "EARTH / NIGHT",
-    desc: "Global illumination tracking urban infrastructure."
+    src: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg",
+    title: "VENUS / MARINER 10",
+    desc: "Processed true color image of Venus."
   },
   {
-    src: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1000&auto=format&fit=crop",
-    title: "ISS / SOLAR PANELS",
-    desc: "Orbital infrastructure against the atmospheric limb."
+    src: "https://upload.wikimedia.org/wikipedia/commons/0/04/International_Space_Station_after_undocking_of_STS-132.jpg",
+    title: "ISS / LEO",
+    desc: "The International Space Station in Low Earth Orbit."
   },
   {
-    src: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=900&auto=format&fit=crop",
-    title: "DEEP SPACE",
-    desc: "Stellar nursery and gas nebula imaging."
+    src: "https://upload.wikimedia.org/wikipedia/commons/9/98/Andromeda_Galaxy_%28with_h-alpha%29.jpg",
+    title: "ANDROMEDA GALAXY",
+    desc: "Deep space observation of our neighboring spiral galaxy."
   },
   {
-    src: "https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?q=80&w=800&auto=format&fit=crop",
-    title: "MILKY WAY",
-    desc: "Galactic core observed from orbital telescope."
+    src: "https://upload.wikimedia.org/wikipedia/commons/6/68/Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg",
+    title: "PILLARS OF CREATION",
+    desc: "Eagle Nebula captured by the Hubble Space Telescope."
   },
   {
-    src: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=1000&auto=format&fit=crop",
-    title: "MARS / ROVER",
-    desc: "Ground-level structural terrain analysis."
+    src: "https://upload.wikimedia.org/wikipedia/commons/0/06/NGC_3372_a.jpg",
+    title: "CARINA NEBULA",
+    desc: "Massive star-forming region in the Carina–Sagittarius Arm."
   }
 ];
 
@@ -60,16 +60,18 @@ export default function SpaceGallery() {
   const [selectedImg, setSelectedImg] = useState<typeof planetaryImages[0] | null>(null);
 
   return (
-    <div className="w-full min-h-screen bg-black pt-32 pb-16 px-8 relative z-10">
+    <div className="w-full min-h-screen bg-black pt-32 pb-16 px-8 relative z-10 overflow-hidden">
       
-      {/* Title */}
-      <div className="max-w-7xl mx-auto mb-12">
-        <h1 className="text-4xl font-mono text-white tracking-[0.2em] font-bold mb-2 uppercase">Planetary Reconnaissance</h1>
-        <p className="text-[#00F0FF] font-mono text-sm tracking-widest uppercase">Orbital & Deep Space Satellite Imagery Library</p>
+      {/* Background Globe Animation */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-30 pointer-events-none">
+        <div className="w-[1200px] h-[1200px]">
+          <FramerGlobe />
+        </div>
       </div>
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
 
       {/* Masonry Grid */}
-      <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+      <div className="relative z-10 max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
         {planetaryImages.map((img, idx) => (
           <div 
             key={idx} 
