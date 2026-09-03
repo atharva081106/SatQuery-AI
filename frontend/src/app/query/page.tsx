@@ -134,6 +134,7 @@ export default function Home() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [showPresets, setShowPresets] = useState(false);
   const presetsRef = useRef<HTMLDivElement>(null);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   const handleDownloadGeoJSON = () => {
     if (!latestResult?.geojson_data) return;
@@ -538,7 +539,7 @@ export default function Home() {
     <main className="h-screen bg-black relative overflow-hidden flex flex-col">
       
       {/* HOLOGRAPHIC GLOBE BACKGROUND (EMPTY STATE) */}
-      {messages.length === 0 && (
+      {!messages.some(m => m.role === 'user') && (
         <div className="absolute inset-0 z-0 flex items-center justify-center mix-blend-screen pointer-events-none">
           <div className="relative z-[6] group pointer-events-auto w-[600px] h-[600px] rounded-full flex items-center justify-center">
 
@@ -618,16 +619,25 @@ export default function Home() {
               {/* IMAGE PREVIEWS */}
               {images.length > 0 && (
                 <div className="flex gap-2 flex-wrap mb-2">
-                  {images.map((img, i) => (
-                    <div key={i} className="w-16 h-16 relative group rounded-md overflow-hidden border border-[#3a3a3f]">
-                      <img src={URL.createObjectURL(img)} alt={`Preview ${i}`} className="w-full h-full object-cover" />
-                      <button 
-                        type="button" 
-                        className="absolute inset-0 bg-black/60 text-white flex items-center justify-center micro-cap opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeImage(i)}
-                      >X</button>
-                    </div>
-                  ))}
+                  {images.map((img, i) => {
+                    const objUrl = URL.createObjectURL(img);
+                    return (
+                      <div key={i} className="w-16 h-16 relative group rounded-md overflow-hidden border border-[#3a3a3f]">
+                        <img 
+                          src={objUrl} 
+                          alt={`Preview ${i}`} 
+                          className="w-full h-full object-cover cursor-pointer hover:opacity-70 transition-opacity" 
+                          onClick={() => setExpandedImage(objUrl)}
+                        />
+                        <button 
+                          type="button" 
+                          className="absolute top-1 right-1 bg-black/80 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+                          onClick={() => removeImage(i)}
+                          title="Remove image"
+                        >✕</button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
@@ -929,6 +939,22 @@ export default function Home() {
           animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
+      {/* Lightbox / Modal */}
+      {expandedImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200 pointer-events-auto"
+          onClick={() => setExpandedImage(null)}
+        >
+          <button 
+            className="absolute top-8 right-8 text-white hover:text-[#00F0FF] font-mono tracking-widest uppercase text-sm border border-white/20 px-4 py-2 hover:border-[#00F0FF] transition-colors"
+          >
+            Close [X]
+          </button>
+          <div className="relative max-w-5xl w-full max-h-[85vh] flex flex-col items-center justify-center border border-white/10 bg-black shadow-2xl p-2" onClick={(e) => e.stopPropagation()}>
+            <img src={expandedImage} alt="Expanded preview" className="w-full h-auto max-h-[80vh] object-contain" />
+          </div>
+        </div>
+      )}
     </main>
   );
 }
