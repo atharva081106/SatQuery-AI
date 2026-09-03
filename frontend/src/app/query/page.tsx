@@ -513,11 +513,6 @@ export default function Home() {
       {messages.length === 0 && (
         <div className="absolute inset-0 z-0 flex items-center justify-center mix-blend-screen pointer-events-none">
           <div className="relative z-[6] group pointer-events-auto w-[600px] h-[600px] rounded-full flex items-center justify-center">
-            
-            {/* Glowing Aura behind the globe */}
-            <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
-               <div className="w-full h-full bg-cyan-400/40 rounded-full blur-[120px]" />
-            </div>
 
             {/* Hardware-accelerated desaturation overlay */}
             <div className="absolute inset-0 z-10 bg-black mix-blend-color pointer-events-none transition-opacity duration-700 opacity-100 group-hover:opacity-0 rounded-full" />
