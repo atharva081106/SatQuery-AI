@@ -2,38 +2,33 @@
 
 import React from 'react';
 import FramerGlobe from '@/components/FramerGlobe';
-import MotionGallery from '@/components/MotionGallery';
+import Carousel3d from '@/components/Carousel3d';
 
 const planetaryImages = [
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg",
-    title: "EARTH / APOLLO",
-    desc: "The Blue Marble, captured by Apollo 17."
+    src: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1500",
+    title: "EARTH / LEO",
+    desc: "The Earth from Low Earth Orbit."
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",
-    title: "MARS / ROSETTA",
-    desc: "True color image of Mars taken by the OSIRIS instrument."
+    src: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1500",
+    title: "DEEP SPACE",
+    desc: "A stunning view of a distant nebula."
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg",
-    title: "JUPITER / CASSINI",
-    desc: "True color mosaic of Jupiter captured by Cassini."
+    src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1500",
+    title: "GLOBAL NETWORK",
+    desc: "Digital representation of satellite communication."
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg",
-    title: "SATURN / EQUINOX",
-    desc: "Saturn with its rings edge-on, captured by Cassini."
+    src: "https://images.unsplash.com/photo-1614729939124-03290b56c9ce?q=80&w=1500",
+    title: "ANDROMEDA",
+    desc: "Our neighboring spiral galaxy."
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg",
-    title: "LUNAR SURFACE",
-    desc: "High resolution mosaic of the near side of the Moon."
-  },
-  {
-    src: "https://upload.wikimedia.org/wikipedia/commons/9/98/Andromeda_Galaxy_%28with_h-alpha%29.jpg",
-    title: "ANDROMEDA GALAXY",
-    desc: "Deep space observation of our neighboring spiral galaxy."
+    src: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?q=80&w=1500",
+    title: "STARS",
+    desc: "The infinite expanse of the milky way."
   }
 ];
 
@@ -49,13 +44,11 @@ export default function SpaceGallery() {
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full pt-16">
-        <div className="w-full h-[55vh] max-h-[550px]">
-          <MotionGallery 
-            images={planetaryImages} 
-            itemWidth={100} 
-            scrollSpeed={0.8}
-            scrollSmoothness={0.6}
-            gap={32}
+        <div className="w-full h-[60vh] max-h-[600px]">
+          <Carousel3d 
+            slides={planetaryImages} 
+            slideAspectRatio={1.5}
+            effectPreset="cylinder"
           />
         </div>
         
