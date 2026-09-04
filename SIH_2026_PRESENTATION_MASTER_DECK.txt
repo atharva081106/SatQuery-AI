@@ -12,12 +12,12 @@ SatQuery AI: Autonomous Agentic Vision-Language Assistant for Multimodal Earth O
 PROBLEM BREAKDOWN & MOTIVATION:
 - Single-Task AI Silos: Conventional satellite AI systems require separate models for classification, object detection, and change mapping, forcing users to manually choose architectures and manage GIS parameters.
 - Severe Cloud Obscuration: Up to 67% of global satellite passes and up to 82% of optical passes during Indian monsoon flood events are obscured by cloud cover, blinding standard optical models.
-- VLM Hallucination Crisis: General-purpose commercial VLMs exhibit over 40% hallucination rates on aerial imagery and will invent fake changes when fed two completely different geographical areas.
+- VLM Hallucination Crisis: General-purpose commercial VLMs exhibit significant hallucination on domain-specific aerial imagery (documented by GEOBench-VLM, ICCV 2025) and will invent fake changes when fed two completely different geographical areas — with no grounded spatial verification.
 - Non-Grounded Outputs: Generic conversational assistants produce descriptive text but fail to output georeferenced coordinate vectors that can be directly loaded into field GIS systems.
 
 PROPOSED SOLUTION & SYSTEM OVERVIEW:
 - Autonomous Agentic Orchestrator: SatQuery AI introduces an intelligent, deterministic controller that accepts natural language queries alongside single, bi-temporal, or cross-modal satellite pairs, automatically selecting and executing the correct specialist model.
-- Domain-Adapted Vision-Language Backbone: Fine-tuned on multi-sensor remote-sensing benchmarks (BigEarthNet and RSVQA) to accurately comprehend satellite spectral bands, land-cover classes, and sensor characteristics.
+- Domain-Adapted Vision-Language Backbone: Initialized from Salesforce BLIP-VQA-Base (pre-trained on VQAv2 / COCO); fine-tuning pipeline architected for RSVQA and BigEarthNet-compatible RS datasets to comprehend satellite spectral bands, land-cover classes, and sensor characteristics.
 - Deterministic Input Compatibility Guard: Automatically checks image counts, metadata, Coordinate Reference Systems (CRS), and keypoint homography before execution, preventing invalid runs on disparate scenes.
 - Evidence-Grounded Reporting: Every response provides visual verification via Grad-CAM attention heatmaps, pixel difference vectors, confidence ratings, and downloadable mission reports.
 
@@ -28,7 +28,7 @@ GENUINE TECHNICAL USPS (KEY DIFFERENTIATORS):
 
 KEY METRICS:
 - Spatial Hallucination on Non-Co-Registered Pairs: 0.00
-- End-to-End Execution Latency: Under 1.8 seconds
+- End-to-End Execution Latency: Under 1.8 seconds (heuristic/pixel engine); ~4-8 seconds with full BLIP VQA model inference on CPU
 - Air-Gapped Sovereign Security: 100% offline with zero external cloud API calls
 
 ===================================================================
@@ -51,7 +51,7 @@ STEP-BY-STEP IMPLEMENTATION METHODOLOGY:
 - Step 1 - Data Normalization & Geospatial Parsing: Ingested GeoTIFF, TIFF, PNG, or JPEG files are parsed by Rasterio. The system caches coordinate bounds, normalizes dynamic ranges into 8-bit visual composites, and maps projection datums to WGS84 (EPSG:4326).
 - Step 2 - Deterministic Input & Spatial Verification: The spatial compatibility engine checks whether image counts and formats match defined operational scopes. For pair inputs, it computes bounding box IoU or extracts ORB keypoints to evaluate homography inliers. If coherence falls below 0.28, execution is blocked with an auditable alert.
 - Step 3 - Agentic Classification & Specialist Execution: The query intent classifier routes the payload to the appropriate specialist engine: Single-Image VQA, Holistic Scene Captioning, Text-Guided Spatial Grounding, Bi-Temporal Change Analysis, or Cross-Modal Optical-SAR Fusion.
-- Step 4 - Output Synthesis & Evidence Delivery: The model outputs are synthesized into natural language findings, Grad-CAM attention heatmaps, RFC 7946 GeoJSON vector polygons, and split-screen comparison coordinates, sent directly to the client interface.
+- Step 4 - Output Synthesis & Evidence Delivery: The model outputs are synthesized into natural language findings, AI feature saliency heatmaps (gradient-magnitude based), RFC 7946 GeoJSON vector polygons, and split-screen comparison coordinates, sent directly to the client interface.
 
 ===================================================================
 SLIDE 3: FEASIBILITY ANALYSIS, RISK ENGINEERING & MITIGATION STRATEGIES
@@ -108,8 +108,8 @@ PEER-REVIEWED RESEARCH CITATIONS:
    Link: https://doi.org/10.1109/TGRS.2020.2988782
 
 2. Multitemporal Change Visual Question Answering:
-   Yuan, Z., Mou, L., Wang, Q., & Zhu, X. X. (2024). "Change Detection Visual Question Answering for Remote Sensing Imagery." IEEE Transactions on Geoscience and Remote Sensing (TGRS).
-   Link: https://arxiv.org/abs/2304.09486
+   Yuan, Z., Mou, L., & Zhu, X. X. (2022). "Change Detection Meets Visual Question Answering." IEEE International Geoscience and Remote Sensing Symposium (IGARSS 2022).
+   Link: https://arxiv.org/abs/2112.06343
 
 3. Multi-Spectral Land-Cover Benchmark (BigEarthNet):
    Sumbul, G., Charfuelan, M., Demir, B., & Markl, V. (2019). "BigEarthNet: A Large-Scale Benchmark Archive for Remote Sensing Image Understanding." IEEE IGARSS 2019 Proceedings, 5901-5904.
@@ -146,7 +146,7 @@ EVALUATION / JUDGING CRITERIA MATRIX TABLE:
 | **Track 2: ISRO/SAC Evaluation Set (Target Grounding)** | Cartosat-2S Panchromatic / Multispectral | Localize target infrastructure (tanks, runways, berths) with bounding boxes | Mean Average Precision (mAP@0.50), Intersection over Union (IoU) | Normalized to [0.0, 1.0] via min-max box IoU | Outputs pixel bounding boxes `[x, y, w, h]` AND standard WGS84 GeoJSON polygon vectors for automated geometric scoring against undisclosed annotations. |
 | **Track 3: ISRO/SAC Evaluation Set (Bi-Temporal Change)** | Co-registered Cartosat-2S temporal pairs (T1, T2) | Detect disaster inundation, new construction, and terrain displacement | Change IoU, Pixel F1-Score, Structural Similarity (SSIM) | Normalized to [0.0, 1.0] via harmonic mean of F1 and SSIM | Computes Structural Similarity Index (SSIM) and Otsu morphological change masks; outputs bounding difference vectors and interactive split-screen comparator. |
 | **Track 4: ISRO/SAC Evaluation Set (Optical-SAR Fusion)** | Co-registered Cartosat-2S (Optical) + RISAT-1/2B (C-Band SAR) | Cloud penetration, water surface extraction, and structural reflector detection | Multi-modal IoU, Specular Contrast Ratio, F1-Score | Normalized to [0.0, 1.0] across fused mask overlap | Synthesizes co-registered pairs via Intensity-Hue-Saturation (IHS) fusion; cross-references dielectric radar backscatter to isolate water and structures beneath cloud cover. |
-| **Track 5: Public Benchmark Split (RSVQA / BigEarthNet)** | Sentinel-2 / Landsat-8 public test subsets | Holistic scene captioning, multi-label classification, counting | BLEU-4, METEOR, CIDEr, Multi-label F1 | Min-Max normalized against SOTA benchmark ceilings | Domain-adapted Vision-Language model paired with real pixel HSV clustering, yielding verified land cover percentage tables and structured descriptions. |
+| **Track 5: Public Benchmark Split (RSVQA / BigEarthNet)** | Sentinel-2 / Landsat-8 public test subsets | Holistic scene captioning, multi-label classification, counting | BLEU-4, METEOR, CIDEr, Multi-label F1 (evaluation pipeline ready; metrics computed on ISRO/SAC test split) | Min-Max normalized against SOTA benchmark ceilings | Vision-Language model paired with real pixel HSV clustering, yielding verified land cover percentage tables and structured descriptions. |
 | **Track 6: System Reliability & Hallucination Defense** | Incompatible / Disparate multi-temporal image pairs | Block false change detection across non-overlapping scenes | Spatial False Positive Rate (FPR), Coherence Accuracy | Binary Pass/Fail + Coherence Score [0.0, 1.0] | Automated pre-inference compatibility guard (GeoTIFF CRS/IoU + ORB keypoint homography). Strictly rejects non-co-registered inputs with 0% hallucinated diffs. |
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

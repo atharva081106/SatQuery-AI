@@ -6,6 +6,9 @@ import os
 if os.name == "nt" and "HF_HOME" not in os.environ:
     os.environ["HF_HOME"] = "d:\\sih26167\\.huggingface_cache"
 
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_DATASETS_OFFLINE"] = "1"
+
 logger = logging.getLogger(__name__)
 
 class MLModels:
@@ -41,22 +44,22 @@ class MLModels:
             from transformers import BlipProcessor, BlipForQuestionAnswering
             if os.path.exists(finetuned_path):
                 logger.info(f"Loading Remote-Sensing-Adapted Model from {finetuned_path}...")
-                self.vqa_processor = BlipProcessor.from_pretrained(finetuned_path)
-                self.vqa_model = BlipForQuestionAnswering.from_pretrained(finetuned_path).to(self.device)
+                self.vqa_processor = BlipProcessor.from_pretrained(finetuned_path, local_files_only=True)
+                self.vqa_model = BlipForQuestionAnswering.from_pretrained(finetuned_path, local_files_only=True).to(self.device)
                 self.model_name = "SatQuery-RS-Adapted-v1.2 (Fine-tuned on Remote Sensing)"
             else:
                 model_id = "Salesforce/blip-vqa-base"
                 logger.info(f"Loading baseline model {model_id}...")
-                self.vqa_processor = BlipProcessor.from_pretrained(model_id)
-                self.vqa_model = BlipForQuestionAnswering.from_pretrained(model_id).to(self.device)
+                self.vqa_processor = BlipProcessor.from_pretrained(model_id, local_files_only=True)
+                self.vqa_model = BlipForQuestionAnswering.from_pretrained(model_id, local_files_only=True).to(self.device)
                 self.model_name = "BLIP-VQA-Base (Baseline)"
         except Exception as e:
             logger.error(f"Failed to load fine-tuned model ({e}), attempting fallback...")
             try:
                 from transformers import BlipProcessor, BlipForQuestionAnswering
                 model_id = "Salesforce/blip-vqa-base"
-                self.vqa_processor = BlipProcessor.from_pretrained(model_id)
-                self.vqa_model = BlipForQuestionAnswering.from_pretrained(model_id).to(self.device)
+                self.vqa_processor = BlipProcessor.from_pretrained(model_id, local_files_only=True)
+                self.vqa_model = BlipForQuestionAnswering.from_pretrained(model_id, local_files_only=True).to(self.device)
                 self.model_name = "BLIP-VQA-Base (Fallback)"
             except Exception as e2:
                 logger.error(f"Failed to load any model: {e2}")
