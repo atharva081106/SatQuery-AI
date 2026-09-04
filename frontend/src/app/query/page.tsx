@@ -14,6 +14,7 @@ import FramerGlobe from '@/components/FramerGlobe';
 import jsPDF from 'jspdf';
 import SwipeSlider from '@/components/SwipeSlider';
 import MapExplorer from '@/components/MapExplorer';
+import TiffPreview from '@/components/TiffPreview';
 
 function FormattedMessage({ content }: { content: string }) {
   if (!content) return null;
@@ -625,15 +626,23 @@ export default function Home() {
               {images.length > 0 && (
                 <div className="flex gap-2 flex-wrap mb-2">
                   {images.map((img, i) => {
-                    const objUrl = URL.createObjectURL(img);
+                    const isTiff = img.name.toLowerCase().endsWith('.tif') || img.name.toLowerCase().endsWith('.tiff');
+                    const objUrl = !isTiff ? URL.createObjectURL(img) : "";
                     return (
                       <div key={i} className="w-16 h-16 relative group rounded-md overflow-hidden border border-[#3a3a3f]">
-                        <img 
-                          src={objUrl} 
-                          alt={`Preview ${i}`} 
-                          className="w-full h-full object-cover cursor-pointer hover:opacity-70 transition-opacity" 
-                          onClick={() => setExpandedImage(objUrl)}
-                        />
+                        {isTiff ? (
+                          <TiffPreview 
+                            file={img} 
+                            className="w-full h-full" 
+                          />
+                        ) : (
+                          <img 
+                            src={objUrl} 
+                            alt={`Preview ${i}`} 
+                            className="w-full h-full object-cover cursor-pointer hover:opacity-70 transition-opacity" 
+                            onClick={() => setExpandedImage(objUrl)}
+                          />
+                        )}
                         <button 
                           type="button" 
                           className="absolute top-1 right-1 bg-black/80 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
