@@ -213,46 +213,39 @@ export default function Home() {
 
   const queryCategories = [
     {
-      category: "SINGLE-IMAGE VQA & RECON",
+      category: "TERRAIN & LAND COVER ANALYSIS",
       queries: [
-        "Identify System Architecture",
-        "Classify land cover and terrain type",
-        "Estimate vegetative canopy density",
-        "Identify structural infrastructure and fenestration",
-        "Are there any water bodies or drainage basins in this tile?"
+        "Classify land cover breakdown",
+        "How much green cover and vegetation is there?",
+        "Are there any water bodies or rivers in this area?",
+        "Identify buildings, roads, and settlements",
+        "Give a plain-English overview of this scene"
       ]
     },
     {
-      category: "TEMPORAL CHANGE UNDERSTANDING (2 IMAGES)",
+      category: "CHANGE DETECTION (BEFORE & AFTER)",
       queries: [
-        "Run Change Detection on this bi-temporal pair",
-        "Quantify urban expansion and newly constructed infrastructure",
-        "Detect deforestation or vegetative canopy loss",
-        "Analyze flood extent and hydrological displacement"
+        "What changed between these two dates?",
+        "Measure new construction and building expansion",
+        "Check for deforestation and tree loss",
+        "Analyze flood extent and submerged land"
       ]
     },
     {
-      category: "SPATIAL GROUNDING & LOCALIZATION",
+      category: "FIND & HIGHLIGHT FEATURES (GROUNDING)",
       queries: [
-        "Highlight water bodies and reservoirs",
-        "Ground airfield runways and taxiways",
-        "Locate industrial storage tanks and facilities",
-        "Detect transportation road networks"
+        "Highlight all water bodies and lakes",
+        "Locate buildings and storage facilities",
+        "Pinpoint roads and transport networks",
+        "Find green parks and farmland"
       ]
     },
     {
-      category: "OPTICAL – SAR ANALYSIS (2 IMAGES)",
+      category: "CLOUD PENETRATION (RADAR / SAR)",
       queries: [
-        "Perform Optical-SAR cross-modal joint analysis",
-        "Penetrate cloud cover using SAR radar backscatter",
-        "Extract complementary dielectric and surface roughness features"
-      ]
-    },
-    {
-      category: "HOLISTIC SCENE CAPTIONING",
-      queries: [
-        "Generate comprehensive remote-sensing caption",
-        "Summarize maritime activity and coastal features"
+        "See through clouds using radar (SAR)",
+        "Identify water bodies hidden under clouds",
+        "Detect ships and structures beneath cloud cover"
       ]
     }
   ];
