@@ -16,75 +16,157 @@ import SwipeSlider from '@/components/SwipeSlider';
 import MapExplorer from '@/components/MapExplorer';
 import TiffPreview from '@/components/TiffPreview';
 
+function renderInline(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={i} className="text-white font-semibold">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        return part;
+      })}
+    </>
+  );
+}
+
+function renderTable(tableLinesText: string, key: any) {
+  const rawLines = tableLinesText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const tableLines = rawLines.filter(l => l.includes("|") && !/^\|?\s*[-:]+[-| :]*\|?$/.test(l));
+  
+  if (tableLines.length === 0) return null;
+
+  const headerCells = tableLines[0]
+    .split("|")
+    .map(c => c.trim())
+    .filter(c => c.length > 0);
+
+  const rowLines = tableLines.slice(1);
+  const rows = rowLines.map(line =>
+    line
+      .split("|")
+      .map(c => c.trim())
+      .filter(c => c.length > 0)
+  );
+
+  return (
+    <div key={key} className="overflow-x-auto my-2 rounded-xl border border-white/20 bg-white/[0.04] shadow-sm">
+      <table className="w-full text-left border-collapse text-xs sm:text-sm">
+        <thead>
+          <tr className="border-b border-white/20 bg-white/10 text-white font-medium">
+            {headerCells.map((h, idx) => (
+              <th
+                key={idx}
+                className={`py-2.5 px-4 font-mono tracking-wider text-[11px] sm:text-xs uppercase text-white/80 ${
+                  idx === headerCells.length - 1 ? 'text-right' : ''
+                }`}
+              >
+                {renderInline(h)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/10">
+          {rows.map((row, rIdx) => {
+            const isTotal = row.some(cell => cell.toLowerCase().includes("total"));
+            return (
+              <tr
+                key={rIdx}
+                className={
+                  isTotal
+                    ? "bg-white/10 font-semibold text-white border-t border-white/20"
+                    : "hover:bg-white/[0.05] transition-colors text-white/90"
+                }
+              >
+                {row.map((cell, cIdx) => (
+                  <td
+                    key={cIdx}
+                    className={`py-2.5 px-4 ${
+                      cIdx === row.length - 1 ? 'text-right font-mono text-emerald-300 font-medium' : ''
+                    } ${isTotal ? 'text-white' : ''}`}
+                  >
+                    {renderInline(cell)}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function FormattedMessage({ content }: { content: string }) {
   if (!content) return null;
 
-  // Clean out any raw markdown asterisks (* and **)
-  const sanitized = content.replace(/\*\*/g, "").replace(/\*/g, "");
-
   // Split into blocks by double newline
-  const blocks = sanitized.split(/\n\n+/).map(b => b.trim()).filter(b => b.length > 0);
+  const blocks = content.split(/\n\n+/).map(b => b.trim()).filter(b => b.length > 0);
 
   return (
     <div className="flex flex-col gap-4 text-sm leading-relaxed">
       {blocks.map((block, bIdx) => {
-        // 1. Alert block (Compatibility Failure)
-        if (block.includes("COMPATIBILITY CHECK FAILED") || block.includes("Spatial Disparity Detected")) {
+        // 1. Alert block (Compatibility Failure or warning)
+        if (block.includes("COMPATIBILITY CHECK FAILED") || block.includes("Spatial Disparity Detected") || block.startsWith("⚠️")) {
           const lines = block.split("\n").map(l => l.trim()).filter(l => l.length > 0);
           const alertTitle = lines[0];
-          const alertBody = lines.slice(1).join(" ");
+          const remainingLines = lines.slice(1);
           return (
-            <div key={bIdx} className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex flex-col gap-2 shadow-inner">
-              <div className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-wider uppercase font-bold">
-                <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+            <div key={bIdx} className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex flex-col gap-2 shadow-inner">
+              <div className="flex items-center gap-2 text-amber-400 font-mono text-xs tracking-wider uppercase font-bold">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
                 <span>{alertTitle.replace(/^⚠️\s*/, "")}</span>
               </div>
-              {alertBody && (
-                <p className="text-white/80 text-xs sm:text-sm font-sans leading-relaxed">
-                  {alertBody}
+              {remainingLines.map((line, lIdx) => (
+                <p key={lIdx} className="text-white/85 text-xs sm:text-sm font-sans leading-relaxed">
+                  {renderInline(line)}
                 </p>
-              )}
+              ))}
             </div>
           );
         }
 
-        const lines = block.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-        const hasBullets = lines.some(l => l.startsWith("•") || l.startsWith("-"));
+        // 2. Table block
+        const blockLines = block.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+        const tableStartIndex = blockLines.findIndex(l => l.includes("|"));
+        if (tableStartIndex !== -1 && blockLines.filter(l => l.includes("|")).length >= 2) {
+          const prefixLines = blockLines.slice(0, tableStartIndex);
+          const tableLines = blockLines.slice(tableStartIndex);
+          return (
+            <div key={bIdx} className="flex flex-col gap-2">
+              {prefixLines.length > 0 && (
+                <p className="text-white/90 text-sm leading-relaxed">
+                  {renderInline(prefixLines.join(" "))}
+                </p>
+              )}
+              {renderTable(tableLines.join("\n"), `${bIdx}-tbl`)}
+            </div>
+          );
+        }
 
-        // 2. Bullet list section
+        // 3. Bullet list section
+        const hasBullets = blockLines.some(l => l.startsWith("•") || l.startsWith("-"));
         if (hasBullets) {
           return (
             <div key={bIdx} className="flex flex-col gap-2">
-              {lines.map((line, lIdx) => {
+              {blockLines.map((line, lIdx) => {
                 if (line.startsWith("•") || line.startsWith("-")) {
                   const bulletText = line.replace(/^[•\-]\s*/, "");
-                  const colonIdx = bulletText.indexOf(":");
-                  if (colonIdx > 0 && colonIdx < 35) {
-                    const label = bulletText.slice(0, colonIdx).trim();
-                    const value = bulletText.slice(colonIdx + 1).trim();
-                    return (
-                      <div key={lIdx} className="flex items-start gap-2.5 pl-1 text-xs sm:text-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 shrink-0"></span>
-                        <div>
-                          <span className="text-white/50 font-mono uppercase text-[11px] font-semibold tracking-wider mr-1.5">{label}:</span>
-                          <span className="text-white/90">{value}</span>
-                        </div>
-                      </div>
-                    );
-                  }
                   return (
                     <div key={lIdx} className="flex items-start gap-2.5 pl-1 text-xs sm:text-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 shrink-0"></span>
-                      <span className="text-white/85">{bulletText}</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0"></span>
+                      <span className="text-white/90 leading-relaxed">{renderInline(bulletText)}</span>
                     </div>
                   );
                 } else {
-                  // Heading for this bullet group
-                  const heading = line.replace(/:$/, "").trim();
                   return (
-                    <div key={lIdx} className="text-[10px] font-mono tracking-widest uppercase text-white/50 font-bold flex items-center gap-1.5 mt-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                      <span>{heading}</span>
+                    <div key={lIdx} className="text-white font-medium text-sm flex items-center gap-1.5 mt-1">
+                      {renderInline(line)}
                     </div>
                   );
                 }
@@ -93,31 +175,10 @@ function FormattedMessage({ content }: { content: string }) {
           );
         }
 
-        // 3. Labeled section like "Observation: City — ..."
-        const firstLine = lines[0];
-        const colonIdx = firstLine.indexOf(":");
-        if (colonIdx > 0 && colonIdx < 35) {
-          const sectionLabel = firstLine.slice(0, colonIdx).trim();
-          const inlineText = firstLine.slice(colonIdx + 1).trim();
-          const remainingLines = lines.slice(1);
-          const bodyText = [inlineText, ...remainingLines].filter(t => t.length > 0).join(" ");
-          return (
-            <div key={bIdx} className="flex flex-col gap-1.5">
-              <div className="text-[10px] font-mono tracking-widest uppercase text-white/50 font-bold flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                <span>{sectionLabel}</span>
-              </div>
-              <div className="text-white/95 text-sm font-medium pl-3 border-l-2 border-white/30 leading-relaxed">
-                {bodyText}
-              </div>
-            </div>
-          );
-        }
-
         // 4. Standard paragraph
         return (
           <p key={bIdx} className="text-white/90 text-sm leading-relaxed">
-            {block}
+            {renderInline(block)}
           </p>
         );
       })}
