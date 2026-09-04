@@ -26,6 +26,8 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
   const [maxCC, setMaxCC] = useState(20);
+  const [configuration, setConfiguration] = useState("Default");
+  const [layer, setLayer] = useState("True color");
   const [bbox, setBbox] = useState<number[] | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -53,6 +55,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       center: [50.16, 20.78],
       zoom: 5,
       zoomControl: false,
+      attributionControl: false,
     });
     mapInstanceRef.current = map;
 
@@ -162,7 +165,9 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           start_date: startDate,
           end_date: endDate,
           dataset,
-          maxcc: maxCC
+          maxcc: maxCC,
+          configuration,
+          layer
         })
       });
       
@@ -224,6 +229,49 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
             <option value="s2" className="bg-black">Sentinel-2 (Optical)</option>
             <option value="s1" className="bg-black">Sentinel-1 (Radar)</option>
             <option value="l8" className="bg-black">Landsat 8-9</option>
+          </select>
+        </div>
+
+        {/* Configuration */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 tracking-widest uppercase">Configuration</label>
+          <select 
+            value={configuration} 
+            onChange={e => setConfiguration(e.target.value)}
+            className="bg-transparent border border-white/20 text-white text-xs px-3 py-2 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
+          >
+            <option value="Default" className="bg-black">Default</option>
+            <option value="Monitoring Earth from Space" className="bg-black">Monitoring Earth from Space</option>
+            <option value="Agriculture" className="bg-black">Agriculture</option>
+            <option value="Atmosphere and Air Pollution" className="bg-black">Atmosphere and Air Pollution</option>
+            <option value="Change Detection through Time" className="bg-black">Change Detection through Time</option>
+            <option value="Floods and Droughts" className="bg-black">Floods and Droughts</option>
+            <option value="Geology" className="bg-black">Geology</option>
+            <option value="Ocean and Water Bodies" className="bg-black">Ocean and Water Bodies</option>
+            <option value="Snow and Glaciers" className="bg-black">Snow and Glaciers</option>
+            <option value="Urban" className="bg-black">Urban</option>
+          </select>
+        </div>
+
+        {/* Spectral Layer */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 tracking-widest uppercase">Data Layer</label>
+          <select 
+            value={layer} 
+            onChange={e => setLayer(e.target.value)}
+            className="bg-transparent border border-white/20 text-white text-xs px-3 py-2 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
+          >
+            <option value="True color" className="bg-black">True color</option>
+            <option value="False color" className="bg-black">False color</option>
+            <option value="Highlight Optimized Natural Color" className="bg-black">Highlight Optimized Natural Color</option>
+            <option value="Wildfires" className="bg-black">Wildfires</option>
+            <option value="NDVI" className="bg-black">NDVI</option>
+            <option value="False color (urban)" className="bg-black">False color (urban)</option>
+            <option value="Moisture index" className="bg-black">Moisture index</option>
+            <option value="SWIR" className="bg-black">SWIR</option>
+            <option value="NDWI" className="bg-black">NDWI</option>
+            <option value="NDSI" className="bg-black">NDSI</option>
+            <option value="Scene classification map" className="bg-black">Scene classification map</option>
           </select>
         </div>
 
