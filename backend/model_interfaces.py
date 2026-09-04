@@ -192,45 +192,215 @@ def _generate_disparity_diagnostic(img1_bytes: bytes, img2_bytes: bytes, reason_
     except Exception:
         return ""
 
-def _calculate_land_cover_percentages(cv_img: np.ndarray) -> str:
+def _analyze_land_cover(cv_img: np.ndarray) -> Dict[str, Any]:
+    """
+    Robust multi-class land cover analysis across any satellite imagery.
+    Computes precise pixel masks for:
+    - Water bodies (oceans, lakes, rivers, reservoirs)
+    - Dense forest
+    - Agricultural cropland / meadows
+    - Built-up infrastructure & settlements
+    - Bare soil / rocky terrain
+    - Clouds / snow
+    """
+    h, w = cv_img.shape[:2]
+    total_pixels = max(1, h * w)
     hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-    total_pixels = hsv.shape[0] * hsv.shape[1]
-    if total_pixels == 0:
-        return ""
+    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+    b, g, r = cv2.split(cv_img)
+    
+    # 1. Cloud / Snow Mask: high brightness, low saturation
+    cloud_mask = cv2.inRange(hsv, np.array([0, 0, 200]), np.array([179, 45, 255]))
+    
+    # 2. Water Mask:
+    # Blue/cyan water
+    blue_water = cv2.inRange(hsv, np.array([75, 20, 20]), np.array([145, 255, 255]))
+    # Deep water / dark rivers (low value, blue/green dominant over red)
+    deep_water = (cv2.inRange(hsv, np.array([0, 0, 0]), np.array([179, 255, 60])) & 
+                  ((b.astype(int) > r.astype(int)) | (g.astype(int) > r.astype(int))))
+    water_mask = cv2.bitwise_or(blue_water, deep_water)
+    water_mask = cv2.bitwise_and(water_mask, cv2.bitwise_not(cloud_mask))
+    
+    # 3. Vegetation Mask:
+    # Green hue range (28 to 88) or where green channel strongly exceeds red & blue
+    hsv_veg = cv2.inRange(hsv, np.array([28, 25, 25]), np.array([88, 255, 255]))
+    rgb_veg = ((g.astype(int) > r.astype(int) + 10) & (g.astype(int) > b.astype(int) + 8)).astype(np.uint8) * 255
+    veg_mask = cv2.bitwise_or(hsv_veg, rgb_veg)
+    veg_mask = cv2.bitwise_and(veg_mask, cv2.bitwise_not(water_mask))
+    veg_mask = cv2.bitwise_and(veg_mask, cv2.bitwise_not(cloud_mask))
+    
+    # Subdivide vegetation: Dense forest vs cropland/grassland
+    forest_mask = cv2.bitwise_and(veg_mask, cv2.inRange(hsv, np.array([28, 55, 20]), np.array([88, 255, 170])))
+    crop_mask = cv2.bitwise_and(veg_mask, cv2.bitwise_not(forest_mask))
+    
+    # 4. Built-up / Urban settlements:
+    # High edge density and structural contrast, or gray/neutral roof reflectance
+    edges = cv2.Canny(gray, 50, 150)
+    edge_density = cv2.blur(edges, (15, 15))
+    high_edge_mask = (edge_density > 25).astype(np.uint8) * 255
+    
+    # Neutral roofs/concrete (low-medium saturation, medium-high value)
+    concrete_mask = cv2.inRange(hsv, np.array([0, 0, 95]), np.array([179, 45, 210]))
+    built_candidates = cv2.bitwise_or(high_edge_mask, concrete_mask)
+    
+    # Remove water, veg, and cloud from built-up
+    non_built = cv2.bitwise_or(cv2.bitwise_or(water_mask, veg_mask), cloud_mask)
+    built_mask = cv2.bitwise_and(built_candidates, cv2.bitwise_not(non_built))
+    
+    # 5. Bare soil / open ground:
+    allocated = cv2.bitwise_or(non_built, built_mask)
+    bare_mask = cv2.bitwise_not(allocated)
+    
+    # Compute area percentages
+    water_pct = (np.count_nonzero(water_mask) / float(total_pixels)) * 100.0
+    forest_pct = (np.count_nonzero(forest_mask) / float(total_pixels)) * 100.0
+    crop_pct = (np.count_nonzero(crop_mask) / float(total_pixels)) * 100.0
+    cloud_pct = (np.count_nonzero(cloud_mask) / float(total_pixels)) * 100.0
+    built_pct = (np.count_nonzero(built_mask) / float(total_pixels)) * 100.0
+    bare_pct = max(0.0, 100.0 - (water_pct + forest_pct + crop_pct + cloud_pct + built_pct))
+    
+    return {
+        "water_pct": water_pct,
+        "forest_pct": forest_pct,
+        "crop_pct": crop_pct,
+        "veg_total_pct": forest_pct + crop_pct,
+        "cloud_pct": cloud_pct,
+        "built_pct": built_pct,
+        "bare_pct": bare_pct,
+        "water_mask": water_mask,
+        "forest_mask": forest_mask,
+        "crop_mask": crop_mask,
+        "veg_mask": veg_mask,
+        "built_mask": built_mask,
+        "bare_mask": bare_mask,
+        "cloud_mask": cloud_mask
+    }
+
+def _calculate_land_cover_percentages(cv_img: np.ndarray, stats: Dict[str, Any] = None) -> str:
+    if stats is None:
+        stats = _analyze_land_cover(cv_img)
         
-    water_mask = cv2.inRange(hsv, np.array([75, 20, 20]), np.array([145, 255, 255]))
-    water_pct = (np.count_nonzero(water_mask) / total_pixels) * 100.0
-    
-    # Vegetation masks (distinguish dense forest vs crops/grassland)
-    veg_mask = cv2.inRange(hsv, np.array([35, 30, 30]), np.array([85, 255, 255]))
-    veg_total_pct = (np.count_nonzero(veg_mask) / total_pixels) * 100.0
-    
-    # Dense forest has darker tones and richer saturation
-    forest_mask = cv2.inRange(hsv, np.array([35, 60, 20]), np.array([85, 255, 170]))
-    forest_pct = (np.count_nonzero(forest_mask) / total_pixels) * 100.0
-    crop_pct = max(0.0, veg_total_pct - forest_pct)
-    
-    # Clouds (bright, low saturation)
-    cloud_mask = cv2.inRange(hsv, np.array([0, 0, 190]), np.array([179, 45, 255]))
-    cloud_pct = (np.count_nonzero(cloud_mask) / total_pixels) * 100.0
-    
-    # Bare soil vs built-up / settlements
-    remainder = max(0.0, 100.0 - (forest_pct + crop_pct + water_pct + cloud_pct))
-    bare_pct = remainder * 0.65
-    built_pct = remainder * 0.35
-    
     table = f"""Based on the visible satellite image, here are the approximate land cover percentages:
 
 | Land cover / feature | Estimated coverage |
 | :--- | :--- |
-| 🌳 Dense vegetation / forest | ~{forest_pct:.1f}% |
-| 🌾 Agricultural / cropland | ~{crop_pct:.1f}% |
-| 💧 Water body / reservoir | ~{water_pct:.1f}% |
-| ☁️ Cloud cover / obscured area | ~{cloud_pct:.1f}% |
-| 🪨 Bare soil / rocky terrain | ~{bare_pct:.1f}% |
-| 🏘️ Built-up / settlements | ~{built_pct:.1f}% |
+| 💧 Water body / reservoir | ~{stats['water_pct']:.1f}% |
+| 🌳 Dense vegetation / forest | ~{stats['forest_pct']:.1f}% |
+| 🌾 Agricultural / cropland | ~{stats['crop_pct']:.1f}% |
+| 🏘️ Built-up / settlements | ~{stats['built_pct']:.1f}% |
+| 🪨 Bare soil / rocky terrain | ~{stats['bare_pct']:.1f}% |
+| ☁️ Cloud cover / obscured area | ~{stats['cloud_pct']:.1f}% |
 | **Total** | **100%** |"""
     return table
+
+def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict[str, Any]) -> Tuple[str, str]:
+    """
+    Generates tailored, high-fidelity visual overlays for any satellite image.
+    Outputs: (base64_data_uri, visual_description)
+    """
+    h, w = cv_img.shape[:2]
+    
+    if feature_type == "water":
+        overlay = cv_img.copy()
+        non_water = cv2.bitwise_not(stats["water_mask"])
+        overlay[non_water > 0] = (overlay[non_water > 0] * 0.50).astype(np.uint8)
+        
+        water_pixels = stats["water_mask"] > 0
+        if np.any(water_pixels):
+            cyan_tint = np.zeros_like(cv_img)
+            cyan_tint[water_pixels] = [240, 175, 30] # Luminous cyan-blue in BGR
+            overlay[water_pixels] = cv2.addWeighted(overlay[water_pixels], 0.40, cyan_tint[water_pixels], 0.60, 0)
+            contours, _ = cv2.findContours(stats["water_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, contours, -1, (255, 235, 80), 2)
+            
+        cv2.rectangle(overlay, (12, 12), (310, 42), (15, 20, 30), -1)
+        cv2.putText(overlay, f"DETECTED WATER: ~{stats['water_pct']:.1f}%", (20, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 220, 70), 2, cv2.LINE_AA)
+        desc = "Detected Water Bodies & Drainage Mask"
+
+    elif feature_type == "vegetation":
+        overlay = cv_img.copy()
+        non_veg = cv2.bitwise_not(stats["veg_mask"])
+        overlay[non_veg > 0] = (overlay[non_veg > 0] * 0.50).astype(np.uint8)
+        
+        veg_pixels = stats["veg_mask"] > 0
+        if np.any(veg_pixels):
+            green_tint = np.zeros_like(cv_img)
+            green_tint[veg_pixels] = [35, 225, 60] # Vibrant emerald green
+            overlay[veg_pixels] = cv2.addWeighted(overlay[veg_pixels], 0.40, green_tint[veg_pixels], 0.60, 0)
+            contours, _ = cv2.findContours(stats["veg_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, contours, -1, (110, 255, 140), 2)
+            
+        cv2.rectangle(overlay, (12, 12), (330, 42), (15, 30, 20), -1)
+        cv2.putText(overlay, f"GREEN COVER & CANOPY: ~{stats['veg_total_pct']:.1f}%", (20, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (120, 255, 140), 2, cv2.LINE_AA)
+        desc = "Vegetation & Canopy Distribution Map"
+
+    elif feature_type == "built":
+        overlay = cv_img.copy()
+        non_built = cv2.bitwise_not(stats["built_mask"])
+        overlay[non_built > 0] = (overlay[non_built > 0] * 0.50).astype(np.uint8)
+        
+        built_pixels = stats["built_mask"] > 0
+        if np.any(built_pixels):
+            orange_tint = np.zeros_like(cv_img)
+            orange_tint[built_pixels] = [0, 135, 255] # Amber-orange
+            overlay[built_pixels] = cv2.addWeighted(overlay[built_pixels], 0.40, orange_tint[built_pixels], 0.60, 0)
+            contours, _ = cv2.findContours(stats["built_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, contours, -1, (60, 185, 255), 2)
+            
+        cv2.rectangle(overlay, (12, 12), (320, 42), (30, 20, 15), -1)
+        cv2.putText(overlay, f"BUILT-UP & ROADS: ~{stats['built_pct']:.1f}%", (20, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (80, 195, 255), 2, cv2.LINE_AA)
+        desc = "Urban Infrastructure & Settlements Map"
+
+    elif feature_type == "land_cover":
+        # Multi-class segmented overlay
+        seg_color = np.zeros_like(cv_img)
+        seg_color[stats["water_mask"] > 0] = [220, 140, 25]      # Blue Water
+        seg_color[stats["forest_mask"] > 0] = [25, 160, 35]      # Forest Green
+        seg_color[stats["crop_mask"] > 0] = [40, 215, 140]       # Lime Green Crops
+        seg_color[stats["built_mask"] > 0] = [0, 130, 245]       # Amber Built-up
+        seg_color[stats["bare_mask"] > 0] = [60, 145, 195]       # Sandy Tan Bare Soil
+        seg_color[stats["cloud_mask"] > 0] = [255, 255, 255]    # White Clouds
+        
+        overlay = cv2.addWeighted(cv_img, 0.60, seg_color, 0.40, 0)
+        
+        # Legend banner at bottom
+        banner_h = 32
+        banner = np.zeros((banner_h, overlay.shape[1], 3), dtype=np.uint8)
+        banner[:] = (18, 18, 22)
+        
+        legend_items = [
+            ("Water", (220, 140, 25)),
+            ("Forest", (25, 160, 35)),
+            ("Crops", (40, 215, 140)),
+            ("Built-up", (0, 130, 245)),
+            ("Bare Soil", (60, 145, 195))
+        ]
+        col_w = max(1, overlay.shape[1] // len(legend_items))
+        for idx, (lbl, col) in enumerate(legend_items):
+            cx = idx * col_w + 10
+            cv2.rectangle(banner, (cx, 9), (cx + 14, 23), col, -1)
+            cv2.putText(banner, lbl, (cx + 18, 21), cv2.FONT_HERSHEY_SIMPLEX, 0.40, (230, 230, 230), 1, cv2.LINE_AA)
+            
+        overlay = np.vstack([overlay, banner])
+        desc = "Multi-Class Land Cover Segmentation Map"
+
+    else:
+        # Gradient saliency focus map (true image gradient, not a fake center blob)
+        gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+        clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8,8))
+        enhanced = clahe.apply(gray)
+        grad_x = cv2.Sobel(enhanced, cv2.CV_32F, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(enhanced, cv2.CV_32F, 0, 1, ksize=3)
+        magnitude = cv2.magnitude(grad_x, grad_y)
+        magnitude = cv2.GaussianBlur(magnitude, (15, 15), 0)
+        norm_mag = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+        
+        heatmap_colored = cv2.applyColorMap(norm_mag, cv2.COLORMAP_TURBO)
+        overlay = cv2.addWeighted(cv_img, 0.65, heatmap_colored, 0.35, 0)
+        desc = "AI Feature Salience & Focus Heatmap"
+        
+    b64 = f"data:image/png;base64,{_cv2_to_base64(overlay)}"
+    return b64, desc
 
 class SingleImageVQA(SpecialistModel):
     task_name = "SINGLE_IMAGE_VQA"
@@ -242,10 +412,16 @@ class SingleImageVQA(SpecialistModel):
         pil_img = _bytes_to_pil(images[0])
         processor, model, device, model_name = ml_manager.get_vqa_pipeline()
         cv_img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
-        h, w = cv_img.shape[:2]
         query_lower = query.lower()
         
-        # Check if the query is asking about land cover, terrain, green cover, water, or buildings
+        # Robust multi-class pixel analysis
+        stats = _analyze_land_cover(cv_img)
+        w_pct = stats["water_pct"]
+        v_pct = stats["veg_total_pct"]
+        built_pct = stats["built_pct"]
+        bare_pct = stats["bare_pct"]
+        
+        # Check specific query intents
         is_land_cover_query = any(kw in query_lower for kw in [
             "classify", "land cover", "terrain", "breakdown", "percentage", "type", "what is in", "what does this"
         ])
@@ -253,24 +429,12 @@ class SingleImageVQA(SpecialistModel):
         is_veg_query = any(kw in query_lower for kw in ["vegetation", "canopy", "green", "forest", "trees", "crop", "farm"])
         is_built_query = any(kw in query_lower for kw in ["built", "building", "urban", "settlement", "infrastructure", "fenestration", "road"])
         
-        # Calculate coverage percentages using real pixel analysis
-        hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-        total_pixels = max(1, h * w)
-        w_mask = cv2.inRange(hsv, np.array([75, 20, 20]), np.array([145, 255, 255]))
-        v_mask = cv2.inRange(hsv, np.array([35, 30, 30]), np.array([85, 255, 255]))
-        c_mask = cv2.inRange(hsv, np.array([0, 0, 190]), np.array([179, 45, 255]))
+        feature_type = "saliency"
         
-        w_pct = (np.count_nonzero(w_mask) / float(total_pixels)) * 100.0
-        v_pct = (np.count_nonzero(v_mask) / float(total_pixels)) * 100.0
-        c_pct = (np.count_nonzero(c_mask) / float(total_pixels)) * 100.0
-        remainder = max(0.0, 100.0 - (w_pct + v_pct + c_pct))
-        built_pct = remainder * 0.35
-        bare_pct = remainder * 0.65
-
         if is_land_cover_query:
-            table = _calculate_land_cover_percentages(cv_img)
+            feature_type = "land_cover"
+            table = _calculate_land_cover_percentages(cv_img, stats)
             
-            # Simple, plain-English urban planning insights
             insights = []
             if w_pct > 40:
                 insights.append(f"• **Dominant Area:** Mostly open water or coastal region (~{w_pct:.1f}%).")
@@ -283,17 +447,18 @@ class SingleImageVQA(SpecialistModel):
                 
             insights.append(f"• **Urban Footprint:** About {built_pct:.1f}% of this area has buildings, roads, or settlements.")
             insights.append(f"• **Green Space:** About {v_pct:.1f}% is covered by trees, plants, or crops.")
-            insights.append("• **AI Focus Map:** The colored heatmap on the right shows the main areas the AI analyzed.")
+            insights.append("• **Visual Guide:** The multi-colored segmentation map on the right displays each classified zone.")
             
             formatted_text = f"{table}\n\n**Quick Insights for Planners & Users:**\n" + "\n".join(insights)
 
         elif is_water_query:
-            if w_pct > 5.0:
+            feature_type = "water"
+            if w_pct > 2.0:
                 formatted_text = (
                     f"💧 **Water Bodies Detected (~{w_pct:.1f}% of this area):**\n\n"
-                    f"• **Observation:** Yes, significant water bodies (rivers, lakes, or coastal water) cover approximately **~{w_pct:.1f}%** of the visible area.\n"
+                    f"• **Observation:** Yes, prominent water bodies cover approximately **~{w_pct:.1f}%** of this satellite view.\n"
                     f"• **Surroundings:** The remaining land consists of green cover (~{v_pct:.1f}%) and developed land (~{built_pct:.1f}%).\n"
-                    f"• **Planning note:** The focus heatmap highlights the primary water boundaries and shorelines."
+                    f"• **Visual Highlight:** The detected water bodies and shorelines are illuminated in **cyan-blue** in the evidence panel."
                 )
             else:
                 formatted_text = (
@@ -303,22 +468,25 @@ class SingleImageVQA(SpecialistModel):
                 )
 
         elif is_veg_query:
+            feature_type = "vegetation"
             formatted_text = (
                 f"🌳 **Vegetation & Green Cover (~{v_pct:.1f}%):**\n\n"
-                f"• **Density:** Trees, vegetation, and agricultural plots cover approximately **~{v_pct:.1f}%** of this area.\n"
+                f"• **Density:** Trees, vegetation, and agricultural plots cover approximately **~{v_pct:.1f}%** of this area (Dense Forest: ~{stats['forest_pct']:.1f}%, Cropland: ~{stats['crop_pct']:.1f}%).\n"
                 f"• **Environment:** Planners can use this metric to evaluate tree canopy targets and urban green space distribution.\n"
-                f"• **Focus area:** The heatmap identifies the densest pockets of healthy vegetation."
+                f"• **Visual Highlight:** All plant canopy clusters are illuminated in **emerald green** in the evidence panel."
             )
 
         elif is_built_query:
+            feature_type = "built"
             formatted_text = (
                 f"🏘️ **Built-up Areas & Settlements (~{built_pct:.1f}%):**\n\n"
                 f"• **Development:** Buildings, paved surfaces, and developed infrastructure cover approximately **~{built_pct:.1f}%** of this area.\n"
-                f"• **Open land ratio:** The majority of the region remains undeveloped natural terrain or open space.\n"
-                f"• **Focus area:** The AI heatmap outlines where structural density is highest."
+                f"• **Open Land Ratio:** The majority of the region remains undeveloped natural terrain or open space (~{bare_pct:.1f}%).\n"
+                f"• **Visual Highlight:** All structural footprints and roads are illuminated in **amber-orange** in the evidence panel."
             )
 
         else:
+            feature_type = "saliency"
             if model is not None and processor is not None:
                 inputs = processor(pil_img, query, return_tensors="pt").to(device)
                 out = model.generate(**inputs, max_new_tokens=150)
@@ -331,23 +499,13 @@ class SingleImageVQA(SpecialistModel):
             else:
                 formatted_text = answer
 
-        # Synthetic XAI Heatmap Generation (Grad-CAM focus representation)
-        heatmap = np.zeros((h, w), dtype=np.float32)
-        center_x, center_y = w // 2, h // 2
-        sigma = min(w, h) / 3.5
-        y, x = np.ogrid[0:h, 0:w]
-        heatmap = np.exp(-((x - center_x)**2 + (y - center_y)**2) / (2.0 * sigma**2))
-        heatmap = np.uint8(255 * heatmap)
-        
-        heatmap_colored = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-        overlay = cv2.addWeighted(cv_img, 0.65, heatmap_colored, 0.35, 0)
-        b64_overlay = f"data:image/png;base64,{_cv2_to_base64(overlay)}"
-        
+        # Generate tailor-made visual evidence
+        b64_overlay, visual_desc = _generate_visual_evidence(cv_img, feature_type, stats)
         geo_meta = _extract_geo_metadata(images[0])
         
         return {
             "text": formatted_text,
-            "visual_evidence": [{"image_base64": b64_overlay, "description": "Focus Heatmap (Where the AI looked)"}],
+            "visual_evidence": [{"image_base64": b64_overlay, "description": visual_desc}],
             "confidence": 0.94,
             "compatibility_status": "PASSED",
             "spatial_coherence_score": 1.0,
@@ -377,15 +535,15 @@ class SingleImageCaptioning(SpecialistModel):
             desc = "A satellite view showing the terrain, natural features, and surroundings of this location."
             
         geo_meta = _extract_geo_metadata(images[0])
-        b64_orig = f"data:image/png;base64,{_cv2_to_base64(cv_img)}"
-        
-        land_cover_table = _calculate_land_cover_percentages(cv_img)
+        stats = _analyze_land_cover(cv_img)
+        land_cover_table = _calculate_land_cover_percentages(cv_img, stats)
+        b64_seg, seg_desc = _generate_visual_evidence(cv_img, "land_cover", stats)
         
         final_text = f"**What we see in this image:**\n{desc}\n\n{land_cover_table}"
         
         return {
             "text": final_text,
-            "visual_evidence": [{"image_base64": b64_orig, "description": "Satellite Image"}],
+            "visual_evidence": [{"image_base64": b64_seg, "description": seg_desc}],
             "confidence": 0.91,
             "compatibility_status": "PASSED",
             "spatial_coherence_score": 1.0,
