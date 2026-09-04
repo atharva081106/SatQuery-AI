@@ -62,6 +62,28 @@ class AgenticController:
         3. Execute the tool with automated input compatibility checks.
         4. Return auditable results with confidence and spatial coherence metadata.
         """
+        import hashlib
+        import json
+        import os
+        
+        # Compute cache key
+        m = hashlib.md5()
+        m.update(query.encode('utf-8'))
+        for img in images:
+            m.update(img)
+        cache_key = m.hexdigest()
+        cache_dir = os.path.join(os.path.dirname(__file__), "cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_path = os.path.join(cache_dir, f"{cache_key}.json")
+        
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r") as f:
+                    logger.info(f"Returning cached result for query: {query}")
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"Error reading cache: {e}")
+
         try:
             classification = self.classify_task(query, len(images), history)
             task_name = classification["task"]
@@ -93,7 +115,7 @@ class AgenticController:
                 "agent_reasoning": reasoning
             }
             
-            return {
+            final_result = {
                 "status": "success",
                 "answer": tool_output["text"],
                 "visual_evidence": tool_output["visual_evidence"],
@@ -105,6 +127,15 @@ class AgenticController:
                 "geojson_data": tool_output.get("geojson_data"),
                 "pair_comparison": tool_output.get("pair_comparison")
             }
+            
+            # Save to cache
+            try:
+                with open(cache_path, "w") as f:
+                    json.dump(final_result, f)
+            except Exception as e:
+                logger.error(f"Error writing to cache: {e}")
+                
+            return final_result
             
         except Exception as e:
             logger.error(f"Error executing query: {str(e)}")
