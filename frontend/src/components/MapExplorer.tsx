@@ -12,6 +12,8 @@ interface MapExplorerProps {
 
 export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = {}) {
   const mapRef = useRef<any>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const gibsLayerRef = useRef<any>(null);
   const router = useRouter();
   const [L, setL] = useState<any>(null);
   
@@ -52,6 +54,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       zoom: 5,
       zoomControl: false,
     });
+    mapInstanceRef.current = map;
 
     // High Res Satellite Imagery (Esri World Imagery)
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -110,8 +113,34 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
 
     return () => {
       map.remove();
+      mapInstanceRef.current = null;
     };
   }, [L]);
+
+  // Dynamic NASA GIBS Tile Layer Effect
+  useEffect(() => {
+    if (!L || !mapInstanceRef.current) return;
+    
+    // Remove old layer if it exists
+    if (gibsLayerRef.current) {
+      mapInstanceRef.current.removeLayer(gibsLayerRef.current);
+    }
+    
+    // Create new layer with the updated endDate
+    const gibsLayer = L.tileLayer(
+      `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${endDate}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
+      {
+        attribution: 'NASA GIBS',
+        maxZoom: 9,
+        opacity: 0.9,
+        bounds: [[-85.0511287776, -180], [85.0511287776, 180]]
+      }
+    );
+    
+    gibsLayer.addTo(mapInstanceRef.current);
+    gibsLayerRef.current = gibsLayer;
+    
+  }, [L, endDate]);
 
   const handleAcquire = async () => {
     if (!bbox) {

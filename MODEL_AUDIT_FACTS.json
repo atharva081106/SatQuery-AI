@@ -1,0 +1,90 @@
+{
+  "artifacts_found": [
+    {"path": "backend/requirements.txt", "type": "Environment/dependency file", "size_bytes": 157},
+    {"path": "ml_pipeline/requirements.txt", "type": "Environment/dependency file", "size_bytes": 98},
+    {"path": "ml_pipeline/train_vqa.py", "type": "Training script", "size_bytes": 2263},
+    {"path": "ml_pipeline/satquery_finetuned_model/config.json", "type": "Config file", "size_bytes": 2531},
+    {"path": "ml_pipeline/satquery_finetuned_model/model.safetensors", "type": "Model weight file", "size_bytes": 1445022200},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/config.json", "type": "Config file", "size_bytes": 2531},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/model.safetensors", "type": "Model weight file", "size_bytes": 1445022200},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/optimizer.pt", "type": "Model weight file", "size_bytes": 2890480156},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/rng_state.pth", "type": "Model weight file", "size_bytes": 14455},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/scheduler.pt", "type": "Model weight file", "size_bytes": 1465},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/trainer_state.json", "type": "Log file", "size_bytes": 1074},
+    {"path": "ml_pipeline/satquery_finetuned_model/checkpoint-5/training_args.bin", "type": "Config file", "size_bytes": 5265},
+    {"path": "ml_pipeline/evaluation_results.json", "type": "Log file", "size_bytes": 401}
+  ],
+  "environment": {
+    "framework": "PyTorch",
+    "framework_version": "UNKNOWN - not found",
+    "python_version": "3.10",
+    "cuda": "UNKNOWN - not found"
+  },
+  "architecture": {
+    "model_type": "blip",
+    "base_pretrained": "Salesforce/blip-vqa-base",
+    "total_params": 361230140,
+    "trainable_params": 361230140,
+    "input_shape": "torch.Size([1, 3, 384, 384])",
+    "input_channels": 3,
+    "normalization": {
+      "mean": [],
+      "std": []
+    },
+    "output_shape": "torch.Size([1, 3])",
+    "task_type": "Visual Question Answering",
+    "num_classes": null,
+    "class_labels": []
+  },
+  "training": {
+    "dataset": "RSVQADataset",
+    "dataset_source_path_or_url": "dummy_dataset",
+    "train_samples": 10,
+    "val_samples": 5,
+    "test_samples": 0,
+    "image_resolution_used": "UNKNOWN - not found",
+    "batch_size": 2,
+    "epochs_configured": 10,
+    "epochs_completed": 1,
+    "optimizer": "UNKNOWN - not found",
+    "learning_rate": 5e-05,
+    "loss_function": "UNKNOWN - not found",
+    "augmentations": [],
+    "fine_tuning_method": "full fine-tune",
+    "seed": null
+  },
+  "metrics": {
+    "final_train_loss": null,
+    "final_val_loss": 10.261253356933594,
+    "best_val_metric_name": "accuracy",
+    "best_val_metric_value": 0.0,
+    "per_class_metrics": {},
+    "confusion_matrix": null
+  },
+  "inference_check": {
+    "ran_successfully": true,
+    "error_if_any": "",
+    "sample_results": [
+      {
+        "image": "ml_pipeline/dummy_dataset/val/images/image_000.tif",
+        "top_prediction": "no",
+        "confidence": null,
+        "latency_ms": 4453.77
+      }
+    ]
+  },
+  "unknowns": [
+    "environment.framework_version",
+    "environment.cuda",
+    "architecture.normalization.mean",
+    "architecture.normalization.std",
+    "architecture.num_classes",
+    "architecture.class_labels",
+    "training.image_resolution_used",
+    "training.optimizer",
+    "training.loss_function",
+    "metrics.final_train_loss",
+    "metrics.confusion_matrix",
+    "inference_check.sample_results.confidence"
+  ]
+}

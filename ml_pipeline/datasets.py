@@ -74,10 +74,10 @@ class RSVQADataset(Dataset):
         query = item["question"]
         answer = item["answer"]
         
-        encoding = self.processor(image, query, return_tensors="pt", padding="max_length", truncation=True)
+        encoding = self.processor(image, query, return_tensors="pt", padding="max_length", max_length=128, truncation=True)
         encoding = {k: v.squeeze(0) for k, v in encoding.items()}
         
-        labels_encoding = self.processor.tokenizer(answer, return_tensors="pt", padding="max_length", truncation=True)
+        labels_encoding = self.processor.tokenizer(answer, return_tensors="pt", padding="max_length", max_length=128, truncation=True)
         encoding["labels"] = labels_encoding["input_ids"].squeeze(0)
         
         return encoding

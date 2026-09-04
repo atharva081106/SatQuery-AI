@@ -96,23 +96,19 @@ async def acquire_imagery(request: AcquireRequest):
     config.sh_client_id = client_id
     config.sh_client_secret = client_secret
     
-    # Use Copernicus Data Space Ecosystem (CDSE) endpoints
-    # since Sentinel Hub transitioned to CDSE and user keys are registered there.
-    config.sh_base_url = "https://sh.dataspace.copernicus.eu"
-    config.sh_token_url = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    # Use standard Sentinel Hub endpoints since the user generated standard keys.
+    # config.sh_base_url and config.sh_token_url default to standard Sentinel Hub endpoints.
     
     try:
         # Convert bbox array to BBox object
         bbox_obj = BBox(bbox=request.bbox, crs=CRS.WGS84)
         
-        cdse_url = "https://sh.dataspace.copernicus.eu"
-        
-        # Select Data Collection mapped to CDSE
-        collection = DataCollection.define(name="CDSE_S2", api_id="sentinel-2-l2a", service_url=cdse_url)
+        # Select standard Data Collection mapped to Sentinel Hub
+        collection = DataCollection.SENTINEL2_L2A
         if request.dataset == "s1":
-            collection = DataCollection.define(name="CDSE_S1", api_id="sentinel-1-grd", service_url=cdse_url)
+            collection = DataCollection.SENTINEL1_IW
         elif request.dataset == "l8":
-            collection = DataCollection.define(name="CDSE_L8", api_id="landsat-ot-l2", service_url=cdse_url)
+            collection = DataCollection.LANDSAT8_L2
             
         # Evalscript for True Color
         evalscript = """

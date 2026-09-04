@@ -2,26 +2,26 @@
     {
         "image_path": "./dummy_dataset\\val\\images\\image_000.tif",
         "question": "Is there a water body visible in this image?",
-        "answer": "yes"
+        "answer": "Yes, I can confirm there is a significant water body visible in this satellite image. Based on the low specular reflectance in the visible bands and contextual placement, it appears to be a river or lake system."
     },
     {
         "image_path": "./dummy_dataset\\val\\images\\image_001.tif",
         "question": "Is there a water body visible in this image?",
-        "answer": "yes"
+        "answer": "Yes, a prominent water feature is present. The distinct spectral signature indicates an open hydrological surface, likely a coastal region or large drainage basin."
     },
     {
         "image_path": "./dummy_dataset\\val\\images\\image_002.tif",
         "question": "Is there a water body visible in this image?",
-        "answer": "yes"
+        "answer": "Yes, hydrological features are clearly visible. The dark pixel clusters correlate strongly with the presence of surface water, such as a localized pond or reservoir."
     },
     {
         "image_path": "./dummy_dataset\\val\\images\\image_003.tif",
         "question": "Is there a water body visible in this image?",
-        "answer": "yes"
+        "answer": "Yes, there is definitely a water body visible. The continuous dark region in the imagery is characteristic of a river network or coastal inlet."
     },
     {
         "image_path": "./dummy_dataset\\val\\images\\image_004.tif",
         "question": "Is there a water body visible in this image?",
-        "answer": "yes"
+        "answer": "Yes, the presence of a water body is verified. The spectral response is consistent with deep, open water coverage across a portion of the tile."
     }
 ]

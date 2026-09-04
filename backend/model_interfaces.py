@@ -6,6 +6,7 @@ from PIL import Image
 import cv2
 import numpy as np
 import rasterio
+from skimage.metrics import structural_similarity as ssim
 from ml_models import ml_manager
 
 class SpecialistModel(ABC):
@@ -97,6 +98,11 @@ def check_spatial_compatibility(img1_bytes: bytes, img2_bytes: bytes, cross_moda
     
     gray1 = cv2.cvtColor(r1, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(r2, cv2.COLOR_BGR2GRAY)
+    
+    # Apply CLAHE for robust feature matching against haze/clouds
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    gray1 = clahe.apply(gray1)
+    gray2 = clahe.apply(gray2)
     
     # In cross-modal Optical-SAR where clouds obscure optical bands, compute gradient/edge structural correlation
     if cross_modal:
@@ -198,7 +204,7 @@ class SingleImageVQA(SpecialistModel):
         
         if model is not None and processor is not None:
             inputs = processor(pil_img, query, return_tensors="pt").to(device)
-            out = model.generate(**inputs, max_new_tokens=60)
+            out = model.generate(**inputs, max_new_tokens=150)
             answer = processor.decode(out[0], skip_special_tokens=True).strip()
         else:
             answer = "satellite"
@@ -216,108 +222,11 @@ class SingleImageVQA(SpecialistModel):
         heatmap_colored = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
         overlay = cv2.addWeighted(cv_img, 0.65, heatmap_colored, 0.35, 0)
         b64_overlay = f"data:image/png;base64,{_cv2_to_base64(overlay)}"
-
-        query_lower = query.lower().strip()
-        
-        # Check if the user is asking about the system architecture or operational setup
-        if any(kw in query_lower for kw in ["identify system", "what system", "system architecture", "active system", "sensor identification"]):
-            final_answer = (
-                "Operational System Identification:\n\n"
-                "• Platform Core: SatQuery AI Multi-Agent Remote Sensing Architecture (v1.4)\n"
-                "• Active Pipeline: Fine-tuned Vision-Language Foundation with Specialist Remote Sensing Dispatch\n"
-                "• Sensor Modalities: Co-registered Optical/Multispectral (Cartosat-2S / Sentinel-2) & C/X-Band SAR (RISAT-1 / Sentinel-1)\n"
-                "• Inference Verification: Automated spatial compatibility verification with sub-pixel alignment checks\n"
-                "• Evaluation Protocol: ISRO/SAC & Public Benchmark Compliant (VRSBench, RSVQAxBEN, CDVQA)"
-            )
-        elif any(kw in query_lower for kw in ["country", "state", "identify the region", "what region"]):
-            final_answer = (
-                "Geospatial Region Identification:\n\n"
-                "• Primary Region: Indian Subcontinent & South Asia\n"
-                "• Key Countries: India, Pakistan, Nepal, Bangladesh, Sri Lanka, Bhutan\n"
-                "• Surrounding Water Bodies: Arabian Sea, Bay of Bengal, Indian Ocean\n"
-                "• Observation: The imagery captures widespread meteorological cloud cover across the southern peninsula and eastern coastal territories."
-            )
-        else:
-            # Domain-adapted expansion for VQA outputs using real image heuristics
-            cv_img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
-            hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-            gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-            
-            total_pixels = h * w
-            
-            # Heuristics
-            w_mask = cv2.inRange(hsv, np.array([75, 20, 20]), np.array([145, 255, 255]))
-            v_mask = cv2.inRange(hsv, np.array([35, 30, 30]), np.array([85, 255, 255]))
-            u_mask = cv2.inRange(gray, 180, 255)
-            
-            w_ratio = (np.sum(w_mask > 0) / float(total_pixels)) * 100
-            v_ratio = (np.sum(v_mask > 0) / float(total_pixels)) * 100
-            u_ratio = (np.sum(u_mask > 0) / float(total_pixels)) * 100
-            other_ratio = max(0, 100 - w_ratio - v_ratio - u_ratio)
-            
-            ans_clean = answer.strip()
-            
-            if any(kw in query_lower for kw in ["classify", "land cover", "terrain", "what is in", "describe", "analysis", "type"]):
-                classification = (
-                    f"Terrain & Land Cover Classification:\n"
-                    f"• Hydrological Features (Water Bodies): ~{w_ratio:.1f}%\n"
-                    f"• Vegetative Biomass (Forests/Farms): ~{v_ratio:.1f}%\n"
-                    f"• High-Albedo / Built-up Surfaces: ~{u_ratio:.1f}%\n"
-                    f"• Bare Earth / Other Cover: ~{other_ratio:.1f}%\n\n"
-                    f"Dominant Signature: "
-                )
-                if w_ratio > 40:
-                    classification += "Maritime/Coastal or Large Water Body Region."
-                elif v_ratio > 40:
-                    classification += "Dense Vegetation or Agricultural Zone."
-                elif u_ratio > 30:
-                    classification += "Highly Urbanized or Built-up Infrastructure."
-                else:
-                    classification += "Heterogeneous / Mixed Terrain."
-                    
-                final_answer = (
-                    f"Observation:\n{classification}\n\n"
-                    f"Remote-Sensing Feature Analysis:\n"
-                    f"• Spectral analysis applied to dynamically categorize pixel clusters based on multi-band thresholding.\n"
-                    f"• Grad-CAM attention heatmap highlights the principal regions of interest across the image."
-                )
-            elif any(kw in query_lower for kw in ["water", "sea", "ocean", "river", "lake", "drainage"]):
-                final_answer = (
-                    f"Observation:\nHydrological feature extraction indicates water bodies cover approximately {w_ratio:.1f}% of the visible area.\n\n"
-                    f"Remote-Sensing Feature Analysis:\n"
-                    f"• Verified against spectral reflectance patterns and low-specular visible band returns.\n"
-                    f"• Grad-CAM attention heatmap isolates the precise pixel clusters driving this activation."
-                )
-            elif any(kw in query_lower for kw in ["green", "forest", "tree", "vegetation", "grass", "farm", "crop"]):
-                final_answer = (
-                    f"Observation:\nVegetation and photosynthetic biomass extraction indicates coverage of approximately {v_ratio:.1f}% of the visible area.\n\n"
-                    f"Remote-Sensing Feature Analysis:\n"
-                    f"• Verified against spectral reflectance patterns and contextual spatial relationships.\n"
-                    f"• Grad-CAM attention heatmap isolates the precise pixel clusters driving this activation."
-                )
-            else:
-                if ans_clean.lower() in ["windows", "window"]:
-                    ans_expanded = "Urban residential/commercial built infrastructure with identifiable architectural fenestration."
-                elif ans_clean.lower() in ["water", "sea", "ocean", "river", "lake"]:
-                    ans_expanded = "Open hydrological water surface characterized by low specular reflectance in visible bands."
-                elif ans_clean.lower() in ["trees", "forest", "vegetation", "grass", "plant", "plants"]:
-                    ans_expanded = "Dense vegetative canopy and photosynthetic biomass coverage."
-                elif ans_clean.lower() in ["yes", "no"]:
-                    ans_expanded = f"{ans_clean.upper()} — verified against spatial-spectral feature distribution across the survey tile."
-                else:
-                    ans_expanded = f"{ans_clean.capitalize()} — identified as the dominant signature corresponding to the query."
-    
-                final_answer = (
-                    f"Observation:\n{ans_expanded}\n\n"
-                    f"Remote-Sensing Feature Analysis:\n"
-                    f"• Verified against spectral reflectance patterns and contextual spatial relationships.\n"
-                    f"• Grad-CAM attention heatmap rendered in the Trace panel isolates the precise pixel clusters driving this activation."
-                )
         
         geo_meta = _extract_geo_metadata(images[0])
         
         return {
-            "text": final_answer,
+            "text": answer,
             "visual_evidence": [{"image_base64": b64_overlay, "description": "XAI Attention Heatmap (Grad-CAM)"}],
             "confidence": 0.94,
             "compatibility_status": "PASSED",
@@ -336,22 +245,16 @@ class SingleImageCaptioning(SpecialistModel):
         pil_img = _bytes_to_pil(images[0])
         processor, model, device, model_name = ml_manager.get_vqa_pipeline()
         
-        # Analyze landscape features
         cv_img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
         h, w = cv_img.shape[:2]
         
-        # Dominant terrain classification heuristic
-        hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-        water_ratio = np.sum(cv2.inRange(hsv, np.array([70, 40, 40]), np.array([140, 255, 255])) > 0) / float(h * w)
-        veg_ratio = np.sum(cv2.inRange(hsv, np.array([35, 40, 40]), np.array([85, 255, 255])) > 0) / float(h * w)
-        
-        desc = "High-resolution remote sensing image showing "
-        if water_ratio > 0.25:
-            desc += f"coastal/maritime area with water bodies occupying approximately {water_ratio*100:.1f}% of the scene, accompanied by built infrastructure and shoreline features."
-        elif veg_ratio > 0.30:
-            desc += f"dense vegetative canopy and agricultural or forest parcel distribution covering {veg_ratio*100:.1f}% of the geographic tile."
+        if model is not None and processor is not None:
+            prompt = "Describe the land-cover and major objects visible in this image in detail."
+            inputs = processor(pil_img, prompt, return_tensors="pt").to(device)
+            out = model.generate(**inputs, max_new_tokens=150)
+            desc = processor.decode(out[0], skip_special_tokens=True).strip()
         else:
-            desc += "structured urban layout, road networks, commercial installations, and heterogeneous ground terrain."
+            desc = "Unable to generate caption as the VLM is not loaded."
             
         geo_meta = _extract_geo_metadata(images[0])
         b64_orig = f"data:image/png;base64,{_cv2_to_base64(cv_img)}"
@@ -545,8 +448,14 @@ class BiTemporalChangeAnalysis(SpecialistModel):
         gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
         gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
         
-        diff = cv2.absdiff(gray1, gray2)
-        _, thresh = cv2.threshold(diff, 40, 255, cv2.THRESH_BINARY)
+        # Robust change detection using Structural Similarity Index (SSIM)
+        score, diff_map = ssim(gray1, gray2, full=True)
+        diff_map = (diff_map * 255).astype(np.uint8)
+        
+        # The diff_map shows similarity (255 = identical, 0 = different)
+        # We invert it so changes are high values (white)
+        diff = 255 - diff_map
+        _, thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         change_detected = False
@@ -678,7 +587,16 @@ class CrossModalAnalysis(SpecialistModel):
             else:
                 img2 = cv2.resize(img2, (w1, h1))
             
-        blended = cv2.addWeighted(img1, 0.55, img2, 0.45, 0)
+        # Advanced IHS (Intensity-Hue-Saturation) Fusion
+        hsv_opt = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
+        h_channel, s_channel, v_channel = cv2.split(hsv_opt)
+        sar_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+        
+        # Inject SAR structure into Optical Intensity
+        v_fused = cv2.addWeighted(v_channel, 0.4, sar_gray, 0.6, 0)
+        hsv_fused = cv2.merge([h_channel, s_channel, v_fused])
+        blended = cv2.cvtColor(hsv_fused, cv2.COLOR_HSV2BGR)
+        
         b64_img = f"data:image/png;base64,{_cv2_to_base64(blended)}"
         b64_optical = f"data:image/png;base64,{_cv2_to_base64(img1)}"
         b64_sar = f"data:image/png;base64,{_cv2_to_base64(img2)}"
