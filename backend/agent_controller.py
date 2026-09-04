@@ -43,7 +43,7 @@ class AgenticController:
             elif any(keyword in query_lower for keyword in ["country", "state", "identify the region", "what region"]):
                 reasoning += "User is asking for geospatial intelligence and location identification. Routing to Remote-Sensing-Adapted Vision-Language Model."
                 task = "SINGLE_IMAGE_VQA"
-            elif any(keyword in query_lower for keyword in ["highlight", "where", "region", "find", "locate", "bound", "detect", "box"]):
+            elif any(keyword in query_lower for keyword in ["highlight", "where", "region", "find", "locate", "bound", "detect", "box", "identify"]):
                 reasoning += "User is asking for spatial localization of a specific feature. Routing to Specialist Grounding Model."
                 task = "SINGLE_IMAGE_GROUNDING"
             else:

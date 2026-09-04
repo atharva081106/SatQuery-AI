@@ -322,22 +322,41 @@ class SingleImageGrounding(SpecialistModel):
         cv_img = _bytes_to_cv2(images[0])
         h, w = cv_img.shape[:2]
         query_lower = query.lower()
+        hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
         mask = np.zeros((h, w), dtype=np.uint8)
+        found_kw = False
         
         if any(kw in query_lower for kw in ["water", "sea", "ocean", "river", "lake"]):
-            hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-            lower_water = np.array([70, 40, 40])
-            upper_water = np.array([140, 255, 255])
-            mask = cv2.inRange(hsv, lower_water, upper_water)
-        elif any(kw in query_lower for kw in ["green", "forest", "tree", "vegetation", "grass", "farm", "crop"]):
-            hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-            lower_green = np.array([35, 40, 40])
+            lower_water = np.array([75, 20, 20])
+            upper_water = np.array([145, 255, 255])
+            water_mask = cv2.inRange(hsv, lower_water, upper_water)
+            mask = cv2.bitwise_or(mask, water_mask)
+            found_kw = True
+            
+        if any(kw in query_lower for kw in ["green", "forest", "tree", "vegetation", "grass", "farm", "crop"]):
+            lower_green = np.array([35, 30, 30])
             upper_green = np.array([85, 255, 255])
-            mask = cv2.inRange(hsv, lower_green, upper_green)
-        else:
+            green_mask = cv2.inRange(hsv, lower_green, upper_green)
+            mask = cv2.bitwise_or(mask, green_mask)
+            found_kw = True
+            
+        if any(kw in query_lower for kw in ["land", "ground", "bare", "earth", "soil", "urban", "built", "building", "road"]):
+            lower_water = np.array([75, 20, 20])
+            upper_water = np.array([145, 255, 255])
+            water_mask = cv2.inRange(hsv, lower_water, upper_water)
+            lower_cloud = np.array([0, 0, 190])
+            upper_cloud = np.array([179, 50, 255])
+            cloud_mask = cv2.inRange(hsv, lower_cloud, upper_cloud)
+            non_land = cv2.bitwise_or(water_mask, cloud_mask)
+            land_mask = cv2.bitwise_not(non_land)
+            mask = cv2.bitwise_or(mask, land_mask)
+            found_kw = True
+            
+        if not found_kw:
             gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
             blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-            _, mask = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            _, otsu_mask = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            mask = cv2.bitwise_or(mask, otsu_mask)
             
         kernel = np.ones((5,5),np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
@@ -348,7 +367,7 @@ class SingleImageGrounding(SpecialistModel):
         found = False
         box_count = 0
         for c in contours:
-            if cv2.contourArea(c) > (h * w * 0.005) and box_count < 6:
+            if cv2.contourArea(c) > (h * w * 0.001) and box_count < 15:
                 found = True
                 box_count += 1
                 x, y, w_b, h_b = cv2.boundingRect(c)
@@ -381,7 +400,7 @@ class SingleImageGrounding(SpecialistModel):
 
         boxes_list = []
         for c in contours:
-            if cv2.contourArea(c) > (h * w * 0.005) and len(boxes_list) < 6:
+            if cv2.contourArea(c) > (h * w * 0.001) and len(boxes_list) < 15:
                 x, y, w_b, h_b = cv2.boundingRect(c)
                 boxes_list.append((x, y, w_b, h_b))
         if not boxes_list:
