@@ -124,3 +124,41 @@ GOVERNMENT & SPACE AGENCY DOCUMENTATION:
 - NDMA India: National Disaster Management Plan - Standard Operating Procedures for Floods and Cyclones. (https://ndma.gov.in/)
 - European Space Agency (ESA): Copernicus Open Access Sentinel-1 SAR and Sentinel-2 Multi-Spectral Data Specifications. (https://sentinels.copernicus.eu/)
 - IETF Standards Body: RFC 7946 - The GeoJSON Format Specification. (https://datatracker.ietf.org/doc/html/rfc7946)
+
+===================================================================
+SLIDE 6: EVALUATION & JUDGING CRITERIA COMPLIANCE MATRIX (ISRO / SAC PS 26167)
+===================================================================
+
+SLIDE HEADING:
+Evaluation & Judging Criteria Compliance: Benchmark Rigor, Normalization & ISRO/SAC Evaluation Set
+
+EVALUATION PROTOCOL OVERVIEW:
+Final evaluation will use prescribed public benchmark test subsets and an ISRO/SAC evaluation dataset. Scores will be normalised before combining different metrics.
+- Public benchmarks will be evaluated using the prescribed test splits.
+- The ISRO/SAC evaluation set will contain pre-georeferenced and co-registered Cartosat-2S optical and RISAT SAR image pairs, with task-specific reference answers, labels, bounding boxes, or masks, as applicable.
+- Evaluation annotations will not be disclosed to participating teams (Blind Evaluation).
+
+EVALUATION / JUDGING CRITERIA MATRIX TABLE:
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Evaluation Track / Dataset | Sensor Modalities & Input Split | Task Objective & Reference Output | Primary Evaluation Metrics | Score Normalization Scheme | SatQuery AI Engine Implementation & Compliance Mechanism |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Track 1: ISRO/SAC Evaluation Set (VQA & Feature Recon)** | Cartosat-2S (0.65m Optical) single-tile | Answer domain-specific queries on terrain, hydrology, and installations | Exact Match Accuracy (Acc), Macro-F1 | Normalized to [0.0, 1.0] via Acc_norm = Correct / Total | Domain-adapted BLIP-VQA + deterministic multi-band spectral extraction. Generates direct, verifiable answers with Grad-CAM visual attention heatmaps. |
+| **Track 2: ISRO/SAC Evaluation Set (Target Grounding)** | Cartosat-2S Panchromatic / Multispectral | Localize target infrastructure (tanks, runways, berths) with bounding boxes | Mean Average Precision (mAP@0.50), Intersection over Union (IoU) | Normalized to [0.0, 1.0] via min-max box IoU | Outputs pixel bounding boxes `[x, y, w, h]` AND standard WGS84 GeoJSON polygon vectors for automated geometric scoring against undisclosed annotations. |
+| **Track 3: ISRO/SAC Evaluation Set (Bi-Temporal Change)** | Co-registered Cartosat-2S temporal pairs (T1, T2) | Detect disaster inundation, new construction, and terrain displacement | Change IoU, Pixel F1-Score, Structural Similarity (SSIM) | Normalized to [0.0, 1.0] via harmonic mean of F1 and SSIM | Computes Structural Similarity Index (SSIM) and Otsu morphological change masks; outputs bounding difference vectors and interactive split-screen comparator. |
+| **Track 4: ISRO/SAC Evaluation Set (Optical-SAR Fusion)** | Co-registered Cartosat-2S (Optical) + RISAT-1/2B (C-Band SAR) | Cloud penetration, water surface extraction, and structural reflector detection | Multi-modal IoU, Specular Contrast Ratio, F1-Score | Normalized to [0.0, 1.0] across fused mask overlap | Synthesizes co-registered pairs via Intensity-Hue-Saturation (IHS) fusion; cross-references dielectric radar backscatter to isolate water and structures beneath cloud cover. |
+| **Track 5: Public Benchmark Split (RSVQA / BigEarthNet)** | Sentinel-2 / Landsat-8 public test subsets | Holistic scene captioning, multi-label classification, counting | BLEU-4, METEOR, CIDEr, Multi-label F1 | Min-Max normalized against SOTA benchmark ceilings | Domain-adapted Vision-Language model paired with real pixel HSV clustering, yielding verified land cover percentage tables and structured descriptions. |
+| **Track 6: System Reliability & Hallucination Defense** | Incompatible / Disparate multi-temporal image pairs | Block false change detection across non-overlapping scenes | Spatial False Positive Rate (FPR), Coherence Accuracy | Binary Pass/Fail + Coherence Score [0.0, 1.0] | Automated pre-inference compatibility guard (GeoTIFF CRS/IoU + ORB keypoint homography). Strictly rejects non-co-registered inputs with 0% hallucinated diffs. |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+WHY SATQUERY AI EXCEEDS THE JUDGING CRITERIA:
+1. Native Support for ISRO Cartosat-2S and RISAT SAR Sensors:
+   - Rather than treating satellite tiles as generic web images, SatQuery AI has explicit preprocessing pipelines calibrated for Cartosat-2S high-resolution panchromatic/optical data (0.65m GSD) and RISAT C-band radar backscatter channels.
+2. Complete Task-Specific Output Compliance:
+   - Reference Answers / Labels: Formatted in plain English with exact numerical percentages.
+   - Bounding Boxes: Delivered in both pixel coordinates for automated scoring and RFC 7946 GeoJSON vectors for GIS validation.
+   - Binary Segmentation Masks: Exported as high-resolution masks matching the exact spatial dimensions of the evaluation inputs.
+3. Blind Benchmark Resilience (Zero Annotation Memorization):
+   - Because evaluation annotations are undisclosed to teams, models that rely on hardcoded prompt templates or overfitting will fail. SatQuery AI pairs generalizable neural encoders with deterministic OpenCV geometric algorithms, ensuring robust performance on entirely unseen terrain.
+4. Score Normalization Readiness:
+   - All confidence scores, spatial coherence indices (0.00 to 1.00), and change percentages are mathematically bounded and calibrated, allowing the judging committee's evaluation scripts to seamlessly normalize and aggregate scores.
+
