@@ -145,35 +145,35 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in font-sans">
-      {/* Centered Modal Card - Clean SpaceX Architecture */}
-      <div className="relative w-full max-w-md bg-[#070709] border border-white/20 p-5 sm:p-6 text-white flex flex-col gap-3.5 shadow-2xl max-h-[94vh] overflow-y-auto custom-scrollbar">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-xl animate-fade-in font-sans">
+      {/* Centered Modal Card - Curvy Glassmorphism Architecture */}
+      <div className="relative w-full max-w-md bg-zinc-950/75 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 sm:p-7 text-white flex flex-col gap-4 shadow-[0_25px_60px_rgba(0,0,0,0.8),0_0_30px_rgba(255,255,255,0.05)] max-h-[92vh] overflow-y-auto custom-scrollbar">
         
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-white/10 pb-2.5">
+        <div className="flex items-start justify-between border-b border-white/10 pb-3">
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[9px] font-mono tracking-widest text-white/50 uppercase">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+              <span className="text-[10px] font-mono tracking-widest text-emerald-400/90 font-bold uppercase">
                 AUTHENTICATION REQUIRED
               </span>
             </div>
-            <h2 className="text-base sm:text-lg font-bold tracking-widest uppercase mt-0.5 font-mono">
+            <h2 className="text-base sm:text-lg font-bold tracking-wider uppercase mt-1 font-mono text-white">
               SIGN IN TO CONTINUE USING
             </h2>
           </div>
           <button
             type="button"
             onClick={closeAuthModal}
-            className="text-white/40 hover:text-white transition-colors p-1 text-xs font-mono tracking-widest cursor-pointer"
+            className="w-8 h-8 rounded-full border border-white/20 bg-white/5 hover:bg-white/20 text-white/60 hover:text-white transition-all flex items-center justify-center text-xs font-mono cursor-pointer"
             title="Close (Esc)"
           >
-            [ESC &times;]
+            &times;
           </button>
         </div>
 
-        {/* Dynamic Alert Banner */}
-        <div className="bg-white/[0.04] border border-white/15 p-2.5 text-xs">
+        {/* Dynamic Alert Banner - Curvy Glass */}
+        <div className="bg-white/[0.05] backdrop-blur-md border border-white/10 rounded-2xl p-3.5 text-xs">
           <div className="flex items-center justify-between text-[10px] font-mono font-bold text-emerald-400 tracking-wider uppercase mb-1">
             <span>QUOTA LIMIT REACHED</span>
             <span>
@@ -182,20 +182,20 @@ export default function AuthModal() {
                 : `${mapCount}/${maxFreeMapQueries} MAP SCAN USED`}
             </span>
           </div>
-          <p className="text-white/70 text-[11px] leading-relaxed font-sans">
+          <p className="text-white/80 text-[11px] leading-relaxed font-sans">
             {authModalReason ||
               "Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses."}
           </p>
         </div>
 
         {/* Google 1-Click Sign-In (Guaranteed EXACTLY ONE button, zero duplication) */}
-        <div id="google-btn-slot" className="w-full flex justify-center empty:hidden min-h-[44px]" />
+        <div id="google-btn-slot" className="w-full flex justify-center empty:hidden min-h-[44px] rounded-xl overflow-hidden" />
 
         {!gisLoaded && (
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="w-full py-2.5 px-4 bg-white text-black hover:bg-white/90 font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2.5 border border-white cursor-pointer shadow-sm hover:scale-[1.01]"
+            className="w-full py-3 px-4 bg-white hover:bg-zinc-200 text-black font-bold text-xs uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2.5 border border-white cursor-pointer shadow-lg hover:scale-[1.01]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -220,24 +220,24 @@ export default function AuthModal() {
         )}
 
         {/* Divider */}
-        <div className="flex items-center gap-2.5 my-0.5">
-          <div className="flex-1 h-[1px] bg-white/15" />
+        <div className="flex items-center gap-3 my-0.5">
+          <div className="flex-1 h-[1px] bg-white/10" />
           <span className="text-[9px] font-mono text-white/40 tracking-widest uppercase">OR EMAIL CREDENTIALS</span>
-          <div className="flex-1 h-[1px] bg-white/15" />
+          <div className="flex-1 h-[1px] bg-white/10" />
         </div>
 
-        {/* Tab Switcher */}
-        <div className="grid grid-cols-2 border border-white/20 p-0.5 bg-white/5 font-mono text-xs">
+        {/* Curvy Tab Switcher */}
+        <div className="grid grid-cols-2 p-1 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 font-mono text-xs">
           <button
             type="button"
             onClick={() => {
               setMode("signin");
               setError(null);
             }}
-            className={`py-1.5 tracking-wider uppercase font-bold transition-all cursor-pointer ${
+            className={`py-2 rounded-xl tracking-wider uppercase font-bold transition-all cursor-pointer ${
               mode === "signin"
-                ? "bg-white text-black shadow"
-                : "text-white/50 hover:text-white"
+                ? "bg-white text-black shadow-md"
+                : "text-white/60 hover:text-white"
             }`}
           >
             SIGN IN
@@ -248,10 +248,10 @@ export default function AuthModal() {
               setMode("signup");
               setError(null);
             }}
-            className={`py-1.5 tracking-wider uppercase font-bold transition-all cursor-pointer ${
+            className={`py-2 rounded-xl tracking-wider uppercase font-bold transition-all cursor-pointer ${
               mode === "signup"
-                ? "bg-white text-black shadow"
-                : "text-white/50 hover:text-white"
+                ? "bg-white text-black shadow-md"
+                : "text-white/60 hover:text-white"
             }`}
           >
             REGISTER
@@ -259,16 +259,16 @@ export default function AuthModal() {
         </div>
 
         {/* Compact Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2.5 font-mono">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 font-mono">
           {error && (
-            <div className="bg-red-500/20 border border-red-500/50 p-2 text-[10px] text-red-200 tracking-wide">
+            <div className="bg-red-500/15 backdrop-blur-sm border border-red-500/40 rounded-xl p-2.5 text-[10px] text-red-200 tracking-wide">
               {error}
             </div>
           )}
 
           {mode === "signup" && (
-            <div className="flex flex-col gap-1">
-              <label className="text-[9px] uppercase tracking-widest text-white/50">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[9px] uppercase tracking-widest text-white/60 font-medium">
                 Operator Callsign / Name
               </label>
               <input
@@ -276,14 +276,14 @@ export default function AuthModal() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Commander Vikram"
-                className="bg-black border border-white/20 px-3 py-1.5 text-xs text-white outline-none focus:border-white transition-colors"
+                className="bg-white/5 border border-white/15 focus:border-white/50 rounded-xl px-3.5 py-2 text-xs text-white outline-none transition-all placeholder:text-white/30"
                 autoFocus
               />
             </div>
           )}
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[9px] uppercase tracking-widest text-white/50">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[9px] uppercase tracking-widest text-white/60 font-medium">
               Station / Account Email
             </label>
             <input
@@ -291,13 +291,13 @@ export default function AuthModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="operator@ground-station.isro.in"
-              className="bg-black border border-white/20 px-3 py-1.5 text-xs text-white outline-none focus:border-white transition-colors"
+              className="bg-white/5 border border-white/15 focus:border-white/50 rounded-xl px-3.5 py-2 text-xs text-white outline-none transition-all placeholder:text-white/30"
               required
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[9px] uppercase tracking-widest text-white/50">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[9px] uppercase tracking-widest text-white/60 font-medium">
               Access Password
             </label>
             <input
@@ -305,25 +305,25 @@ export default function AuthModal() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="bg-black border border-white/20 px-3 py-1.5 text-xs text-white outline-none focus:border-white transition-colors"
+              className="bg-white/5 border border-white/15 focus:border-white/50 rounded-xl px-3.5 py-2 text-xs text-white outline-none transition-all placeholder:text-white/30"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-2.5 mt-1 border border-white/40 hover:border-white bg-white/10 hover:bg-white text-white hover:text-black font-bold text-xs uppercase tracking-widest transition-all cursor-pointer"
+            className="w-full py-2.5 mt-1 border border-white/25 hover:border-white/60 bg-white/15 hover:bg-white text-white hover:text-black font-bold text-xs uppercase tracking-widest rounded-2xl transition-all cursor-pointer shadow-md"
           >
             {mode === "signin" ? "AUTHENTICATE & CONTINUE" : "REGISTER & UNLOCK"}
           </button>
         </form>
 
         {/* 1-Click SIH Evaluator Pass */}
-        <div className="border-t border-white/10 pt-2.5 flex flex-col gap-1.5">
+        <div className="border-t border-white/10 pt-3 flex flex-col gap-2">
           <button
             type="button"
             onClick={loginAsJudge}
-            className="w-full py-2 bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/20 text-[11px] font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 rounded-2xl text-[11px] font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
             <span>⚡</span>
             <span>INSTANT SIH EVALUATOR PASS</span>
