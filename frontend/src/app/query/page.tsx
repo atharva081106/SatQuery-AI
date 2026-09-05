@@ -730,10 +730,10 @@ export default function Home() {
       </nav>
 
       {/* MAIN APPLICATION CONTAINER */}
-      <div className={`flex-1 flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-8 gap-8 z-10 pb-8 min-h-0 overflow-y-auto lg:overflow-hidden transition-all duration-500 pointer-events-none ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
+      <div className={`flex-1 h-[calc(100vh-4.5rem)] max-h-[calc(100vh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-6 gap-6 z-10 min-h-0 overflow-y-auto lg:overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
         
         {/* LEFT/MAIN: CHAT & INPUT */}
-        <div className="flex-1 flex flex-col justify-end relative min-h-0 h-full">
+        <div className="flex-1 flex flex-col justify-end relative min-h-0 h-full max-h-full overflow-hidden">
           
           <div className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
@@ -947,8 +947,8 @@ export default function Home() {
         {/* RIGHT/TRACE: ONLY SHOWN ON RESULT */}
         {latestResult && (
             <div 
-              className="w-full lg:w-1/3 bg-black/60 backdrop-blur-md border border-[#3a3a3f] rounded-lg p-6 flex flex-col min-h-0 max-h-full h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto"
-              style={{ maxHeight: "100%" }}
+              className="w-full lg:w-1/3 bg-black/75 backdrop-blur-md border border-[#3a3a3f] rounded-xl p-5 lg:p-6 flex flex-col min-h-0 h-full max-h-[calc(100vh-6.5rem)] lg:max-h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto touch-pan-y shrink-0 lg:shrink"
+              style={{ maxHeight: "calc(100vh - 6.5rem)" }}
             >
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#2a2a2f]">
                 <h3 className="display-lg flex items-center gap-2">
@@ -1084,7 +1084,7 @@ export default function Home() {
             </div>
 
             {/* DOWNLOAD AUDIT AND GEOJSON FOOTER */}
-            <div className="pt-4 border-t border-[#2a2a2f] mt-auto flex flex-col gap-2">
+            <div className="pt-4 border-t border-[#2a2a2f] mt-6 shrink-0 flex flex-col gap-2">
               {latestResult.geojson_data && (
                 <button
                   type="button"
