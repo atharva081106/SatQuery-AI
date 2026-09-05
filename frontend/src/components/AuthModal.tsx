@@ -179,21 +179,19 @@ export default function AuthModal() {
           </button>
         </div>
 
-        {/* Dynamic Alert Banner - Curvy Transparent Glass */}
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-2xl p-3.5 text-xs shadow-inner">
-          <div className="flex items-center justify-between text-[10px] font-mono font-bold text-emerald-400 tracking-wider uppercase mb-1">
-            <span>QUOTA LIMIT REACHED</span>
-            <span>
-              {queryCount >= maxFreeQueries
-                ? `${queryCount}/${maxFreeQueries} FREE QUERIES USED`
-                : `${mapCount}/${maxFreeMapQueries} MAP SCAN USED`}
-            </span>
+        {/* Quota Limit Reached Banner - ONLY rendered when the user has completed their free queries */}
+        {queryCount >= maxFreeQueries && (
+          <div className="bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-2xl p-3.5 text-xs shadow-inner">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-emerald-400 tracking-wider uppercase mb-1">
+              <span>QUOTA LIMIT REACHED</span>
+              <span>{queryCount}/{maxFreeQueries} FREE QUERIES USED</span>
+            </div>
+            <p className="text-white/90 text-[11px] leading-relaxed font-sans">
+              {authModalReason ||
+                "Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses."}
+            </p>
           </div>
-          <p className="text-white/90 text-[11px] leading-relaxed font-sans">
-            {authModalReason ||
-              "Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses."}
-          </p>
-        </div>
+        )}
 
         {/* Google 1-Click Sign-In (Guaranteed EXACTLY ONE button, zero duplication) */}
         <div id="google-btn-slot" className="w-full flex justify-center empty:hidden min-h-[44px] rounded-xl overflow-hidden" />
