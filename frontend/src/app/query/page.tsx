@@ -723,7 +723,7 @@ export default function Home() {
                   className="hidden"
                   onChange={handleFileChange}
                   ref={fileInputRef}
-                  accept="image/png, image/jpeg, image/tiff"
+                  accept="image/*, .tif, .tiff, .geotiff, .jp2, .j2k, .webp, .png, .jpg, .jpeg, .bmp, .avif, .fits, .fit"
                   id="file-upload"
                 />
                 

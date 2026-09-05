@@ -21,7 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff"}
+ALLOWED_EXTENSIONS = {
+    ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".geotiff",
+    ".webp", ".bmp", ".jp2", ".j2k", ".avif", ".fits", ".fit", ".gif",
+    ".img", ".dat", ".bin", ""
+}
 
 @app.get("/")
 async def healthcheck():
@@ -35,19 +39,13 @@ async def process_query(
     images: List[UploadFile] = File(...)
 ):
     """
-    Endpoint to process natural language query with multimodal images.
+    Endpoint to process natural language query with multimodal images in ANY format.
     """
-    # Check input compatibility
-    for image in images:
-        ext = ""
-        if image.filename:
-            ext = "." + image.filename.rsplit(".", 1)[-1].lower() if "." in image.filename else ""
-        
-        if ext not in ALLOWED_EXTENSIONS:
-            return {
-                "status": "error",
-                "message": f"Unsupported file format: {ext}. Only GeoTIFF, TIFF, PNG, and JPEG are supported."
-            }
+    if not images or len(images) == 0:
+        return {
+            "status": "error",
+            "message": "Please provide at least one satellite image."
+        }
 
     # Read image contents
     image_bytes_list = []
