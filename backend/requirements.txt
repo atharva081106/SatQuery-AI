@@ -15,3 +15,4 @@ sentinelhub
 oauthlib
 requests-oauthlib
 scikit-image
+onnxruntime

@@ -1,0 +1,25 @@
+name: Keep SatQuery Backend Alive
+
+on:
+  schedule:
+    # Runs every 12 minutes to keep free-tier containers (Render, Hugging Face Spaces, Koyeb) awake
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend Health Endpoint
+        env:
+          BACKEND_URL: ${{ secrets.SATQUERY_BACKEND_URL }}
+        run: |
+          TARGET_URL="${BACKEND_URL:-https://your-satquery-backend.hf.space}"
+          echo "Pinging SatQuery AI health endpoint at: ${TARGET_URL}/health"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "${TARGET_URL}/health" || echo "FAILED")
+          echo "Response Status Code: ${HTTP_STATUS}"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "SatQuery AI Backend is warm and healthy."
+          else
+            echo "Notice: Health check returned ${HTTP_STATUS}. Target instance might be warming up."
+          fi

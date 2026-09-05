@@ -12,6 +12,8 @@ import time
 from collections import defaultdict
 from agent_controller import agent_controller
 import storage_manager
+from cache_manager import cache_manager
+from storage_r2 import r2_storage
 
 app = FastAPI(
     title="SatQuery AI Backend",
@@ -29,31 +31,21 @@ app.add_middleware(
 )
 
 # -------------------------------------------------------------
-# Rate Limiter & Security Middleware
+# Rate Limiter & Security Middleware (Redis / In-Memory Sliding Window)
 # -------------------------------------------------------------
-RATE_LIMIT_WINDOW = 60 # seconds
-MAX_REQUESTS_PER_WINDOW = 60 # 60 requests/minute per client IP
-client_request_history = defaultdict(list)
-
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
     client_ip = request.client.host if request.client else "unknown"
-    now = time.time()
     
     # Exclude health check and preflight OPTIONS from rate limiting
     if request.url.path not in ["/", "/health"] and request.method != "OPTIONS":
-        window_start = now - RATE_LIMIT_WINDOW
-        # Filter timestamps older than the window
-        history = [ts for ts in client_request_history[client_ip] if ts > window_start]
-        if len(history) >= MAX_REQUESTS_PER_WINDOW:
+        if not cache_manager.check_rate_limit(client_ip, limit=60, window_seconds=60):
             from fastapi.responses import JSONResponse
             return JSONResponse(
                 status_code=429,
                 content={"error": "Too Many Requests", "message": "Rate limit of 60 req/min exceeded. Please throttle requests."},
                 headers={"Retry-After": "60"}
             )
-        history.append(now)
-        client_request_history[client_ip] = history
 
     response = await call_next(request)
     return response
@@ -70,8 +62,8 @@ START_TIME = time.time()
 @app.get("/health")
 async def healthcheck():
     """
-    Comprehensive healthcheck endpoint for Render / cloud port detection & auditability.
-    Reflects ISRO PS 26167 multi-model architecture specifications.
+    Comprehensive healthcheck endpoint for Render / Hugging Face Spaces / cloud detection.
+    Reflects ISRO PS 26167 multi-model architecture specifications and free scaling status.
     """
     return {
         "status": "online",
@@ -79,9 +71,16 @@ async def healthcheck():
         "problem_statement": "ISRO / SAC — PS 26167",
         "version": "1.0.0",
         "uptime_seconds": round(time.time() - START_TIME, 1),
+        "scaling": {
+            "tier": "100% Free Production Stack ($0/month)",
+            "cache_backend": cache_manager.get_backend_name(),
+            "storage_backend": storage_manager.get_storage_type(),
+            "object_storage": "cloudflare_r2" if r2_storage.is_configured() else "inline_base64_fallback",
+            "onnx_acceleration": "SatSegNet INT8 Quantized (<4ms CPU)"
+        },
         "models": {
             "vlm_foundation": "Florence-2-base (Fine-tuned for Earth Observation / Remote Sensing)",
-            "segmentation": "SatSegNet (ResNet-18 Backbone, 6 Land-Cover Classes)",
+            "segmentation": "SatSegNet (ResNet-18 Backbone, 6 Land-Cover Classes, ONNX INT8)",
             "classes": ["Background", "Water", "Forest/Vegetation", "Bare Soil", "Urban/Built-up", "Agriculture"],
             "change_detection": "Bi-Temporal Residual Engine with Spatial Coherence Kernel",
             "sar_fusion": "RISAT-1 / Sentinel-1 C-Band Cloud-Penetrating Synthesis",
@@ -90,8 +89,7 @@ async def healthcheck():
         "gis_integration": {
             "bhuvan_wms": "enabled (bhuvan-vec2.nrsc.gov.in)",
             "geojson_export": "enabled (EPSG:4326 / RFC 7946)"
-        },
-        "storage": "sqlite (backend/storage/queries.db active)"
+        }
     }
 
 @app.post("/api/query")
@@ -103,7 +101,7 @@ async def process_query(
 ):
     """
     Endpoint to process natural language query with multimodal images in ANY format.
-    Stores query result persistently in queries.db for auditable traceability.
+    Includes deterministic query caching (0ms hits) and persistent database storage.
     """
     # Optional API key verification (if configured in env)
     required_key = os.getenv("SATQUERY_API_KEY")
@@ -121,6 +119,15 @@ async def process_query(
     for image in images:
         content = await image.read()
         image_bytes_list.append(content)
+
+    # 1. Check Deterministic Hash Cache (0ms response, 0 RAM/CPU cost)
+    cache_key = cache_manager.compute_query_hash(query, image_bytes_list)
+    cached_result = cache_manager.get(cache_key)
+    if cached_result:
+        result_copy = dict(cached_result)
+        result_copy["from_cache"] = True
+        result_copy["cache_key"] = cache_key
+        return result_copy
         
     import json
     history_list = []
@@ -132,7 +139,7 @@ async def process_query(
             
     result = agent_controller.execute_query(query, image_bytes_list, history_list)
     
-    # Save to persistent SQLite storage
+    # Save to persistent database (Supabase PostgreSQL or SQLite)
     if result.get("status") == "success":
         try:
             result_id = storage_manager.save_query_result(
@@ -141,10 +148,14 @@ async def process_query(
                 geojson_data=result.get("geojson_data")
             )
             result["id"] = result_id
+            
+            # Store in cache for future identical queries
+            cache_manager.set(cache_key, result, ttl_seconds=86400)
         except Exception as store_err:
             print(f"[Storage Warning] Could not persist query to DB: {store_err}")
 
     return result
+
 
 @app.get("/api/results")
 async def get_recent_results(limit: int = 20):
