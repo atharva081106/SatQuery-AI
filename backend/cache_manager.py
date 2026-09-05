@@ -7,6 +7,9 @@ import urllib.error
 from collections import OrderedDict
 from threading import Lock
 from typing import Optional, Dict, Any, List
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class InMemoryLRUCache:
     """Thread-safe in-memory LRU Cache with TTL fallback (Zero external dependency, $0 cost)."""

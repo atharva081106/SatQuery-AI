@@ -3,6 +3,8 @@ import os
 # Only set local windows cache if on windows and not provided by environment
 if os.name == "nt" and "HF_HOME" not in os.environ:
     os.environ["HF_HOME"] = "d:\\sih26167\\.huggingface_cache"
+from dotenv import load_dotenv
+load_dotenv()
 
 from fastapi import FastAPI, UploadFile, File, Form, Request, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
