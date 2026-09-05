@@ -683,19 +683,6 @@ export default function Home() {
         </div>
 
         <div className="flex gap-2.5 sm:gap-3 items-center">
-          {/* Guest 3/3 Free Queries Status Button */}
-          {!isAuthenticated && (
-            <button
-              type="button"
-              onClick={() => openAuthModal("Sign in to continue using SatQuery AI. Unlock unlimited satellite analyses.")}
-              className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-3.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase font-bold flex items-center gap-1.5"
-              title="Remaining Free Tier Queries"
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${queryCount >= maxFreeQueries ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse`}></span>
-              <span>{Math.max(0, maxFreeQueries - queryCount)}/{maxFreeQueries} FREE QUERIES</span>
-            </button>
-          )}
-
           {/* Authenticated User Callsign */}
           {isAuthenticated && (
             <div className="flex items-center gap-2">
@@ -938,19 +925,6 @@ export default function Home() {
                   Execute
                 </button>
               </div>
-
-              {!isAuthenticated && (
-                <div className="flex justify-between items-center px-4 py-1 text-[10px] tracking-wider text-white/60 font-mono">
-                  <span>GUEST QUOTA: {queryCount}/3 FREE QUERIES USED</span>
-                  <button
-                    type="button"
-                    onClick={() => openAuthModal("Sign in to unlock unlimited high-resolution satellite analyses.")}
-                    className="text-[#00F0FF] hover:underline"
-                  >
-                    SIGN IN FOR UNLIMITED ACCESS &rarr;
-                  </button>
-                </div>
-              )}
             </form>
           </div>
         </div>

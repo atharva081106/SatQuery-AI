@@ -272,11 +272,11 @@ export default function MissionPresetsModal({
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10 min-h-0">
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10 min-h-0">
           
           {/* Left Column: Demo Queries List */}
-          <div className="w-full md:w-5/12 p-3.5 flex flex-col gap-2 overflow-y-auto bg-black contain-content">
-            <div className="flex items-center justify-between px-1 mb-0.5">
+          <div className="w-full md:w-5/12 p-3.5 flex flex-col gap-2 overflow-y-auto h-full max-h-[50vh] md:max-h-full custom-scrollbar bg-black overscroll-contain">
+            <div className="flex items-center justify-between px-1 mb-0.5 shrink-0">
               <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">
                 SCENARIOS ({filteredMissions.length})
               </span>
@@ -289,7 +289,7 @@ export default function MissionPresetsModal({
                   key={m.id}
                   type="button"
                   onClick={() => handleSelectId(m.id)}
-                  className={`text-left p-3 border transition-colors cursor-pointer ${
+                  className={`text-left p-3 border transition-colors cursor-pointer shrink-0 ${
                     isSelected
                       ? "bg-white/10 border-white text-white"
                       : "bg-transparent border-white/10 hover:border-white/30 text-white/80"
@@ -318,7 +318,7 @@ export default function MissionPresetsModal({
 
           {/* Right Column: Query Detail, Satellite Previews, and TOP LAUNCH BUTTON */}
           {currentMission && (
-            <div className="w-full md:w-7/12 p-5 sm:p-6 flex flex-col overflow-y-auto bg-[#030305] contain-content">
+            <div className="w-full md:w-7/12 p-5 sm:p-6 flex flex-col overflow-y-auto h-full max-h-[50vh] md:max-h-full custom-scrollbar bg-[#030305] overscroll-contain">
               
               {/* TOP ACTION BAR - LAUNCH ON TOP (SpaceX Style) */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pb-4 mb-4 border-b border-white/15">
