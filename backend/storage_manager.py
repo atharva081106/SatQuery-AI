@@ -4,19 +4,27 @@ import os
 import uuid
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "storage", "queries.db")
-DATABASE_URL = os.getenv("DATABASE_URL")
+
+def get_database_url() -> Optional[str]:
+    return os.getenv("DATABASE_URL")
 
 def get_storage_type() -> str:
-    if DATABASE_URL and (DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")):
+    db_url = get_database_url()
+    if db_url and (db_url.startswith("postgres://") or db_url.startswith("postgresql://")):
         return "postgresql"
     return "sqlite"
 
 def get_pg_connection():
     try:
         import psycopg2
-        url = DATABASE_URL
+        url = get_database_url()
+        if not url:
+            return None
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
         return psycopg2.connect(url)
@@ -135,6 +143,7 @@ def get_query_result(query_id: str) -> Optional[Dict[str, Any]]:
                         result_id, q_text, ts, resp_json, geojson_str = row
                         data = json.loads(resp_json) if resp_json else {}
                         data["id"] = result_id
+                        data["query_text"] = q_text
                         data["saved_timestamp"] = ts
                         if geojson_str and "geojson_data" not in data:
                             try:
@@ -157,6 +166,7 @@ def get_query_result(query_id: str) -> Optional[Dict[str, Any]]:
         result_id, q_text, ts, resp_json, geojson_str = row
         data = json.loads(resp_json) if resp_json else {}
         data["id"] = result_id
+        data["query_text"] = q_text
         data["saved_timestamp"] = ts
         if geojson_str and "geojson_data" not in data:
             try:
