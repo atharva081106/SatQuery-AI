@@ -77,8 +77,10 @@ class AgenticController:
         import json
         import os
         
-        # Compute cache key
+        # Compute cache key with version prefix to ensure updated logic runs fresh
+        CACHE_VERSION = "v3_compound_intent"
         m = hashlib.md5()
+        m.update(CACHE_VERSION.encode('utf-8'))
         m.update(query.encode('utf-8'))
         for img in images:
             m.update(img)

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Tuple
 import io
+import re
 import base64
 from PIL import Image
 import cv2
@@ -453,6 +454,57 @@ def _calculate_land_cover_percentages(cv_img: np.ndarray, stats: Dict[str, Any] 
 | 🌐 **TOTAL SCENE SURFACE** | **100.0%** | **{stats['total_km2']:.2f} km²** | **{stats['total_ha']:,.0f} ha** | **{stats['total_pixels']:,} px** | **Full satellite observation viewport** |"""
     return table
 
+def parse_grounding_intent(query: str) -> Tuple[str, Dict[str, bool]]:
+    """
+    Decouples compound natural language remote-sensing queries into:
+    1. Grounding Target (feature to visually delineate & bound)
+    2. Inquiry Directives (numerical metrics and percentages to calculate)
+    """
+    q = query.lower().strip()
+    
+    # Extract specific action target if preceded by action verbs
+    action_match = re.search(
+        r'(?:highlight|mark|detect|bound|locate|outline|show|find|pinpoint|trace|draw|delineate|segment)\s+(?:the\s+)?([a-z\s]+?)(?:\s+and|\s+with|\s+to|\s+tell|\s+calculate|\s+what|\s+how|,|\.|$)',
+        q
+    )
+    action_phrase = action_match.group(1).strip() if action_match else q
+    
+    def match_feature(text: str) -> str:
+        if re.search(r'\b(water\w*|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*|drainage\w*|bay\w*|creek\w*|hydrology|pond\w*)\b', text):
+            return "water"
+        if re.search(r'\b(airport\w*|runway\w*|airstrip\w*|aviation\w*|airfield\w*|taxiway\w*)\b', text):
+            return "runway"
+        if re.search(r'\b(port\w*|dock\w*|berth\w*|pier\w*|jetty\w*|harbor\w*|harbour\w*|wharf\w*)\b', text):
+            return "port"
+        if re.search(r'\b(ship\w*|boat\w*|vessel\w*|tanker\w*|cargo\w*|barge\w*|ferry\w*)\b', text):
+            return "ship"
+        if re.search(r'\b(veg\w*|green\w*|forest\w*|tree\w*|crop\w*|plant\w*|agriculture\w*|canopy\w*)\b', text):
+            return "vegetation"
+        if re.search(r'\b(built\w*|building\w*|urban\w*|city\w*|settlement\w*|road\w*|infrastructure\w*|residential\w*)\b', text):
+            return "built"
+        if re.search(r'\b(cloud\w*|haze\w*|fog\w*|obscur\w*|overcast\w*)\b', text):
+            return "cloud"
+        if re.search(r'\b(land\w*|terrain\w*|ground\w*|earth\w*|peninsula\w*|continent\w*|mainland\w*|soil\w*)\b', text):
+            return "land"
+        return None
+
+    grounding_target = match_feature(action_phrase)
+    if not grounding_target:
+        if re.search(r'\b(water\w*|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*)\b', q) and any(w in q for w in ["highlight", "mark", "bound", "detect", "outline", "find"]):
+            grounding_target = "water"
+        elif match_feature(q):
+            grounding_target = match_feature(q)
+        else:
+            grounding_target = "land"
+
+    inquiries = {
+        "land": bool(re.search(r'\b(percentage of land|land percentage|how much land|area of land|land area|tell.*land|calculate.*land)\b', q)),
+        "water": bool(re.search(r'\b(percentage of water|water percentage|how much water|area of water|water area|tell.*water|calculate.*water)\b', q)),
+        "vegetation": bool(re.search(r'\b(percentage of veg|veg.*percentage|green.*percentage|canopy percentage|tell.*veg|crop percentage)\b', q)),
+        "built": bool(re.search(r'\b(percentage of built|urban percentage|built.*percentage|tell.*urban|tell.*built)\b', q)),
+    }
+    return grounding_target, inquiries
+
 def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict[str, Any]) -> Tuple[str, str]:
     """
     Generates tailored, high-fidelity visual overlays for any satellite image.
@@ -508,24 +560,50 @@ def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict
     elif feature_type == "water":
         overlay = cv_img.copy()
         non_water = cv2.bitwise_not(stats["water_mask"])
-        overlay[non_water > 0] = (overlay[non_water > 0] * 0.50).astype(np.uint8)
+        overlay[non_water > 0] = (overlay[non_water > 0] * 0.45).astype(np.uint8)
         
         water_pixels = stats["water_mask"] > 0
         if np.any(water_pixels):
             cyan_tint = np.zeros_like(cv_img)
-            cyan_tint[water_pixels] = [240, 175, 30] # Luminous cyan-blue in BGR
-            overlay[water_pixels] = cv2.addWeighted(overlay[water_pixels], 0.40, cyan_tint[water_pixels], 0.60, 0)
+            cyan_tint[water_pixels] = [245, 180, 25] # Luminous cyan-blue in BGR
+            overlay[water_pixels] = cv2.addWeighted(overlay[water_pixels], 0.35, cyan_tint[water_pixels], 0.65, 0)
             contours, _ = cv2.findContours(stats["water_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cv2.drawContours(overlay, contours, -1, (255, 235, 80), 2)
+            cv2.drawContours(overlay, contours, -1, (255, 235, 80), 2, cv2.LINE_AA)
             
-        cv2.rectangle(overlay, (12, 12), (360, 42), (15, 20, 30), -1)
-        cv2.putText(overlay, f"DETECTED WATER: ~{stats['water_pct']:.1f}% ({stats['water_km2']:.2f} km2)", (20, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 220, 70), 2, cv2.LINE_AA)
-        desc = "Detected Water Bodies & Drainage Mask"
+            # Find major water sectors and draw tactical bounding vectors
+            c_sorted = sorted(contours, key=cv2.contourArea, reverse=True)
+            for idx, c in enumerate(c_sorted[:5]):
+                ca = cv2.contourArea(c)
+                if ca > (h * w * 0.01):
+                    bx, by, bw, bh = cv2.boundingRect(c)
+                    cv2.rectangle(overlay, (bx, by), (bx + bw, by + bh), (255, 220, 50), 2)
+                    c_km2 = (ca * stats["sqm_per_px"]) / 1_000_000.0
+                    lbl = f"WATER BODY #{idx+1}: {c_km2:.2f} km2"
+                    (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.44, 1)
+                    cv2.rectangle(overlay, (bx, max(0, by - 22)), (bx + lw + 12, max(22, by)), (12, 18, 26), -1)
+                    cv2.putText(overlay, lbl, (bx + 6, max(16, by - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (255, 230, 80), 1, cv2.LINE_AA)
+            
+        # Top banner
+        banner_top = 44
+        b_top = np.zeros((banner_top, overlay.shape[1], 3), dtype=np.uint8)
+        b_top[:] = (12, 18, 25)
+        cv2.putText(b_top, f"DELINEATED WATER BODIES: ~{stats['water_pct']:.1f}% ({stats['water_km2']:.2f} km2 / {stats['water_ha']:,.0f} ha)", 
+                    (16, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.54, (255, 220, 60), 2, cv2.LINE_AA)
+        
+        # Bottom banner
+        banner_bot = 30
+        b_bot = np.zeros((banner_bot, overlay.shape[1], 3), dtype=np.uint8)
+        b_bot[:] = (18, 18, 22)
+        cv2.putText(b_bot, f"TERRESTRIAL LAND COVER: ~{stats['land_pct']:.1f}% ({stats['land_km2']:.2f} km2) | WGS84 VECTORIZED", 
+                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (200, 200, 200), 1, cv2.LINE_AA)
+        
+        overlay = np.vstack([b_top, overlay, b_bot])
+        desc = f"Delineated Water Bodies Map: ~{stats['water_pct']:.1f}% ({stats['water_km2']:.2f} km²)"
 
     elif feature_type == "vegetation":
         overlay = cv_img.copy()
         non_veg = cv2.bitwise_not(stats["veg_mask"])
-        overlay[non_veg > 0] = (overlay[non_veg > 0] * 0.50).astype(np.uint8)
+        overlay[non_veg > 0] = (overlay[non_veg > 0] * 0.45).astype(np.uint8)
         
         veg_pixels = stats["veg_mask"] > 0
         if np.any(veg_pixels):
@@ -533,16 +611,39 @@ def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict
             green_tint[veg_pixels] = [35, 225, 60] # Vibrant emerald green
             overlay[veg_pixels] = cv2.addWeighted(overlay[veg_pixels], 0.40, green_tint[veg_pixels], 0.60, 0)
             contours, _ = cv2.findContours(stats["veg_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cv2.drawContours(overlay, contours, -1, (110, 255, 140), 2)
+            cv2.drawContours(overlay, contours, -1, (110, 255, 140), 2, cv2.LINE_AA)
             
-        cv2.rectangle(overlay, (12, 12), (380, 42), (15, 30, 20), -1)
-        cv2.putText(overlay, f"GREEN COVER & CANOPY: ~{stats['veg_total_pct']:.1f}% ({stats['veg_km2']:.2f} km2)", (20, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.50, (120, 255, 140), 2, cv2.LINE_AA)
-        desc = "Vegetation & Canopy Distribution Map"
+            c_sorted = sorted(contours, key=cv2.contourArea, reverse=True)
+            for idx, c in enumerate(c_sorted[:4]):
+                ca = cv2.contourArea(c)
+                if ca > (h * w * 0.01):
+                    bx, by, bw, bh = cv2.boundingRect(c)
+                    cv2.rectangle(overlay, (bx, by), (bx + bw, by + bh), (110, 255, 140), 2)
+                    c_km2 = (ca * stats["sqm_per_px"]) / 1_000_000.0
+                    lbl = f"CANOPY SECTOR {idx+1}: {c_km2:.2f} km2"
+                    (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.44, 1)
+                    cv2.rectangle(overlay, (bx, max(0, by - 22)), (bx + lw + 12, max(22, by)), (12, 25, 15), -1)
+                    cv2.putText(overlay, lbl, (bx + 6, max(16, by - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (110, 255, 140), 1, cv2.LINE_AA)
+            
+        banner_top = 44
+        b_top = np.zeros((banner_top, overlay.shape[1], 3), dtype=np.uint8)
+        b_top[:] = (12, 25, 15)
+        cv2.putText(b_top, f"GREEN CANOPY COVER: ~{stats['veg_total_pct']:.1f}% ({stats['veg_km2']:.2f} km2 / {stats['veg_ha']:,.0f} ha)", 
+                    (16, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.54, (120, 255, 140), 2, cv2.LINE_AA)
+        
+        banner_bot = 30
+        b_bot = np.zeros((banner_bot, overlay.shape[1], 3), dtype=np.uint8)
+        b_bot[:] = (18, 18, 22)
+        cv2.putText(b_bot, f"FOREST: {stats['forest_pct']:.1f}% | CROPLAND: {stats['crop_pct']:.1f}% | WGS84 VECTORIZED", 
+                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (200, 200, 200), 1, cv2.LINE_AA)
+        
+        overlay = np.vstack([b_top, overlay, b_bot])
+        desc = f"Vegetation & Canopy Distribution Map: ~{stats['veg_total_pct']:.1f}% ({stats['veg_km2']:.2f} km²)"
 
     elif feature_type == "built":
         overlay = cv_img.copy()
         non_built = cv2.bitwise_not(stats["built_mask"])
-        overlay[non_built > 0] = (overlay[non_built > 0] * 0.50).astype(np.uint8)
+        overlay[non_built > 0] = (overlay[non_built > 0] * 0.45).astype(np.uint8)
         
         built_pixels = stats["built_mask"] > 0
         if np.any(built_pixels):
@@ -550,11 +651,34 @@ def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict
             orange_tint[built_pixels] = [0, 135, 255] # Amber-orange
             overlay[built_pixels] = cv2.addWeighted(overlay[built_pixels], 0.40, orange_tint[built_pixels], 0.60, 0)
             contours, _ = cv2.findContours(stats["built_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cv2.drawContours(overlay, contours, -1, (60, 185, 255), 2)
+            cv2.drawContours(overlay, contours, -1, (60, 185, 255), 2, cv2.LINE_AA)
             
-        cv2.rectangle(overlay, (12, 12), (360, 42), (30, 20, 15), -1)
-        cv2.putText(overlay, f"BUILT-UP & ROADS: ~{stats['built_pct']:.1f}% ({stats['built_km2']:.2f} km2)", (20, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (80, 195, 255), 2, cv2.LINE_AA)
-        desc = "Urban Infrastructure & Settlements Map"
+            c_sorted = sorted(contours, key=cv2.contourArea, reverse=True)
+            for idx, c in enumerate(c_sorted[:4]):
+                ca = cv2.contourArea(c)
+                if ca > (h * w * 0.01):
+                    bx, by, bw, bh = cv2.boundingRect(c)
+                    cv2.rectangle(overlay, (bx, by), (bx + bw, by + bh), (60, 185, 255), 2)
+                    c_km2 = (ca * stats["sqm_per_px"]) / 1_000_000.0
+                    lbl = f"URBAN SECTOR {idx+1}: {c_km2:.2f} km2"
+                    (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.44, 1)
+                    cv2.rectangle(overlay, (bx, max(0, by - 22)), (bx + lw + 12, max(22, by)), (25, 18, 12), -1)
+                    cv2.putText(overlay, lbl, (bx + 6, max(16, by - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (80, 195, 255), 1, cv2.LINE_AA)
+            
+        banner_top = 44
+        b_top = np.zeros((banner_top, overlay.shape[1], 3), dtype=np.uint8)
+        b_top[:] = (25, 18, 12)
+        cv2.putText(b_top, f"BUILT-UP & INFRASTRUCTURE: ~{stats['built_pct']:.1f}% ({stats['built_km2']:.2f} km2 / {stats['built_ha']:,.0f} ha)", 
+                    (16, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.54, (80, 195, 255), 2, cv2.LINE_AA)
+        
+        banner_bot = 30
+        b_bot = np.zeros((banner_bot, overlay.shape[1], 3), dtype=np.uint8)
+        b_bot[:] = (18, 18, 22)
+        cv2.putText(b_bot, f"URBAN DENSITY: {stats['built_pct']:.1f}% | OPEN TERRAIN: {100.0 - stats['built_pct']:.1f}% | WGS84 VECTORIZED", 
+                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (200, 200, 200), 1, cv2.LINE_AA)
+        
+        overlay = np.vstack([b_top, overlay, b_bot])
+        desc = f"Urban Infrastructure & Settlements Map: ~{stats['built_pct']:.1f}% ({stats['built_km2']:.2f} km²)"
 
     elif feature_type == "land_cover":
         # Multi-class segmented overlay
@@ -775,6 +899,25 @@ class SingleImageVQA(SpecialistModel):
                 f"{table}"
             )
 
+        elif is_water_query:
+            feature_type = "water"
+            if w_pct > 1.5:
+                land_bullet = f"• **Inquired Land Coverage:** Terrestrial land encompasses **~{land_pct:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} ha)." if ("land" in query_lower) else f"• **Remaining Terrestrial Land:** Contiguous landmass covers **~{land_pct:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} ha)."
+                formatted_text = (
+                    f"💧 **Water Bodies Detected (~{w_pct:.1f}% of scene):**\n\n"
+                    f"• **Quantified Surface Area:** Water bodies cover approximately **~{w_pct:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares).\n"
+                    f"{land_bullet}\n"
+                    f"• **Visual Highlight:** Marine waters and shorelines are highlighted in **cyan-blue** in the evidence panel.\n\n"
+                    f"---\n\n{table}"
+                )
+            else:
+                formatted_text = (
+                    f"💧 **No Major Water Bodies Detected:**\n\n"
+                    f"• Water features cover less than 1% of this image tile.\n"
+                    f"• The area consists primarily of contiguous landmass (~{land_pct:.1f}%), with built-up settlements (~{built_pct:.1f}%) and green cover (~{v_pct:.1f}%).\n\n"
+                    f"---\n\n{table}"
+                )
+
         elif is_land_query or is_land_cover_query:
             feature_type = "land" if is_land_query else "land_cover"
             insights = [
@@ -794,24 +937,6 @@ class SingleImageVQA(SpecialistModel):
                 f"---\n\n"
                 f"### 🔍 Detailed Analytical Insights\n" + "\n".join(insights)
             )
-
-        elif is_water_query:
-            feature_type = "water"
-            if w_pct > 1.5:
-                formatted_text = (
-                    f"💧 **Water Bodies Detected (~{w_pct:.1f}% of scene):**\n\n"
-                    f"• **Quantified Surface Area:** Water bodies cover approximately **~{w_pct:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares).\n"
-                    f"• **Remaining Terrestrial Land:** Contiguous landmass covers **~{land_pct:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} ha).\n"
-                    f"• **Visual Highlight:** Marine waters and shorelines are highlighted in **cyan-blue** in the evidence panel.\n\n"
-                    f"---\n\n{table}"
-                )
-            else:
-                formatted_text = (
-                    f"💧 **No Major Water Bodies Detected:**\n\n"
-                    f"• Water features cover less than 1% of this image tile.\n"
-                    f"• The area consists primarily of contiguous landmass (~{land_pct:.1f}%), with built-up settlements (~{built_pct:.1f}%) and green cover (~{v_pct:.1f}%).\n\n"
-                    f"---\n\n{table}"
-                )
 
         elif is_veg_query:
             feature_type = "vegetation"
@@ -929,20 +1054,11 @@ class SingleImageGrounding(SpecialistModel):
         query_lower = query.lower()
         stats = _analyze_land_cover(cv_img, geo_meta)
         
-        is_land_query = any(kw in query_lower for kw in [
-            "land", "ground", "terrain", "earth", "soil", "peninsula", "continent", "mainland"
-        ])
-        is_water_query = any(kw in query_lower for kw in ["water", "sea", "ocean", "river", "lake", "drainage", "reservoir"])
-        is_veg_query = any(kw in query_lower for kw in ["green", "forest", "tree", "vegetation", "crop", "farm", "canopy"])
-        is_built_query = any(kw in query_lower for kw in ["built", "building", "urban", "city", "settlement", "infrastructure", "road", "residential"])
-        is_port_query = any(kw in query_lower for kw in ["port", "dock", "berth", "pier", "jetty", "harbor", "harbour", "anchorage", "wharf"])
-        is_runway_query = any(kw in query_lower for kw in ["runway", "airport", "airstrip", "airfield", "taxiway", "hangar", "aviation"])
-        is_ship_query = any(kw in query_lower for kw in ["ship", "boat", "vessel", "tanker", "cargo", "barge", "ferry"])
-        is_cloud_query = any(kw in query_lower for kw in ["cloud", "haze", "fog", "obscur", "weather", "overcast"])
-        is_calc_query = any(kw in query_lower for kw in ["calculate", "measure", "area", "percentage", "how much", "size", "breakdown", "distribution"])
+        # Deconstruct compound query intents (action directive vs inquiry metric)
+        grounding_target, inquiries = parse_grounding_intent(query)
         
-        # Determine target mask
-        if is_port_query:
+        # Determine target mask based on decoupled action target
+        if grounding_target == "port":
             # Port interface: built-up regions in proximity to water
             dilated_built = cv2.dilate(stats["built_mask"], np.ones((15, 15), np.uint8))
             coastal_port = cv2.bitwise_and(dilated_built, stats["water_mask"])
@@ -956,7 +1072,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = (target_px * stats["sqm_per_px"]) / 10_000.0
             feature_type = "built"
 
-        elif is_runway_query:
+        elif grounding_target == "runway":
             # Elongated linear corridor features
             gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
             edges = cv2.Canny(gray, 40, 120)
@@ -968,7 +1084,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = (target_px * stats["sqm_per_px"]) / 10_000.0
             feature_type = "built"
 
-        elif is_ship_query:
+        elif grounding_target == "ship":
             gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
             mean_w = cv2.mean(gray, mask=stats["water_mask"])[0]
             vessel_thresh = cv2.inRange(gray, int(min(250, mean_w + 35)), 255)
@@ -980,7 +1096,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = (target_px * stats["sqm_per_px"]) / 10_000.0
             feature_type = "water"
 
-        elif is_cloud_query:
+        elif grounding_target == "cloud":
             target_mask = stats["cloud_mask"]
             target_label = "ATMOSPHERIC CLOUD COVER"
             target_pct = stats["cloud_pct"]
@@ -989,25 +1105,16 @@ class SingleImageGrounding(SpecialistModel):
             target_px = stats["cloud_pixels"]
             feature_type = "land_cover"
 
-        elif is_land_query or (is_calc_query and not is_water_query and not is_veg_query and not is_built_query):
-            target_mask = stats["land_mask"]
-            target_label = "TERRESTRIAL LANDMASS"
-            target_pct = stats["land_pct"]
-            target_km2 = stats["land_km2"]
-            target_ha = stats["land_ha"]
-            target_px = stats["land_pixels"]
-            feature_type = "land"
-
-        elif is_water_query:
+        elif grounding_target == "water":
             target_mask = stats["water_mask"]
-            target_label = "WATER BODY / MARINE"
+            target_label = "WATER BODIES & HYDROLOGICAL BASIN"
             target_pct = stats["water_pct"]
             target_km2 = stats["water_km2"]
             target_ha = stats["water_ha"]
             target_px = stats["water_pixels"]
             feature_type = "water"
 
-        elif is_veg_query:
+        elif grounding_target == "vegetation":
             target_mask = stats["veg_mask"]
             target_label = "VEGETATION & GREEN COVER"
             target_pct = stats["veg_total_pct"]
@@ -1016,7 +1123,7 @@ class SingleImageGrounding(SpecialistModel):
             target_px = stats["forest_pixels"] + stats["crop_pixels"]
             feature_type = "vegetation"
 
-        elif is_built_query:
+        elif grounding_target == "built":
             target_mask = stats["built_mask"]
             target_label = "BUILT-UP & INFRASTRUCTURE"
             target_pct = stats["built_pct"]
@@ -1024,6 +1131,15 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = stats["built_ha"]
             target_px = stats["built_pixels"]
             feature_type = "built"
+
+        elif grounding_target == "land":
+            target_mask = stats["land_mask"]
+            target_label = "TERRESTRIAL LANDMASS"
+            target_pct = stats["land_pct"]
+            target_km2 = stats["land_km2"]
+            target_ha = stats["land_ha"]
+            target_px = stats["land_pixels"]
+            feature_type = "land"
 
         else:
             gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
@@ -1097,22 +1213,44 @@ class SingleImageGrounding(SpecialistModel):
 
         table = _calculate_land_cover_percentages(cv_img, stats)
 
-        # Construct comprehensive, calculation-dense analytical report
+        # Build direct query answers addressing all parts of the user request
+        summary_bullets = [
+            f"• **Delineated Feature:** **{target_label}** illuminated across **~{target_pct:.1f}%** ({target_km2:.2f} km² / {target_ha:,.0f} hectares / {target_px:,} pixels).",
+        ]
+        if inquiries.get("land") or "land" in query_lower:
+            summary_bullets.append(
+                f"• **Inquired Land Coverage:** Terrestrial land encompasses **~{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} hectares)."
+            )
+        if inquiries.get("water") or "water" in query_lower:
+            summary_bullets.append(
+                f"• **Inquired Water Coverage:** Hydrological water bodies cover **~{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares)."
+            )
+        if inquiries.get("vegetation") or any(k in query_lower for k in ["veg", "green", "canopy", "forest", "crop"]):
+            summary_bullets.append(
+                f"• **Inquired Vegetation Cover:** Vegetated canopy covers **~{stats['veg_total_pct']:.1f}%** ({stats['veg_km2']:.2f} km² / {stats['veg_ha']:,.0f} hectares)."
+            )
+        if inquiries.get("built") or any(k in query_lower for k in ["built", "urban", "settlement", "infrastructure"]):
+            summary_bullets.append(
+                f"• **Inquired Urban Footprint:** Developed infrastructure covers **~{stats['built_pct']:.1f}%** ({stats['built_km2']:.2f} km² / {stats['built_ha']:,.0f} hectares)."
+            )
+        summary_bullets.append(
+            f"• **Total Surface Balance:** Landmass covers **{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km²), bordered by **{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km²) of water bodies."
+        )
+
+        exec_summary = "\n".join(summary_bullets)
+
         formatted_text = (
-            f"📍 **Spatial Delineation & Surface Area Quantification Complete**\n\n"
-            f"### 1. Executive Spatial Summary\n"
-            f"• **Delineated Target:** **{target_label}**\n"
-            f"• **Total Surface Coverage:** **~{target_pct:.1f}%** of the observation viewport\n"
-            f"• **Quantified Physical Area:** **{target_km2:.2f} km²** ({target_ha:,.0f} hectares / {target_px:,} pixels)\n"
-            f"• **Terrestrial vs. Marine Balance:** Land encompasses **{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km²), bordered by **{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km²) of water bodies.\n\n"
+            f"📍 **Tactical Spatial Delineation & Surface Area Quantification**\n\n"
+            f"### 1. Direct Executive Answers to Your Query\n"
+            f"{exec_summary}\n\n"
             f"---\n\n"
             f"{table}\n\n"
             f"---\n\n"
             f"### 2. Geospatial Observations & Morphological Features\n"
-            f"• **Contiguous Boundaries Identified:** The entire perimeter of the **{target_label.lower()}** has been marked with high-visibility contours along the coastline and geographic interface.\n"
-            f"• **Urban / Structural Footprint:** Built-up density covers **{stats['built_pct']:.1f}%** ({stats['built_km2']:.2f} km²), highlighting roads, residential blocks, and port installations.\n"
-            f"• **Vegetation & Open Ground:** Natural canopy covers **{stats['veg_total_pct']:.1f}%** ({stats['veg_km2']:.2f} km²), while exposed soil / mudflats account for **{stats['bare_pct']:.1f}%** ({stats['bare_km2']:.2f} km²).\n"
-            f"• **Visual Evidence Verification:** In the evidence panel on the right, the entire marked region is illuminated with an emerald spatial overlay and sector bounding vectors.\n\n"
+            f"• **Contiguous Boundaries Identified:** The entire perimeter of **{target_label.lower()}** has been marked with high-visibility contours along the shoreline and physical interfaces.\n"
+            f"• **Urban / Structural Footprint:** Built-up density covers **{stats['built_pct']:.1f}%** ({stats['built_km2']:.2f} km²), highlighting roads, settlements, and infrastructure.\n"
+            f"• **Vegetation & Open Ground:** Natural canopy covers **{stats['veg_total_pct']:.1f}%** ({stats['veg_km2']:.2f} km²), while bare ground accounts for **{stats['bare_pct']:.1f}%** ({stats['bare_km2']:.2f} km²).\n"
+            f"• **Visual Evidence Verification:** In the evidence canvas on the right, the delineated target is illuminated with tactical boundary contours, sector bounding vectors, and telemetry banners.\n\n"
             f"---\n\n"
             f"### 3. Tactical GIS Interoperability\n"
             f"• Delineated boundaries have been exported to **RFC 7946 GeoJSON format in WGS84 coordinates**.\n"
