@@ -91,7 +91,17 @@ To unlock multi-worker scaling, add these free environment variables in your bac
    DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres
    ```
 
-### B. Upstash Serverless Redis (Free 0ms Cache)
+### B. Redis Distributed Cache (Native Redis & Upstash)
+SatQuery AI supports both native Redis TCP connections and Upstash Serverless Redis REST API:
+
+**Option 1: Native Redis (Docker, Redis Cloud, AWS ElastiCache, or Railway Redis)**
+```env
+REDIS_URL=redis://default:[PASSWORD]@[HOST]:[PORT]
+# Or TLS/SSL:
+REDIS_URL=rediss://default:[PASSWORD]@[HOST]:[PORT]
+```
+
+**Option 2: Upstash Serverless Redis (Free 10k cmds/day)**
 1. Create a free database at [upstash.com](https://upstash.com/).
 2. Copy the REST URL and Token from the Upstash console.
 3. Set backend environment variables:

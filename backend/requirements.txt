@@ -8,7 +8,8 @@ transformers
 Pillow
 opencv-python
 numpy
-
+redis
+psycopg2-binary
 rasterio
 python-dotenv
 sentinelhub

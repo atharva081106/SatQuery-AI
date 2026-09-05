@@ -74,6 +74,7 @@ async def healthcheck():
         "scaling": {
             "tier": "100% Free Production Stack ($0/month)",
             "cache_backend": cache_manager.get_backend_name(),
+            "cache_diagnostics": cache_manager.get_status(),
             "storage_backend": storage_manager.get_storage_type(),
             "object_storage": "cloudflare_r2" if r2_storage.is_configured() else "inline_base64_fallback",
             "onnx_acceleration": "SatSegNet INT8 Quantized (<4ms CPU)"
