@@ -699,20 +699,14 @@ export default function Home() {
             </div>
           )}
 
-          {/* 1-Click ISRO Tactical Missions Launcher */}
+          {/* Demo Queries Launcher (SpaceX Aerospace Aesthetic) */}
           <button
             type="button"
             onClick={() => setShowMissionPresets(true)}
-            className="micro-cap text-black font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 px-4 py-1.5 rounded-full flex items-center gap-2 transition-all shadow-md shadow-emerald-500/25 hover:shadow-cyan-500/35 hover:scale-[1.02] cursor-pointer pointer-events-auto border border-emerald-300/40"
-            title="Explore & Launch Pre-Configured ISRO Tactical Missions"
+            className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase font-bold"
+            title="Explore & Launch Pre-Configured Demo Queries"
           >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-900 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
-            </span>
-            <span>🚀</span>
-            <span className="tracking-widest">ISRO MISSIONS</span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-black/20 text-black font-mono font-bold uppercase hidden sm:inline-block">5 Scenarios</span>
+            DEMO QUERIES
           </button>
 
           <a href="/" className="micro-cap text-white hover:opacity-70 transition-opacity border border-white/20 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 pointer-events-auto">
