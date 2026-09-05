@@ -89,6 +89,34 @@ def generate_sample_missions():
     cv2.circle(sar_radar, (340, 190), 7, (255, 255, 255), -1)
     cv2.circle(sar_radar, (95, 320), 6, (255, 255, 255), -1)
 
+    # 4. Sambhar Salt Lake Desiccation & Wetland Survey (Ramsar Wetland Site, Rajasthan)
+    sambhar_img = np.zeros((400, 400, 3), dtype=np.uint8)
+    sambhar_img[:] = [190, 185, 175] # Arid lakebed / saline soil
+    # Salt crust boundary
+    pts_lake = np.array([[50, 80], [120, 50], [290, 70], [360, 160], [340, 290], [220, 360], [100, 330], [40, 220]], np.int32)
+    cv2.fillPoly(sambhar_img, [pts_lake], (230, 235, 240)) # Saline crust
+    # Brine reservoir / residual hypersaline water body
+    pts_brine = np.array([[120, 140], [260, 130], [310, 210], [240, 280], [140, 270]], np.int32)
+    cv2.fillPoly(sambhar_img, [pts_brine], (180, 130, 70)) # High salinity shallow water
+    # Salt evaporation pans (man-made grid on east shore)
+    for px in range(250, 350, 20):
+        for py in range(250, 350, 20):
+            cv2.rectangle(sambhar_img, (px, py), (px + 16, py + 16), (220, 215, 205), -1)
+            cv2.rectangle(sambhar_img, (px, py), (px + 16, py + 16), (130, 110, 90), 1)
+
+    # 5. Bengaluru Urban Expansion (Cartosat-3 Optical - Whitefield IT Corridor)
+    bengaluru_img = np.zeros((400, 400, 3), dtype=np.uint8)
+    bengaluru_img[:] = [50, 110, 60] # Natural green cover / tree canopy
+    # Arterial highway
+    cv2.line(bengaluru_img, (0, 200), (400, 200), (140, 140, 145), 8) # Major 6-lane road
+    cv2.line(bengaluru_img, (180, 0), (220, 400), (130, 130, 135), 6) # Cross arterial
+    # Tech parks / commercial high-rise footprint
+    for tx, ty, tw, th in [(40, 40, 70, 60), (250, 50, 90, 80), (60, 240, 80, 70), (260, 250, 95, 85)]:
+        cv2.rectangle(bengaluru_img, (tx, ty), (tx + tw, ty + th), (180, 185, 195), -1) # Concrete roof
+        cv2.rectangle(bengaluru_img, (tx, ty), (tx + tw, ty + th), (80, 85, 95), 2)
+    # Construction earthwork parcel
+    cv2.rectangle(bengaluru_img, (140, 60), (210, 130), (70, 130, 180), -1)
+
     return [
         {
             "id": "uttarakhand_flood",
@@ -145,6 +173,38 @@ def generate_sample_missions():
                     "name": "risat1_cband_radar_sar.png",
                     "base64": f"data:image/png;base64,{_encode_b64(sar_radar)}",
                     "label": "RISAT-1 SAR (PENETRATED)"
+                }
+            ]
+        },
+        {
+            "id": "sambhar_salt_lake",
+            "title": "SAMBHAR SALT LAKE DESICCATION",
+            "tag": "WETLAND BOUNDARY DELINEATION",
+            "location": "Sambhar Lake, Rajasthan (26.90° N, 75.00° E)",
+            "sensors": "Resourcesat-2 LISS-4 Multispectral (5.8m GSD)",
+            "query": "Detect water body boundary and calculate total wetland surface area in km²",
+            "description": "Delineation of hypersaline lake perimeter, salt pans, and arid basin boundaries with RFC 7946 GeoJSON output.",
+            "images": [
+                {
+                    "name": "sambhar_lake_liss4.png",
+                    "base64": f"data:image/png;base64,{_encode_b64(sambhar_img)}",
+                    "label": "RESOURCESAT-2 LISS-4"
+                }
+            ]
+        },
+        {
+            "id": "bengaluru_urban_sprawl",
+            "title": "BENGALURU URBAN DEVELOPMENT",
+            "tag": "LAND USE & BUILT-UP EXTRACTION",
+            "location": "Whitefield Tech Corridor, Bengaluru (12.97° N, 77.75° E)",
+            "sensors": "Cartosat-3 High-Resolution Panchromatic (0.28m GSD)",
+            "query": "Detect built-up structures, commercial buildings, and calculate built-up density percentage",
+            "description": "High-density urban analysis isolating commercial complexes, arterial road networks, and vegetative buffer zones.",
+            "images": [
+                {
+                    "name": "bengaluru_cartosat3.png",
+                    "base64": f"data:image/png;base64,{_encode_b64(bengaluru_img)}",
+                    "label": "CARTOSAT-3 SUB-METER"
                 }
             ]
         }

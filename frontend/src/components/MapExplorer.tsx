@@ -14,6 +14,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const mapRef = useRef<any>(null);
   const mapInstanceRef = useRef<any>(null);
   const gibsLayerRef = useRef<any>(null);
+  const basemapLayerRef = useRef<any>(null);
   const router = useRouter();
   const [L, setL] = useState<any>(null);
   
@@ -28,6 +29,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [maxCC, setMaxCC] = useState(20);
   const [configuration, setConfiguration] = useState("Default");
   const [layer, setLayer] = useState("True color");
+  const [basemap, setBasemap] = useState<"esri" | "bhuvan" | "osm">("esri");
   const [bbox, setBbox] = useState<number[] | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -59,11 +61,14 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     });
     mapInstanceRef.current = map;
 
-    // High Res Satellite Imagery (Esri World Imagery)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
-      maxZoom: 18
-    }).addTo(map);
+    // Default basemap: ESRI World Imagery
+    basemapLayerRef.current = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 18
+      }
+    ).addTo(map);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -119,6 +124,37 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       mapInstanceRef.current = null;
     };
   }, [L]);
+
+  // Switch basemap when selection changes
+  useEffect(() => {
+    if (!L || !mapInstanceRef.current) return;
+    if (basemapLayerRef.current) {
+      mapInstanceRef.current.removeLayer(basemapLayerRef.current);
+    }
+    const BASEMAPS: Record<string, any> = {
+      esri: L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Tiles &copy; Esri', maxZoom: 18 }
+      ),
+      bhuvan: L.tileLayer(
+        'https://bhuvan-vec2.nrsc.gov.in/bhuvan/gwc/service/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=india_map&STYLE=default&TILEMATRIXSET=EPSG:900913&TILEMATRIX=EPSG:900913:{z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',
+        {
+          attribution: 'ISRO Bhuvan &copy; NRSC',
+          maxZoom: 14,
+          tileSize: 256,
+          errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+        }
+      ),
+      osm: L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 }
+      ),
+    };
+    const newLayer = BASEMAPS[basemap];
+    newLayer.addTo(mapInstanceRef.current);
+    newLayer.bringToBack();
+    basemapLayerRef.current = newLayer;
+  }, [L, basemap]);
 
   // Dynamic NASA GIBS Tile Layer Effect
   useEffect(() => {
@@ -217,6 +253,31 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       {/* FLOATING ACQUISITION PANEL (design.md spec) */}
       <div className="absolute top-28 left-8 w-80 bg-black/60 backdrop-blur-md border border-white/20 p-6 z-[400] flex flex-col gap-6 shadow-2xl">
         <h2 className="text-sm font-bold tracking-[0.2em] uppercase border-b border-white/20 pb-2">Acquisition Config</h2>
+
+        {/* Basemap Switcher */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-white/50 tracking-widest uppercase">Base Map</label>
+          <div className="grid grid-cols-3 gap-1">
+            {([['esri', 'ESRI Sat'], ['bhuvan', '🇮🇳 Bhuvan'], ['osm', 'OpenStreet']] as const).map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setBasemap(val)}
+                className={`text-[10px] py-1.5 px-1 uppercase tracking-wider border transition-all ${
+                  basemap === val
+                    ? 'border-[#00F0FF] text-[#00F0FF] bg-[#00F0FF]/10 font-bold'
+                    : 'border-white/20 text-white/50 hover:border-white/50'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {basemap === 'bhuvan' && (
+            <div className="text-[10px] text-emerald-400 tracking-wider">
+              ✓ ISRO Bhuvan NRSC — National Geoportal
+            </div>
+          )}
+        </div>
         
         {/* Dataset Selection */}
         <div className="flex flex-col gap-2">

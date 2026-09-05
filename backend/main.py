@@ -4,13 +4,20 @@ import os
 if os.name == "nt" and "HF_HOME" not in os.environ:
     os.environ["HF_HOME"] = "d:\\sih26167\\.huggingface_cache"
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Request, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
+from typing import List, Optional
 import uvicorn
+import time
+from collections import defaultdict
 from agent_controller import agent_controller
+import storage_manager
 
-app = FastAPI(title="SatQuery AI Backend")
+app = FastAPI(
+    title="SatQuery AI Backend",
+    description="Agentic Vision-Language System for Remote Sensing & Earth Observation (ISRO / SAC - PS 26167)",
+    version="1.0.0"
+)
 
 # Allow CORS for Next.js frontend (local and deployed on Vercel)
 app.add_middleware(
@@ -21,26 +28,88 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# -------------------------------------------------------------
+# Rate Limiter & Security Middleware
+# -------------------------------------------------------------
+RATE_LIMIT_WINDOW = 60 # seconds
+MAX_REQUESTS_PER_WINDOW = 60 # 60 requests/minute per client IP
+client_request_history = defaultdict(list)
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    
+    # Exclude health check and preflight OPTIONS from rate limiting
+    if request.url.path not in ["/", "/health"] and request.method != "OPTIONS":
+        window_start = now - RATE_LIMIT_WINDOW
+        # Filter timestamps older than the window
+        history = [ts for ts in client_request_history[client_ip] if ts > window_start]
+        if len(history) >= MAX_REQUESTS_PER_WINDOW:
+            from fastapi.responses import JSONResponse
+            return JSONResponse(
+                status_code=429,
+                content={"error": "Too Many Requests", "message": "Rate limit of 60 req/min exceeded. Please throttle requests."},
+                headers={"Retry-After": "60"}
+            )
+        history.append(now)
+        client_request_history[client_ip] = history
+
+    response = await call_next(request)
+    return response
+
 ALLOWED_EXTENSIONS = {
     ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".geotiff",
     ".webp", ".bmp", ".jp2", ".j2k", ".avif", ".fits", ".fit", ".gif",
     ".img", ".dat", ".bin", ""
 }
 
+START_TIME = time.time()
+
 @app.get("/")
+@app.get("/health")
 async def healthcheck():
-    """Healthcheck endpoint for Render / cloud port detection"""
-    return {"status": "online", "service": "SatQuery AI Backend"}
+    """
+    Comprehensive healthcheck endpoint for Render / cloud port detection & auditability.
+    Reflects ISRO PS 26167 multi-model architecture specifications.
+    """
+    return {
+        "status": "online",
+        "service": "SatQuery AI Backend",
+        "problem_statement": "ISRO / SAC — PS 26167",
+        "version": "1.0.0",
+        "uptime_seconds": round(time.time() - START_TIME, 1),
+        "models": {
+            "vlm_foundation": "Florence-2-base (Fine-tuned for Earth Observation / Remote Sensing)",
+            "segmentation": "SatSegNet (ResNet-18 Backbone, 6 Land-Cover Classes)",
+            "classes": ["Background", "Water", "Forest/Vegetation", "Bare Soil", "Urban/Built-up", "Agriculture"],
+            "change_detection": "Bi-Temporal Residual Engine with Spatial Coherence Kernel",
+            "sar_fusion": "RISAT-1 / Sentinel-1 C-Band Cloud-Penetrating Synthesis",
+            "spatial_grounding": "Connected-component subpixel contour delineation (RFC 7946 GeoJSON)"
+        },
+        "gis_integration": {
+            "bhuvan_wms": "enabled (bhuvan-vec2.nrsc.gov.in)",
+            "geojson_export": "enabled (EPSG:4326 / RFC 7946)"
+        },
+        "storage": "sqlite (backend/storage/queries.db active)"
+    }
 
 @app.post("/api/query")
 async def process_query(
     query: str = Form(...),
     history: str = Form(None),
-    images: List[UploadFile] = File(...)
+    images: List[UploadFile] = File(...),
+    x_api_key: Optional[str] = Header(None)
 ):
     """
     Endpoint to process natural language query with multimodal images in ANY format.
+    Stores query result persistently in queries.db for auditable traceability.
     """
+    # Optional API key verification (if configured in env)
+    required_key = os.getenv("SATQUERY_API_KEY")
+    if required_key and x_api_key != required_key:
+        raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key header.")
+
     if not images or len(images) == 0:
         return {
             "status": "error",
@@ -62,7 +131,47 @@ async def process_query(
             pass
             
     result = agent_controller.execute_query(query, image_bytes_list, history_list)
+    
+    # Save to persistent SQLite storage
+    if result.get("status") == "success":
+        try:
+            result_id = storage_manager.save_query_result(
+                query_text=query,
+                response=result,
+                geojson_data=result.get("geojson_data")
+            )
+            result["id"] = result_id
+        except Exception as store_err:
+            print(f"[Storage Warning] Could not persist query to DB: {store_err}")
+
     return result
+
+@app.get("/api/results")
+async def get_recent_results(limit: int = 20):
+    """
+    Returns recent analysis runs with metadata, confidence, and timestamps.
+    """
+    try:
+        return {
+            "status": "success",
+            "results": storage_manager.list_recent_queries(limit=limit)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/results/{result_id}")
+async def get_result_by_id(result_id: str):
+    """
+    Retrieves full persistent query result, GeoJSON data, and execution summary by ID.
+    """
+    result = storage_manager.get_query_result(result_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Query result '{result_id}' not found.")
+    return {
+        "status": "success",
+        "result": result
+    }
+
 
 from pydantic import BaseModel
 from fastapi import HTTPException
