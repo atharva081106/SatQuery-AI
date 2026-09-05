@@ -38,13 +38,16 @@ class AgenticController:
                 
         else:
             # Single Image Intent Disambiguation
-            # 1. Grounding / Delineation / Spatial Outlining
+            # 1. Grounding / Delineation / Spatial Outlining (with typo tolerance)
             is_grounding = any(kw in query_lower for kw in [
-                "mark", "highlight", "bound", "box", "locate", "outline", "delineate", "trace", 
-                "find where", "detect where", "show where", "draw", "pinpoint"
+                "mark", "highlight", "hightlight", "hilight", "hihlight", "highlite", "highlght",
+                "bound", "box", "locate", "outline", "delineate", "trace", 
+                "find where", "detect where", "show where", "draw", "pinpoint", "segment", "isolate"
             ])
-            # If query says "identify ... and calculate", grounding produces the visual contour + area calculation
-            if ("identify" in query_lower or "detect" in query_lower) and any(kw in query_lower for kw in ["land", "water", "sea", "vegetation", "built", "area", "boundary", "coastline"]):
+            # If query says "identify/detect/show/find ... [target feature]", grounding produces the visual contour + area calculation
+            if any(action in query_lower for action in ["identify", "detect", "show", "find", "locate", "extract"]) and any(kw in query_lower for kw in [
+                "land", "water", "waterbody", "waterbodies", "sea", "ocean", "river", "lake", "reservoir", "vegetation", "built", "urban", "area", "boundary", "coastline", "runway", "ship", "port"
+            ]):
                 is_grounding = True
 
             # 2. Captioning / Holistic Scene Overview
@@ -78,7 +81,7 @@ class AgenticController:
         import os
         
         # Compute cache key with version prefix to ensure updated logic runs fresh
-        CACHE_VERSION = "v3_compound_intent"
+        CACHE_VERSION = "v4_subpixel_precision"
         m = hashlib.md5()
         m.update(CACHE_VERSION.encode('utf-8'))
         m.update(query.encode('utf-8'))

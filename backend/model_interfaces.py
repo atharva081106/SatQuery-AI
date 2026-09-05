@@ -298,33 +298,50 @@ def _analyze_land_cover(cv_img: np.ndarray, geo_meta: Dict[str, Any] = None) -> 
     hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
     gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
     b, g, r = cv2.split(cv_img)
+    hue, sat, val = cv2.split(hsv)
     
     # Texture & edge density
     edges = cv2.Canny(gray, 30, 100)
     edge_density = cv2.blur(edges, (21, 21))
     
+    # Local standard deviation (specular water smoothness vs vegetative texture)
+    mean = cv2.blur(gray.astype(np.float32), (7, 7))
+    mean_sq = cv2.blur((gray.astype(np.float32))**2, (7, 7))
+    std_dev = np.sqrt(np.maximum(mean_sq - mean**2, 0))
+    
     # 1. Cloud / Snow Mask: high brightness, low saturation
     cloud_mask = cv2.inRange(hsv, np.array([0, 0, 200]), np.array([179, 45, 255]))
     
+    # Forest / Terrestrial vegetation discriminator:
+    # Terrestrial vegetation has high Green reflectance over Blue, Red >= Blue, and distinct canopy texture
+    is_forest = (g.astype(int) > b.astype(int) + 4) & (r.astype(int) >= b.astype(int)) & (hue >= 28) & (hue <= 62) & (std_dev >= 1.5)
+
     # 2. Water Mask:
-    # A) Blue/cyan water (open sea, reservoirs, deep bays):
-    blue_water = cv2.inRange(hsv, np.array([75, 18, 18]), np.array([145, 255, 255]))
-    # B) Deep dark water / rivers (low value, blue/green dominant over red):
-    deep_water = (cv2.inRange(hsv, np.array([0, 0, 0]), np.array([179, 255, 65])) & 
-                  ((b.astype(int) > r.astype(int)) | (g.astype(int) > r.astype(int))))
-    # C) Coastal silty / turbid water (e.g. Mumbai harbor / bays with sediment):
-    # Flat texture (low edge density < 10), moderate brightness, not vegetation
-    veg_hue = cv2.inRange(hsv, np.array([28, 35, 25]), np.array([88, 255, 255]))
-    turbid_water = ((edge_density < 10) & (b.astype(int) > 40) & (r.astype(int) < 185) & (g.astype(int) < 185) & 
-                    (cv2.bitwise_not(veg_hue) > 0) & (cv2.bitwise_not(cloud_mask) > 0))
+    # A) Blue/cyan water (open sea, deep reservoirs, coastal waters):
+    water_blue = (hue >= 65) & (hue <= 145) & (sat >= 12) & (val >= 8) & (~is_forest)
+    # B) Deep dark water / lakes / pit basins / rivers (low value, blue/green >= red - 1, and smooth texture):
+    water_dark = (val <= 65) & (b.astype(int) >= r.astype(int) - 1) & (g.astype(int) >= r.astype(int) - 1) & (std_dev < 2.5) & (~is_forest)
+    # C) Greenish algae-rich / eutrophic lake or reservoir (Hue 58-78, smooth texture, saturation):
+    water_green = (hue >= 58) & (hue <= 78) & (std_dev < 1.8) & (sat >= 50) & (val <= 65) & (b.astype(int) >= r.astype(int) - 3) & (~is_forest)
+    # D) Coastal silty / turbid water (e.g. Mumbai harbor / bays with sediment):
+    water_turbid = (edge_density < 12) & (b.astype(int) > 30) & (b.astype(int) >= r.astype(int) - 2) & (hue >= 65) & (hue <= 150)
     
-    water_mask = cv2.bitwise_or(blue_water, cv2.bitwise_or(deep_water.astype(np.uint8) * 255, turbid_water.astype(np.uint8) * 255))
+    water_mask = (water_blue | water_dark | water_green | water_turbid).astype(np.uint8) * 255
     water_mask = cv2.bitwise_and(water_mask, cv2.bitwise_not(cloud_mask))
     
-    # Clean up water mask
-    k_water = np.ones((5, 5), np.uint8)
-    water_mask = cv2.morphologyEx(water_mask, cv2.MORPH_OPEN, k_water)
-    water_mask = cv2.morphologyEx(water_mask, cv2.MORPH_CLOSE, k_water)
+    # Clean up water mask: remove single pixel noise and close small reflections
+    k_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    water_mask = cv2.morphologyEx(water_mask, cv2.MORPH_OPEN, k_open)
+    k_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
+    water_mask = cv2.morphologyEx(water_mask, cv2.MORPH_CLOSE, k_close)
+
+    # Retain all coherent water bodies (> 150 px)
+    w_contours, _ = cv2.findContours(water_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    final_water = np.zeros_like(water_mask)
+    for c in w_contours:
+        if cv2.contourArea(c) > 150:
+            cv2.drawContours(final_water, [c], -1, 255, -1)
+    water_mask = final_water
 
     # 3. Complete Land Mask (everything that is not water and not cloud)
     land_mask = cv2.bitwise_not(cv2.bitwise_or(water_mask, cloud_mask))
@@ -462,15 +479,15 @@ def parse_grounding_intent(query: str) -> Tuple[str, Dict[str, bool]]:
     """
     q = query.lower().strip()
     
-    # Extract specific action target if preceded by action verbs
+    # Extract specific action target if preceded by action verbs (with common typo tolerance)
     action_match = re.search(
-        r'(?:highlight|mark|detect|bound|locate|outline|show|find|pinpoint|trace|draw|delineate|segment)\s+(?:the\s+)?([a-z\s]+?)(?:\s+and|\s+with|\s+to|\s+tell|\s+calculate|\s+what|\s+how|,|\.|$)',
+        r'(?:highlight|hightlight|hilight|hihlight|highlite|highlght|mark|detect|bound|locate|outline|show|find|pinpoint|trace|draw|delineate|segment|isolate)\s+(?:the\s+)?([a-z\s]+?)(?:\s+and|\s+with|\s+to|\s+tell|\s+calculate|\s+what|\s+how|,|\.|$)',
         q
     )
     action_phrase = action_match.group(1).strip() if action_match else q
     
     def match_feature(text: str) -> str:
-        if re.search(r'\b(water\w*|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*|drainage\w*|bay\w*|creek\w*|hydrology|pond\w*)\b', text):
+        if re.search(r'\b(water\w*|waterbody|waterbodies|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*|drainage\w*|bay\w*|creek\w*|hydrology|pond\w*)\b', text):
             return "water"
         if re.search(r'\b(airport\w*|runway\w*|airstrip\w*|aviation\w*|airfield\w*|taxiway\w*)\b', text):
             return "runway"
@@ -490,7 +507,7 @@ def parse_grounding_intent(query: str) -> Tuple[str, Dict[str, bool]]:
 
     grounding_target = match_feature(action_phrase)
     if not grounding_target:
-        if re.search(r'\b(water\w*|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*)\b', q) and any(w in q for w in ["highlight", "mark", "bound", "detect", "outline", "find"]):
+        if re.search(r'\b(water\w*|waterbody|waterbodies|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*)\b', q) and any(w in q for w in ["highlight", "hightlight", "hilight", "mark", "bound", "detect", "outline", "find", "show"]):
             grounding_target = "water"
         elif match_feature(q):
             grounding_target = match_feature(q)
