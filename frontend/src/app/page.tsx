@@ -64,19 +64,16 @@ export default function LandingPage() {
         </div>
         <div className="flex gap-6 items-center">
           <Link href="/acquire" className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold">
-            ACQUIRE IMAGERY
+            SATELLITE MAP
           </Link>
           <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold cursor-pointer">
-            MISSION QUERY
+            ANALYZE EARTH
           </a>
           <Link href="/dashboard" className="micro-cap text-white hover:opacity-70 transition-opacity">
             BENCHMARKS
           </Link>
           <Link href="/gallery" className="micro-cap text-white hover:opacity-70 transition-opacity">
             GALLERY
-          </Link>
-          <Link href="/faq" className="micro-cap text-white hover:opacity-70 transition-opacity">
-            FAQ
           </Link>
 
           {/* Small Sign In / Sign Up Button */}
