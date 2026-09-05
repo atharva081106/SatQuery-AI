@@ -10,6 +10,8 @@ type Message = {
   result?: any;
 };
 
+import { useAuth } from "@/context/AuthContext";
+
 import BackgroundSlideshow from '@/components/BackgroundSlideshow';
 import FadeInScroll from '@/components/FadeInScroll';
 import FramerGlobe from '@/components/FramerGlobe';
@@ -190,6 +192,17 @@ function FormattedMessage({ content }: { content: string }) {
 }
 
 export default function Home() {
+  const {
+    canQuery,
+    incrementQueryCount,
+    openAuthModal,
+    queryCount,
+    maxFreeQueries,
+    isAuthenticated,
+    user,
+    logout,
+  } = useAuth();
+
   const [images, setImages] = useState<File[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -358,6 +371,11 @@ export default function Home() {
   };
 
   const executeAnalysis = async (queryText: string, imageFiles: File[]) => {
+    if (!canQuery) {
+      openAuthModal("You have reached your limit of 3 free queries. Please sign in or create an account to unlock unlimited satellite analyses.");
+      return;
+    }
+
     if (!queryText) {
       setError("Please provide a query.");
       return;
@@ -405,6 +423,7 @@ export default function Home() {
       }
       
       setMessages([...newMessages, { role: "assistant", content: data.answer, result: data }]);
+      incrementQueryCount();
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
       setMessages([...newMessages, { role: "assistant", content: "Sorry, I encountered an error: " + err.message }]);
@@ -419,6 +438,10 @@ export default function Home() {
   };
 
   const handleSelectMission = (mission: SampleMission, autoSubmit = false) => {
+    if (autoSubmit && !canQuery) {
+      openAuthModal("You have reached your limit of 3 free queries. Please sign in or create an account to unlock unlimited satellite analyses.");
+      return;
+    }
     const files: File[] = [];
     for (const img of mission.images) {
       const f = dataURLtoFile(img.base64, img.name);
@@ -661,6 +684,41 @@ export default function Home() {
         </div>
 
         <div className="flex gap-2.5 sm:gap-3 items-center">
+          {/* Auth Status & Quota Badge */}
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold tracking-widest uppercase flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>{user?.name?.toUpperCase() || "PRO OPERATOR"}</span>
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="text-[10px] text-white/50 hover:text-white uppercase tracking-wider underline cursor-pointer"
+                title="Sign out"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openAuthModal("Sign in to unlock unlimited high-resolution satellite analyses.")}
+              className={`text-[10px] px-3 py-1 rounded-full border font-mono font-bold tracking-widest uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+                queryCount >= maxFreeQueries
+                  ? "border-red-500/50 bg-red-500/20 text-red-300 animate-pulse"
+                  : "border-[#00F0FF]/40 bg-[#00F0FF]/10 text-[#00F0FF] hover:bg-[#00F0FF]/20"
+              }`}
+            >
+              <span>⚡</span>
+              <span>
+                {queryCount >= maxFreeQueries
+                  ? "QUOTA EXCEEDED (SIGN IN)"
+                  : `${maxFreeQueries - queryCount}/${maxFreeQueries} FREE QUERIES`}
+              </span>
+            </button>
+          )}
+
           {/* 1-Click Sample Missions Launcher */}
           <button
             type="button"
@@ -921,6 +979,19 @@ export default function Home() {
                   Execute
                 </button>
               </div>
+
+              {!isAuthenticated && (
+                <div className="flex justify-between items-center px-4 py-1 text-[10px] tracking-wider text-white/60 font-mono">
+                  <span>GUEST QUOTA: {queryCount}/3 FREE QUERIES USED</span>
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal("Sign in to unlock unlimited high-resolution satellite analyses.")}
+                    className="text-[#00F0FF] hover:underline"
+                  >
+                    SIGN IN FOR UNLIMITED ACCESS &rarr;
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>

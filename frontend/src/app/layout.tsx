@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import CookieConsent from "@/components/CookieConsent";
+import { AuthProvider } from "@/context/AuthContext";
+import AuthModal from "@/components/AuthModal";
 
 export const metadata: Metadata = {
-  title: "SatQuery AI",
-  description: "Multimodal Remote Sensing Image Analysis through Text Queries",
+  title: "SatQuery AI - Earth Observation Intelligence",
+  description: "Multimodal Remote Sensing Image Analysis through Natural Language Queries",
 };
 
 export default function RootLayout({
@@ -15,8 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
-        <CookieConsent />
+        <AuthProvider>
+          {children}
+          <AuthModal />
+          <CookieConsent />
+        </AuthProvider>
       </body>
     </html>
   );

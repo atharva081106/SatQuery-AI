@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { useAuth } from "@/context/AuthContext";
 
 interface MapExplorerProps {
   onAcquire?: (base64data: string, bbox: number[]) => void;
@@ -11,6 +12,15 @@ interface MapExplorerProps {
 }
 
 export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = {}) {
+  const {
+    canUseMap,
+    incrementMapCount,
+    openAuthModal,
+    mapCount,
+    maxFreeMapQueries,
+    isAuthenticated,
+  } = useAuth();
+
   const mapRef = useRef<any>(null);
   const mapInstanceRef = useRef<any>(null);
   const gibsLayerRef = useRef<any>(null);
@@ -182,6 +192,11 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   }, [L, endDate]);
 
   const handleAcquire = async () => {
+    if (!canUseMap) {
+      openAuthModal("You have used your 1 free Map Satellite Acquisition. Please sign in or create an account to unlock unlimited satellite area tasking.");
+      return;
+    }
+
     if (!bbox) {
       alert("Please draw an Area of Interest (Bounding Box) on the map first.");
       return;
@@ -217,6 +232,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result as string;
+        incrementMapCount();
         if (onAcquire) {
           onAcquire(base64data, bbox);
         } else {
@@ -252,7 +268,18 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       
       {/* FLOATING ACQUISITION PANEL (design.md spec) */}
       <div className="absolute top-28 left-8 w-80 bg-black/60 backdrop-blur-md border border-white/20 p-6 z-[400] flex flex-col gap-6 shadow-2xl">
-        <h2 className="text-sm font-bold tracking-[0.2em] uppercase border-b border-white/20 pb-2">Acquisition Config</h2>
+        <div className="flex items-center justify-between border-b border-white/20 pb-2">
+          <h2 className="text-sm font-bold tracking-[0.2em] uppercase">Acquisition Config</h2>
+          {isAuthenticated ? (
+            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              PRO UNLIMITED
+            </span>
+          ) : (
+            <span className="text-[9px] font-bold text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              {mapCount >= maxFreeMapQueries ? "0/1 FREE LEFT" : "1/1 FREE SCAN"}
+            </span>
+          )}
+        </div>
 
         {/* Basemap Switcher */}
         <div className="flex flex-col gap-2">

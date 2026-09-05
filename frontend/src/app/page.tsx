@@ -101,11 +101,12 @@ export default function LandingPage() {
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
-            <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-48 text-center hover:bg-white hover:text-black cursor-pointer">
-              ENTER SYSTEM
+            <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark min-w-[200px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase">
+              TRY FOR FREE
             </a>
           </FadeInScroll>
         </div>
+
         
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-pulse opacity-50 z-10">
