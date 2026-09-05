@@ -8,8 +8,11 @@ import FadeInScroll from '@/components/FadeInScroll';
 import FramerGlobe from '@/components/FramerGlobe';
 import WebsiteLoader from '@/components/WebsiteLoader';
 import SystemLoader from '@/components/SystemLoader';
+import { useAuth } from '@/context/AuthContext';
+
 export default function LandingPage() {
   const router = useRouter();
+  const { isAuthenticated, user, openAuthModal, logout } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const [flyOff, setFlyOff] = useState(false);
   const [enteringSystem, setEnteringSystem] = useState(false);
@@ -59,7 +62,7 @@ export default function LandingPage() {
         <div className="display-lg tracking-widest text-white">
           SATQUERY AI.
         </div>
-        <div className="flex gap-8 items-center">
+        <div className="flex gap-6 items-center">
           <Link href="/acquire" className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold">
             ACQUIRE IMAGERY
           </Link>
@@ -75,6 +78,32 @@ export default function LandingPage() {
           <Link href="/faq" className="micro-cap text-white hover:opacity-70 transition-opacity">
             FAQ
           </Link>
+
+          {/* Small Sign In / Sign Up Button */}
+          {!isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => openAuthModal("Sign in to access advanced earth observation intelligence.", "signin")}
+              className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-3.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer tracking-widest uppercase font-semibold text-[11px]"
+              title="Sign in or register"
+            >
+              SIGN IN
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold tracking-widest uppercase">
+                {user?.name?.slice(0, 14).toUpperCase() || "OPERATOR"}
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="text-[10px] text-white/50 hover:text-white uppercase tracking-wider underline cursor-pointer"
+                title="Sign out"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -172,6 +201,15 @@ export default function LandingPage() {
           <span>SATQUERY AI &copy; {new Date().getFullYear()}</span>
           <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
             <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="hover:text-white transition-colors cursor-pointer">SYSTEM ACCESS</a>
+            {!isAuthenticated ? (
+              <button
+                type="button"
+                onClick={() => openAuthModal("Sign in to your SatQuery AI account.", "signin")}
+                className="hover:text-white transition-colors cursor-pointer uppercase"
+              >
+                SIGN IN
+              </button>
+            ) : null}
             <Link href="/faq" className="hover:text-white transition-colors">FAQS</Link>
             <Link href="/dashboard" className="hover:text-white transition-colors">BENCHMARKS</Link>
             <Link href="#" className="hover:text-white transition-colors">DOCUMENTATION</Link>

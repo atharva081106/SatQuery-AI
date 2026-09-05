@@ -21,7 +21,8 @@ interface AuthContextType {
   canUseMap: boolean;
   isAuthModalOpen: boolean;
   authModalReason: string;
-  openAuthModal: (reason?: string) => void;
+  authModalInitialMode?: "signin" | "signup";
+  openAuthModal: (reason?: string, initialMode?: "signin" | "signup") => void;
   closeAuthModal: () => void;
   incrementQueryCount: () => void;
   incrementMapCount: () => void;
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [mapCount, setMapCount] = useState<number>(0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalReason, setAuthModalReason] = useState<string>("");
+  const [authModalInitialMode, setAuthModalInitialMode] = useState<"signin" | "signup">("signin");
 
   useEffect(() => {
     // Hydrate state from localStorage
@@ -67,10 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const openAuthModal = (reason?: string) => {
+  const openAuthModal = (reason?: string, initialMode?: "signin" | "signup") => {
     setAuthModalReason(
       reason || "Authentication required to access advanced satellite analytics."
     );
+    if (initialMode) {
+      setAuthModalInitialMode(initialMode);
+    }
     setIsAuthModalOpen(true);
   };
 
@@ -179,6 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         canUseMap,
         isAuthModalOpen,
         authModalReason,
+        authModalInitialMode,
         openAuthModal,
         closeAuthModal,
         incrementQueryCount,

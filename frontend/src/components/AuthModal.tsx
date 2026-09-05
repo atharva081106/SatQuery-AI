@@ -7,6 +7,7 @@ export default function AuthModal() {
   const {
     isAuthModalOpen,
     authModalReason,
+    authModalInitialMode,
     closeAuthModal,
     login,
     signup,
@@ -24,6 +25,12 @@ export default function AuthModal() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [gisLoaded, setGisLoaded] = useState(false);
+
+  useEffect(() => {
+    if (authModalInitialMode) {
+      setMode(authModalInitialMode);
+    }
+  }, [authModalInitialMode, isAuthModalOpen]);
 
   const GOOGLE_CLIENT_ID =
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||

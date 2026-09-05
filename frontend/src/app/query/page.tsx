@@ -683,6 +683,18 @@ export default function Home() {
         </div>
 
         <div className="flex gap-2.5 sm:gap-3 items-center">
+          {/* Guest Sign In / Sign Up Trigger */}
+          {!isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => openAuthModal("Sign in to sync mission logs and access unlimited high-resolution analyses.", "signin")}
+              className="micro-cap border border-white/20 hover:border-white text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase text-[11px]"
+              title="Sign in to your account"
+            >
+              SIGN IN
+            </button>
+          )}
+
           {/* Authenticated User Callsign */}
           {isAuthenticated && (
             <div className="flex items-center gap-2">
