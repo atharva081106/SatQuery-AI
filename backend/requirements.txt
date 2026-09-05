@@ -14,3 +14,4 @@ python-dotenv
 sentinelhub
 oauthlib
 requests-oauthlib
+scikit-image

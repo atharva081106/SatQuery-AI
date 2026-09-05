@@ -7,7 +7,10 @@ from PIL import Image
 import cv2
 import numpy as np
 import rasterio
-from skimage.metrics import structural_similarity as ssim
+try:
+    from skimage.metrics import structural_similarity as ssim
+except ImportError:
+    ssim = None
 from ml_models import ml_manager
 
 class SpecialistModel(ABC):
