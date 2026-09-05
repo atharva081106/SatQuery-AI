@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 export interface MissionImage {
   name: string;
@@ -31,7 +31,11 @@ interface MissionPresetsModalProps {
   onSelectMission: (mission: SampleMission, autoSubmit?: boolean) => void;
 }
 
-// Pre-packaged demo queries for instant zero-latency loading
+// Global in-memory cache to guarantee zero-latency 0ms subsequent opens
+let globalMissionsCache: SampleMission[] | null = null;
+let isPreloadingMissions = false;
+
+// Pre-packaged demo queries
 const FALLBACK_MISSIONS: SampleMission[] = [
   {
     id: "uttarakhand_flood",
@@ -115,16 +119,72 @@ const FALLBACK_MISSIONS: SampleMission[] = [
   }
 ];
 
+// Helper to prefetch missions once
+async function loadMissionsData(): Promise<SampleMission[]> {
+  if (globalMissionsCache) return globalMissionsCache;
+  if (isPreloadingMissions) return FALLBACK_MISSIONS;
+
+  isPreloadingMissions = true;
+  try {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const res = await fetch(`${backendUrl}/api/sample-missions`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.missions && data.missions.length > 0) {
+        const enhanced: SampleMission[] = data.missions.map((backendM: any) => {
+          const fallback = FALLBACK_MISSIONS.find((f) => f.id === backendM.id) || FALLBACK_MISSIONS[0];
+          return {
+            ...fallback,
+            title: backendM.title || fallback.title,
+            tag: backendM.tag || fallback.tag,
+            location: backendM.location || fallback.location,
+            sensors: backendM.sensors || fallback.sensors,
+            query: backendM.query || fallback.query,
+            description: backendM.description || fallback.description,
+            images: backendM.images || [],
+          };
+        });
+        globalMissionsCache = enhanced;
+        return enhanced;
+      }
+    }
+  } catch (err) {
+    console.warn("Using bundled high-speed demo queries", err);
+  } finally {
+    isPreloadingMissions = false;
+  }
+  return FALLBACK_MISSIONS;
+}
+
 export default function MissionPresetsModal({
   isOpen,
   onClose,
-  onSelectMission
+  onSelectMission,
 }: MissionPresetsModalProps) {
-  const [missions, setMissions] = useState<SampleMission[]>(FALLBACK_MISSIONS);
-  const [loading, setLoading] = useState(false);
+  const [missions, setMissions] = useState<SampleMission[]>(
+    globalMissionsCache || FALLBACK_MISSIONS
+  );
   const [selectedId, setSelectedId] = useState<string>("uttarakhand_flood");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [previewTileIndex, setPreviewTileIndex] = useState<number>(0);
+
+  // Eagerly prefetch in background if not already cached
+  useEffect(() => {
+    if (!globalMissionsCache) {
+      loadMissionsData().then((loaded) => {
+        setMissions(loaded);
+      });
+    }
+  }, []);
+
+  // Fetch when opened if cache was missing
+  useEffect(() => {
+    if (isOpen && !globalMissionsCache) {
+      loadMissionsData().then((loaded) => {
+        setMissions(loaded);
+      });
+    }
+  }, [isOpen]);
 
   // Close on Escape key
   useEffect(() => {
@@ -137,61 +197,29 @@ export default function MissionPresetsModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Fetch full tile image payloads from backend
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchMissions = async () => {
-      setLoading(true);
-      try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        const res = await fetch(`${backendUrl}/api/sample-missions`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.missions && data.missions.length > 0) {
-            const enhanced: SampleMission[] = data.missions.map((backendM: any) => {
-              const fallback = FALLBACK_MISSIONS.find(f => f.id === backendM.id) || FALLBACK_MISSIONS[0];
-              return {
-                ...fallback,
-                title: backendM.title || fallback.title,
-                tag: backendM.tag || fallback.tag,
-                location: backendM.location || fallback.location,
-                sensors: backendM.sensors || fallback.sensors,
-                query: backendM.query || fallback.query,
-                description: backendM.description || fallback.description,
-                images: backendM.images || []
-              };
-            });
-            setMissions(enhanced);
-          }
-        }
-      } catch (err) {
-        console.warn("Using bundled demo queries", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMissions();
-  }, [isOpen]);
-
   const filteredMissions = useMemo(() => {
     if (activeCategory === "all") return missions;
-    return missions.filter(m => m.category === activeCategory);
+    return missions.filter((m) => m.category === activeCategory);
   }, [missions, activeCategory]);
 
   const currentMission = useMemo(() => {
-    return missions.find(m => m.id === selectedId) || filteredMissions[0] || missions[0];
+    return missions.find((m) => m.id === selectedId) || filteredMissions[0] || missions[0];
   }, [missions, selectedId, filteredMissions]);
+
+  const handleSelectId = useCallback((id: string) => {
+    setSelectedId(id);
+    setPreviewTileIndex(0);
+  }, []);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in font-sans">
-      <div className="bg-black border border-white/20 rounded-none w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    // High-performance overlay: NO GPU-heavy backdrop-blur over running 3D WebGL canvas
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-6 font-sans will-change-transform">
+      <div className="bg-[#050507] border border-white/20 w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden will-change-contents">
         
-        {/* SpaceX-Style Minimalist Header Bar */}
-        <div className="px-6 py-4 border-b border-white/15 flex items-center justify-between bg-[#050505]">
+        {/* SpaceX-Style Header Bar */}
+        <div className="px-6 py-3.5 border-b border-white/15 flex items-center justify-between bg-black">
           <div className="flex items-center gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -200,10 +228,10 @@ export default function MissionPresetsModal({
                 </span>
                 <span className="text-white/20">•</span>
                 <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase">
-                  VERIFIED SCENARIOS
+                  INSTANT DEMO
                 </span>
               </div>
-              <h2 className="text-sm sm:text-base font-bold text-white tracking-widest uppercase mt-0.5">
+              <h2 className="text-sm sm:text-base font-bold text-white tracking-widest uppercase mt-0.5 font-mono">
                 DEMO QUERIES
               </h2>
             </div>
@@ -211,7 +239,7 @@ export default function MissionPresetsModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-colors cursor-pointer text-xs"
+            className="w-8 h-8 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-colors cursor-pointer text-xs font-mono"
             title="Close (Esc)"
           >
             ✕
@@ -219,7 +247,7 @@ export default function MissionPresetsModal({
         </div>
 
         {/* Minimal Category Filter Tabs */}
-        <div className="px-6 py-2.5 bg-black border-b border-white/10 flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs font-mono">
+        <div className="px-6 py-2 bg-[#08080a] border-b border-white/10 flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs font-mono">
           <span className="text-white/40 uppercase text-[10px] tracking-widest mr-2 hidden sm:inline">FILTER:</span>
           {[
             { id: "all", label: "ALL" },
@@ -227,12 +255,12 @@ export default function MissionPresetsModal({
             { id: "maritime", label: "MARITIME RECON" },
             { id: "sar", label: "SAR RADAR" },
             { id: "urban", label: "URBAN EXPANSION" }
-          ].map(tab => (
+          ].map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveCategory(tab.id)}
-              className={`px-3 py-1 text-xs tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap border ${
+              className={`px-3 py-1 text-xs tracking-wider uppercase transition-colors cursor-pointer whitespace-nowrap border ${
                 activeCategory === tab.id
                   ? "bg-white text-black border-white font-bold"
                   : "bg-transparent text-white/60 border-white/15 hover:border-white/40 hover:text-white"
@@ -247,29 +275,21 @@ export default function MissionPresetsModal({
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10 min-h-0">
           
           {/* Left Column: Demo Queries List */}
-          <div className="w-full md:w-5/12 p-4 flex flex-col gap-2 overflow-y-auto bg-black">
-            <div className="flex items-center justify-between px-1 mb-1">
+          <div className="w-full md:w-5/12 p-3.5 flex flex-col gap-2 overflow-y-auto bg-black contain-content">
+            <div className="flex items-center justify-between px-1 mb-0.5">
               <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">
-                DEMO QUERIES ({filteredMissions.length})
+                SCENARIOS ({filteredMissions.length})
               </span>
-              {loading && (
-                <span className="text-[10px] font-mono text-white/60 animate-pulse tracking-wider">
-                  SYNCING...
-                </span>
-              )}
             </div>
 
-            {filteredMissions.map(m => {
+            {filteredMissions.map((m) => {
               const isSelected = m.id === currentMission?.id;
               return (
                 <button
                   key={m.id}
                   type="button"
-                  onClick={() => {
-                    setSelectedId(m.id);
-                    setPreviewTileIndex(0);
-                  }}
-                  className={`text-left p-3.5 border transition-all cursor-pointer ${
+                  onClick={() => handleSelectId(m.id)}
+                  className={`text-left p-3 border transition-colors cursor-pointer ${
                     isSelected
                       ? "bg-white/10 border-white text-white"
                       : "bg-transparent border-white/10 hover:border-white/30 text-white/80"
@@ -280,7 +300,7 @@ export default function MissionPresetsModal({
                       {m.tag}
                     </span>
                     <span className="text-[9px] font-mono text-white/40">
-                      {m.images.length > 0 ? `${m.images.length} TILES` : "READY"}
+                      {m.images.length > 0 ? `${m.images.length} TILES` : "SYNTHETIC"}
                     </span>
                   </div>
 
@@ -288,7 +308,7 @@ export default function MissionPresetsModal({
                     {m.title}
                   </div>
 
-                  <div className="text-[11px] text-white/50 truncate mt-1 font-mono">
+                  <div className="text-[11px] text-white/50 truncate mt-0.5 font-mono">
                     {m.location}
                   </div>
                 </button>
@@ -298,17 +318,17 @@ export default function MissionPresetsModal({
 
           {/* Right Column: Query Detail, Satellite Previews, and TOP LAUNCH BUTTON */}
           {currentMission && (
-            <div className="w-full md:w-7/12 p-6 flex flex-col overflow-y-auto bg-[#040404]">
+            <div className="w-full md:w-7/12 p-5 sm:p-6 flex flex-col overflow-y-auto bg-[#030305] contain-content">
               
               {/* TOP ACTION BAR - LAUNCH ON TOP (SpaceX Style) */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pb-5 mb-5 border-b border-white/15">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pb-4 mb-4 border-b border-white/15">
                 <button
                   type="button"
                   onClick={() => {
                     onSelectMission(currentMission, true);
                     onClose();
                   }}
-                  className="flex-1 py-2.5 px-5 bg-white text-black hover:bg-white/90 text-xs font-mono font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:scale-[1.01]"
+                  className="flex-1 py-2.5 px-5 bg-white text-black hover:bg-white/90 text-xs font-mono font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
                 >
                   <span>▲</span>
                   <span>LAUNCH QUERY</span>
@@ -326,30 +346,30 @@ export default function MissionPresetsModal({
                 </button>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3.5">
                 
                 {/* Header & Description */}
                 <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10px] font-mono text-white/70 uppercase tracking-widest border border-white/20 px-2 py-0.5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[9px] font-mono text-white/70 uppercase tracking-widest border border-white/20 px-2 py-0.5">
                       {currentMission.tag}
                     </span>
-                    <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
+                    <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest truncate">
                       {currentMission.pipeline}
                     </span>
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-bold text-white tracking-widest uppercase mt-1">
+                  <h3 className="text-sm sm:text-base font-bold text-white tracking-widest uppercase mt-1 font-mono">
                     {currentMission.title}
                   </h3>
 
-                  <p className="text-xs text-white/70 mt-1.5 leading-relaxed font-sans">
+                  <p className="text-xs text-white/70 mt-1 leading-relaxed font-sans">
                     {currentMission.description}
                   </p>
                 </div>
 
-                {/* Tactical Parameters Grid (SpaceX Telemetry Style) */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono bg-white/[0.02] p-3 border border-white/10">
+                {/* Tactical Parameters Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-mono bg-white/[0.02] p-2.5 border border-white/10">
                   <div className="col-span-2 sm:col-span-1">
                     <span className="text-white/40 block text-[9px] uppercase tracking-widest">GEOLOCATION</span>
                     <span className="text-white font-medium text-[11px] truncate block">{currentMission.location}</span>
@@ -366,14 +386,14 @@ export default function MissionPresetsModal({
                 </div>
 
                 {/* Natural Language Mission Query Command */}
-                <div className="border border-white/15 p-3 bg-black">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-mono text-white/60 uppercase tracking-widest">
+                <div className="border border-white/15 p-2.5 bg-black">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-mono text-white/60 uppercase tracking-widest">
                       MISSION QUERY PROMPT
                     </span>
                     <span className="text-[9px] font-mono text-white/40 uppercase">PS 26167 GROUNDING</span>
                   </div>
-                  <p className="text-xs text-white font-mono leading-relaxed bg-white/[0.04] p-3 border border-white/10">
+                  <p className="text-xs text-white font-mono leading-relaxed bg-white/[0.03] p-2.5 border border-white/10 select-all">
                     "{currentMission.query}"
                   </p>
                 </div>
@@ -381,30 +401,32 @@ export default function MissionPresetsModal({
                 {/* Satellite Tiles View */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono tracking-widest text-white/60 uppercase font-semibold">
-                      CO-REGISTERED SATELLITE TILES ({currentMission.images.length || 2})
+                    <span className="text-[9px] font-mono tracking-widest text-white/60 uppercase font-semibold">
+                      SATELLITE TILES ({currentMission.images.length || 2})
                     </span>
                   </div>
 
                   {currentMission.images.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {currentMission.images.map((img, idx) => (
                         <div
                           key={idx}
                           onClick={() => setPreviewTileIndex(idx)}
-                          className={`flex flex-col gap-1 cursor-pointer transition-all p-1 border ${
+                          className={`flex flex-col gap-1 cursor-pointer transition-colors p-1 border ${
                             previewTileIndex === idx
                               ? "border-white bg-white/5"
                               : "border-white/15 bg-black hover:border-white/40"
                           }`}
                         >
-                          <div className="aspect-video sm:aspect-square overflow-hidden border border-white/10 bg-black relative group">
+                          <div className="aspect-video sm:aspect-square overflow-hidden border border-white/10 bg-black relative">
                             <img
                               src={img.base64}
                               alt={img.label}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              decoding="async"
+                              loading="eager"
+                              className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-80" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-75" />
                             <span className="absolute bottom-1.5 left-2 right-2 text-[9px] font-mono text-white/90 uppercase tracking-wider truncate">
                               {img.label}
                             </span>
@@ -413,11 +435,11 @@ export default function MissionPresetsModal({
                       ))}
                     </div>
                   ) : (
-                    <div className="aspect-video border border-white/10 bg-black flex flex-col items-center justify-center p-6 text-center">
+                    <div className="aspect-video border border-white/10 bg-black flex flex-col items-center justify-center p-4 text-center">
                       <span className="text-xs text-white/70 font-mono uppercase tracking-wider">
                         Synthetic payload calibrated for {currentMission.title}
                       </span>
-                      <span className="text-[10px] text-white/40 font-mono mt-1 uppercase">
+                      <span className="text-[10px] text-white/40 font-mono mt-0.5 uppercase">
                         Click 'Launch Query' to execute analysis
                       </span>
                     </div>
@@ -425,7 +447,7 @@ export default function MissionPresetsModal({
                 </div>
 
                 {/* SIH 2026 Evaluator Note */}
-                <div className="text-[10px] font-mono text-white/60 bg-white/[0.02] p-2.5 border border-white/10">
+                <div className="text-[10px] font-mono text-white/60 bg-white/[0.02] p-2 border border-white/10">
                   <span className="text-white font-bold mr-1.5 tracking-wider uppercase">NOTE:</span>
                   <span>{currentMission.technicalNote}</span>
                 </div>
