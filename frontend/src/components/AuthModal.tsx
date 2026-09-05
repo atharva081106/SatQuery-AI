@@ -145,16 +145,16 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-xl animate-fade-in font-sans">
-      {/* Centered Modal Card - Curvy Glassmorphism Architecture */}
-      <div className="relative w-full max-w-md bg-zinc-950/75 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 sm:p-7 text-white flex flex-col gap-4 shadow-[0_25px_60px_rgba(0,0,0,0.8),0_0_30px_rgba(255,255,255,0.05)] max-h-[92vh] overflow-y-auto custom-scrollbar">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-md animate-fade-in font-sans">
+      {/* Centered Modal Card - Transparent Curvy Glassmorphism Architecture */}
+      <div className="relative w-full max-w-md bg-white/[0.04] backdrop-blur-3xl border border-white/25 rounded-3xl p-6 sm:p-7 text-white flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.25)] max-h-[92vh] overflow-y-auto custom-scrollbar">
         
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-white/10 pb-3">
+        <div className="flex items-start justify-between border-b border-white/15 pb-3">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-              <span className="text-[10px] font-mono tracking-widest text-emerald-400/90 font-bold uppercase">
+              <span className="text-[10px] font-mono tracking-widest text-emerald-300 font-bold uppercase">
                 AUTHENTICATION REQUIRED
               </span>
             </div>
@@ -165,15 +165,15 @@ export default function AuthModal() {
           <button
             type="button"
             onClick={closeAuthModal}
-            className="w-8 h-8 rounded-full border border-white/20 bg-white/5 hover:bg-white/20 text-white/60 hover:text-white transition-all flex items-center justify-center text-xs font-mono cursor-pointer"
+            className="w-8 h-8 rounded-full border border-white/30 bg-white/10 hover:bg-white/25 text-white/80 hover:text-white transition-all flex items-center justify-center text-xs font-mono cursor-pointer"
             title="Close (Esc)"
           >
             &times;
           </button>
         </div>
 
-        {/* Dynamic Alert Banner - Curvy Glass */}
-        <div className="bg-white/[0.05] backdrop-blur-md border border-white/10 rounded-2xl p-3.5 text-xs">
+        {/* Dynamic Alert Banner - Curvy Transparent Glass */}
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-2xl p-3.5 text-xs shadow-inner">
           <div className="flex items-center justify-between text-[10px] font-mono font-bold text-emerald-400 tracking-wider uppercase mb-1">
             <span>QUOTA LIMIT REACHED</span>
             <span>
@@ -182,7 +182,7 @@ export default function AuthModal() {
                 : `${mapCount}/${maxFreeMapQueries} MAP SCAN USED`}
             </span>
           </div>
-          <p className="text-white/80 text-[11px] leading-relaxed font-sans">
+          <p className="text-white/90 text-[11px] leading-relaxed font-sans">
             {authModalReason ||
               "Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses."}
           </p>
@@ -195,7 +195,7 @@ export default function AuthModal() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="w-full py-3 px-4 bg-white hover:bg-zinc-200 text-black font-bold text-xs uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2.5 border border-white cursor-pointer shadow-lg hover:scale-[1.01]"
+            className="w-full py-3 px-4 bg-white/90 hover:bg-white text-black font-bold text-xs uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2.5 border border-white/80 cursor-pointer shadow-lg hover:scale-[1.01]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -221,13 +221,13 @@ export default function AuthModal() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-0.5">
-          <div className="flex-1 h-[1px] bg-white/10" />
-          <span className="text-[9px] font-mono text-white/40 tracking-widest uppercase">OR EMAIL CREDENTIALS</span>
-          <div className="flex-1 h-[1px] bg-white/10" />
+          <div className="flex-1 h-[1px] bg-white/15" />
+          <span className="text-[9px] font-mono text-white/50 tracking-widest uppercase">OR EMAIL CREDENTIALS</span>
+          <div className="flex-1 h-[1px] bg-white/15" />
         </div>
 
         {/* Curvy Tab Switcher */}
-        <div className="grid grid-cols-2 p-1 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 font-mono text-xs">
+        <div className="grid grid-cols-2 p-1 bg-white/[0.08] backdrop-blur-xl rounded-2xl border border-white/20 font-mono text-xs">
           <button
             type="button"
             onClick={() => {
