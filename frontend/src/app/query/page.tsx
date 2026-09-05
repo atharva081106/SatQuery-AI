@@ -875,7 +875,10 @@ export default function Home() {
 
                   {/* Expandable Query Popover Library */}
                   {showPresets && (
-                    <div className="absolute bottom-full mb-3 left-0 w-[92vw] sm:w-[560px] max-h-[380px] overflow-y-auto custom-scrollbar bg-black/95 backdrop-blur-xl border border-[#3a3a3f] rounded-xl p-4 shadow-2xl z-50 animate-slide-up">
+                    <div 
+                      className="absolute bottom-full mb-3 left-0 w-[92vw] sm:w-[560px] max-h-[380px] overflow-y-auto custom-scrollbar bg-black/95 backdrop-blur-xl border border-[#3a3a3f] rounded-xl p-4 shadow-2xl z-50 animate-slide-up pointer-events-auto touch-pan-y"
+                      onWheel={(e) => e.stopPropagation()}
+                    >
                       <div className="flex justify-between items-center pb-3 mb-3 border-b border-[#2a2a2f]">
                         <div className="flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>

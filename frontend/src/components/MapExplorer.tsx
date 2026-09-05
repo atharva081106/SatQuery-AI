@@ -266,9 +266,12 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       {/* THE MAP */}
       <div ref={mapRef} className="absolute inset-0 z-0" />
       
-      {/* FLOATING ACQUISITION PANEL (design.md spec) */}
-      <div className="absolute top-28 left-8 w-80 bg-black/60 backdrop-blur-md border border-white/20 p-6 z-[400] flex flex-col gap-6 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/20 pb-2">
+      {/* FLOATING ACQUISITION PANEL (Scrollable & Responsive) */}
+      <div 
+        className="absolute top-20 sm:top-24 left-4 sm:left-8 w-[calc(100vw-2rem)] sm:w-84 max-h-[calc(100vh-6rem)] sm:max-h-[calc(100vh-7.5rem)] overflow-y-auto custom-scrollbar bg-black/85 backdrop-blur-xl border border-white/20 p-5 sm:p-6 z-[400] flex flex-col gap-4.5 shadow-2xl rounded-xl pointer-events-auto touch-pan-y"
+        onWheel={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-white/20 pb-2 shrink-0">
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase">Acquisition Config</h2>
           {isAuthenticated ? (
             <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -404,7 +407,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         <button 
           onClick={handleAcquire}
           disabled={loading}
-          className={`w-full py-3 mt-4 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border ${
+          className={`w-full py-3 mt-2 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border shrink-0 cursor-pointer ${
             loading 
             ? 'border-white/20 text-white/40 cursor-not-allowed bg-transparent' 
             : 'border-white text-white hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.5)]'
@@ -417,7 +420,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           <button 
             onClick={onCancel}
             disabled={loading}
-            className="w-full py-3 mt-2 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border border-white/20 text-white/60 hover:text-white hover:border-white"
+            className="w-full py-3 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border border-white/20 text-white/60 hover:text-white hover:border-white shrink-0 cursor-pointer"
           >
             Cancel
           </button>

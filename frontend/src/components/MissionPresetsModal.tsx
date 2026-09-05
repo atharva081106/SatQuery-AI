@@ -216,10 +216,10 @@ export default function MissionPresetsModal({
   return (
     // High-performance overlay: NO GPU-heavy backdrop-blur over running 3D WebGL canvas
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-6 font-sans will-change-transform">
-      <div className="bg-[#050507] border border-white/20 w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden will-change-contents">
+      <div className="bg-[#050507] border border-white/20 w-full max-w-5xl h-[86vh] max-h-[850px] min-h-[480px] flex flex-col shadow-2xl overflow-hidden rounded-xl will-change-contents">
         
         {/* SpaceX-Style Header Bar */}
-        <div className="px-6 py-3.5 border-b border-white/15 flex items-center justify-between bg-black">
+        <div className="px-6 py-3.5 border-b border-white/15 flex items-center justify-between bg-black shrink-0">
           <div className="flex items-center gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -247,7 +247,7 @@ export default function MissionPresetsModal({
         </div>
 
         {/* Minimal Category Filter Tabs */}
-        <div className="px-6 py-2 bg-[#08080a] border-b border-white/10 flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs font-mono">
+        <div className="px-6 py-2 bg-[#08080a] border-b border-white/10 flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs font-mono shrink-0">
           <span className="text-white/40 uppercase text-[10px] tracking-widest mr-2 hidden sm:inline">FILTER:</span>
           {[
             { id: "all", label: "ALL" },
@@ -272,10 +272,13 @@ export default function MissionPresetsModal({
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10 min-h-0">
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10">
           
-          {/* Left Column: Demo Queries List */}
-          <div className="w-full md:w-5/12 p-3.5 flex flex-col gap-2 overflow-y-auto h-full max-h-[50vh] md:max-h-full custom-scrollbar bg-black overscroll-contain">
+          {/* Left Column: Demo Queries List (Smooth Scrolling) */}
+          <div 
+            className="w-full md:w-5/12 flex-1 md:flex-initial md:h-full p-3.5 flex flex-col gap-2 overflow-y-auto custom-scrollbar bg-black pointer-events-auto min-h-0 touch-pan-y"
+            onWheel={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between px-1 mb-0.5 shrink-0">
               <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">
                 SCENARIOS ({filteredMissions.length})
@@ -316,12 +319,15 @@ export default function MissionPresetsModal({
             })}
           </div>
 
-          {/* Right Column: Query Detail, Satellite Previews, and TOP LAUNCH BUTTON */}
+          {/* Right Column: Query Detail, Satellite Previews, and TOP LAUNCH BUTTON (Smooth Scrolling) */}
           {currentMission && (
-            <div className="w-full md:w-7/12 p-5 sm:p-6 flex flex-col overflow-y-auto h-full max-h-[50vh] md:max-h-full custom-scrollbar bg-[#030305] overscroll-contain">
+            <div 
+              className="w-full md:w-7/12 flex-1 md:flex-initial md:h-full p-5 sm:p-6 flex flex-col overflow-y-auto custom-scrollbar bg-[#030305] pointer-events-auto min-h-0 touch-pan-y"
+              onWheel={(e) => e.stopPropagation()}
+            >
               
               {/* TOP ACTION BAR - LAUNCH ON TOP (SpaceX Style) */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pb-4 mb-4 border-b border-white/15">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pb-4 mb-4 border-b border-white/15 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
