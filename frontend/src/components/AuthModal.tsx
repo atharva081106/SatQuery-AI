@@ -24,36 +24,66 @@ export default function AuthModal() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "1000467611044-mpptlqt6hn56blhcljqt8fg2itptm1us.apps.googleusercontent.com";
+
+  React.useEffect(() => {
+    if (!isAuthModalOpen) return;
+
+    const initGIS = () => {
+      if (typeof window !== "undefined" && (window as any).google?.accounts?.id) {
+        try {
+          const google = (window as any).google;
+          google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: (response: any) => {
+              if (response.credential) {
+                try {
+                  const base64Url = response.credential.split('.')[1];
+                  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                  const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                  }).join(''));
+                  const payload = JSON.parse(jsonPayload);
+                  loginWithGoogle(payload.email, payload.name);
+                  return;
+                } catch (e) {}
+              }
+              loginWithGoogle();
+            },
+          });
+
+          const btnSlot = document.getElementById("google-btn-slot");
+          if (btnSlot) {
+            btnSlot.innerHTML = "";
+            google.accounts.id.renderButton(btnSlot, {
+              theme: "filled_blue",
+              size: "large",
+              text: "continue_with",
+              shape: "rectangular",
+              width: "360",
+            });
+          }
+        } catch (err) {
+          console.warn("Google GIS init error:", err);
+        }
+      }
+    };
+
+    const timer = setTimeout(initGIS, 350);
+    return () => clearTimeout(timer);
+  }, [isAuthModalOpen]);
+
   if (!isAuthModalOpen) return null;
 
   const handleGoogleSignIn = () => {
-    // 1. Check if official Google Identity Services client is loaded and client ID exists
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (clientId && typeof window !== "undefined" && (window as any).google?.accounts?.id) {
+    // 1. Check if official Google Identity Services client is loaded
+    if (typeof window !== "undefined" && (window as any).google?.accounts?.id) {
       try {
         const google = (window as any).google;
-        google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (response: any) => {
-            if (response.credential) {
-              try {
-                const base64Url = response.credential.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-                  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                const payload = JSON.parse(jsonPayload);
-                loginWithGoogle(payload.email, payload.name);
-                return;
-              } catch (e) {}
-            }
-            loginWithGoogle();
-          },
-        });
         google.accounts.id.prompt();
         return;
       } catch (e) {
-        console.warn("Google GIS error, falling back to verified Google operator flow", e);
+        console.warn("Google GIS prompt notice, using operator fallback", e);
       }
     }
 
@@ -65,6 +95,7 @@ export default function AuthModal() {
       loginWithGoogle(gEmail, gName);
     }
   };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,10 +169,13 @@ export default function AuthModal() {
           </p>
         </div>
 
-        {/* CONTINUE WITH GOOGLE BUTTON */}
+        {/* GOOGLE GIS OFFICIAL CONTAINER & CUSTOM TRIGGER */}
+        <div id="google-btn-slot" className="w-full flex justify-center empty:hidden" />
+
         <button
           type="button"
           onClick={handleGoogleSignIn}
+
           className="w-full py-3 px-4 bg-white text-black hover:bg-neutral-200 font-bold text-xs uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-3 border border-white shadow-lg cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
