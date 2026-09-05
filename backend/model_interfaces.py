@@ -50,6 +50,7 @@ def decode_satellite_image(image_bytes: bytes) -> Tuple[np.ndarray, Image.Image,
                         "crs": str(ds.crs)
                     }
                 data = ds.read()
+                data = np.nan_to_num(data, nan=0.0, posinf=65535.0, neginf=0.0)
                 c, h, w = data.shape
                 if c == 1:
                     # Single-band SAR or panchromatic
@@ -287,6 +288,12 @@ def _analyze_land_cover(cv_img: np.ndarray, geo_meta: Dict[str, Any] = None) -> 
     """
     h, w = cv_img.shape[:2]
     total_pixels = max(1, h * w)
+    if len(cv_img.shape) == 2:
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+    elif cv_img.shape[2] == 1:
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+    elif cv_img.shape[2] == 4:
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGRA2BGR)
     hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
     gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
     b, g, r = cv2.split(cv_img)
@@ -927,11 +934,62 @@ class SingleImageGrounding(SpecialistModel):
         ])
         is_water_query = any(kw in query_lower for kw in ["water", "sea", "ocean", "river", "lake", "drainage", "reservoir"])
         is_veg_query = any(kw in query_lower for kw in ["green", "forest", "tree", "vegetation", "crop", "farm", "canopy"])
-        is_built_query = any(kw in query_lower for kw in ["built", "building", "urban", "city", "settlement", "infrastructure", "port", "dock", "road"])
+        is_built_query = any(kw in query_lower for kw in ["built", "building", "urban", "city", "settlement", "infrastructure", "road", "residential"])
+        is_port_query = any(kw in query_lower for kw in ["port", "dock", "berth", "pier", "jetty", "harbor", "harbour", "anchorage", "wharf"])
+        is_runway_query = any(kw in query_lower for kw in ["runway", "airport", "airstrip", "airfield", "taxiway", "hangar", "aviation"])
+        is_ship_query = any(kw in query_lower for kw in ["ship", "boat", "vessel", "tanker", "cargo", "barge", "ferry"])
+        is_cloud_query = any(kw in query_lower for kw in ["cloud", "haze", "fog", "obscur", "weather", "overcast"])
         is_calc_query = any(kw in query_lower for kw in ["calculate", "measure", "area", "percentage", "how much", "size", "breakdown", "distribution"])
         
         # Determine target mask
-        if is_land_query or (is_calc_query and not is_water_query and not is_veg_query and not is_built_query):
+        if is_port_query:
+            # Port interface: built-up regions in proximity to water
+            dilated_built = cv2.dilate(stats["built_mask"], np.ones((15, 15), np.uint8))
+            coastal_port = cv2.bitwise_and(dilated_built, stats["water_mask"])
+            target_mask = cv2.bitwise_or(coastal_port, cv2.bitwise_and(stats["built_mask"], cv2.dilate(stats["water_mask"], np.ones((11, 11), np.uint8))))
+            if np.count_nonzero(target_mask) < 50:
+                target_mask = stats["built_mask"]
+            target_label = "PORT BERTHS & MARITIME INFRASTRUCTURE"
+            target_px = int(np.count_nonzero(target_mask))
+            target_pct = (target_px / float(h * w)) * 100.0
+            target_km2 = (target_px * stats["sqm_per_px"]) / 1_000_000.0
+            target_ha = (target_px * stats["sqm_per_px"]) / 10_000.0
+            feature_type = "built"
+
+        elif is_runway_query:
+            # Elongated linear corridor features
+            gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+            edges = cv2.Canny(gray, 40, 120)
+            target_mask = cv2.dilate(edges, np.ones((5, 5), np.uint8))
+            target_label = "AVIATION RUNWAYS & TRANSPORT CORRIDORS"
+            target_px = int(np.count_nonzero(target_mask))
+            target_pct = (target_px / float(h * w)) * 100.0
+            target_km2 = (target_px * stats["sqm_per_px"]) / 1_000_000.0
+            target_ha = (target_px * stats["sqm_per_px"]) / 10_000.0
+            feature_type = "built"
+
+        elif is_ship_query:
+            gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+            mean_w = cv2.mean(gray, mask=stats["water_mask"])[0]
+            vessel_thresh = cv2.inRange(gray, int(min(250, mean_w + 35)), 255)
+            target_mask = cv2.bitwise_and(vessel_thresh, stats["water_mask"])
+            target_label = "MARITIME VESSELS & MOORED TARGETS"
+            target_px = int(np.count_nonzero(target_mask))
+            target_pct = (target_px / float(h * w)) * 100.0
+            target_km2 = (target_px * stats["sqm_per_px"]) / 1_000_000.0
+            target_ha = (target_px * stats["sqm_per_px"]) / 10_000.0
+            feature_type = "water"
+
+        elif is_cloud_query:
+            target_mask = stats["cloud_mask"]
+            target_label = "ATMOSPHERIC CLOUD COVER"
+            target_pct = stats["cloud_pct"]
+            target_km2 = stats["cloud_km2"]
+            target_ha = stats["cloud_ha"]
+            target_px = stats["cloud_pixels"]
+            feature_type = "land_cover"
+
+        elif is_land_query or (is_calc_query and not is_water_query and not is_veg_query and not is_built_query):
             target_mask = stats["land_mask"]
             target_label = "TERRESTRIAL LANDMASS"
             target_pct = stats["land_pct"]
@@ -939,6 +997,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = stats["land_ha"]
             target_px = stats["land_pixels"]
             feature_type = "land"
+
         elif is_water_query:
             target_mask = stats["water_mask"]
             target_label = "WATER BODY / MARINE"
@@ -947,6 +1006,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = stats["water_ha"]
             target_px = stats["water_pixels"]
             feature_type = "water"
+
         elif is_veg_query:
             target_mask = stats["veg_mask"]
             target_label = "VEGETATION & GREEN COVER"
@@ -955,6 +1015,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = stats["veg_ha"]
             target_px = stats["forest_pixels"] + stats["crop_pixels"]
             feature_type = "vegetation"
+
         elif is_built_query:
             target_mask = stats["built_mask"]
             target_label = "BUILT-UP & INFRASTRUCTURE"
@@ -963,6 +1024,7 @@ class SingleImageGrounding(SpecialistModel):
             target_ha = stats["built_ha"]
             target_px = stats["built_pixels"]
             feature_type = "built"
+
         else:
             gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
             blurred = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -1063,6 +1125,7 @@ class SingleImageGrounding(SpecialistModel):
             "confidence": 0.94,
             "compatibility_status": "PASSED",
             "spatial_coherence_score": 1.0,
+            "bounding_boxes": [f["properties"]["pixel_bbox"] for f in geojson_features],
             "geo_metadata": geo_meta,
             "geojson_data": geojson_data
         }
