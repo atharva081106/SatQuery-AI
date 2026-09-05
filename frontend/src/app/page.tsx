@@ -62,13 +62,10 @@ export default function LandingPage() {
         <div className="display-lg tracking-widest text-white">
           SATQUERY AI.
         </div>
-        <div className="flex gap-6 items-center">
+        <div className="flex gap-7 items-center">
           <Link href="/acquire" className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold">
             SATELLITE MAP
           </Link>
-          <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold cursor-pointer">
-            ANALYZE EARTH
-          </a>
           <Link href="/dashboard" className="micro-cap text-white hover:opacity-70 transition-opacity">
             BENCHMARKS
           </Link>
