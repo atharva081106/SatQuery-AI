@@ -82,14 +82,21 @@ This guide provides step-by-step instructions to deploy and scale the entire Sat
 
 To unlock multi-worker scaling, add these free environment variables in your backend dashboard (Hugging Face Spaces Settings / Render Environment / Railway Variables):
 
-### A. Supabase PostgreSQL + PostGIS (Free Database)
-1. Create a free project at [supabase.com](https://supabase.com/).
-2. In SQL Editor, run: `CREATE EXTENSION IF NOT EXISTS postgis;`
-3. Copy the Connection URI from **Project Settings** -> **Database**.
-4. Set backend environment variable:
+### A. Cloud PostgreSQL Database (Neon or Supabase)
+SatQuery AI supports any standard PostgreSQL connection URI:
+
+**Option 1: Neon Serverless PostgreSQL (Recommended Free Tier)**
+1. Create a free project at [neon.tech](https://neon.tech/).
+2. Copy your connection string from the Neon Console.
+3. Set backend environment variable on Render / local `.env`:
    ```env
-   DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres
+   DATABASE_URL=postgresql://[USER]:[PASSWORD]@[ENDPOINT].neon.tech/[DBNAME]?sslmode=require
    ```
+
+**Option 2: Supabase PostgreSQL + PostGIS**
+```env
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres
+```
 
 ### B. Redis Distributed Cache (Native Redis & Upstash)
 SatQuery AI supports both native Redis TCP connections and Upstash Serverless Redis REST API:
