@@ -1,0 +1,452 @@
+[
+  {
+    "image_id": "val_tile_0000.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0000.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Cloud Obscuration."
+  },
+  {
+    "image_id": "val_tile_0000.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 99.9%, while water bodies span 0.1%."
+  },
+  {
+    "image_id": "val_tile_0001.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 82.7% of this tile."
+  },
+  {
+    "image_id": "val_tile_0001.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0001.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 17.3%, while water bodies span 82.7%."
+  },
+  {
+    "image_id": "val_tile_0002.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 81.1% of this tile."
+  },
+  {
+    "image_id": "val_tile_0002.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0002.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 18.9%, while water bodies span 81.1%."
+  },
+  {
+    "image_id": "val_tile_0003.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0003.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Bare Ground & Soil."
+  },
+  {
+    "image_id": "val_tile_0003.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 99.6%, while water bodies span 0.4%."
+  },
+  {
+    "image_id": "val_tile_0004.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 85.0% of this tile."
+  },
+  {
+    "image_id": "val_tile_0004.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0004.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 15.0%, while water bodies span 85.0%."
+  },
+  {
+    "image_id": "val_tile_0005.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 85.9% of this tile."
+  },
+  {
+    "image_id": "val_tile_0005.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0005.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 14.1%, while water bodies span 85.9%."
+  },
+  {
+    "image_id": "val_tile_0006.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0006.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Built-up Infrastructure."
+  },
+  {
+    "image_id": "val_tile_0006.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 99.9%, while water bodies span 0.1%."
+  },
+  {
+    "image_id": "val_tile_0007.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 77.5% of this tile."
+  },
+  {
+    "image_id": "val_tile_0007.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0007.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 22.5%, while water bodies span 77.5%."
+  },
+  {
+    "image_id": "val_tile_0008.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0008.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Bare Ground & Soil."
+  },
+  {
+    "image_id": "val_tile_0008.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 99.6%, while water bodies span 0.4%."
+  },
+  {
+    "image_id": "val_tile_0009.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 62.5% of this tile."
+  },
+  {
+    "image_id": "val_tile_0009.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0009.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 37.5%, while water bodies span 62.5%."
+  },
+  {
+    "image_id": "val_tile_0010.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 68.7% of this tile."
+  },
+  {
+    "image_id": "val_tile_0010.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0010.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 31.3%, while water bodies span 68.7%."
+  },
+  {
+    "image_id": "val_tile_0011.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 51.6% of this tile."
+  },
+  {
+    "image_id": "val_tile_0011.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0011.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 48.4%, while water bodies span 51.6%."
+  },
+  {
+    "image_id": "val_tile_0012.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 73.5% of this tile."
+  },
+  {
+    "image_id": "val_tile_0012.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0012.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 26.5%, while water bodies span 73.5%."
+  },
+  {
+    "image_id": "val_tile_0013.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 30.5% of this tile."
+  },
+  {
+    "image_id": "val_tile_0013.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Vegetation & Canopy."
+  },
+  {
+    "image_id": "val_tile_0013.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 69.5%, while water bodies span 30.5%."
+  },
+  {
+    "image_id": "val_tile_0014.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 3.8% of this tile."
+  },
+  {
+    "image_id": "val_tile_0014.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Cloud Obscuration."
+  },
+  {
+    "image_id": "val_tile_0014.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 96.2%, while water bodies span 3.8%."
+  },
+  {
+    "image_id": "val_tile_0015.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 71.1% of this tile."
+  },
+  {
+    "image_id": "val_tile_0015.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0015.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 28.9%, while water bodies span 71.1%."
+  },
+  {
+    "image_id": "val_tile_0016.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 5.1% of this tile."
+  },
+  {
+    "image_id": "val_tile_0016.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Cloud Obscuration."
+  },
+  {
+    "image_id": "val_tile_0016.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 94.9%, while water bodies span 5.1%."
+  },
+  {
+    "image_id": "val_tile_0017.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0017.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Built-up Infrastructure."
+  },
+  {
+    "image_id": "val_tile_0017.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 98.7%, while water bodies span 1.3%."
+  },
+  {
+    "image_id": "val_tile_0018.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 68.7% of this tile."
+  },
+  {
+    "image_id": "val_tile_0018.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0018.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 31.3%, while water bodies span 68.7%."
+  },
+  {
+    "image_id": "val_tile_0019.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0019.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Built-up Infrastructure."
+  },
+  {
+    "image_id": "val_tile_0019.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 100.0%, while water bodies span 0.0%."
+  },
+  {
+    "image_id": "val_tile_0020.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 90.0% of this tile."
+  },
+  {
+    "image_id": "val_tile_0020.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0020.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 10.0%, while water bodies span 90.0%."
+  },
+  {
+    "image_id": "val_tile_0021.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 85.9% of this tile."
+  },
+  {
+    "image_id": "val_tile_0021.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0021.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 14.1%, while water bodies span 85.9%."
+  },
+  {
+    "image_id": "val_tile_0022.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 4.0% of this tile."
+  },
+  {
+    "image_id": "val_tile_0022.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Cloud Obscuration."
+  },
+  {
+    "image_id": "val_tile_0022.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 96.0%, while water bodies span 4.0%."
+  },
+  {
+    "image_id": "val_tile_0023.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 48.9% of this tile."
+  },
+  {
+    "image_id": "val_tile_0023.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0023.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 51.1%, while water bodies span 48.9%."
+  },
+  {
+    "image_id": "val_tile_0024.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 73.5% of this tile."
+  },
+  {
+    "image_id": "val_tile_0024.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0024.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 26.5%, while water bodies span 73.5%."
+  },
+  {
+    "image_id": "val_tile_0025.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "No significant water bodies are detected."
+  },
+  {
+    "image_id": "val_tile_0025.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Bare Ground & Soil."
+  },
+  {
+    "image_id": "val_tile_0025.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 98.7%, while water bodies span 1.3%."
+  },
+  {
+    "image_id": "val_tile_0026.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 68.7% of this tile."
+  },
+  {
+    "image_id": "val_tile_0026.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0026.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 31.3%, while water bodies span 68.7%."
+  },
+  {
+    "image_id": "val_tile_0027.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 49.9% of this tile."
+  },
+  {
+    "image_id": "val_tile_0027.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0027.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 50.1%, while water bodies span 49.9%."
+  },
+  {
+    "image_id": "val_tile_0028.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 53.3% of this tile."
+  },
+  {
+    "image_id": "val_tile_0028.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Water Bodies."
+  },
+  {
+    "image_id": "val_tile_0028.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 46.7%, while water bodies span 53.3%."
+  },
+  {
+    "image_id": "val_tile_0029.png",
+    "question": "Is there a water body or hydrological feature visible in this satellite tile?",
+    "answer": "Yes, water bodies cover approximately 18.9% of this tile."
+  },
+  {
+    "image_id": "val_tile_0029.png",
+    "question": "What is the primary land-cover category in this observation viewport?",
+    "answer": "The dominant land cover is Built-up Infrastructure."
+  },
+  {
+    "image_id": "val_tile_0029.png",
+    "question": "What is the approximate percentage of terrestrial land versus water?",
+    "answer": "Terrestrial land encompasses 81.1%, while water bodies span 18.9%."
+  }
+]

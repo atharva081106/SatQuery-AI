@@ -1,0 +1,38 @@
+{
+  "train": {
+    "samples": 240,
+    "qa_pairs": 720,
+    "classes": {
+      "0": "Background / Other",
+      "1": "Water Bodies",
+      "2": "Vegetation & Canopy",
+      "3": "Built-up Infrastructure",
+      "4": "Bare Ground & Soil",
+      "5": "Cloud Obscuration"
+    }
+  },
+  "val": {
+    "samples": 30,
+    "qa_pairs": 90,
+    "classes": {
+      "0": "Background / Other",
+      "1": "Water Bodies",
+      "2": "Vegetation & Canopy",
+      "3": "Built-up Infrastructure",
+      "4": "Bare Ground & Soil",
+      "5": "Cloud Obscuration"
+    }
+  },
+  "test": {
+    "samples": 30,
+    "qa_pairs": 90,
+    "classes": {
+      "0": "Background / Other",
+      "1": "Water Bodies",
+      "2": "Vegetation & Canopy",
+      "3": "Built-up Infrastructure",
+      "4": "Bare Ground & Soil",
+      "5": "Cloud Obscuration"
+    }
+  }
+}

@@ -1,25 +1,111 @@
 {
-    "accuracy": 0.0,
-    "details": [
-        {
-            "pred": "no",
-            "gt": "yes"
-        },
-        {
-            "pred": "no",
-            "gt": "yes"
-        },
-        {
-            "pred": "no",
-            "gt": "yes"
-        },
-        {
-            "pred": "no",
-            "gt": "yes"
-        },
-        {
-            "pred": "no",
-            "gt": "yes"
-        }
+  "mission": "SatQuery AI Remote Sensing Benchmark Audit",
+  "checkpoint_evaluated": "best_satsegnet.pth",
+  "overall_accuracy": 0.902,
+  "mean_iou (mIoU)": 0.8022,
+  "mean_f1_score": 0.8877,
+  "mean_precision": 0.8885,
+  "mean_recall": 0.8875,
+  "total_test_samples": 30,
+  "total_pixels_evaluated": 491520,
+  "per_class_metrics": {
+    "Background / Other": {
+      "class_id": 0,
+      "iou": 1.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_ground_truth_pixels": 0
+    },
+    "Water Bodies": {
+      "class_id": 1,
+      "iou": 0.882,
+      "precision": 0.93,
+      "recall": 0.9448,
+      "f1_score": 0.9373,
+      "total_ground_truth_pixels": 137832
+    },
+    "Vegetation & Canopy": {
+      "class_id": 2,
+      "iou": 0.7201,
+      "precision": 0.834,
+      "recall": 0.8406,
+      "f1_score": 0.8373,
+      "total_ground_truth_pixels": 43870
+    },
+    "Built-up Infrastructure": {
+      "class_id": 3,
+      "iou": 0.6876,
+      "precision": 0.8463,
+      "recall": 0.7858,
+      "f1_score": 0.8149,
+      "total_ground_truth_pixels": 110273
+    },
+    "Bare Ground & Soil": {
+      "class_id": 4,
+      "iou": 0.8147,
+      "precision": 0.8979,
+      "recall": 0.8979,
+      "f1_score": 0.8979,
+      "total_ground_truth_pixels": 51105
+    },
+    "Cloud Obscuration": {
+      "class_id": 5,
+      "iou": 0.9068,
+      "precision": 0.9346,
+      "recall": 0.9683,
+      "f1_score": 0.9511,
+      "total_ground_truth_pixels": 148440
+    }
+  },
+  "confusion_matrix": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      130218,
+      921,
+      5005,
+      32,
+      1656
+    ],
+    [
+      0,
+      1439,
+      36876,
+      5419,
+      10,
+      126
+    ],
+    [
+      0,
+      4916,
+      5273,
+      86649,
+      5178,
+      8257
+    ],
+    [
+      0,
+      1153,
+      1096,
+      2949,
+      45887,
+      20
+    ],
+    [
+      0,
+      2293,
+      52,
+      2366,
+      0,
+      143729
     ]
+  ]
 }
