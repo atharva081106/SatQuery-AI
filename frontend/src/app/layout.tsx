@@ -3,6 +3,7 @@ import "./globals.css";
 import CookieConsent from "@/components/CookieConsent";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthModal from "@/components/AuthModal";
+import SmoothScroll from "@/components/SmoothScroll";
 
 import Script from "next/script";
 
@@ -20,11 +21,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
-        <AuthProvider>
-          {children}
-          <AuthModal />
-          <CookieConsent />
-        </AuthProvider>
+        <SmoothScroll>
+          <AuthProvider>
+            {children}
+            <AuthModal />
+            <CookieConsent />
+          </AuthProvider>
+        </SmoothScroll>
       </body>
     </html>
   );
