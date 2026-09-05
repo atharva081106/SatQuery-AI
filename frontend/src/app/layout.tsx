@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
+        <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
         <SmoothScroll>
           <AuthProvider>
             {children}
