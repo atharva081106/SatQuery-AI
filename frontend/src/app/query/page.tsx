@@ -371,7 +371,7 @@ export default function Home() {
 
   const executeAnalysis = async (queryText: string, imageFiles: File[]) => {
     if (!canQuery) {
-      openAuthModal("You have reached your limit of 3 free queries. Please sign in or create an account to unlock unlimited satellite analyses.");
+      openAuthModal("Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses.");
       return;
     }
 
@@ -423,6 +423,13 @@ export default function Home() {
       
       setMessages([...newMessages, { role: "assistant", content: data.answer, result: data }]);
       incrementQueryCount();
+
+      // Trigger authentication popup right after 3 free queries are completed
+      if (!isAuthenticated && (queryCount + 1) >= maxFreeQueries) {
+        setTimeout(() => {
+          openAuthModal("Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses.");
+        }, 1000);
+      }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
       setMessages([...newMessages, { role: "assistant", content: "Sorry, I encountered an error: " + err.message }]);
@@ -438,7 +445,7 @@ export default function Home() {
 
   const handleSelectMission = (mission: SampleMission, autoSubmit = false) => {
     if (autoSubmit && !canQuery) {
-      openAuthModal("You have reached your limit of 3 free queries. Please sign in or create an account to unlock unlimited satellite analyses.");
+      openAuthModal("Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses.");
       return;
     }
     const files: File[] = [];
