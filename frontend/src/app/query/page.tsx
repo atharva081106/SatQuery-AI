@@ -730,10 +730,10 @@ export default function Home() {
       </nav>
 
       {/* MAIN APPLICATION CONTAINER */}
-      <div className={`flex-1 flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-8 gap-8 z-10 pb-8 min-h-0 transition-all duration-500 pointer-events-none ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
+      <div className={`flex-1 flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-8 gap-8 z-10 pb-8 min-h-0 overflow-y-auto lg:overflow-hidden transition-all duration-500 pointer-events-none ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
         
         {/* LEFT/MAIN: CHAT & INPUT */}
-        <div className="flex-1 flex flex-col justify-end relative min-h-0">
+        <div className="flex-1 flex flex-col justify-end relative min-h-0 h-full">
           
           <div className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
@@ -946,7 +946,10 @@ export default function Home() {
 
         {/* RIGHT/TRACE: ONLY SHOWN ON RESULT */}
         {latestResult && (
-            <div className="w-full lg:w-1/3 bg-black/60 backdrop-blur-md border border-[#3a3a3f] rounded-lg p-6 flex flex-col h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto">
+            <div 
+              className="w-full lg:w-1/3 bg-black/60 backdrop-blur-md border border-[#3a3a3f] rounded-lg p-6 flex flex-col min-h-0 max-h-full h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto"
+              style={{ maxHeight: "100%" }}
+            >
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#2a2a2f]">
                 <h3 className="display-lg flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
@@ -1108,17 +1111,18 @@ export default function Home() {
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
+          width: 6px;
+          height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #3a3a3f;
+          background: rgba(255, 255, 255, 0.25);
           border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #5a5a5f;
+          background: rgba(255, 255, 255, 0.45);
         }
         @keyframes slideUpFade {
           from {
