@@ -216,7 +216,6 @@ export default function Home() {
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [showMapExplorer, setShowMapExplorer] = useState(false);
   const [showMissionPresets, setShowMissionPresets] = useState(false);
-  const [presentationMode, setPresentationMode] = useState(false);
 
   const dataURLtoFile = (dataurl: string, filename: string): File => {
     const arr = dataurl.split(',');
@@ -671,9 +670,7 @@ export default function Home() {
       )}
 
       {/* FIXED TOP NAV OVERLAY */}
-      <nav className={`w-full flex justify-between items-center px-6 lg:px-8 py-4 z-50 transition-all ${
-        presentationMode ? 'bg-[#0a0a0f]/95 border-b border-emerald-500/40 backdrop-blur-md shadow-lg shadow-emerald-500/5' : ''
-      }`}>
+      <nav className="w-full flex justify-between items-center px-6 lg:px-8 py-4 z-50 transition-all">
         <div className="flex items-center gap-3">
           <a href="/" className="display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-2">
             <span>SATQUERY AI.</span>
@@ -684,8 +681,8 @@ export default function Home() {
         </div>
 
         <div className="flex gap-2.5 sm:gap-3 items-center">
-          {/* Auth Status & Quota Badge */}
-          {isAuthenticated ? (
+          {/* Authenticated User Callsign */}
+          {isAuthenticated && (
             <div className="flex items-center gap-2">
               <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold tracking-widest uppercase flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -700,49 +697,22 @@ export default function Home() {
                 Sign Out
               </button>
             </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => openAuthModal("Sign in to unlock unlimited high-resolution satellite analyses.")}
-              className={`text-[10px] px-3 py-1 rounded-full border font-mono font-bold tracking-widest uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
-                queryCount >= maxFreeQueries
-                  ? "border-red-500/50 bg-red-500/20 text-red-300 animate-pulse"
-                  : "border-[#00F0FF]/40 bg-[#00F0FF]/10 text-[#00F0FF] hover:bg-[#00F0FF]/20"
-              }`}
-            >
-              <span>⚡</span>
-              <span>
-                {queryCount >= maxFreeQueries
-                  ? "QUOTA EXCEEDED (SIGN IN)"
-                  : `${maxFreeQueries - queryCount}/${maxFreeQueries} FREE QUERIES`}
-              </span>
-            </button>
           )}
 
-          {/* 1-Click Sample Missions Launcher */}
+          {/* 1-Click ISRO Tactical Missions Launcher */}
           <button
             type="button"
             onClick={() => setShowMissionPresets(true)}
-            className="micro-cap text-black font-semibold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-md shadow-emerald-500/20 cursor-pointer pointer-events-auto"
-            title="Launch Pre-Configured ISRO Mission Scenarios"
+            className="micro-cap text-black font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 px-4 py-1.5 rounded-full flex items-center gap-2 transition-all shadow-md shadow-emerald-500/25 hover:shadow-cyan-500/35 hover:scale-[1.02] cursor-pointer pointer-events-auto border border-emerald-300/40"
+            title="Explore & Launch Pre-Configured ISRO Tactical Missions"
           >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-900 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
+            </span>
             <span>🚀</span>
             <span className="tracking-widest">ISRO MISSIONS</span>
-          </button>
-
-          {/* Presentation Mode Toggle */}
-          <button
-            type="button"
-            onClick={() => setPresentationMode(!presentationMode)}
-            className={`micro-cap border px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all cursor-pointer pointer-events-auto ${
-              presentationMode
-                ? 'border-yellow-400/80 bg-yellow-400/20 text-yellow-300 shadow-md shadow-yellow-500/20 font-bold'
-                : 'border-white/20 text-white/70 hover:text-white hover:bg-white/10'
-            }`}
-            title="Toggle SIH 2026 Presentation Mode"
-          >
-            <span>📺</span>
-            <span className="hidden sm:inline">{presentationMode ? 'EXIT PRESENTATION' : 'PRESENTATION MODE'}</span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-black/20 text-black font-mono font-bold uppercase hidden sm:inline-block">5 Scenarios</span>
           </button>
 
           <a href="/" className="micro-cap text-white hover:opacity-70 transition-opacity border border-white/20 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 pointer-events-auto">
@@ -750,26 +720,6 @@ export default function Home() {
           </a>
         </div>
       </nav>
-
-      {/* PRESENTATION MODE BANNER */}
-      {presentationMode && (
-        <div className="w-full bg-gradient-to-r from-emerald-950/80 via-[#071720]/90 to-black border-b border-emerald-500/30 py-2 px-6 flex items-center justify-between text-xs font-mono text-emerald-300 z-40 animate-fade-in shadow-inner">
-          <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-            <span className="text-white font-semibold tracking-wide">
-              🇮🇳 SMART INDIA HACKATHON 2026
-            </span>
-            <span className="text-white/40">|</span>
-            <span className="text-emerald-300">
-              ISRO / SAC PS 26167: Vision-Language & Segmentation Foundation Engine
-            </span>
-          </div>
-          <div className="hidden lg:flex items-center gap-4 text-[11px] text-white/70">
-            <span>Sensors: Cartosat-2S/3 • RISAT-1 (SAR) • Resourcesat-2 (LISS-4) • Sentinel-1/2</span>
-            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">● ACTIVE AUDIT MODE</span>
-          </div>
-        </div>
-      )}
 
       {/* MAIN APPLICATION CONTAINER */}
       <div className={`flex-1 flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-8 gap-8 z-10 pb-8 min-h-0 transition-all duration-500 pointer-events-none ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
