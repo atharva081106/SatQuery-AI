@@ -653,18 +653,13 @@ export default function Home() {
   return (
     <main className="h-screen bg-black relative overflow-hidden flex flex-col">
       
-      {/* HOLOGRAPHIC GLOBE BACKGROUND (EMPTY STATE) */}
+      {/* NATURAL COLOUR GLOBE BACKGROUND (EMPTY STATE) */}
       {!messages.some(m => m.role === 'user') && (
-        <div className="absolute inset-0 z-0 flex items-center justify-center mix-blend-screen pointer-events-none">
-          <div className="relative z-[6] group pointer-events-auto w-[600px] h-[600px] rounded-full flex items-center justify-center">
-
-            {/* Hardware-accelerated desaturation overlay */}
-            <div className="absolute inset-0 z-10 bg-black mix-blend-color pointer-events-none transition-opacity duration-700 opacity-100 group-hover:opacity-0 rounded-full" />
-            
-            <div className="w-full h-full opacity-20 group-hover:opacity-100 transition-opacity duration-700">
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+          <div className="relative z-[6] pointer-events-auto w-[600px] h-[600px] rounded-full flex items-center justify-center">
+            <div className="w-full h-full opacity-100">
               <FramerGlobe />
             </div>
-            
           </div>
         </div>
       )}
