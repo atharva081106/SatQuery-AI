@@ -268,6 +268,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       
       {/* FLOATING ACQUISITION PANEL (Scrollable & Responsive) */}
       <div 
+        data-lenis-prevent
         className="absolute top-20 sm:top-24 left-4 sm:left-8 w-[calc(100vw-2rem)] sm:w-84 max-h-[calc(100vh-6rem)] sm:max-h-[calc(100vh-7.5rem)] overflow-y-auto custom-scrollbar bg-black/85 backdrop-blur-xl border border-white/20 p-5 sm:p-6 z-[400] flex flex-col gap-4.5 shadow-2xl rounded-xl pointer-events-auto touch-pan-y"
         onWheel={(e) => e.stopPropagation()}
       >

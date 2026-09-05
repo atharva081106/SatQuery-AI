@@ -276,6 +276,7 @@ export default function MissionPresetsModal({
           
           {/* Left Column: Demo Queries List (Smooth Scrolling) */}
           <div 
+            data-lenis-prevent
             className="w-full md:w-5/12 flex-1 md:flex-initial md:h-full p-3.5 flex flex-col gap-2 overflow-y-auto custom-scrollbar bg-black pointer-events-auto min-h-0 touch-pan-y"
             onWheel={(e) => e.stopPropagation()}
           >
@@ -322,6 +323,7 @@ export default function MissionPresetsModal({
           {/* Right Column: Query Detail, Satellite Previews, and TOP LAUNCH BUTTON (Smooth Scrolling) */}
           {currentMission && (
             <div 
+              data-lenis-prevent
               className="w-full md:w-7/12 flex-1 md:flex-initial md:h-full p-5 sm:p-6 flex flex-col overflow-y-auto custom-scrollbar bg-[#030305] pointer-events-auto min-h-0 touch-pan-y"
               onWheel={(e) => e.stopPropagation()}
             >

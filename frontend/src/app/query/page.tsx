@@ -735,7 +735,7 @@ export default function Home() {
         {/* LEFT/MAIN: CHAT & INPUT */}
         <div className="flex-1 flex flex-col justify-end relative min-h-0 h-full max-h-full overflow-hidden">
           
-          <div className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
+          <div data-lenis-prevent className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-center justify-center pointer-events-none h-full mt-32">
               </div>
@@ -876,6 +876,7 @@ export default function Home() {
                   {/* Expandable Query Popover Library */}
                   {showPresets && (
                     <div 
+                      data-lenis-prevent
                       className="absolute bottom-full mb-3 left-0 w-[92vw] sm:w-[560px] max-h-[380px] overflow-y-auto custom-scrollbar bg-black/95 backdrop-blur-xl border border-[#3a3a3f] rounded-xl p-4 shadow-2xl z-50 animate-slide-up pointer-events-auto touch-pan-y"
                       onWheel={(e) => e.stopPropagation()}
                     >
@@ -947,6 +948,7 @@ export default function Home() {
         {/* RIGHT/TRACE: ONLY SHOWN ON RESULT */}
         {latestResult && (
             <div 
+              data-lenis-prevent
               className="w-full lg:w-1/3 bg-black/75 backdrop-blur-md border border-[#3a3a3f] rounded-xl p-5 lg:p-6 flex flex-col min-h-0 h-full max-h-[calc(100vh-6.5rem)] lg:max-h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto touch-pan-y shrink-0 lg:shrink"
               style={{ maxHeight: "calc(100vh - 6.5rem)" }}
             >
