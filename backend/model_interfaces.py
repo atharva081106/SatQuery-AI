@@ -56,15 +56,21 @@ def decode_satellite_image(image_bytes: bytes) -> Tuple[np.ndarray, Image.Image,
                 if c == 1:
                     # Single-band SAR or panchromatic
                     band = data[0]
-                    p2, p98 = np.percentile(band, (2, 98))
-                    scaled = np.clip((band.astype(float) - p2) / max(1e-5, p98 - p2) * 255.0, 0, 255).astype(np.uint8)
+                    if data.dtype == np.uint8:
+                        scaled = band
+                    else:
+                        p2, p98 = np.percentile(band, (2, 98))
+                        scaled = np.clip((band.astype(float) - p2) / max(1e-5, p98 - p2) * 255.0, 0, 255).astype(np.uint8)
                     rgb = np.dstack([scaled, scaled, scaled])
                 elif c >= 3:
                     # RGB or multispectral
                     bands_rgb = data[:3]
-                    p2, p98 = np.percentile(bands_rgb, (2, 98))
-                    scaled = np.clip((bands_rgb.astype(float) - p2) / max(1e-5, p98 - p2) * 255.0, 0, 255).astype(np.uint8)
-                    rgb = np.transpose(scaled, (1, 2, 0))
+                    if data.dtype == np.uint8:
+                        rgb = np.transpose(bands_rgb, (1, 2, 0))
+                    else:
+                        p2, p98 = np.percentile(bands_rgb, (2, 98))
+                        scaled = np.clip((bands_rgb.astype(float) - p2) / max(1e-5, p98 - p2) * 255.0, 0, 255).astype(np.uint8)
+                        rgb = np.transpose(scaled, (1, 2, 0))
                 else:
                     rgb = np.repeat(data[0:1], 3, axis=0).transpose(1, 2, 0).astype(np.uint8)
 
@@ -481,66 +487,138 @@ def parse_grounding_intent(query: str) -> Tuple[str, Dict[str, bool]]:
     
     # Extract specific action target if preceded by action verbs (with common typo tolerance)
     action_match = re.search(
-        r'(?:highlight|hightlight|hilight|hihlight|highlite|highlght|mark|detect|bound|locate|outline|show|find|pinpoint|trace|draw|delineate|segment|isolate)\s+(?:the\s+)?([a-z\s]+?)(?:\s+and|\s+with|\s+to|\s+tell|\s+calculate|\s+what|\s+how|,|\.|$)',
+        r'(?:highlight|hightlight|hilight|hihlight|highlite|highlght|mark|detect|bound|locate|outline|show|find|pinpoint|trace|draw|delineate|segment|isolate)\s+(?:the\s+)?([a-z\s,]+?)(?:\s+and|\s+with|\s+to|\s+tell|\s+calculate|\s+what|\s+how|,|\.|$)',
         q
     )
     action_phrase = action_match.group(1).strip() if action_match else q
     
-    def match_feature(text: str) -> str:
-        if re.search(r'\b(water\w*|waterbody|waterbodies|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*|drainage\w*|bay\w*|creek\w*|hydrology|pond\w*)\b', text):
-            return "water"
-        if re.search(r'\b(airport\w*|runway\w*|airstrip\w*|aviation\w*|airfield\w*|taxiway\w*)\b', text):
-            return "runway"
-        if re.search(r'\b(port\w*|dock\w*|berth\w*|pier\w*|jetty\w*|harbor\w*|harbour\w*|wharf\w*)\b', text):
-            return "port"
-        if re.search(r'\b(ship\w*|boat\w*|vessel\w*|tanker\w*|cargo\w*|barge\w*|ferry\w*)\b', text):
-            return "ship"
-        if re.search(r'\b(veg\w*|green\w*|forest\w*|tree\w*|crop\w*|plant\w*|agriculture\w*|canopy\w*)\b', text):
-            return "vegetation"
-        if re.search(r'\b(built\w*|building\w*|urban\w*|city\w*|settlement\w*|road\w*|infrastructure\w*|residential\w*)\b', text):
-            return "built"
-        if re.search(r'\b(cloud\w*|haze\w*|fog\w*|obscur\w*|overcast\w*)\b', text):
-            return "cloud"
-        if re.search(r'\b(land\w*|terrain\w*|ground\w*|earth\w*|peninsula\w*|continent\w*|mainland\w*|soil\w*)\b', text):
-            return "land"
-        return None
+    has_water = bool(re.search(r'\b(water\w*|waterbody|waterbodies|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*|drainage\w*|bay\w*|creek\w*|hydrology|pond\w*)\b', q))
+    has_land = bool(re.search(r'\b(land\w*|terrain\w*|ground\w*|earth\w*|peninsula\w*|continent\w*|mainland\w*|soil\w*)\b', q))
+    
+    if has_water and has_land:
+        grounding_target = "dual"
+    elif has_water:
+        grounding_target = "water"
+    elif has_land:
+        grounding_target = "land"
+    else:
+        def match_feature(text: str) -> str:
+            if re.search(r'\b(airport\w*|runway\w*|airstrip\w*|aviation\w*|airfield\w*|taxiway\w*)\b', text):
+                return "runway"
+            if re.search(r'\b(port\w*|dock\w*|berth\w*|pier\w*|jetty\w*|harbor\w*|harbour\w*|wharf\w*)\b', text):
+                return "port"
+            if re.search(r'\b(ship\w*|boat\w*|vessel\w*|tanker\w*|cargo\w*|barge\w*|ferry\w*)\b', text):
+                return "ship"
+            if re.search(r'\b(veg\w*|green\w*|forest\w*|tree\w*|crop\w*|plant\w*|agriculture\w*|canopy\w*)\b', text):
+                return "vegetation"
+            if re.search(r'\b(built\w*|building\w*|urban\w*|city\w*|settlement\w*|road\w*|infrastructure\w*|residential\w*)\b', text):
+                return "built"
+            if re.search(r'\b(cloud\w*|haze\w*|fog\w*|obscur\w*|overcast\w*)\b', text):
+                return "cloud"
+            return None
 
-    grounding_target = match_feature(action_phrase)
-    if not grounding_target:
-        if re.search(r'\b(water\w*|waterbody|waterbodies|sea\w*|ocean\w*|river\w*|lake\w*|reservoir\w*)\b', q) and any(w in q for w in ["highlight", "hightlight", "hilight", "mark", "bound", "detect", "outline", "find", "show"]):
-            grounding_target = "water"
-        elif match_feature(q):
-            grounding_target = match_feature(q)
-        else:
-            grounding_target = "land"
+        grounding_target = match_feature(action_phrase) or match_feature(q) or "dual"
 
     inquiries = {
-        "land": bool(re.search(r'\b(percentage of land|land percentage|how much land|area of land|land area|tell.*land|calculate.*land)\b', q)),
-        "water": bool(re.search(r'\b(percentage of water|water percentage|how much water|area of water|water area|tell.*water|calculate.*water)\b', q)),
-        "vegetation": bool(re.search(r'\b(percentage of veg|veg.*percentage|green.*percentage|canopy percentage|tell.*veg|crop percentage)\b', q)),
-        "built": bool(re.search(r'\b(percentage of built|urban percentage|built.*percentage|tell.*urban|tell.*built)\b', q)),
+        "land": has_land,
+        "water": has_water,
+        "vegetation": bool(re.search(r'\b(percentage of veg|veg.*percentage|green.*percentage|canopy percentage|tell.*veg|crop percentage|forest)\b', q)),
+        "built": bool(re.search(r'\b(percentage of built|urban percentage|built.*percentage|tell.*urban|tell.*built|infrastructure)\b', q)),
     }
     return grounding_target, inquiries
 
 def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict[str, Any]) -> Tuple[str, str]:
     """
-    Generates tailored, high-fidelity visual overlays for any satellite image.
+    Generates tailored, high-fidelity visual overlays for any satellite image or map file.
     Outputs: (base64_data_uri, visual_description)
     """
     h, w = cv_img.shape[:2]
     
-    if feature_type == "land":
+    if feature_type in ["water", "dual"]:
+        overlay = cv_img.copy()
+        w_mask = stats["water_mask"]
+        l_mask = stats["land_mask"]
+        
+        # 1. Tint water bodies in luminous cyan-blue with crisp golden/cyan boundary contours
+        w_px = w_mask > 0
+        if np.any(w_px):
+            cyan_tint = np.zeros_like(cv_img)
+            cyan_tint[w_px] = [245, 180, 25]  # Luminous cyan-blue in BGR
+            overlay[w_px] = cv2.addWeighted(overlay[w_px], 0.35, cyan_tint[w_px], 0.65, 0)
+            w_contours, _ = cv2.findContours(w_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, w_contours, -1, (255, 235, 80), 2, cv2.LINE_AA)
+            
+            # Find major water sectors and draw tactical bounding vectors
+            w_c_sorted = sorted(w_contours, key=cv2.contourArea, reverse=True)
+            for idx, c in enumerate(w_c_sorted[:5]):
+                ca = cv2.contourArea(c)
+                if ca > (h * w * 0.005):
+                    bx, by, bw, bh = cv2.boundingRect(c)
+                    cv2.rectangle(overlay, (bx, by), (bx + bw, by + bh), (255, 220, 50), 2)
+                    c_km2 = (ca * stats["sqm_per_px"]) / 1_000_000.0
+                    lbl = f"WATER BODY #{idx+1}: {c_km2:.2f} km2"
+                    (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.44, 1)
+                    cv2.rectangle(overlay, (bx, max(0, by - 22)), (bx + lw + 12, max(22, by)), (12, 18, 26), -1)
+                    cv2.putText(overlay, lbl, (bx + 6, max(16, by - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (255, 230, 80), 1, cv2.LINE_AA)
+        
+        # 2. Demarcate terrestrial landmass in glowing emerald green with perimeter vectors
+        l_px = l_mask > 0
+        if np.any(l_px):
+            emerald_tint = np.zeros_like(cv_img)
+            emerald_tint[l_px] = [40, 210, 90]  # Glowing emerald green in BGR
+            overlay[l_px] = cv2.addWeighted(overlay[l_px], 0.70, emerald_tint[l_px], 0.30, 0)
+            l_contours, _ = cv2.findContours(l_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, l_contours, -1, (60, 255, 130), 2, cv2.LINE_AA)
+            
+            # If dual mode or if land is primary inquiry, label major land sector
+            if feature_type == "dual" or stats["water_pct"] < 10.0:
+                l_c_sorted = sorted(l_contours, key=cv2.contourArea, reverse=True)
+                for idx, c in enumerate(l_c_sorted[:3]):
+                    ca = cv2.contourArea(c)
+                    if ca > (h * w * 0.04):
+                        bx, by, bw, bh = cv2.boundingRect(c)
+                        c_km2 = (ca * stats["sqm_per_px"]) / 1_000_000.0
+                        lbl = f"LAND SECTOR #{idx+1}: {c_km2:.1f} km2"
+                        (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.42, 1)
+                        tag_y = min(h - 10, by + bh - 10)
+                        cv2.rectangle(overlay, (bx + 8, tag_y - 20), (bx + lw + 20, tag_y), (12, 28, 18), -1)
+                        cv2.putText(overlay, lbl, (bx + 14, tag_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (80, 255, 150), 1, cv2.LINE_AA)
+
+        # Top banner
+        banner_top = 44
+        b_top = np.zeros((banner_top, overlay.shape[1], 3), dtype=np.uint8)
+        b_top[:] = (12, 18, 25)
+        cv2.putText(b_top, f"WATER BODIES: ~{stats['water_pct']:.1f}% ({stats['water_km2']:.2f} km2) | TERRESTRIAL LAND: ~{stats['land_pct']:.1f}% ({stats['land_km2']:.2f} km2)", 
+                    (16, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (100, 255, 220), 2, cv2.LINE_AA)
+        
+        # Bottom banner
+        banner_bot = 30
+        b_bot = np.zeros((banner_bot, overlay.shape[1], 3), dtype=np.uint8)
+        b_bot[:] = (18, 18, 22)
+        cv2.putText(b_bot, f"DUAL-TARGET SPATIAL GROUNDING: CYAN = WATER, EMERALD = LAND | RFC 7946 WGS84 VECTORIZED", 
+                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.40, (200, 200, 200), 1, cv2.LINE_AA)
+        
+        overlay = np.vstack([b_top, overlay, b_bot])
+        desc = f"Delineated Water Bodies (~{stats['water_pct']:.1f}%) & Terrestrial Landmass (~{stats['land_pct']:.1f}%)"
+
+    elif feature_type == "land":
         overlay = cv_img.copy()
         
-        # Dim water to focus on landmass
-        water_mask = stats["water_mask"]
-        overlay[water_mask > 0] = (overlay[water_mask > 0] * 0.55).astype(np.uint8)
+        # 1. Subtle cyan tint on water bodies for crisp shoreline demarcation
+        w_mask = stats["water_mask"]
+        w_px = w_mask > 0
+        if np.any(w_px):
+            cyan_tint = np.zeros_like(cv_img)
+            cyan_tint[w_px] = [200, 150, 20]
+            overlay[w_px] = cv2.addWeighted(overlay[w_px], 0.55, cyan_tint[w_px], 0.45, 0)
+            w_contours, _ = cv2.findContours(w_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, w_contours, -1, (255, 220, 50), 1, cv2.LINE_AA)
         
-        # Apply glowing emerald/lime tint across the entire landmass
+        # 2. Apply glowing emerald tint across the entire landmass
         land_pixels = stats["land_mask"] > 0
         if np.any(land_pixels):
             lime_tint = np.zeros_like(cv_img)
-            lime_tint[land_pixels] = [40, 220, 100] # Vibrant emerald in BGR
+            lime_tint[land_pixels] = [40, 220, 100]  # Vibrant emerald in BGR
             overlay[land_pixels] = cv2.addWeighted(overlay[land_pixels], 0.65, lime_tint[land_pixels], 0.35, 0)
             
             # Draw crisp, glowing boundary contours along the entire coastline and perimeter
@@ -554,7 +632,7 @@ def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict
                     bx, by, bw, bh = cv2.boundingRect(c)
                     cv2.rectangle(overlay, (bx, by), (bx + bw, by + bh), (0, 255, 255), 2)
                     c_km2 = (cv2.contourArea(c) * stats['sqm_per_px']) / 1_000_000.0
-                    lbl = f"SECTOR {idx+1}: {c_km2:.1f} km2"
+                    lbl = f"LAND SECTOR {idx+1}: {c_km2:.1f} km2"
                     cv2.putText(overlay, lbl, (bx + 8, max(24, by - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (0, 255, 255), 2, cv2.LINE_AA)
         
         # Top banner
@@ -568,54 +646,11 @@ def _generate_visual_evidence(cv_img: np.ndarray, feature_type: str, stats: Dict
         banner_bot = 30
         b_bot = np.zeros((banner_bot, overlay.shape[1], 3), dtype=np.uint8)
         b_bot[:] = (18, 18, 22)
-        cv2.putText(b_bot, f"COASTAL BOUNDARY: {stats['water_pct']:.1f}% WATER/SEA ({stats['water_km2']:.2f} km2) | WGS84 VECTORIZED", 
-                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (200, 200, 200), 1, cv2.LINE_AA)
+        cv2.putText(b_bot, f"COASTAL & TERRAIN BOUNDARY DELINEATION: ~{stats['water_pct']:.1f}% WATER/SEA | RFC 7946 WGS84 VECTORIZED", 
+                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.40, (200, 200, 200), 1, cv2.LINE_AA)
         
         overlay = np.vstack([b_top, overlay, b_bot])
         desc = f"Delineated Landmass Map: ~{stats['land_pct']:.1f}% ({stats['land_km2']:.2f} km²)"
-
-    elif feature_type == "water":
-        overlay = cv_img.copy()
-        non_water = cv2.bitwise_not(stats["water_mask"])
-        overlay[non_water > 0] = (overlay[non_water > 0] * 0.45).astype(np.uint8)
-        
-        water_pixels = stats["water_mask"] > 0
-        if np.any(water_pixels):
-            cyan_tint = np.zeros_like(cv_img)
-            cyan_tint[water_pixels] = [245, 180, 25] # Luminous cyan-blue in BGR
-            overlay[water_pixels] = cv2.addWeighted(overlay[water_pixels], 0.35, cyan_tint[water_pixels], 0.65, 0)
-            contours, _ = cv2.findContours(stats["water_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cv2.drawContours(overlay, contours, -1, (255, 235, 80), 2, cv2.LINE_AA)
-            
-            # Find major water sectors and draw tactical bounding vectors
-            c_sorted = sorted(contours, key=cv2.contourArea, reverse=True)
-            for idx, c in enumerate(c_sorted[:5]):
-                ca = cv2.contourArea(c)
-                if ca > (h * w * 0.01):
-                    bx, by, bw, bh = cv2.boundingRect(c)
-                    cv2.rectangle(overlay, (bx, by), (bx + bw, by + bh), (255, 220, 50), 2)
-                    c_km2 = (ca * stats["sqm_per_px"]) / 1_000_000.0
-                    lbl = f"WATER BODY #{idx+1}: {c_km2:.2f} km2"
-                    (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.44, 1)
-                    cv2.rectangle(overlay, (bx, max(0, by - 22)), (bx + lw + 12, max(22, by)), (12, 18, 26), -1)
-                    cv2.putText(overlay, lbl, (bx + 6, max(16, by - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (255, 230, 80), 1, cv2.LINE_AA)
-            
-        # Top banner
-        banner_top = 44
-        b_top = np.zeros((banner_top, overlay.shape[1], 3), dtype=np.uint8)
-        b_top[:] = (12, 18, 25)
-        cv2.putText(b_top, f"DELINEATED WATER BODIES: ~{stats['water_pct']:.1f}% ({stats['water_km2']:.2f} km2 / {stats['water_ha']:,.0f} ha)", 
-                    (16, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.54, (255, 220, 60), 2, cv2.LINE_AA)
-        
-        # Bottom banner
-        banner_bot = 30
-        b_bot = np.zeros((banner_bot, overlay.shape[1], 3), dtype=np.uint8)
-        b_bot[:] = (18, 18, 22)
-        cv2.putText(b_bot, f"TERRESTRIAL LAND COVER: ~{stats['land_pct']:.1f}% ({stats['land_km2']:.2f} km2) | WGS84 VECTORIZED", 
-                    (16, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (200, 200, 200), 1, cv2.LINE_AA)
-        
-        overlay = np.vstack([b_top, overlay, b_bot])
-        desc = f"Delineated Water Bodies Map: ~{stats['water_pct']:.1f}% ({stats['water_km2']:.2f} km²)"
 
     elif feature_type == "vegetation":
         overlay = cv_img.copy()
@@ -916,6 +951,25 @@ class SingleImageVQA(SpecialistModel):
                 f"{table}"
             )
 
+        elif is_water_query and is_land_query:
+            feature_type = "dual"
+            formatted_text = (
+                f"🌐 **Comprehensive Water Bodies & Land Surface Quantification**\n\n"
+                f"### 1. Direct Executive Metrics\n"
+                f"• **Terrestrial Landmass Extent:** **~{land_pct:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} hectares)\n"
+                f"• **Hydrological Water Bodies Extent:** **~{w_pct:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares)\n"
+                f"• **Urban Built-up Footprint:** **~{built_pct:.1f}%** ({stats['built_km2']:.2f} km² / {stats['built_ha']:,.0f} hectares)\n"
+                f"• **Vegetation & Natural Canopy:** **~{v_pct:.1f}%** ({stats['veg_km2']:.2f} km² / {stats['veg_ha']:,.0f} hectares)\n"
+                f"• **Total Surface Balance:** 100.0% of the scene is partitioned into landmass ({land_pct:.1f}%) and water bodies ({w_pct:.1f}%).\n\n"
+                f"---\n\n"
+                f"{table}\n\n"
+                f"---\n\n"
+                f"### 2. Dual Spatial Grounding Verification\n"
+                f"• In the visual evidence panel, **water bodies are illuminated in luminous cyan-blue** with gold perimeter vectors and tactical sector bounds.\n"
+                f"• **Terrestrial landmass is delineated in glowing emerald green** with high-contrast boundary vectors.\n"
+                f"• All boundaries are vectorized for direct export to RFC 7946 WGS84 GeoJSON."
+            )
+
         elif is_water_query:
             feature_type = "water"
             if w_pct > 1.5:
@@ -1122,6 +1176,15 @@ class SingleImageGrounding(SpecialistModel):
             target_px = stats["cloud_pixels"]
             feature_type = "land_cover"
 
+        elif grounding_target == "dual":
+            target_mask = stats["water_mask"]
+            target_label = "WATER BODIES & TERRESTRIAL LAND"
+            target_pct = stats["water_pct"]
+            target_km2 = stats["water_km2"]
+            target_ha = stats["water_ha"]
+            target_px = stats["water_pixels"]
+            feature_type = "dual"
+
         elif grounding_target == "water":
             target_mask = stats["water_mask"]
             target_label = "WATER BODIES & HYDROLOGICAL BASIN"
@@ -1173,10 +1236,6 @@ class SingleImageGrounding(SpecialistModel):
         # Generate the visual evidence overlay illuminating the entire marked area
         b64_img, visual_desc = _generate_visual_evidence(cv_img, feature_type, stats)
         
-        # Extract bounding boxes and polygons for WGS84 GeoJSON export
-        contours, _ = cv2.findContours(target_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        c_sorted = sorted(contours, key=cv2.contourArea, reverse=True)
-        
         base_lat = 19.0760
         base_lon = 72.8777
         if geo_meta and "west" in geo_meta and "east" in geo_meta and "north" in geo_meta and "south" in geo_meta:
@@ -1190,31 +1249,90 @@ class SingleImageGrounding(SpecialistModel):
             return round(geo_lon, 6), round(geo_lat, 6)
 
         geojson_features = []
-        for idx, c in enumerate(c_sorted[:8]):
-            c_area = cv2.contourArea(c)
-            if c_area > (h * w * 0.005):
-                bx, by, bw, bh = cv2.boundingRect(c)
-                p1 = px_to_geo(bx, by)
-                p2 = px_to_geo(bx + bw, by)
-                p3 = px_to_geo(bx + bw, by + bh)
-                p4 = px_to_geo(bx, by + bh)
-                sec_km2 = (c_area * stats["sqm_per_px"]) / 1_000_000.0
-                geojson_features.append({
-                    "type": "Feature",
-                    "id": f"sector_{idx+1}",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[list(p1), list(p2), list(p3), list(p4), list(p1)]]
-                    },
-                    "properties": {
-                        "feature_id": idx + 1,
-                        "label": f"{target_label} SECTOR {idx+1}",
-                        "area_km2": round(sec_km2, 2),
-                        "area_pct": round((c_area / float(h * w)) * 100.0, 2),
-                        "pixel_bbox": [bx, by, bw, bh],
-                        "classification": target_label
-                    }
-                })
+        if grounding_target in ["dual", "water"]:
+            # Extract water contours
+            w_contours, _ = cv2.findContours(stats["water_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for idx, c in enumerate(sorted(w_contours, key=cv2.contourArea, reverse=True)[:5]):
+                c_area = cv2.contourArea(c)
+                if c_area > (h * w * 0.005):
+                    bx, by, bw, bh = cv2.boundingRect(c)
+                    p1 = px_to_geo(bx, by)
+                    p2 = px_to_geo(bx + bw, by)
+                    p3 = px_to_geo(bx + bw, by + bh)
+                    p4 = px_to_geo(bx, by + bh)
+                    sec_km2 = (c_area * stats["sqm_per_px"]) / 1_000_000.0
+                    geojson_features.append({
+                        "type": "Feature",
+                        "id": f"water_sector_{idx+1}",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[list(p1), list(p2), list(p3), list(p4), list(p1)]]
+                        },
+                        "properties": {
+                            "feature_id": idx + 1,
+                            "label": f"WATER BODY #{idx+1}",
+                            "area_km2": round(sec_km2, 2),
+                            "area_pct": round((c_area / float(h * w)) * 100.0, 2),
+                            "pixel_bbox": [bx, by, bw, bh],
+                            "classification": "WATER BODY"
+                        }
+                    })
+            # Extract land contours if dual
+            if grounding_target == "dual" or stats["water_pct"] < 20.0:
+                l_contours, _ = cv2.findContours(stats["land_mask"], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                for idx, c in enumerate(sorted(l_contours, key=cv2.contourArea, reverse=True)[:3]):
+                    c_area = cv2.contourArea(c)
+                    if c_area > (h * w * 0.02):
+                        bx, by, bw, bh = cv2.boundingRect(c)
+                        p1 = px_to_geo(bx, by)
+                        p2 = px_to_geo(bx + bw, by)
+                        p3 = px_to_geo(bx + bw, by + bh)
+                        p4 = px_to_geo(bx, by + bh)
+                        sec_km2 = (c_area * stats["sqm_per_px"]) / 1_000_000.0
+                        geojson_features.append({
+                            "type": "Feature",
+                            "id": f"land_sector_{idx+1}",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [[list(p1), list(p2), list(p3), list(p4), list(p1)]]
+                            },
+                            "properties": {
+                                "feature_id": 10 + idx + 1,
+                                "label": f"TERRESTRIAL LAND #{idx+1}",
+                                "area_km2": round(sec_km2, 2),
+                                "area_pct": round((c_area / float(h * w)) * 100.0, 2),
+                                "pixel_bbox": [bx, by, bw, bh],
+                                "classification": "TERRESTRIAL LAND"
+                            }
+                        })
+        else:
+            contours, _ = cv2.findContours(target_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            c_sorted = sorted(contours, key=cv2.contourArea, reverse=True)
+            for idx, c in enumerate(c_sorted[:8]):
+                c_area = cv2.contourArea(c)
+                if c_area > (h * w * 0.005):
+                    bx, by, bw, bh = cv2.boundingRect(c)
+                    p1 = px_to_geo(bx, by)
+                    p2 = px_to_geo(bx + bw, by)
+                    p3 = px_to_geo(bx + bw, by + bh)
+                    p4 = px_to_geo(bx, by + bh)
+                    sec_km2 = (c_area * stats["sqm_per_px"]) / 1_000_000.0
+                    geojson_features.append({
+                        "type": "Feature",
+                        "id": f"sector_{idx+1}",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[list(p1), list(p2), list(p3), list(p4), list(p1)]]
+                        },
+                        "properties": {
+                            "feature_id": idx + 1,
+                            "label": f"{target_label} SECTOR {idx+1}",
+                            "area_km2": round(sec_km2, 2),
+                            "area_pct": round((c_area / float(h * w)) * 100.0, 2),
+                            "pixel_bbox": [bx, by, bw, bh],
+                            "classification": target_label
+                        }
+                    })
 
         geojson_data = {
             "type": "FeatureCollection",
@@ -1231,28 +1349,35 @@ class SingleImageGrounding(SpecialistModel):
         table = _calculate_land_cover_percentages(cv_img, stats)
 
         # Build direct query answers addressing all parts of the user request
-        summary_bullets = [
-            f"• **Delineated Feature:** **{target_label}** illuminated across **~{target_pct:.1f}%** ({target_km2:.2f} km² / {target_ha:,.0f} hectares / {target_px:,} pixels).",
-        ]
-        if inquiries.get("land") or "land" in query_lower:
+        if grounding_target == "dual":
+            summary_bullets = [
+                f"• **Delineated Water Bodies:** Illuminated in **luminous cyan-blue** covering **~{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares / {stats['water_pixels']:,} pixels).",
+                f"• **Delineated Terrestrial Landmass:** Delineated in **glowing emerald green** covering **~{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} hectares / {stats['land_pixels']:,} pixels).",
+                f"• **Total Surface Balance:** 100.0% of the surface area is partitioned into landmass ({stats['land_pct']:.1f}%) and water bodies ({stats['water_pct']:.1f}%)."
+            ]
+        else:
+            summary_bullets = [
+                f"• **Delineated Feature:** **{target_label}** illuminated across **~{target_pct:.1f}%** ({target_km2:.2f} km² / {target_ha:,.0f} hectares / {target_px:,} pixels).",
+            ]
+            if inquiries.get("land") or "land" in query_lower:
+                summary_bullets.append(
+                    f"• **Inquired Land Coverage:** Terrestrial land encompasses **~{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} hectares)."
+                )
+            if inquiries.get("water") or "water" in query_lower:
+                summary_bullets.append(
+                    f"• **Inquired Water Coverage:** Hydrological water bodies cover **~{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares)."
+                )
+            if inquiries.get("vegetation") or any(k in query_lower for k in ["veg", "green", "canopy", "forest", "crop"]):
+                summary_bullets.append(
+                    f"• **Inquired Vegetation Cover:** Vegetated canopy covers **~{stats['veg_total_pct']:.1f}%** ({stats['veg_km2']:.2f} km² / {stats['veg_ha']:,.0f} hectares)."
+                )
+            if inquiries.get("built") or any(k in query_lower for k in ["built", "urban", "settlement", "infrastructure"]):
+                summary_bullets.append(
+                    f"• **Inquired Urban Footprint:** Developed infrastructure covers **~{stats['built_pct']:.1f}%** ({stats['built_km2']:.2f} km² / {stats['built_ha']:,.0f} hectares)."
+                )
             summary_bullets.append(
-                f"• **Inquired Land Coverage:** Terrestrial land encompasses **~{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km² / {stats['land_ha']:,.0f} hectares)."
+                f"• **Total Surface Balance:** Landmass covers **{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km²), bordered by **{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km²) of water bodies."
             )
-        if inquiries.get("water") or "water" in query_lower:
-            summary_bullets.append(
-                f"• **Inquired Water Coverage:** Hydrological water bodies cover **~{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km² / {stats['water_ha']:,.0f} hectares)."
-            )
-        if inquiries.get("vegetation") or any(k in query_lower for k in ["veg", "green", "canopy", "forest", "crop"]):
-            summary_bullets.append(
-                f"• **Inquired Vegetation Cover:** Vegetated canopy covers **~{stats['veg_total_pct']:.1f}%** ({stats['veg_km2']:.2f} km² / {stats['veg_ha']:,.0f} hectares)."
-            )
-        if inquiries.get("built") or any(k in query_lower for k in ["built", "urban", "settlement", "infrastructure"]):
-            summary_bullets.append(
-                f"• **Inquired Urban Footprint:** Developed infrastructure covers **~{stats['built_pct']:.1f}%** ({stats['built_km2']:.2f} km² / {stats['built_ha']:,.0f} hectares)."
-            )
-        summary_bullets.append(
-            f"• **Total Surface Balance:** Landmass covers **{stats['land_pct']:.1f}%** ({stats['land_km2']:.2f} km²), bordered by **{stats['water_pct']:.1f}%** ({stats['water_km2']:.2f} km²) of water bodies."
-        )
 
         exec_summary = "\n".join(summary_bullets)
 
