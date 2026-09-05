@@ -4,6 +4,8 @@ import CookieConsent from "@/components/CookieConsent";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthModal from "@/components/AuthModal";
 
+import Script from "next/script";
+
 export const metadata: Metadata = {
   title: "SatQuery AI - Earth Observation Intelligence",
   description: "Multimodal Remote Sensing Image Analysis through Natural Language Queries",
@@ -17,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
         <AuthProvider>
           {children}
           <AuthModal />
@@ -26,3 +29,4 @@ export default function RootLayout({
     </html>
   );
 }
+

@@ -7,6 +7,7 @@ export interface User {
   email: string;
   role?: string;
   isJudge?: boolean;
+  provider?: "google" | "email" | "judge";
 }
 
 interface AuthContextType {
@@ -26,9 +27,11 @@ interface AuthContextType {
   incrementMapCount: () => void;
   login: (email: string, name?: string) => void;
   signup: (name: string, email: string) => void;
+  loginWithGoogle: (email?: string, name?: string) => void;
   loginAsJudge: () => void;
   logout: () => void;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -137,12 +140,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
+  const loginWithGoogle = (email?: string, name?: string) => {
+    const googleUser: User = {
+      name: name || "Google Verified Operator",
+      email: email || "operator.isro@gmail.com",
+      role: "GOOGLE_VERIFIED",
+      provider: "google",
+    };
+    setUser(googleUser);
+    try {
+      localStorage.setItem("satquery_user", JSON.stringify(googleUser));
+    } catch (e) {}
+    setIsAuthModalOpen(false);
+  };
+
   const logout = () => {
     setUser(null);
     try {
       localStorage.removeItem("satquery_user");
     } catch (e) {}
   };
+
 
   const isAuthenticated = !!user;
   const canQuery = isAuthenticated || queryCount < MAX_FREE_QUERIES;
@@ -167,9 +185,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         incrementMapCount,
         login,
         signup,
+        loginWithGoogle,
         loginAsJudge,
         logout,
       }}
+
     >
       {children}
     </AuthContext.Provider>
