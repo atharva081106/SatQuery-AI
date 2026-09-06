@@ -44,6 +44,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [loading, setLoading] = useState(false);
   
   const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
   useEffect(() => {
     // Dynamic import of Leaflet
@@ -126,6 +127,10 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           layerBounds.getEast(),
           layerBounds.getNorth()
         ]);
+        // Reopen config panel on mobile so user can immediately click Acquire Data
+        if (typeof window !== "undefined" && window.innerWidth < 640) {
+          setMobilePanelOpen(true);
+        }
       }
     });
 
@@ -266,23 +271,34 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       {/* THE MAP */}
       <div ref={mapRef} className="absolute inset-0 z-0" />
       
-      {/* FLOATING ACQUISITION PANEL (Scrollable & Responsive) */}
+      {/* FLOATING ACQUISITION PANEL (Collapsible on Mobile, Persistent on Desktop) */}
       <div 
         data-lenis-prevent
-        className="absolute top-20 sm:top-24 left-4 sm:left-8 w-[calc(100vw-2rem)] sm:w-84 max-h-[calc(100vh-6rem)] sm:max-h-[calc(100vh-7.5rem)] overflow-y-auto custom-scrollbar bg-black/85 backdrop-blur-xl border border-white/20 p-5 sm:p-6 z-[400] flex flex-col gap-4.5 shadow-2xl rounded-xl pointer-events-auto touch-pan-y"
+        className={`fixed sm:absolute inset-x-3 bottom-20 sm:bottom-auto sm:top-24 sm:left-8 w-[calc(100vw-1.5rem)] sm:w-84 max-h-[70dvh] sm:max-h-[calc(100vh-7.5rem)] overflow-y-auto custom-scrollbar bg-black/90 backdrop-blur-2xl border border-white/20 p-4 sm:p-6 z-[450] flex-col gap-4 shadow-2xl rounded-2xl sm:rounded-xl pointer-events-auto touch-pan-y animate-slide-up ${
+          mobilePanelOpen ? 'flex' : 'hidden sm:flex'
+        }`}
         onWheel={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-white/20 pb-2 shrink-0">
-          <h2 className="text-sm font-bold tracking-[0.2em] uppercase">Acquisition Config</h2>
-          {isAuthenticated ? (
-            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              PRO UNLIMITED
-            </span>
-          ) : (
-            <span className="text-[9px] font-bold text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              {mapCount >= maxFreeMapQueries ? "0/1 FREE LEFT" : "1/1 FREE SCAN"}
-            </span>
-          )}
+          <h2 className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase font-mono">Acquisition Config</h2>
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                PRO UNLIMITED
+              </span>
+            ) : (
+              <span className="text-[9px] font-bold text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                {mapCount >= maxFreeMapQueries ? "0/1 FREE" : "1/1 FREE"}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setMobilePanelOpen(false)}
+              className="sm:hidden text-white/50 hover:text-white text-xs px-2 py-0.5 border border-white/20 rounded cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Basemap Switcher */}
@@ -436,10 +452,26 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       </div>
 
       {/* LAT/LNG TRACKER */}
-      <div className="absolute bottom-6 right-16 z-[400] pointer-events-none">
-        <div className="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 text-[10px] tracking-[0.2em] text-[#00F0FF]">
-          LAT: {mousePos.lat.toFixed(4)} / LNG: {mousePos.lng.toFixed(4)}
+      <div className="absolute top-16 sm:bottom-6 right-3 sm:right-16 z-[400] pointer-events-none">
+        <div className="bg-black/70 backdrop-blur-md border border-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] text-[#00F0FF] rounded-lg">
+          LAT: {mousePos.lat.toFixed(3)} / LNG: {mousePos.lng.toFixed(3)}
         </div>
+      </div>
+
+      {/* MOBILE FLOATING TOGGLE PILL */}
+      <div className="sm:hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-[480] pointer-events-auto">
+        <button
+          type="button"
+          onClick={() => setMobilePanelOpen(!mobilePanelOpen)}
+          className={`px-5 py-2.5 rounded-full font-mono text-xs font-bold tracking-widest shadow-2xl flex items-center gap-2 uppercase cursor-pointer transition-all ${
+            mobilePanelOpen
+              ? "bg-white text-black border border-white"
+              : "bg-black/90 text-white border border-[#00F0FF]/60 shadow-[0_0_15px_rgba(0,240,255,0.4)]"
+          }`}
+        >
+          <span>{mobilePanelOpen ? "🗺️ VIEW FULL MAP" : "⚙️ CONFIGURE SCAN"}</span>
+          {bbox && <span className="w-2 h-2 rounded-full bg-[#00F0FF] animate-pulse" />}
+        </button>
       </div>
       
     </div>

@@ -16,9 +16,11 @@ export default function LandingPage() {
   const [showSplash, setShowSplash] = useState(true);
   const [flyOff, setFlyOff] = useState(false);
   const [enteringSystem, setEnteringSystem] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleEnterSystem = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
+    setMobileMenuOpen(false);
     setEnteringSystem(true);
     setTimeout(() => {
       router.push(path);
@@ -57,8 +59,115 @@ export default function LandingPage() {
         <SystemLoader />
       )}
 
-      {/* FIXED TOP NAV OVERLAY */}
-      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-6 z-50 mix-blend-difference hidden md:flex">
+      {/* MOBILE NAVBAR (< 768px) */}
+      <header className="fixed top-0 left-0 w-full flex justify-between items-center px-5 py-4 z-50 mix-blend-difference md:hidden">
+        <div className="text-base tracking-[0.2em] font-mono font-bold text-white">
+          SATQUERY AI.
+        </div>
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-full border border-white/30 text-white cursor-pointer touch-manipulation"
+          aria-label="Toggle mobile menu"
+        >
+          <span className={`w-5 h-0.5 bg-white transition-transform duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+          <span className={`w-5 h-0.5 bg-white transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+          <span className={`w-5 h-0.5 bg-white transition-transform duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+        </button>
+      </header>
+
+      {/* MOBILE FULLSCREEN MENU DRAWER */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-6 pt-20 safe-bottom animate-in fade-in duration-200 md:hidden font-mono">
+          <div className="flex flex-col gap-6 text-left">
+            <div className="text-[10px] tracking-widest uppercase text-emerald-400 font-bold border-b border-white/15 pb-2">
+              MISSION NAVIGATION
+            </div>
+            <Link
+              href="/acquire"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xl font-bold tracking-wider text-white hover:text-emerald-300 transition-colors py-1 flex items-center justify-between"
+            >
+              <span>SATELLITE MAP</span>
+              <span className="text-xs text-white/40">&rarr;</span>
+            </Link>
+            <Link
+              href="/query"
+              onClick={(e) => handleEnterSystem(e, '/query')}
+              className="text-xl font-bold tracking-wider text-white hover:text-emerald-300 transition-colors py-1 flex items-center justify-between"
+            >
+              <span>AI QUERY WORKSPACE</span>
+              <span className="text-xs text-white/40">&rarr;</span>
+            </Link>
+            <Link
+              href="/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xl font-bold tracking-wider text-white hover:text-emerald-300 transition-colors py-1 flex items-center justify-between"
+            >
+              <span>BENCHMARKS &amp; TELEMETRY</span>
+              <span className="text-xs text-white/40">&rarr;</span>
+            </Link>
+            <Link
+              href="/gallery"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xl font-bold tracking-wider text-white hover:text-emerald-300 transition-colors py-1 flex items-center justify-between"
+            >
+              <span>3D SPACE GALLERY</span>
+              <span className="text-xs text-white/40">&rarr;</span>
+            </Link>
+            <Link
+              href="/faq"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xl font-bold tracking-wider text-white hover:text-emerald-300 transition-colors py-1 flex items-center justify-between"
+            >
+              <span>SYSTEM FAQS</span>
+              <span className="text-xs text-white/40">&rarr;</span>
+            </Link>
+          </div>
+
+          <div className="flex flex-col gap-3 pt-6 border-t border-white/15">
+            {!isAuthenticated ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openAuthModal("Sign in to access advanced earth observation intelligence.", "signin");
+                }}
+                className="w-full py-3 rounded-full border border-white bg-white text-black font-bold text-xs uppercase tracking-widest text-center"
+              >
+                SIGN IN / REGISTER
+              </button>
+            ) : (
+              <div className="flex items-center justify-between bg-white/5 border border-white/15 p-3 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs text-emerald-300 font-bold uppercase">{user?.name || "OPERATOR"}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="text-xs text-white/60 hover:text-white uppercase tracking-wider underline"
+                >
+                  SIGN OUT
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-2.5 text-center text-xs text-white/40 uppercase tracking-widest"
+            >
+              CLOSE MENU [✕]
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* DESKTOP TOP NAV OVERLAY (>= 768px) */}
+      <nav className="fixed top-0 left-0 w-full justify-between items-center px-8 py-6 z-50 mix-blend-difference hidden md:flex">
         <div className="display-lg tracking-widest text-white">
           SATQUERY AI.
         </div>
@@ -102,7 +211,7 @@ export default function LandingPage() {
       </nav>
 
       {/* BAND 1: HERO */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen min-h-dvh h-[100dvh] w-full flex items-center justify-center overflow-hidden">
         {/* Full Bleed Background */}
         <div className="absolute inset-0 z-0 bg-black">
           <div className="absolute inset-0 opacity-70">
@@ -112,34 +221,33 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-end h-full pb-32 text-center">
+        <div className="relative z-10 flex flex-col items-center justify-end h-full pb-24 sm:pb-32 px-4 text-center">
           <FadeInScroll delay={200}>
-            <h1 className="display-xxl mb-4">
+            <h1 className="display-xxl mb-3 sm:mb-4">
               MAKING SENSE<br/>OF THE EARTH.
             </h1>
           </FadeInScroll>
           <FadeInScroll delay={400}>
-            <p className="body-md uppercase tracking-[4px] opacity-70 mb-12">
+            <p className="body-md uppercase tracking-[2px] sm:tracking-[4px] opacity-70 mb-8 sm:mb-12 text-xs sm:text-base px-2">
               Multimodal Remote Sensing Image Analysis
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
-            <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark min-w-[200px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase">
+            <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark min-w-[180px] sm:min-w-[200px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2">
               TRY FOR FREE
             </a>
           </FadeInScroll>
         </div>
 
-        
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-pulse opacity-50 z-10">
-          <span className="micro-cap">SCROLL TO EXPLORE</span>
+        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 animate-pulse opacity-50 z-10 pointer-events-none">
+          <span className="micro-cap text-[10px]">SCROLL TO EXPLORE</span>
           <span className="text-xs">&darr;</span>
         </div>
       </section>
 
       {/* BAND 2: FEATURE - VQA */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen min-h-dvh h-[100dvh] w-full flex items-center justify-center overflow-hidden">
         {/* Full Bleed Background */}
         <div 
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
@@ -150,13 +258,13 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-start justify-end h-full pb-32 px-8 md:px-24 w-full max-w-[1500px] mx-auto">
+        <div className="relative z-10 flex flex-col items-start justify-end h-full pb-24 sm:pb-32 px-6 sm:px-8 md:px-24 w-full max-w-[1500px] mx-auto">
           <FadeInScroll>
-            <div className="micro-cap mb-4 opacity-50">CAPABILITY 01</div>
-            <h2 className="display-xl mb-6 max-w-3xl">
+            <div className="micro-cap mb-3 opacity-50 text-[10px]">CAPABILITY 01</div>
+            <h2 className="display-xl mb-4 sm:mb-6 max-w-3xl">
               NATURAL LANGUAGE<br/>QUERIES
             </h2>
-            <p className="body-md opacity-80 max-w-xl">
+            <p className="body-md opacity-80 max-w-xl text-xs sm:text-base leading-relaxed">
               Interact with complex remote sensing data using everyday language. Our advanced agentic pipeline interprets your intent and extracts precise insights from vast geographical areas.
             </p>
           </FadeInScroll>
@@ -164,7 +272,7 @@ export default function LandingPage() {
       </section>
 
       {/* BAND 3: FEATURE - GROUNDING */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen min-h-dvh h-[100dvh] w-full flex items-center justify-center overflow-hidden">
         {/* Full Bleed Background */}
         <div 
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
@@ -175,25 +283,25 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-start justify-end h-full pb-32 px-8 md:px-24 w-full max-w-[1500px] mx-auto">
+        <div className="relative z-10 flex flex-col items-start justify-end h-full pb-28 sm:pb-32 px-6 sm:px-8 md:px-24 w-full max-w-[1500px] mx-auto">
           <FadeInScroll>
-            <div className="micro-cap mb-4 opacity-50">CAPABILITY 02</div>
-            <h2 className="display-xl mb-6 max-w-3xl">
+            <div className="micro-cap mb-3 opacity-50 text-[10px]">CAPABILITY 02</div>
+            <h2 className="display-xl mb-3 sm:mb-6 max-w-3xl">
               SPATIAL<br/>LOCALIZATION
             </h2>
-            <p className="body-md opacity-80 max-w-xl mb-8">
+            <p className="body-md opacity-80 max-w-xl mb-6 sm:mb-8 text-xs sm:text-base leading-relaxed">
               Identify and bound critical infrastructure, environmental changes, and specific geographical features directly onto the image canvas with millimeter precision.
             </p>
-            <Link href="/query" className="button-ghost-on-dark hover:bg-white hover:text-black">
+            <Link href="/query" className="button-ghost-on-dark hover:bg-white hover:text-black text-xs sm:text-sm py-2.5 px-6">
               TRY THE DEMO
             </Link>
           </FadeInScroll>
         </div>
         
         {/* OVERLAID MINIMAL FOOTER */}
-        <div className="absolute bottom-8 w-full px-8 flex flex-col md:flex-row justify-center items-center gap-6 text-[10px] tracking-widest uppercase text-white/60 font-semibold z-20">
+        <div className="absolute bottom-4 sm:bottom-8 w-full px-4 sm:px-8 flex flex-col md:flex-row justify-center items-center gap-3 sm:gap-6 text-[9px] sm:text-[10px] tracking-widest uppercase text-white/60 font-semibold z-20">
           <span>SATQUERY AI &copy; {new Date().getFullYear()}</span>
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
+          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
             <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="hover:text-white transition-colors cursor-pointer">SYSTEM ACCESS</a>
             {!isAuthenticated ? (
               <button
@@ -207,7 +315,7 @@ export default function LandingPage() {
             <Link href="/faq" className="hover:text-white transition-colors">FAQS</Link>
             <Link href="/dashboard" className="hover:text-white transition-colors">BENCHMARKS</Link>
             <Link href="#" className="hover:text-white transition-colors">DOCUMENTATION</Link>
-            <Link href="#" className="hover:text-white transition-colors">PRIVACY POLICY</Link>
+            <Link href="#" className="hover:text-white transition-colors">PRIVACY</Link>
             <Link href="#" className="hover:text-white transition-colors">TERMS</Link>
           </div>
         </div>

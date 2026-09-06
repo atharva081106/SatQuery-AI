@@ -216,6 +216,7 @@ export default function Home() {
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [showMapExplorer, setShowMapExplorer] = useState(false);
   const [showMissionPresets, setShowMissionPresets] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"chat" | "trace">("chat");
 
   const dataURLtoFile = (dataurl: string, filename: string): File => {
     const arr = dataurl.split(',');
@@ -423,6 +424,11 @@ export default function Home() {
       
       setMessages([...newMessages, { role: "assistant", content: data.answer, result: data }]);
       incrementQueryCount();
+
+      // On mobile screens, automatically show trace tab if result contains visual evidence or GeoJSON
+      if (typeof window !== "undefined" && window.innerWidth < 1024 && (data.visual_evidence?.length || data.geojson_data || data.pair_comparison)) {
+        setMobileTab("trace");
+      }
 
       // Trigger authentication popup right after 3 free queries are completed
       if (!isAuthenticated && (queryCount + 1) >= maxFreeQueries) {
@@ -672,23 +678,23 @@ export default function Home() {
       )}
 
       {/* FIXED TOP NAV OVERLAY */}
-      <nav className="w-full flex justify-between items-center px-6 lg:px-8 py-4 z-50 transition-all">
-        <div className="flex items-center gap-3">
-          <a href="/" className="display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-2">
+      <nav className="w-full flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3 sm:py-4 z-50 transition-all">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <a href="/" className="text-sm sm:text-xl lg:display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-1.5 font-mono font-bold">
             <span>SATQUERY AI.</span>
           </a>
-          <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-mono font-bold tracking-wider border border-emerald-500/30">
+          <span className="hidden md:inline-block text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-mono font-bold tracking-wider border border-emerald-500/30">
             ISRO / SAC — PS 26167
           </span>
         </div>
 
-        <div className="flex gap-2.5 sm:gap-3 items-center">
+        <div className="flex gap-2 sm:gap-3 items-center">
           {/* Guest Sign In / Sign Up Trigger */}
           {!isAuthenticated && (
             <button
               type="button"
               onClick={() => openAuthModal("Sign in to sync mission logs and access unlimited high-resolution analyses.", "signin")}
-              className="micro-cap border border-white/20 hover:border-white text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase text-[11px]"
+              className="micro-cap border border-white/20 hover:border-white text-white/80 hover:text-white hover:bg-white/10 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase text-[10px] sm:text-[11px]"
               title="Sign in to your account"
             >
               SIGN IN
@@ -697,15 +703,15 @@ export default function Home() {
 
           {/* Authenticated User Callsign */}
           {isAuthenticated && (
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold tracking-widest uppercase flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold tracking-widest uppercase flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>{user?.name?.toUpperCase() || "PRO OPERATOR"}</span>
+                <span>{user?.name?.slice(0, 10).toUpperCase() || "OPERATOR"}</span>
               </span>
               <button
                 type="button"
                 onClick={logout}
-                className="text-[10px] text-white/50 hover:text-white uppercase tracking-wider underline cursor-pointer"
+                className="text-[9px] sm:text-[10px] text-white/50 hover:text-white uppercase tracking-wider underline cursor-pointer"
                 title="Sign out"
               >
                 Sign Out
@@ -717,23 +723,58 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setShowMissionPresets(true)}
-            className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase font-bold"
+            className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto tracking-widest uppercase font-bold text-[9px] sm:text-xs"
             title="Explore & Launch Pre-Configured Demo Queries"
           >
             DEMO QUERIES
           </button>
 
-          <a href="/" className="micro-cap text-white hover:opacity-70 transition-opacity border border-white/20 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 pointer-events-auto">
-            <span>&larr;</span> <span className="hidden md:inline">DASHBOARD</span>
+          <a href="/" className="micro-cap text-white hover:opacity-70 transition-opacity border border-white/20 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full flex items-center gap-1 pointer-events-auto text-[10px] sm:text-xs">
+            <span>&larr;</span> <span className="hidden sm:inline">DASHBOARD</span>
           </a>
         </div>
       </nav>
 
       {/* MAIN APPLICATION CONTAINER */}
-      <div className={`flex-1 h-[calc(100vh-4.5rem)] max-h-[calc(100vh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-4 lg:p-6 gap-6 z-10 min-h-0 overflow-y-auto lg:overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
+      <div className={`flex-1 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-4.5rem)] sm:max-h-[calc(100dvh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-3 sm:p-4 lg:p-6 gap-3 sm:gap-6 z-10 min-h-0 overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
         
+        {/* MOBILE DUAL-MODE SEGMENTED TABS (< 1024px) */}
+        {latestResult && (
+          <div className="flex lg:hidden w-full mb-1 bg-[#0f0f14]/90 backdrop-blur-md p-1 rounded-xl border border-white/20 shrink-0 font-mono text-xs z-30 pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => setMobileTab("chat")}
+              className={`flex-1 py-2 rounded-lg font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 ${
+                mobileTab === "chat"
+                  ? "bg-white text-black shadow-md"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              <span>💬 CONSOLE</span>
+              <span className="text-[10px] opacity-70">({messages.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileTab("trace")}
+              className={`flex-1 py-2 rounded-lg font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 ${
+                mobileTab === "trace"
+                  ? "bg-emerald-400 text-black shadow-md font-extrabold"
+                  : "text-emerald-300 hover:text-white"
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>TRACE &amp; EVIDENCE</span>
+              {latestResult.visual_evidence?.length > 0 && (
+                <span className="text-[9px] px-1.5 py-0.5 bg-black/40 text-white rounded font-mono font-bold">
+                  {latestResult.visual_evidence.length}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* LEFT/MAIN: CHAT & INPUT */}
-        <div className="flex-1 flex flex-col justify-end relative min-h-0 h-full max-h-full overflow-hidden">
+        <div className={`flex-1 flex-col justify-end relative min-h-0 h-full max-h-full overflow-hidden ${mobileTab === 'trace' ? 'hidden lg:flex' : 'flex'}`}>
           
           <div data-lenis-prevent className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
@@ -873,17 +914,17 @@ export default function Home() {
                     <span className={`text-[7px] transition-transform duration-200 ${showPresets ? 'rotate-180' : ''}`}>▼</span>
                   </button>
 
-                  {/* Expandable Query Popover Library */}
+                  {/* Expandable Query Popover Library - Responsive Mobile Bottom Sheet */}
                   {showPresets && (
                     <div 
                       data-lenis-prevent
-                      className="absolute bottom-full mb-3 left-0 w-[92vw] sm:w-[560px] max-h-[380px] overflow-y-auto custom-scrollbar bg-black/95 backdrop-blur-xl border border-[#3a3a3f] rounded-xl p-4 shadow-2xl z-50 animate-slide-up pointer-events-auto touch-pan-y"
+                      className="fixed sm:absolute inset-x-3 bottom-20 sm:bottom-full sm:mb-3 sm:left-0 sm:inset-x-auto w-[calc(100vw-1.5rem)] sm:w-[560px] max-h-[65dvh] sm:max-h-[380px] overflow-y-auto custom-scrollbar bg-black/95 backdrop-blur-2xl border border-white/20 rounded-2xl sm:rounded-xl p-4 shadow-2xl z-50 animate-slide-up pointer-events-auto touch-pan-y"
                       onWheel={(e) => e.stopPropagation()}
                     >
                       <div className="flex justify-between items-center pb-3 mb-3 border-b border-[#2a2a2f]">
                         <div className="flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                          <span className="micro-cap text-white font-semibold">REMOTE SENSING QUERY LIBRARY</span>
+                          <span className="micro-cap text-white font-semibold text-[10px] sm:text-xs">REMOTE SENSING QUERY LIBRARY</span>
                         </div>
                         <button 
                           type="button" 
@@ -909,7 +950,7 @@ export default function Home() {
                                     setQuery(q);
                                     setShowPresets(false);
                                   }}
-                                  className="text-left text-xs px-3 py-1.5 rounded-md bg-white/5 hover:bg-white text-white/80 hover:text-black transition-all border border-white/10 hover:border-white cursor-pointer"
+                                  className="text-left text-xs px-2.5 sm:px-3 py-1.5 rounded-md bg-white/5 hover:bg-white text-white/80 hover:text-black transition-all border border-white/10 hover:border-white cursor-pointer"
                                 >
                                   {q}
                                 </button>
@@ -925,8 +966,8 @@ export default function Home() {
                 {/* Text Input */}
                 <input
                   type="text"
-                  className="flex-1 bg-transparent border-none outline-none text-white px-3 py-2 text-sm placeholder-white/40"
-                  placeholder="ENTER COMMAND OR NATURAL LANGUAGE QUERY..."
+                  className="flex-1 min-w-0 bg-transparent border-none outline-none text-white px-2 sm:px-3 py-2 text-base sm:text-sm placeholder-white/40 placeholder:text-xs sm:placeholder:text-sm"
+                  placeholder="ENTER COMMAND OR QUERY..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   disabled={loading}
@@ -936,9 +977,10 @@ export default function Home() {
                 <button 
                   type="submit" 
                   disabled={loading || (!query && images.length === 0)}
-                  className="ml-2 h-8 px-5 rounded-full bg-white text-black font-semibold text-[10px] tracking-widest uppercase hover:bg-white/80 disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0"
+                  className="ml-1 sm:ml-2 h-8 px-3 sm:px-5 rounded-full bg-white text-black font-semibold text-[10px] tracking-widest uppercase hover:bg-white/80 disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0"
                 >
-                  Execute
+                  <span className="hidden sm:inline">Execute</span>
+                  <span className="sm:hidden">GO</span>
                 </button>
               </div>
             </form>
@@ -949,7 +991,9 @@ export default function Home() {
         {latestResult && (
             <div 
               data-lenis-prevent
-              className="w-full lg:w-1/3 bg-black/75 backdrop-blur-md border border-[#3a3a3f] rounded-xl p-5 lg:p-6 flex flex-col min-h-0 h-full max-h-[calc(100vh-6.5rem)] lg:max-h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto touch-pan-y shrink-0 lg:shrink"
+              className={`w-full lg:w-1/3 bg-black/75 backdrop-blur-md border border-[#3a3a3f] rounded-xl p-4 lg:p-6 flex-col min-h-0 h-full max-h-[calc(100dvh-7.5rem)] lg:max-h-full overflow-y-auto custom-scrollbar shadow-2xl animate-slide-up pointer-events-auto touch-pan-y shrink-0 lg:shrink ${
+                mobileTab === 'chat' ? 'hidden lg:flex' : 'flex'
+              }`}
               style={{ maxHeight: "calc(100vh - 6.5rem)" }}
             >
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#2a2a2f]">

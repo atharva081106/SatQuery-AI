@@ -195,25 +195,25 @@ export default function Dashboard() {
       </div>
 
       {/* Navigation Header */}
-      <header className="px-8 py-5 relative z-10 w-full max-w-[1500px] mx-auto flex justify-between items-center mt-2 shrink-0 border-b border-white/10">
+      <header className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 relative z-10 w-full max-w-[1500px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 sm:mt-2 gap-3 shrink-0 border-b border-white/10">
         <FadeInScroll delay={100}>
           <div>
-            <div className="flex items-center gap-2.5 mb-1.5">
-              <span className="micro-cap text-emerald-400 font-mono tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[10px]">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="micro-cap text-emerald-400 font-mono tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px]">
                 AUDITED PARAMETERS &amp; VERIFIED BENCHMARKS
               </span>
-              <span className="text-[10px] font-mono text-white/40">ISRO / SAC PS 26167</span>
+              <span className="text-[9px] sm:text-[10px] font-mono text-white/40">ISRO / SAC PS 26167</span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-white mb-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white mb-1">
               SYSTEM BENCHMARKS &amp; TELEMETRY
             </h1>
-            <p className="text-xs text-white/70 max-w-2xl font-mono leading-relaxed">
+            <p className="text-[11px] sm:text-xs text-white/70 max-w-2xl font-mono leading-relaxed">
               Real measured parameters extracted directly from trained checkpoint artifacts (<span className="text-emerald-300">best_satsegnet.pth</span>, 482.8K params), active runtime CPU latencies (ONNX INT8 vs PyTorch), and 491,520 test pixel evaluations.
             </p>
           </div>
         </FadeInScroll>
         <FadeInScroll delay={200}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <div className="hidden sm:flex flex-col items-end text-right font-mono text-[10px]">
               <span className="text-emerald-400 font-semibold flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
@@ -223,7 +223,7 @@ export default function Dashboard() {
             </div>
             <Link 
               href="/" 
-              className="flex items-center gap-2 hover:bg-white hover:text-black transition-all text-xs font-mono py-2 px-4 border border-white/20 rounded-lg bg-[#111114]"
+              className="flex items-center gap-2 hover:bg-white hover:text-black transition-all text-xs font-mono py-1.5 sm:py-2 px-3.5 sm:px-4 border border-white/20 rounded-lg bg-[#111114]"
             >
               <span>&larr;</span><span>HOME</span>
             </Link>
@@ -232,62 +232,62 @@ export default function Dashboard() {
       </header>
 
       {/* Top Telemetry Strip - 6 Primary Audited Metrics */}
-      <section className="w-full max-w-[1500px] mx-auto px-8 pt-6 pb-4 relative z-10">
+      <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-3 sm:pb-4 relative z-10">
         <FadeInScroll delay={150}>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
             
             {/* Metric 1 */}
-            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-emerald-500/40 transition-colors rounded-lg p-3.5 flex flex-col justify-between">
-              <span className="text-white/50 text-[10px] font-mono uppercase tracking-wider">Overall Accuracy</span>
-              <div className="my-2">
-                <span className="text-2xl lg:text-3xl font-bold font-mono text-emerald-400">90.20<span className="text-sm font-normal text-emerald-400/70 ml-0.5">%</span></span>
+            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-emerald-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Overall Accuracy</span>
+              <div className="my-1 sm:my-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-emerald-400">90.20<span className="text-xs sm:text-sm font-normal text-emerald-400/70 ml-0.5">%</span></span>
               </div>
-              <span className="text-[9px] text-white/40 font-mono">443,358 / 491,520 pixels</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">443,358 / 491,520 pixels</span>
             </div>
 
             {/* Metric 2 */}
-            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-blue-500/40 transition-colors rounded-lg p-3.5 flex flex-col justify-between">
-              <span className="text-white/50 text-[10px] font-mono uppercase tracking-wider">Mean IoU (mIoU)</span>
-              <div className="my-2">
-                <span className="text-2xl lg:text-3xl font-bold font-mono text-blue-400">80.22<span className="text-sm font-normal text-blue-400/70 ml-0.5">%</span></span>
+            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-blue-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Mean IoU (mIoU)</span>
+              <div className="my-1 sm:my-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-blue-400">80.22<span className="text-xs sm:text-sm font-normal text-blue-400/70 ml-0.5">%</span></span>
               </div>
-              <span className="text-[9px] text-white/40 font-mono">Test split (Val: 72.60%)</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">Test split (Val: 72.60%)</span>
             </div>
 
             {/* Metric 3 */}
-            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-indigo-500/40 transition-colors rounded-lg p-3.5 flex flex-col justify-between">
-              <span className="text-white/50 text-[10px] font-mono uppercase tracking-wider">Macro-F1 Score</span>
-              <div className="my-2">
-                <span className="text-2xl lg:text-3xl font-bold font-mono text-indigo-400">88.77<span className="text-sm font-normal text-indigo-400/70 ml-0.5">%</span></span>
+            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-indigo-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Macro-F1 Score</span>
+              <div className="my-1 sm:my-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-indigo-400">88.77<span className="text-xs sm:text-sm font-normal text-indigo-400/70 ml-0.5">%</span></span>
               </div>
-              <span className="text-[9px] text-white/40 font-mono">Harmonic precision-recall</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">Harmonic prec-recall</span>
             </div>
 
             {/* Metric 4 */}
-            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-cyan-500/40 transition-colors rounded-lg p-3.5 flex flex-col justify-between">
-              <span className="text-white/50 text-[10px] font-mono uppercase tracking-wider">ONNX INT8 Latency</span>
-              <div className="my-2">
-                <span className="text-2xl lg:text-3xl font-bold font-mono text-cyan-400">9.68<span className="text-sm font-normal text-cyan-400/70 ml-0.5">ms</span></span>
+            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-cyan-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">ONNX INT8 Latency</span>
+              <div className="my-1 sm:my-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-cyan-400">9.68<span className="text-xs sm:text-sm font-normal text-cyan-400/70 ml-0.5">ms</span></span>
               </div>
-              <span className="text-[9px] text-white/40 font-mono">103.3 FPS CPU throughput</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">103.3 FPS CPU throughput</span>
             </div>
 
             {/* Metric 5 */}
-            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-amber-500/40 transition-colors rounded-lg p-3.5 flex flex-col justify-between">
-              <span className="text-white/50 text-[10px] font-mono uppercase tracking-wider">Model Footprint</span>
-              <div className="my-2">
-                <span className="text-2xl lg:text-3xl font-bold font-mono text-amber-400">482.8<span className="text-sm font-normal text-amber-400/70 ml-0.5">K</span></span>
+            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-amber-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Model Footprint</span>
+              <div className="my-1 sm:my-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-amber-400">482.8<span className="text-xs sm:text-sm font-normal text-amber-400/70 ml-0.5">K</span></span>
               </div>
-              <span className="text-[9px] text-white/40 font-mono">1.94MB pth / 495KB onnx</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">1.94MB pth / 495KB onnx</span>
             </div>
 
             {/* Metric 6 */}
-            <div className="bg-[#0b0b0e] border border-emerald-500/30 bg-emerald-950/10 rounded-lg p-3.5 flex flex-col justify-between">
-              <span className="text-emerald-400/80 text-[10px] font-mono uppercase tracking-wider">Spatial False Positives</span>
-              <div className="my-2">
-                <span className="text-2xl lg:text-3xl font-bold font-mono text-emerald-400">0.00<span className="text-sm font-normal text-emerald-400/70 ml-0.5">FPR</span></span>
+            <div className="bg-[#0b0b0e] border border-emerald-500/30 bg-emerald-950/10 rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-emerald-400/80 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Spatial False Pos.</span>
+              <div className="my-1 sm:my-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-emerald-400">0.00<span className="text-xs sm:text-sm font-normal text-emerald-400/70 ml-0.5">FPR</span></span>
               </div>
-              <span className="text-[9px] text-emerald-400/70 font-mono">Coherence &lt; 0.28 Hard Gate</span>
+              <span className="text-[8px] sm:text-[9px] text-emerald-400/70 font-mono">Coherence &lt; 0.28 Gate</span>
             </div>
 
           </div>
@@ -295,7 +295,7 @@ export default function Dashboard() {
       </section>
 
       {/* Main Interactive Visualizer Grid */}
-      <section className="w-full max-w-[1500px] mx-auto px-8 py-4 relative z-10">
+      <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
           {/* PANEL 1: Per-Class Segmentation Performance (IoU, Precision, Recall, F1) */}
@@ -585,30 +585,34 @@ export default function Dashboard() {
       </section>
 
       {/* Audited 6-Class Confusion Matrix Section */}
-      <section className="w-full max-w-[1500px] mx-auto px-8 py-8 relative z-10 border-t border-[#232328] mt-6">
+      <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 border-t border-[#232328] mt-4 sm:mt-6">
         <FadeInScroll delay={200}>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-emerald-400 text-xs font-mono">02. DENSE PIXEL EVALUATION</span>
                 <span className="text-white/40 text-xs font-mono">• 491,520 PIXELS CLASSIFIED</span>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 AUDITED 6-CLASS CONFUSION MATRIX
               </h2>
-              <p className="text-xs text-white/70 max-w-3xl font-mono mt-1">
+              <p className="text-[11px] sm:text-xs text-white/70 max-w-3xl font-mono mt-1 leading-relaxed">
                 Exact confusion matrix generated from independent test evaluation on 30 unseen satellite scenes (128x128 resolution, 491,520 pixels). Demonstrates acute class discrimination and minimal inter-class confusion.
               </p>
             </div>
-            <div className="font-mono text-xs text-right bg-[#0e0e12] border border-[#232328] px-4 py-2 rounded-lg">
-              <span className="text-white/40 block text-[10px]">MACRO PIXEL ACCURACY</span>
-              <span className="text-emerald-400 font-bold text-lg">90.20%</span>
-              <span className="text-white/50 text-[10px] block">443,358 Correct Pixels</span>
+            <div className="font-mono text-xs text-left md:text-right bg-[#0e0e12] border border-[#232328] px-3 sm:px-4 py-2 rounded-lg shrink-0">
+              <span className="text-white/40 block text-[9px] sm:text-[10px]">MACRO PIXEL ACCURACY</span>
+              <span className="text-emerald-400 font-bold text-base sm:text-lg">90.20%</span>
+              <span className="text-white/50 text-[9px] sm:text-[10px] block">443,358 Correct Pixels</span>
             </div>
           </div>
 
           <div className="w-full bg-[#0a0a0d] border border-[#232328] rounded-xl overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
+            <div className="md:hidden text-[9px] font-mono text-white/40 px-3 py-1.5 bg-white/5 border-b border-[#232328] flex items-center justify-between">
+              <span>← SWIPE TABLE HORIZONTALLY →</span>
+              <span>9 COLUMNS</span>
+            </div>
+            <div className="overflow-x-auto custom-scrollbar touch-pan-x">
               <table className="w-full text-left text-xs font-mono">
                 <thead className="bg-[#121217] border-b border-[#232328] text-white/60">
                   <tr>
@@ -688,28 +692,32 @@ export default function Dashboard() {
       </section>
 
       {/* Comparative Architecture Benchmark Table */}
-      <section className="w-full max-w-[1500px] mx-auto px-8 py-8 relative z-10 border-t border-[#232328]">
+      <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 border-t border-[#232328]">
         <FadeInScroll delay={250}>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-cyan-400 text-xs font-mono">03. ARCHITECTURAL COMPARISON</span>
                 <span className="text-white/40 text-xs font-mono">• SOTA EFFICIENCY BENCHMARK</span>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 EFFICIENCY VS STANDARD REMOTE SENSING SEGMENTATION MODELS
               </h2>
-              <p className="text-xs text-white/70 max-w-3xl font-mono mt-1">
+              <p className="text-[11px] sm:text-xs text-white/70 max-w-3xl font-mono mt-1 leading-relaxed">
                 Benchmarked against standard segmentation baselines. SatSegNet achieves competitive 80.22% mIoU while being 67x smaller than ResNet-50 U-Net and executing in under 10ms on ordinary commodity laptop CPUs without GPU dependencies.
               </p>
             </div>
-            <span className="font-mono text-xs px-3 py-1.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+            <span className="font-mono text-[10px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shrink-0">
               AIR-GAPPED COMPATIBLE
             </span>
           </div>
 
           <div className="w-full bg-[#0a0a0d] border border-[#232328] rounded-xl overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
+            <div className="md:hidden text-[9px] font-mono text-white/40 px-3 py-1.5 bg-white/5 border-b border-[#232328] flex items-center justify-between">
+              <span>← SWIPE TABLE HORIZONTALLY →</span>
+              <span>7 COLUMNS</span>
+            </div>
+            <div className="overflow-x-auto custom-scrollbar touch-pan-x">
               <table className="w-full text-left text-xs font-mono">
                 <thead className="bg-[#121217] border-b border-[#232328] text-white/60">
                   <tr>
@@ -758,28 +766,32 @@ export default function Dashboard() {
       </section>
 
       {/* Multi-Resolution End-to-End Pipeline Scaling Table */}
-      <section className="w-full max-w-[1500px] mx-auto px-8 py-8 relative z-10 border-t border-[#232328]">
+      <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 border-t border-[#232328]">
         <FadeInScroll delay={300}>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-amber-400 text-xs font-mono">04. RUNTIME SCALING</span>
                 <span className="text-white/40 text-xs font-mono">• 128PX TO 2048PX RESOLUTION</span>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 MULTI-RESOLUTION END-TO-END LATENCY SCALING
               </h2>
-              <p className="text-xs text-white/70 max-w-3xl font-mono mt-1">
+              <p className="text-[11px] sm:text-xs text-white/70 max-w-3xl font-mono mt-1 leading-relaxed">
                 Active execution profile of the full hybrid processing pipeline: Pixel HSV screening, ONNX neural segmentation, ORB feature alignment (1,200 keypoints), and SSIM structural difference mapping.
               </p>
             </div>
-            <span className="font-mono text-xs px-3 py-1.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
-              3.39 MPX/S PEAK CPU THROUGHPUT
+            <span className="font-mono text-[10px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 shrink-0">
+              3.39 MPX/S PEAK
             </span>
           </div>
 
           <div className="w-full bg-[#0a0a0d] border border-[#232328] rounded-xl overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
+            <div className="md:hidden text-[9px] font-mono text-white/40 px-3 py-1.5 bg-white/5 border-b border-[#232328] flex items-center justify-between">
+              <span>← SWIPE TABLE HORIZONTALLY →</span>
+              <span>8 COLUMNS</span>
+            </div>
+            <div className="overflow-x-auto custom-scrollbar touch-pan-x">
               <table className="w-full text-left text-xs font-mono">
                 <thead className="bg-[#121217] border-b border-[#232328] text-white/60">
                   <tr>
@@ -818,15 +830,15 @@ export default function Dashboard() {
       </section>
 
       {/* ISRO/SAC 6-Track Evaluation Protocol Table */}
-      <section className="w-full max-w-[1500px] mx-auto px-8 pb-16 pt-8 relative z-10 border-t border-[#232328]">
+      <section className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 pt-6 sm:pt-8 relative z-10 border-t border-[#232328]">
         <FadeInScroll delay={200}>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-emerald-400 text-xs font-mono">05. FORMAL PROTOCOL</span>
                 <span className="text-white/40 text-xs font-mono">• PROBLEM STATEMENT 26167</span>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 ISRO / SAC 6-TRACK EVALUATION &amp; JUDGING CRITERIA
               </h2>
             </div>

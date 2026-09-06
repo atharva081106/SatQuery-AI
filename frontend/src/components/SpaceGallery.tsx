@@ -21,33 +21,44 @@ const planetaryImages = [
 ];
 
 export default function SpaceGallery() {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
-    <div className="w-full h-screen bg-black relative z-10 overflow-hidden flex flex-col">
+    <div className="w-full h-screen min-h-dvh h-[100dvh] bg-black relative z-10 overflow-hidden flex flex-col">
       {/* Background Globe Animation */}
       <div className="absolute inset-0 z-0 flex items-center justify-center opacity-30 pointer-events-none">
-        <div className="w-[1200px] h-[1200px]">
+        <div className="w-[800px] sm:w-[1200px] h-[800px] sm:h-[1200px]">
           <FramerGlobe />
         </div>
       </div>
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full pt-16">
-        <div className="w-[800px] h-[800px] max-w-full max-h-[80vh]">
+      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full pt-12 sm:pt-16 px-4">
+        <div className="w-[800px] h-[650px] sm:h-[800px] max-w-full max-h-[75vh]">
           <GlobeCarousel3d 
             images={planetaryImages} 
             background="transparent"
-            radius={350}
-            tileWidth={210}
-            tileHeight={140}
+            radius={isMobile ? 220 : 350}
+            tileWidth={isMobile ? 140 : 210}
+            tileHeight={isMobile ? 95 : 140}
             count={25}
             speed={20}
-            distance={800}
+            distance={isMobile ? 650 : 800}
             hideBack={true}
           />
         </div>
         
-        <div className="text-center mt-8">
-          <p className="text-white/50 text-xs tracking-widest uppercase font-mono">( Drag or Scroll to Navigate )</p>
+        <div className="text-center mt-4 sm:mt-8 safe-bottom">
+          <p className="text-white/50 text-[10px] sm:text-xs tracking-widest uppercase font-mono">( Touch &amp; Drag or Scroll to Navigate )</p>
         </div>
       </div>
     </div>

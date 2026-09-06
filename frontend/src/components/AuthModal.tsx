@@ -79,6 +79,7 @@ export default function AuthModal() {
           const btnSlot = document.getElementById("google-btn-slot");
           if (btnSlot) {
             btnSlot.innerHTML = "";
+            const dynamicWidth = Math.min(340, Math.max(260, window.innerWidth - 72));
             google.accounts.id.renderButton(btnSlot, {
               type: "standard",
               theme: "outline",
@@ -86,7 +87,7 @@ export default function AuthModal() {
               text: "continue_with",
               shape: "pill",
               logo_alignment: "center",
-              width: 340,
+              width: dynamicWidth,
             });
             setGisLoaded(true);
             return;
@@ -164,9 +165,9 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-md animate-fade-in font-sans">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-black/40 backdrop-blur-md animate-fade-in font-sans">
       {/* Centered Modal Card - Transparent Curvy Glassmorphism Architecture */}
-      <div className="relative w-full max-w-md bg-white/[0.04] backdrop-blur-3xl border border-white/25 rounded-3xl p-6 sm:p-7 text-white flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.25)] max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <div className="relative w-full max-w-md bg-white/[0.04] backdrop-blur-3xl border border-white/25 rounded-3xl p-5 sm:p-7 text-white flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.25)] max-h-[90dvh] overflow-y-auto custom-scrollbar">
         
         {/* Header */}
         <div className="flex items-start justify-between border-b border-white/15 pb-3">

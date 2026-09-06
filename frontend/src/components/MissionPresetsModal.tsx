@@ -206,32 +206,37 @@ export default function MissionPresetsModal({
     return missions.find((m) => m.id === selectedId) || filteredMissions[0] || missions[0];
   }, [missions, selectedId, filteredMissions]);
 
+  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
+
   const handleSelectId = useCallback((id: string) => {
     setSelectedId(id);
     setPreviewTileIndex(0);
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setMobileView("detail");
+    }
   }, []);
 
   if (!isOpen) return null;
 
   return (
     // High-performance overlay: NO GPU-heavy backdrop-blur over running 3D WebGL canvas
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-6 font-sans will-change-transform">
-      <div className="bg-[#050507] border border-white/20 w-full max-w-5xl h-[86vh] max-h-[850px] min-h-[480px] flex flex-col shadow-2xl overflow-hidden rounded-xl will-change-contents">
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-2 sm:p-6 font-sans will-change-transform">
+      <div className="bg-[#050507] border border-white/20 w-full max-w-5xl h-[90dvh] max-h-[850px] flex flex-col shadow-2xl overflow-hidden rounded-xl will-change-contents">
         
         {/* SpaceX-Style Header Bar */}
-        <div className="px-6 py-3.5 border-b border-white/15 flex items-center justify-between bg-black shrink-0">
+        <div className="px-4 sm:px-6 py-3 sm:py-3.5 border-b border-white/15 flex items-center justify-between bg-black shrink-0">
           <div className="flex items-center gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono tracking-widest text-white/50 uppercase">
+                <span className="text-[9px] sm:text-[10px] font-mono tracking-widest text-white/50 uppercase">
                   ISRO / SAC — PS 26167
                 </span>
                 <span className="text-white/20">•</span>
-                <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase">
+                <span className="text-[9px] sm:text-[10px] font-mono tracking-widest text-white/70 uppercase">
                   INSTANT DEMO
                 </span>
               </div>
-              <h2 className="text-sm sm:text-base font-bold text-white tracking-widest uppercase mt-0.5 font-mono">
+              <h2 className="text-xs sm:text-base font-bold text-white tracking-widest uppercase mt-0.5 font-mono">
                 DEMO QUERIES
               </h2>
             </div>
@@ -239,7 +244,7 @@ export default function MissionPresetsModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-colors cursor-pointer text-xs font-mono"
+            className="w-7 sm:w-8 h-7 sm:h-8 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-colors cursor-pointer text-xs font-mono rounded"
             title="Close (Esc)"
           >
             ✕
@@ -247,7 +252,7 @@ export default function MissionPresetsModal({
         </div>
 
         {/* Minimal Category Filter Tabs */}
-        <div className="px-6 py-2 bg-[#08080a] border-b border-white/10 flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs font-mono shrink-0">
+        <div className="px-4 sm:px-6 py-2 bg-[#08080a] border-b border-white/10 flex items-center gap-1.5 sm:gap-2 overflow-x-auto custom-scrollbar text-xs font-mono shrink-0 touch-pan-x">
           <span className="text-white/40 uppercase text-[10px] tracking-widest mr-2 hidden sm:inline">FILTER:</span>
           {[
             { id: "all", label: "ALL" },
@@ -277,7 +282,9 @@ export default function MissionPresetsModal({
           {/* Left Column: Demo Queries List (Smooth Scrolling) */}
           <div 
             data-lenis-prevent
-            className="w-full md:w-5/12 flex-1 md:flex-initial md:h-full p-3.5 flex flex-col gap-2 overflow-y-auto custom-scrollbar bg-black pointer-events-auto min-h-0 touch-pan-y"
+            className={`w-full md:w-5/12 flex-1 md:flex-initial md:h-full p-3 sm:p-3.5 flex-col gap-2 overflow-y-auto custom-scrollbar bg-black pointer-events-auto min-h-0 touch-pan-y ${
+              mobileView === 'detail' ? 'hidden md:flex' : 'flex'
+            }`}
             onWheel={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-1 mb-0.5 shrink-0">
@@ -324,10 +331,26 @@ export default function MissionPresetsModal({
           {currentMission && (
             <div 
               data-lenis-prevent
-              className="w-full md:w-7/12 flex-1 md:flex-initial md:h-full p-5 sm:p-6 flex flex-col overflow-y-auto custom-scrollbar bg-[#030305] pointer-events-auto min-h-0 touch-pan-y"
+              className={`w-full md:w-7/12 flex-1 md:flex-initial md:h-full p-4 sm:p-6 flex-col overflow-y-auto custom-scrollbar bg-[#030305] pointer-events-auto min-h-0 touch-pan-y ${
+                mobileView === 'list' ? 'hidden md:flex' : 'flex'
+              }`}
               onWheel={(e) => e.stopPropagation()}
             >
               
+              {/* Mobile Back Button */}
+              <div className="md:hidden pb-3 border-b border-white/10 mb-3 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setMobileView("list")}
+                  className="text-xs font-mono text-white/80 hover:text-white flex items-center gap-1.5 py-1 px-3 rounded-full border border-white/20 bg-white/5 cursor-pointer"
+                >
+                  <span>&larr;</span> <span>ALL SCENARIOS</span>
+                </button>
+                <span className="text-[9px] font-mono text-emerald-400 font-bold uppercase">
+                  {currentMission.tag}
+                </span>
+              </div>
+
               {/* TOP ACTION BAR - LAUNCH ON TOP (SpaceX Style) */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pb-4 mb-4 border-b border-white/15 shrink-0">
                 <button

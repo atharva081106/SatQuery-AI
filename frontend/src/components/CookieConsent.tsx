@@ -42,9 +42,9 @@ export default function CookieConsent() {
           className="fixed bottom-0 left-0 right-0 z-[99999]"
         >
           {/* Main Single Line Footer */}
-          <div className="bg-[#0b0c10]/70 backdrop-blur-2xl border-t border-white/10 px-4 py-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+          <div className="bg-[#0b0c10]/90 backdrop-blur-2xl border-t border-white/10 px-4 py-3 safe-bottom shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2.5 sm:gap-3 text-center sm:text-left">
                 <div className="p-1.5 bg-[#1c2230]/80 rounded-full shrink-0 hidden sm:block">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
                     <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" />
@@ -55,27 +55,27 @@ export default function CookieConsent() {
                     <path d="M7 14v.01" />
                   </svg>
                 </div>
-                <p className="text-[12px] md:text-[13px] text-gray-300/90 leading-tight text-center md:text-left">
+                <p className="text-[11px] sm:text-[13px] text-gray-300/90 leading-tight">
                   We use cookies to enhance your experience. By continuing, you agree to our use of cookies.
                 </p>
               </div>
               
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                 <button
                   onClick={() => setPreferencesOpen(!preferencesOpen)}
-                  className="text-[11px] md:text-xs text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline mr-1"
+                  className="text-[10px] sm:text-xs text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline mr-1"
                 >
                   Preferences
                 </button>
                 <button
                   onClick={handleRejectAll}
-                  className="bg-[#23252d]/80 text-white font-medium text-[11px] md:text-xs py-1.5 px-4 rounded-full hover:bg-[#2c2f38] border border-white/5 transition-colors active:scale-95"
+                  className="bg-[#23252d]/80 text-white font-medium text-[10px] sm:text-xs py-1.5 px-3 sm:px-4 rounded-full hover:bg-[#2c2f38] border border-white/5 transition-colors active:scale-95"
                 >
                   Reject All
                 </button>
                 <button
                   onClick={handleAcceptAll}
-                  className="bg-white text-black font-semibold text-[11px] md:text-xs py-1.5 px-4 rounded-full hover:bg-gray-200 transition-colors active:scale-95"
+                  className="bg-white text-black font-semibold text-[10px] sm:text-xs py-1.5 px-3 sm:px-4 rounded-full hover:bg-gray-200 transition-colors active:scale-95"
                 >
                   Accept All
                 </button>

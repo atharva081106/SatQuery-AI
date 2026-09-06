@@ -21,13 +21,38 @@
 }
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: var(--color-canvas-night);
     color: var(--color-on-primary);
     font-family: var(--font-body);
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
     scroll-behavior: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Prevent iOS Safari from auto-zooming into inputs on focus */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
 }
 
@@ -35,18 +60,18 @@
   /* Typography */
   .display-xxl {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 6vw, 80px);
+    font-size: clamp(2.2rem, 7vw, 80px);
     font-weight: 700;
-    line-height: 0.95;
-    letter-spacing: 1.6px;
+    line-height: 1.05;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
   }
   
   .display-xl {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 60px);
+    font-size: clamp(1.8rem, 5.5vw, 60px);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.15;
     letter-spacing: 1.2px;
     text-transform: uppercase;
   }
@@ -140,6 +165,24 @@
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.45);
+  }
+
+  /* Mobile Safe Area & Touch Utilities */
+  .safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .safe-top {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
