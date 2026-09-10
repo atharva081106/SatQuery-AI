@@ -191,6 +191,123 @@ function FormattedMessage({ content }: { content: string }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// QUERY UNDERSTANDING PANEL
+// Shows above every assistant message when structured results are available
+// ─────────────────────────────────────────────────────────────────────────────
+function QueryUnderstandingPanel({ result }: { result: any }) {
+  const qu = result?.query_understanding;
+  const task = result?.interpreted_task;
+  const detectionCount = result?.detection_count ?? 0;
+  const targets = qu?.targets ?? [];
+  const confidence = qu?.confidence ?? 0;
+  const warnings = result?.validation?.warnings ?? [];
+  const issues = result?.validation?.issues ?? [];
+
+  if (!qu && !task) return null;
+
+  const intentIcon: Record<string, string> = {
+    OBJECT_LOCALIZATION: "📍",
+    OBJECT_DETECTION: "🔍",
+    OBJECT_COUNTING: "🔢",
+    LAND_COVER_CLASSIFICATION: "🗺️",
+    AREA_QUANTIFICATION: "📐",
+    WATER_BODY_ANALYSIS: "💧",
+    VEGETATION_ANALYSIS: "🌿",
+    AGRICULTURAL_ANALYSIS: "🌾",
+    ROAD_NETWORK_ANALYSIS: "🛣️",
+    SCENE_UNDERSTANDING: "🛰️",
+    IMAGE_DESCRIPTION: "🛰️",
+    CHANGE_DETECTION: "⏱️",
+    COMPARISON: "⚖️",
+    SPATIAL_RELATIONSHIP_ANALYSIS: "📡",
+    REGION_DIRECTION_ANALYSIS: "🧭",
+    MULTI_TASK_QUERY: "🔀",
+    COORDINATE_REQUEST: "📌",
+  };
+  const icon = intentIcon[qu?.intent ?? ""] ?? "🛰️";
+  const hasIssues = issues.length > 0;
+
+  return (
+    <div className={`w-full mb-2 rounded-xl border text-xs font-mono overflow-hidden ${
+      hasIssues
+        ? "border-amber-500/40 bg-amber-500/5"
+        : "border-emerald-500/25 bg-emerald-500/5"
+    }`}>
+      {/* Header bar */}
+      <div className={`flex items-center gap-2 px-3 py-2 border-b ${
+        hasIssues ? "border-amber-500/20 bg-amber-500/10" : "border-emerald-500/20 bg-emerald-500/10"
+      }`}>
+        <span className="text-base">{icon}</span>
+        <div className="flex-1 min-w-0">
+          <div className={`font-bold tracking-wider uppercase text-[10px] truncate ${
+            hasIssues ? "text-amber-300" : "text-emerald-300"
+          }`}>
+            {task || qu?.intent?.replace(/_/g, " ") || "ANALYSIS"}
+          </div>
+        </div>
+        <div className="text-white/40 text-[10px] shrink-0">
+          {(confidence * 100).toFixed(0)}% intent confidence
+        </div>
+      </div>
+
+      {/* Content row */}
+      <div className="flex flex-wrap gap-3 px-3 py-2">
+        {targets.length > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-white/40 text-[10px] uppercase tracking-wider">Targets:</span>
+            <div className="flex flex-wrap gap-1">
+              {targets.map((t: string) => (
+                <span key={t} className="px-1.5 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-medium">
+                  {t.replace(/_/g, " ")}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        {detectionCount > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-white/40 text-[10px] uppercase tracking-wider">Detections:</span>
+            <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+              {detectionCount} object{detectionCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
+        {qu?.operation && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-white/40 text-[10px] uppercase tracking-wider">Op:</span>
+            <span className="text-white/60 text-[10px]">{qu.operation}</span>
+          </div>
+        )}
+        {qu?.spatial_constraint && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-white/40 text-[10px] uppercase tracking-wider">Region:</span>
+            <span className="text-white/60 text-[10px]">{qu.spatial_constraint}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Validation issues */}
+      {(issues.length > 0 || warnings.length > 0) && (
+        <div className="px-3 py-1.5 border-t border-amber-500/15">
+          {issues.map((issue: string, i: number) => (
+            <div key={i} className="text-amber-300/80 text-[10px] flex items-start gap-1.5">
+              <span className="shrink-0 mt-0.5">⚠</span>
+              <span>{issue}</span>
+            </div>
+          ))}
+          {warnings.slice(0, 2).map((w: string, i: number) => (
+            <div key={i} className="text-white/40 text-[10px] flex items-start gap-1.5">
+              <span className="shrink-0 mt-0.5">ℹ</span>
+              <span>{w}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const {
     canQuery,
@@ -787,6 +904,12 @@ export default function Home() {
                 <div className="micro-cap text-white/50 mb-1">
                   {msg.role === 'user' ? 'COMMAND' : 'SYSTEM'}
                 </div>
+                {/* Query Understanding Panel — shown above assistant message */}
+                {msg.role === 'assistant' && msg.result && (
+                  <div className="max-w-[85%] w-full">
+                    <QueryUnderstandingPanel result={msg.result} />
+                  </div>
+                )}
                 <div className={`text-sm max-w-[85%] p-4 rounded-xl border shadow-lg pointer-events-auto ${
                   msg.role === 'user' 
                     ? 'bg-white/5 text-white border-white/40 font-mono text-xs whitespace-pre-wrap' 
