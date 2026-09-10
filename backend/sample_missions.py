@@ -117,133 +117,94 @@ def generate_sample_missions():
     # Construction earthwork parcel
     cv2.rectangle(bengaluru_img, (140, 60), (210, 130), (70, 130, 180), -1)
 
-    # 6. Navi Mumbai International Airport (NMIA) Construction Corridor (Bi-temporal Pair)
-    nmia_t1 = np.zeros((400, 400, 3), dtype=np.uint8)
-    nmia_t1[:] = [70, 130, 80] # Agricultural/wetland green baseline
-    # Creek interface
-    pts_creek = np.array([[0, 280], [140, 290], [280, 330], [400, 320], [400, 400], [0, 400]], np.int32)
-    cv2.fillPoly(nmia_t1, [pts_creek], (160, 110, 30))
-    # Rural road
-    cv2.line(nmia_t1, (0, 120), (400, 140), (160, 160, 165), 3)
-
-    # NMIA T2: Major airport earthwork grading, runway construction, and tarmac infrastructure
-    nmia_t2 = nmia_t1.copy()
-    # Extensive leveled earthwork & runway strip
-    cv2.rectangle(nmia_t2, (30, 80), (370, 180), (180, 185, 195), -1) # Runway base
-    cv2.line(nmia_t2, (50, 130), (350, 130), (230, 230, 235), 8) # Active runway centerline
-    cv2.rectangle(nmia_t2, (120, 190), (280, 260), (170, 175, 185), -1) # Terminal apron
-    # Retain creek
-    cv2.fillPoly(nmia_t2, [pts_creek], (160, 110, 30))
-
     return [
         {
             "id": "uttarakhand_flood",
-            "title": "CHAMOLI GLACIER BURST & RISHI GANGA FLOOD",
+            "title": "UTTARAKHAND FLASH FLOOD",
             "tag": "BI-TEMPORAL CHANGE DETECTION",
-            "location": "Rishi Ganga Valley, Uttarakhand (30.4150° N, 79.7340° E)",
-            "sensors": "Cartosat-2S PAN (0.65m) / Sentinel-2 MSI (10m L2A)",
-            "query": "What changed between these two dates, and where did the change occur?",
-            "description": "Bi-temporal analysis capturing catastrophic river channel swelling, debris deposition, and bridge infrastructure washouts.",
+            "location": "Rishi Ganga Valley, Uttarakhand (30.41° N, 79.73° E)",
+            "sensors": "Cartosat-2S / Sentinel-2 Bi-Temporal Pair",
+            "query": "Run Change Detection between pre-flood baseline and post-flood event",
+            "description": "Bi-temporal sequence capturing catastrophic river swelling, debris flow, and structural displacement.",
             "images": [
                 {
-                    "name": "chamoli_pre_event_t1.png",
+                    "name": "uttarakhand_pre_event_t1.png",
                     "base64": f"data:image/png;base64,{_encode_b64(t1_flood)}",
-                    "label": "T1: BASELINE PRE-EVENT"
+                    "label": "T1: BASELINE ACQUISITION"
                 },
                 {
-                    "name": "chamoli_post_event_t2.png",
+                    "name": "uttarakhand_post_event_t2.png",
                     "base64": f"data:image/png;base64,{_encode_b64(t2_flood)}",
-                    "label": "T2: POST-DISASTER INUNDATION"
+                    "label": "T2: POST-DISASTER TILE"
                 }
             ]
         },
         {
             "id": "mumbai_port_recon",
-            "title": "JNPT & MUMBAI HARBOR STRATEGIC RECON",
-            "tag": "SPATIAL GROUNDING & WATER DELINEATION",
-            "location": "Jawaharlal Nehru Port, Navi Mumbai (18.9490° N, 72.9510° E)",
-            "sensors": "Cartosat-2S High-Resolution 4-Band VNIR (0.65m GSD)",
-            "query": "Highlight the water body referred to in the query and locate maritime berths and vessels",
-            "description": "Sub-meter optical reconnaissance isolating maritime shipping berths, liquid storage tank farms, and container vessels.",
+            "title": "MUMBAI HARBOR & DOCKS RECON",
+            "tag": "SINGLE-IMAGE VQA & GROUNDING",
+            "location": "Jawaharlal Nehru Port, Navi Mumbai (18.95° N, 72.95° E)",
+            "sensors": "Cartosat-2S High-Resolution Optical (0.65m GSD)",
+            "query": "Highlight industrial storage facilities, maritime docks, and cargo vessels",
+            "description": "Sub-meter optical spatial reconnaissance isolating maritime shipping berths and cylindrical storage infrastructure.",
             "images": [
                 {
                     "name": "mumbai_cartosat2s_optical.png",
                     "base64": f"data:image/png;base64,{_encode_b64(mumbai_opt)}",
-                    "label": "CARTOSAT-2S PANCHROMATIC (0.65m)"
+                    "label": "CARTOSAT-2S PANCHROMATIC"
                 }
             ]
         },
         {
             "id": "bay_of_bengal_sar",
-            "title": "BAY OF BENGAL MONSOON CLOUD PENETRATION",
+            "title": "BAY OF BENGAL MONSOON OBSCURED",
             "tag": "OPTICAL–SAR CROSS-MODAL FUSION",
-            "location": "Andaman Sea Maritime Corridor (12.3520° N, 92.7840° E)",
-            "sensors": "Cartosat-3 Optical (100% Cloud-Cover) + RISAT-1 / EOS-04 C-Band SAR",
-            "query": "Use the optical and SAR images together to identify built-up and water-covered regions.",
-            "description": "Fuses 100% cloud-obscured optical imagery with RISAT-1 C-band microwave radar backscatter to detect hidden vessels and coastlines.",
+            "location": "Andaman Sea Corridor (12.35° N, 92.78° E)",
+            "sensors": "Cartosat Optical + RISAT-1 C-Band SAR Co-Registered",
+            "query": "Penetrate cloud cover using SAR radar backscatter channels and extract obscured maritime features",
+            "description": "Cross-modal pair demonstrating 100% cloud penetration via RISAT-1 C-band microwave radar to reveal hidden vessels and coastline.",
             "images": [
                 {
                     "name": "cyclone_cloud_obscured_optical.png",
                     "base64": f"data:image/png;base64,{_encode_b64(cloud_opt)}",
-                    "label": "OPTICAL (100% MONSOON CLOUD COVER)"
+                    "label": "OPTICAL (CLOUD OBSCURED)"
                 },
                 {
                     "name": "risat1_cband_radar_sar.png",
                     "base64": f"data:image/png;base64,{_encode_b64(sar_radar)}",
-                    "label": "RISAT-1 C-BAND SAR (5.4 GHz RADAR)"
-                }
-            ]
-        },
-        {
-            "id": "bengaluru_urban_sprawl",
-            "title": "WHITEFIELD TECH CORRIDOR DIVERSIFICATION",
-            "tag": "MULTITASK SCENE & OBJECT LOCALIZATION",
-            "location": "Whitefield IT Corridor, Bengaluru (12.9698° N, 77.7499° E)",
-            "sensors": "Cartosat-3 Ultra High-Resolution Optical (0.28m GSD)",
-            "query": "Describe the land-cover and major objects visible in this image.",
-            "description": "Sub-30cm high-density urban analysis isolating commercial complexes, arterial highways, and vegetative buffers with full metrics.",
-            "images": [
-                {
-                    "name": "bengaluru_cartosat3.png",
-                    "base64": f"data:image/png;base64,{_encode_b64(bengaluru_img)}",
-                    "label": "CARTOSAT-3 SUB-30cm (0.28m GSD)"
-                }
-            ]
-        },
-        {
-            "id": "navimumbai_airport_trend",
-            "title": "NAVI MUMBAI AIRPORT (NMIA) URBAN GROWTH",
-            "tag": "BI-TEMPORAL TREND QUANTIFICATION",
-            "location": "Ulwe / Panvel Creek, Navi Mumbai (18.9902° N, 73.0684° E)",
-            "sensors": "Cartosat-2S / Sentinel-2 Multi-Year Bi-Temporal Pair",
-            "query": "Has the built-up area increased, decreased, or remained unchanged?",
-            "description": "Multi-year monitoring tracking agricultural and marshland transition into runway grading and international airport terminal footprint.",
-            "images": [
-                {
-                    "name": "nmia_baseline_t1.png",
-                    "base64": f"data:image/png;base64,{_encode_b64(nmia_t1)}",
-                    "label": "T1: BASELINE MARSHLAND"
-                },
-                {
-                    "name": "nmia_post_runway_t2.png",
-                    "base64": f"data:image/png;base64,{_encode_b64(nmia_t2)}",
-                    "label": "T2: ACTIVE RUNWAY & TERMINAL"
+                    "label": "RISAT-1 SAR (PENETRATED)"
                 }
             ]
         },
         {
             "id": "sambhar_salt_lake",
-            "title": "SAMBHAR HYPERSALINE LAKE WETLAND SURVEY",
-            "tag": "WETLAND DELINEATION & RFC 7946",
-            "location": "Sambhar Lake Ramsar Wetland #464, Rajasthan (26.9010° N, 75.0020° E)",
-            "sensors": "Resourcesat-2A LISS-4 Multispectral (5.8m GSD)",
+            "title": "SAMBHAR SALT LAKE DESICCATION",
+            "tag": "WETLAND BOUNDARY DELINEATION",
+            "location": "Sambhar Lake, Rajasthan (26.90° N, 75.00° E)",
+            "sensors": "Resourcesat-2 LISS-4 Multispectral (5.8m GSD)",
             "query": "Detect water body boundary and calculate total wetland surface area in km²",
-            "description": "Delineation of hypersaline lake perimeter, industrial evaporation salt pans, and arid basin boundaries with RFC 7946 GeoJSON export.",
+            "description": "Delineation of hypersaline lake perimeter, salt pans, and arid basin boundaries with RFC 7946 GeoJSON output.",
             "images": [
                 {
                     "name": "sambhar_lake_liss4.png",
                     "base64": f"data:image/png;base64,{_encode_b64(sambhar_img)}",
-                    "label": "RESOURCESAT-2A LISS-4 (5.8m)"
+                    "label": "RESOURCESAT-2 LISS-4"
+                }
+            ]
+        },
+        {
+            "id": "bengaluru_urban_sprawl",
+            "title": "BENGALURU URBAN DEVELOPMENT",
+            "tag": "LAND USE & BUILT-UP EXTRACTION",
+            "location": "Whitefield Tech Corridor, Bengaluru (12.97° N, 77.75° E)",
+            "sensors": "Cartosat-3 High-Resolution Panchromatic (0.28m GSD)",
+            "query": "Detect built-up structures, commercial buildings, and calculate built-up density percentage",
+            "description": "High-density urban analysis isolating commercial complexes, arterial road networks, and vegetative buffer zones.",
+            "images": [
+                {
+                    "name": "bengaluru_cartosat3.png",
+                    "base64": f"data:image/png;base64,{_encode_b64(bengaluru_img)}",
+                    "label": "CARTOSAT-3 SUB-METER"
                 }
             ]
         }

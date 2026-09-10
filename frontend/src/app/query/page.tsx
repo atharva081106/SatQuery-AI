@@ -361,55 +361,39 @@ export default function Home() {
 
   const queryCategories = [
     {
-      category: "MULTITASK SCENE & LAND COVER ANALYSIS",
+      category: "TERRAIN & LAND COVER ANALYSIS",
       queries: [
-        "Describe the land-cover and major objects visible in this image.",
-        "Classify surface land cover and calculate vegetation percentage",
-        "Identify built-up structures, commercial complexes, and road grid",
-        "Perform multi-class semantic segmentation across terrain parcels",
-        "Give a plain-English tactical overview of this scene"
+        "Classify land cover breakdown",
+        "How much green cover and vegetation is there?",
+        "Are there any water bodies or rivers in this area?",
+        "Identify buildings, roads, and settlements",
+        "Give a plain-English overview of this scene"
       ]
     },
     {
-      category: "SPATIAL GROUNDING & WATER DELINEATION",
+      category: "CHANGE DETECTION (BEFORE & AFTER)",
       queries: [
-        "Highlight the water body referred to in the query.",
-        "Highlight maritime docks, shipping berths, and cargo vessels",
-        "Detect industrial storage tank facilities and outline boundaries",
-        "Locate runway infrastructure and airport taxiway corridors"
+        "What changed between these two dates?",
+        "Measure new construction and building expansion",
+        "Check for deforestation and tree loss",
+        "Analyze flood extent and submerged land"
       ]
     },
     {
-      category: "BI-TEMPORAL CHANGE DETECTION (BEFORE / AFTER)",
+      category: "FIND & HIGHLIGHT FEATURES (GROUNDING)",
       queries: [
-        "What changed between these two dates, and where did the change occur?",
-        "Run bi-temporal difference mapping to identify flood mud inundation",
-        "Isolate new building construction and land conversion between T1 and T2",
-        "Identify washed-out bridges and submerged transportation networks"
+        "Highlight all water bodies and lakes",
+        "Locate buildings and storage facilities",
+        "Pinpoint roads and transport networks",
+        "Find green parks and farmland"
       ]
     },
     {
-      category: "BI-TEMPORAL TREND & EXPANSION QUANTIFICATION",
+      category: "CLOUD PENETRATION (RADAR / SAR)",
       queries: [
-        "Has the built-up area increased, decreased, or remained unchanged?",
-        "Calculate net expansion percentage and area delta in km²",
-        "Track agricultural and wetland transition over multi-year baseline"
-      ]
-    },
-    {
-      category: "OPTICAL–SAR CROSS-MODAL RADAR FUSION",
-      queries: [
-        "Use the optical and SAR images together to identify built-up and water-covered regions.",
-        "Penetrate monsoon cloud cover using RISAT-1 C-band SAR radar backscatter",
-        "Fuse optical RGB with SAR microwave returns to extract obscured coastlines"
-      ]
-    },
-    {
-      category: "GIS VECTOR BOUNDARY & RFC 7946 GEOJSON",
-      queries: [
-        "Detect water body boundary and calculate total wetland surface area in km²",
-        "Extract vector polygon boundaries and export RFC 7946 GeoJSON",
-        "Calculate perimeter and area metrics across segmented land parcels"
+        "See through clouds using radar (SAR)",
+        "Identify water bodies hidden under clouds",
+        "Detect ships and structures beneath cloud cover"
       ]
     }
   ];
@@ -911,95 +895,7 @@ export default function Home() {
           
           <div data-lenis-prevent className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
-              <div className="flex-1 flex flex-col items-center justify-center pointer-events-auto h-full my-auto py-8">
-                <div className="w-full max-w-2xl bg-black/60 border border-white/15 rounded-2xl p-4 sm:p-6 backdrop-blur-md shadow-2xl animate-fade-in">
-                  
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-white uppercase">
-                        OPERATIONAL DEMO MISSIONS &bull; PS 26167
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowMissionPresets(true)}
-                      className="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 tracking-wider uppercase underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>VIEW ALL (6)</span>
-                      <span>&rarr;</span>
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-white/60 mb-4 font-sans leading-relaxed">
-                    Select a pre-calibrated ISRO / ESA satellite mission to test multimodal query understanding, bi-temporal change detection, optical-SAR radar fusion, and sub-meter spatial grounding.
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      {
-                        title: "Chamoli Glacier Outburst Flood",
-                        tag: "BI-TEMPORAL CHANGE",
-                        sensor: "Cartosat-2S / Sentinel-2",
-                        query: "What changed between these two dates, and where did the change occur?"
-                      },
-                      {
-                        title: "JNPT Harbor Strategic Recon",
-                        tag: "SPATIAL GROUNDING",
-                        sensor: "Cartosat-2S (0.65m VNIR)",
-                        query: "Highlight the water body referred to in the query and locate maritime berths and vessels"
-                      },
-                      {
-                        title: "Bay of Bengal Monsoon Radar",
-                        tag: "OPTICAL–SAR FUSION",
-                        sensor: "Cartosat-3 + RISAT-1 C-Band",
-                        query: "Use the optical and SAR images together to identify built-up and water-covered regions."
-                      },
-                      {
-                        title: "Navi Mumbai Airport (NMIA)",
-                        tag: "TREND QUANTIFICATION",
-                        sensor: "Cartosat-2S Bi-Temporal",
-                        query: "Has the built-up area increased, decreased, or remained unchanged?"
-                      }
-                    ].map((item, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setShowMissionPresets(true)}
-                        className="text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-white/40 transition-all cursor-pointer group flex flex-col justify-between gap-2"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <span className="text-[9px] font-mono tracking-wider text-emerald-400 font-bold uppercase">
-                              {item.tag}
-                            </span>
-                            <span className="text-[9px] font-mono text-white/40 truncate">
-                              {item.sensor}
-                            </span>
-                          </div>
-                          <div className="text-xs font-semibold text-white group-hover:text-emerald-200 transition-colors">
-                            {item.title}
-                          </div>
-                        </div>
-                        <div className="text-[11px] font-mono text-white/60 bg-black/40 p-1.5 rounded border border-white/5 truncate">
-                          "{item.query}"
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-white/40">
-                    <span>Or upload 1-2 GeoTIFF / PNG / JPG satellite images below</span>
-                    <button
-                      type="button"
-                      onClick={() => setShowMissionPresets(true)}
-                      className="px-3 py-1 bg-white text-black font-bold tracking-widest uppercase hover:bg-white/90 transition-colors rounded cursor-pointer"
-                    >
-                      OPEN DEMO SUITE
-                    </button>
-                  </div>
-
-                </div>
+              <div className="flex-1 flex flex-col items-center justify-center pointer-events-none h-full mt-32">
               </div>
             )}
 
