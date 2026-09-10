@@ -11,7 +11,7 @@ export interface MissionImage {
 export interface SampleMission {
   id: string;
   title: string;
-  category: "all" | "disaster" | "maritime" | "sar" | "urban";
+  category: "all" | "disaster" | "maritime" | "sar" | "urban" | "ecology";
   categoryLabel: string;
   tag: string;
   location: string;
@@ -39,82 +39,98 @@ let isPreloadingMissions = false;
 const FALLBACK_MISSIONS: SampleMission[] = [
   {
     id: "uttarakhand_flood",
-    title: "Uttarakhand Flash Flood Change Detection",
+    title: "CHAMOLI GLACIER BURST & RISHI GANGA FLOOD",
     category: "disaster",
-    categoryLabel: "Disaster & Floods",
+    categoryLabel: "Floods & Disasters",
     tag: "BI-TEMPORAL CHANGE DETECTION",
-    location: "Rishi Ganga Valley, Uttarakhand, India",
-    coordinates: "30.4150° N, 79.7340° E",
-    sensors: "Cartosat-2S / Sentinel-2 Bi-Temporal Pair",
+    location: "Rishi Ganga Valley, Uttarakhand (30.4150° N, 79.7340° E)",
+    coordinates: "30.4150° N, 79.7340° E (EPSG:4326 / UTM 44N)",
+    sensors: "Cartosat-2S PAN (0.65m) / Sentinel-2 MSI (10m L2A)",
     resolution: "0.65m / 10m Ground Resolution",
     pipeline: "Siamese UNet Change Head + Mask Overlays",
-    query: "Run Change Detection between pre-flood baseline and post-flood event",
+    query: "What changed between these two dates, and where did the change occur?",
     description: "Catastrophic cloudburst and glacial lake outburst flood in Chamoli. Demonstrates bi-temporal difference mapping, swollen silt channel boundary delineation, and affected transport infrastructure isolation.",
     technicalNote: "Directly solves PS 26167 requirement: Bi-temporal satellite pair processing with pixel-level displaced terrain identification.",
     images: []
   },
   {
     id: "mumbai_port_recon",
-    title: "Mumbai Harbor & Docks Strategic Recon",
+    title: "JNPT & MUMBAI HARBOR STRATEGIC RECON",
     category: "maritime",
     categoryLabel: "Maritime Recon",
-    tag: "HIGH-RES VQA & GROUNDING",
-    location: "Jawaharlal Nehru Port, Navi Mumbai, India",
-    coordinates: "18.9490° N, 72.9510° E",
-    sensors: "Cartosat-2S Panchromatic + Multispectral",
+    tag: "SPATIAL GROUNDING & WATER DELINEATION",
+    location: "Jawaharlal Nehru Port, Navi Mumbai (18.9490° N, 72.9510° E)",
+    coordinates: "18.9490° N, 72.9510° E (EPSG:4326 / UTM 43N)",
+    sensors: "Cartosat-2S High-Resolution 4-Band VNIR (0.65m GSD)",
     resolution: "0.65m Sub-Meter GSD",
     pipeline: "SatSegNet Grounding Head + Bounding Boxes",
-    query: "Highlight industrial storage facilities, maritime docks, and cargo vessels",
+    query: "Highlight the water body referred to in the query and locate maritime berths and vessels",
     description: "Deep-water seaport terminal evaluation. Isolates commercial container ships, docking berths, and cylindrical petroleum liquid storage clusters with sub-meter spatial precision.",
     technicalNote: "Validates high-resolution panchromatic spatial grounding with zero false alarms across ocean-land boundaries.",
     images: []
   },
   {
     id: "bay_of_bengal_sar",
-    title: "Bay of Bengal Monsoon Cloud Penetration",
+    title: "BAY OF BENGAL MONSOON CLOUD PENETRATION",
     category: "sar",
     categoryLabel: "SAR Microwave",
     tag: "OPTICAL–SAR CROSS-MODAL FUSION",
-    location: "Andaman Sea Maritime Corridor, India",
-    coordinates: "12.3520° N, 92.7840° E",
-    sensors: "Cartosat-3 Optical + RISAT-1 C-Band SAR",
+    location: "Andaman Sea Maritime Corridor (12.3520° N, 92.7840° E)",
+    coordinates: "12.3520° N, 92.7840° E (EPSG:4326 / UTM 46N)",
+    sensors: "Cartosat-3 Optical (100% Cloud-Cover) + RISAT-1 / EOS-04 C-Band SAR",
     resolution: "5.4 GHz Microwave + 1.2m SAR Stripmap",
-    pipeline: "Cross-Modal Dual-Encoder Attention",
-    query: "Penetrate cloud cover using SAR radar backscatter channels and extract obscured maritime features",
+    pipeline: "Cross-Modal Dual-Encoder Attention + IHS Fusion",
+    query: "Use the optical and SAR images together to identify built-up and water-covered regions.",
     description: "Overcomes 100% thick monsoon cloud cover obscuring optical satellites by fusing synthetic aperture radar backscatter returns to pinpoint maritime vessels and island coastlines.",
     technicalNote: "Demonstrates ISRO RISAT-1 microwave radar capabilities for all-weather 24/7 disaster and strategic surveillance.",
     images: []
   },
   {
-    id: "sambhar_salt_lake",
-    title: "Sambhar Salt Lake Boundary Desiccation",
+    id: "bengaluru_urban_sprawl",
+    title: "WHITEFIELD TECH CORRIDOR DIVERSIFICATION",
     category: "urban",
+    categoryLabel: "Urban Expansion",
+    tag: "MULTITASK SCENE & OBJECT LOCALIZATION",
+    location: "Whitefield IT Corridor, Bengaluru (12.9698° N, 77.7499° E)",
+    coordinates: "12.9698° N, 77.7499° E (EPSG:4326 / UTM 43N)",
+    sensors: "Cartosat-3 Ultra High-Resolution Optical (0.28m GSD)",
+    resolution: "0.28m State-of-the-Art GSD",
+    pipeline: "Multi-Class Semantic Segmentation (Built-Up vs Road)",
+    query: "Describe the land-cover and major objects visible in this image.",
+    description: "Sub-30cm high-density urban analysis isolating commercial complexes, arterial highways, and vegetative buffers with full metrics.",
+    technicalNote: "Evaluates sub-30cm Cartosat-3 high-detail resolving power for smart city planning and tax boundary audits.",
+    images: []
+  },
+  {
+    id: "navimumbai_airport_trend",
+    title: "NAVI MUMBAI AIRPORT (NMIA) URBAN GROWTH",
+    category: "urban",
+    categoryLabel: "Urban & Infrastructure",
+    tag: "BI-TEMPORAL TREND QUANTIFICATION",
+    location: "Ulwe / Panvel Creek, Navi Mumbai (18.9902° N, 73.0684° E)",
+    coordinates: "18.9902° N, 73.0684° E (EPSG:4326 / UTM 43N)",
+    sensors: "Cartosat-2S / Sentinel-2 Multi-Year Bi-Temporal Pair",
+    resolution: "0.65m / 10m Multi-Resolution",
+    pipeline: "Bi-Temporal Siamese Feature Difference & Area Quantification",
+    query: "Has the built-up area increased, decreased, or remained unchanged?",
+    description: "Multi-year monitoring tracking agricultural and marshland transition into runway grading and international airport terminal footprint.",
+    technicalNote: "Answers directional land-use shift query with numerical area quantification in square kilometers.",
+    images: []
+  },
+  {
+    id: "sambhar_salt_lake",
+    title: "SAMBHAR HYPERSALINE LAKE WETLAND SURVEY",
+    category: "ecology",
     categoryLabel: "Ecology & Wetland",
     tag: "WETLAND DELINEATION & RFC 7946",
-    location: "Sambhar Lake, Rajasthan, India",
-    coordinates: "26.9010° N, 75.0020° E",
-    sensors: "Resourcesat-2 LISS-4 Multispectral",
+    location: "Sambhar Lake Ramsar Wetland #464, Rajasthan (26.9010° N, 75.0020° E)",
+    coordinates: "26.9010° N, 75.0020° E (EPSG:4326 / UTM 43N)",
+    sensors: "Resourcesat-2A LISS-4 Multispectral (5.8m GSD)",
     resolution: "5.8m GSD (Green, Red, NIR)",
     pipeline: "Multispectral Water Indices + Vector Contouring",
     query: "Detect water body boundary and calculate total wetland surface area in km²",
     description: "Ramsar wetland desiccation monitoring. Isolates hypersaline brine lagoons from industrial salt evaporation pans and computes accurate surface area vector polygons in RFC 7946 GeoJSON.",
     technicalNote: "Validates multispectral SWIR/NIR water indices and automatic polygon area calculation in square kilometers.",
-    images: []
-  },
-  {
-    id: "bengaluru_urban_sprawl",
-    title: "Bengaluru Tech Corridor Urban Built-Up",
-    category: "urban",
-    categoryLabel: "Urban Expansion",
-    tag: "LAND USE & DENSITY ESTIMATION",
-    location: "Whitefield IT Corridor, Bengaluru, India",
-    coordinates: "12.9698° N, 77.7499° E",
-    sensors: "Cartosat-3 High-Resolution Panchromatic",
-    resolution: "0.28m State-of-the-Art GSD",
-    pipeline: "Multi-Class Semantic Segmentation (Built-Up vs Road)",
-    query: "Detect built-up structures, commercial buildings, and calculate built-up density percentage",
-    description: "Rapid urban densification analysis isolating tech park footprints, multi-lane arterial roads, and remaining vegetative buffers with built-up ratio percentage.",
-    technicalNote: "Evaluates sub-30cm Cartosat-3 high-detail resolving power for smart city planning and tax boundary audits.",
     images: []
   }
 ];
@@ -135,13 +151,18 @@ async function loadMissionsData(): Promise<SampleMission[]> {
           const fallback = FALLBACK_MISSIONS.find((f) => f.id === backendM.id) || FALLBACK_MISSIONS[0];
           return {
             ...fallback,
+            ...backendM,
             title: backendM.title || fallback.title,
             tag: backendM.tag || fallback.tag,
             location: backendM.location || fallback.location,
             sensors: backendM.sensors || fallback.sensors,
             query: backendM.query || fallback.query,
             description: backendM.description || fallback.description,
-            images: backendM.images || [],
+            pipeline: backendM.pipeline || fallback.pipeline,
+            coordinates: backendM.coordinates || fallback.coordinates,
+            resolution: backendM.resolution || fallback.resolution,
+            technicalNote: backendM.technicalNote || fallback.technicalNote,
+            images: backendM.images || fallback.images || [],
           };
         });
         globalMissionsCache = enhanced;
@@ -255,11 +276,12 @@ export default function MissionPresetsModal({
         <div className="px-4 sm:px-6 py-2 bg-[#08080a] border-b border-white/10 flex items-center gap-1.5 sm:gap-2 overflow-x-auto custom-scrollbar text-xs font-mono shrink-0 touch-pan-x">
           <span className="text-white/40 uppercase text-[10px] tracking-widest mr-2 hidden sm:inline">FILTER:</span>
           {[
-            { id: "all", label: "ALL" },
+            { id: "all", label: "ALL SCENARIOS" },
             { id: "disaster", label: "FLOODS & DISASTERS" },
             { id: "maritime", label: "MARITIME RECON" },
             { id: "sar", label: "SAR RADAR" },
-            { id: "urban", label: "URBAN EXPANSION" }
+            { id: "urban", label: "URBAN & INFRASTRUCTURE" },
+            { id: "ecology", label: "ECOLOGY & WETLAND" }
           ].map((tab) => (
             <button
               key={tab.id}
