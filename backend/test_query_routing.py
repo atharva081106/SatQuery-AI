@@ -16,6 +16,7 @@ from data_models import (
     INTENT_WATER_BODY, INTENT_VEGETATION, INTENT_AGRICULTURAL, INTENT_ROAD_NETWORK,
     INTENT_SPATIAL_RELATIONSHIP, INTENT_REGION_DIRECTION, INTENT_SCENE_UNDERSTANDING,
     INTENT_CHANGE_DETECTION, INTENT_COMPARISON, INTENT_IMAGE_DESCRIPTION, INTENT_MULTI_TASK,
+    INTENT_TEMPORAL,
 )
 from analysis_planner import STEP_OBJECT_DETECTION, STEP_LAND_COVER, STEP_WATER_DETECTION
 
@@ -366,6 +367,55 @@ class TestPlanCorrectness:
         assert step_types[0] in (STEP_WATER_DETECTION, STEP_LAND_COVER), (
             f"Water area query first step should be water/land-cover, got {step_types}"
         )
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TARGET 5 USER QUERIES SPECIFIC SUITE
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestTargetFiveQuestions:
+    """Specific tests for the 5 target user queries to ensure 100% routing & planning precision."""
+
+    def test_query_1_describe_landcover_and_objects(self):
+        # 'Describe the land-cover and major objects visible in this image.'
+        q = "Describe the land-cover and major objects visible in this image."
+        qi = query_understanding.analyze(q)
+        assert qi.intent in (INTENT_MULTI_TASK, INTENT_SCENE_UNDERSTANDING, INTENT_LAND_COVER)
+        plan = analysis_planner.build_plan(qi)
+        step_types = [s.step_type for s in plan.steps]
+        assert STEP_LAND_COVER in step_types or STEP_SCENE_DESCRIPTION in step_types
+        assert STEP_OBJECT_DETECTION in step_types
+
+    def test_query_2_highlight_water_body(self):
+        # 'Highlight the water body referred to in the query.'
+        q = "Highlight the water body referred to in the query."
+        qi = query_understanding.analyze(q)
+        assert qi.intent in (INTENT_WATER_BODY, INTENT_OBJECT_LOCALIZATION, INTENT_MULTI_TASK)
+        assert "water_body" in qi.targets
+        plan = analysis_planner.build_plan(qi)
+        step_types = [s.step_type for s in plan.steps]
+        assert STEP_WATER_DETECTION in step_types or STEP_OBJECT_DETECTION in step_types
+
+    def test_query_3_what_changed_and_where(self):
+        # 'What changed between these two dates, and where did the change occur?'
+        q = "What changed between these two dates, and where did the change occur?"
+        qi = query_understanding.analyze(q, num_images=2)
+        assert qi.intent in (INTENT_CHANGE_DETECTION, INTENT_COMPARISON)
+        assert qi.required_vision_capability == "change"
+
+    def test_query_4_optical_and_sar_fusion(self):
+        # 'Use the optical and SAR images together to identify built-up and water-covered regions.'
+        q = "Use the optical and SAR images together to identify built-up and water-covered regions."
+        qi = query_understanding.analyze(q, num_images=2)
+        assert "water_body" in qi.targets
+        assert any(t in ("urban_area", "building") for t in qi.targets)
+        assert qi.required_vision_capability == "change"
+
+    def test_query_5_built_up_area_trend(self):
+        # 'Has the built-up area increased, decreased, or remained unchanged?'
+        q = "Has the built-up area increased, decreased, or remained unchanged?"
+        qi = query_understanding.analyze(q, num_images=2)
+        assert qi.intent in (INTENT_CHANGE_DETECTION, INTENT_COMPARISON, INTENT_TEMPORAL)
+        assert any(t in ("urban_area", "building") for t in qi.targets)
 
 
 if __name__ == "__main__":

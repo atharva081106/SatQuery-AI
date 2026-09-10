@@ -78,10 +78,14 @@ class ResultValidator:
                 )
                 # Not a hard failure — the system should report "none found"
 
-        # ── Check 2: Land-cover % should not be primary answer for detection queries ──
-        if is_detection_query and result.segments:
+        # ── Check 2: Land-cover % should not be primary answer for pure detection queries ──
+        user_wanted_landcover = (
+            effective_intent in (INTENT_LAND_COVER, INTENT_SEMANTIC_SEGMENTATION, INTENT_SCENE_UNDERSTANDING, INTENT_IMAGE_DESCRIPTION) or
+            (effective_intent == INTENT_MULTI_TASK and any(s in (INTENT_LAND_COVER, INTENT_SEMANTIC_SEGMENTATION, INTENT_SCENE_UNDERSTANDING) for s in qi.sub_intents))
+        )
+        if is_detection_query and not user_wanted_landcover and result.segments:
             # Segments are fine to include as supplementary context,
-            # but they must not be the ONLY result when detection was requested
+            # but they must not be the ONLY result when pure detection was requested
             if len(result.detections) == 0 and len(result.segments) > 0:
                 issues.append(
                     "ANSWER TYPE MISMATCH: Query requested object localization/detection, "

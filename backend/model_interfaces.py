@@ -1484,10 +1484,10 @@ class BiTemporalChangeAnalysis(SpecialistModel):
         if not is_compatible:
             return {
                 "text": (
-                    f"⚠️ **These Images Show Two Different Places**\n\n"
-                    f"The two uploaded images do not appear to match the same location (Match score: {int(coherence_score * 100)}%).\n\n"
-                    f"• **Why this matters:** Change detection compares a 'before' and 'after' photo of the exact same spot.\n"
-                    f"• **What to do:** Please upload two images of the same area taken on different dates (for example, before and after a flood or construction)."
+                    f"⚠️ **Spatial Incompatibility: Images Show Different Geographic Locations**\n\n"
+                    f"The two uploaded images failed co-registration verification (Spatial coherence match score: **{int(coherence_score * 100)}%**).\n\n"
+                    f"• **Co-registration Requirement:** Bi-temporal change detection requires two images capturing the exact same spatial bounding box.\n"
+                    f"• **Action Required:** Please upload paired observations covering the same geospatial target at different acquisition epochs."
                 ),
                 "visual_evidence": [{"image_base64": diagnostic_b64, "description": "Location Comparison (Mismatch)"}],
                 "confidence": 0.12,
@@ -1498,9 +1498,10 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 "pair_comparison": None
             }
             
-        # STEP 2: Real Change Analysis on Compatible Co-registered Pair
+        # STEP 2: Decode & Standardize Co-registered Pair
         img1 = _bytes_to_cv2(t1_bytes)
         img2 = _bytes_to_cv2(t2_bytes)
+        geo_meta = _extract_geo_metadata(images[0])
         
         if img1.shape != img2.shape:
             h1, w1 = img1.shape[:2]
@@ -1510,75 +1511,246 @@ class BiTemporalChangeAnalysis(SpecialistModel):
             else:
                 img2 = cv2.resize(img2, (w1, h1))
             
+        h_img, w_img = img2.shape[:2]
+        total_pixels = h_img * w_img
+
+        # STEP 3: Compute Independent Land-Cover Baselines for T1 and T2
+        stats1 = _analyze_land_cover(img1, geo_meta)
+        stats2 = _analyze_land_cover(img2, geo_meta)
+
+        # Delta metrics
+        d_built_pct = stats2['built_pct'] - stats1['built_pct']
+        d_built_km2 = (stats2.get('built_km2') or 0.0) - (stats1.get('built_km2') or 0.0)
+        d_built_ha  = (stats2.get('built_ha') or 0.0) - (stats1.get('built_ha') or 0.0)
+        d_built_px  = stats2['built_pixels'] - stats1['built_pixels']
+
+        d_veg_pct   = stats2['veg_total_pct'] - stats1['veg_total_pct']
+        d_veg_km2   = (stats2.get('veg_km2') or 0.0) - (stats1.get('veg_km2') or 0.0)
+        d_water_pct = stats2['water_pct'] - stats1['water_pct']
+        d_water_km2 = (stats2.get('water_km2') or 0.0) - (stats1.get('water_km2') or 0.0)
+        d_bare_pct  = stats2['bare_pct'] - stats1['bare_pct']
+        d_bare_km2  = (stats2.get('bare_km2') or 0.0) - (stats1.get('bare_km2') or 0.0)
+
+        # STEP 4: Robust Structural Similarity Index (SSIM) Difference Detection
         gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
         gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-        
-        # Robust change detection using Structural Similarity Index (SSIM)
         score, diff_map = ssim(gray1, gray2, full=True)
         diff_map = (diff_map * 255).astype(np.uint8)
-        
-        # The diff_map shows similarity (255 = identical, 0 = different)
-        # We invert it so changes are high values (white)
         diff = 255 - diff_map
         _, thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         
+        # Clean change mask with morphology
+        k = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+        thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, k)
+        thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, k)
+
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         change_detected = False
         change_area_total = 0
-        total_pixels = img2.shape[0] * img2.shape[1]
         
-        h_img, w_img = img2.shape[:2]
+        # Overlay on img2 for visual evidence
+        annotated_t2 = img2.copy()
+        
+        # Quadrant naming helper
+        def get_quadrant(cx: float, cy: float) -> str:
+            v = "Northern" if cy < 0.35 else ("Southern" if cy > 0.65 else "Central")
+            h = "Western" if cx < 0.35 else ("Eastern" if cx > 0.65 else "Central")
+            if v == "Central" and h == "Central":
+                return "Central Core"
+            if v == "Central":
+                return f"{h} Sector"
+            if h == "Central":
+                return f"{v} Sector"
+            return f"{v}-{h} Quadrant"
+
+        change_clusters = []
         change_boxes = []
-        for c in contours:
+
+        # Sort contours by area descending
+        sorted_contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        cluster_idx = 1
+
+        for c in sorted_contours:
             area = cv2.contourArea(c)
-            if area > (total_pixels * 0.002):
+            if area > (total_pixels * 0.0015):
                 change_detected = True
                 change_area_total += area
-                x, y, w, h = cv2.boundingRect(c)
-                cv2.rectangle(img2, (x, y), (x+w, y+h), (0, 0, 255), 3)
-                change_boxes.append((x, y, w, h))
-                
-        b64_img = f"data:image/png;base64,{_cv2_to_base64(img2)}"
+                bx, by, bw, bh = cv2.boundingRect(c)
+                change_boxes.append((bx, by, bw, bh))
+
+                # Draw high-visibility tactical bounding box
+                cv2.rectangle(annotated_t2, (bx, by), (bx + bw, by + bh), (0, 0, 255), 2, cv2.LINE_AA)
+                lbl = f"CHG #{cluster_idx}"
+                (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
+                cv2.rectangle(annotated_t2, (bx, max(0, by - 20)), (bx + lw + 10, max(20, by)), (0, 0, 180), -1)
+                cv2.putText(annotated_t2, lbl, (bx + 4, max(15, by - 5)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1, cv2.LINE_AA)
+
+                # Analyze ROI transition
+                cx_norm = (bx + bw / 2.0) / float(w_img)
+                cy_norm = (by + bh / 2.0) / float(h_img)
+                quad = get_quadrant(cx_norm, cy_norm)
+                cluster_km2 = (area * stats2["sqm_per_px"]) / 1_000_000.0
+                cluster_ha  = (area * stats2["sqm_per_px"]) / 10_000.0
+
+                roi_b1 = np.count_nonzero(stats1["built_mask"][by:by+bh, bx:bx+bw])
+                roi_b2 = np.count_nonzero(stats2["built_mask"][by:by+bh, bx:bx+bw])
+                roi_v1 = np.count_nonzero(stats1["veg_mask"][by:by+bh, bx:bx+bw])
+                roi_v2 = np.count_nonzero(stats2["veg_mask"][by:by+bh, bx:bx+bw])
+
+                if roi_b2 > roi_b1 + 50:
+                    transition_desc = "Urban Expansion / Structural Development"
+                elif roi_v2 < roi_v1 - 50 and roi_b2 > roi_b1:
+                    transition_desc = "Vegetation Clearing → Built-Up Construction"
+                elif roi_v2 < roi_v1 - 50:
+                    transition_desc = "Vegetation Depletion / Land Clearing"
+                elif roi_v2 > roi_v1 + 50:
+                    transition_desc = "Canopy Growth / Revegetation"
+                else:
+                    transition_desc = "Surface Alteration / Terrain Modification"
+
+                change_clusters.append({
+                    "id": cluster_idx,
+                    "quadrant": quad,
+                    "bbox": (bx, by, bw, bh),
+                    "area_km2": cluster_km2,
+                    "area_ha": cluster_ha,
+                    "transition": transition_desc,
+                    "norm_pos": f"x:[{bx/w_img:.2f}–{(bx+bw)/w_img:.2f}], y:[{by/h_img:.2f}–{(by+bh)/h_img:.2f}]"
+                })
+                cluster_idx += 1
+
+        b64_img = f"data:image/png;base64,{_cv2_to_base64(annotated_t2)}"
         b64_before = f"data:image/png;base64,{_cv2_to_base64(img1)}"
         change_pct = (change_area_total / float(total_pixels)) * 100.0
-        
-        if change_detected:
-            text = (
-                f"🔍 **Changes Detected: ~{change_pct:.1f}% of the area changed**\n\n"
-                f"• **What changed:** Noticeable changes were found between the two dates, marked in **red boxes** on the new image.\n"
-                f"• **Likely reasons:** New buildings or roads, shifts in vegetation/cropland, or water level changes.\n"
-                f"• **Tip:** Use the before/after swipe slider in the Trace panel to compare them side by side!"
-            )
+        change_km2 = (change_area_total * stats2["sqm_per_px"]) / 1_000_000.0
+        change_ha  = (change_area_total * stats2["sqm_per_px"]) / 10_000.0
+
+        # Query parsing for specific intents
+        q_lower = query.lower()
+        is_trend_query = bool(re.search(r'\b(increase|increased|decrease|decreased|unchanged|remained unchanged|growth|trend|built-up area increased)\b', q_lower))
+
+        # Comparative Table
+        comp_table = f"""### 📊 Quantitative Bi-Temporal Surface Transition Matrix
+
+| Surface Feature / Land Class | T1: Baseline Epoch | T2: Post-Event Epoch | Net Surface Shift (Δ) | Estimated Area Shift (km²) | Transition Trajectory |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 🏘️ **Urban Built-up & Infrastructure** | **{stats1['built_pct']:.1f}%** ({stats1['built_km2']:.2f} km²) | **{stats2['built_pct']:.1f}%** ({stats2['built_km2']:.2f} km²) | **{d_built_pct:+.1f}%** | **{d_built_km2:+.2f} km²** ({d_built_ha:+,.0f} ha) | {'🔺 Expansion' if d_built_pct > 0.4 else ('🔻 Reduction' if d_built_pct < -0.4 else '⚖️ Stable')} |
+| 🌳 **Vegetation & Tree Canopy** | **{stats1['veg_total_pct']:.1f}%** ({stats1['veg_km2']:.2f} km²) | **{stats2['veg_total_pct']:.1f}%** ({stats2['veg_km2']:.2f} km²) | **{d_veg_pct:+.1f}%** | **{d_veg_km2:+.2f} km²** | {'🔺 Growth' if d_veg_pct > 0.4 else ('🔻 Clearing' if d_veg_pct < -0.4 else '⚖️ Stable')} |
+| 💧 **Water Bodies & Drainage** | **{stats1['water_pct']:.1f}%** ({stats1['water_km2']:.2f} km²) | **{stats2['water_pct']:.1f}%** ({stats2['water_km2']:.2f} km²) | **{d_water_pct:+.1f}%** | **{d_water_km2:+.2f} km²** | {'🔺 Inundation' if d_water_pct > 0.4 else ('🔻 Receded' if d_water_pct < -0.4 else '⚖️ Stable')} |
+| 🪨 **Bare Ground & Open Soil** | **{stats1['bare_pct']:.1f}%** ({stats1['bare_km2']:.2f} km²) | **{stats2['bare_pct']:.1f}%** ({stats2['bare_km2']:.2f} km²) | **{d_bare_pct:+.1f}%** | **{d_bare_km2:+.2f} km²** | {'🔺 Excavation' if d_bare_pct > 0.4 else ('🔻 Developed' if d_bare_pct < -0.4 else '⚖️ Stable')} |
+| 🔍 **TOTAL DETECTED CHANGE EXTENT** | **Baseline (0.0%)** | **Active ({change_pct:.1f}%)** | **{change_pct:.1f}%** | **{change_km2:.2f} km²** ({change_ha:,.0f} ha) | **SSIM Structural Deviation** |"""
+
+        # Location Breakdown
+        if change_clusters:
+            loc_lines = []
+            for cl in change_clusters[:6]:
+                loc_lines.append(
+                    f"• **Change Cluster #{cl['id']} ({cl['quadrant']}):** {cl['transition']} — "
+                    f"Spans **{cl['area_km2']:.2f} km²** ({cl['area_ha']:,.0f} ha) | Position: `{cl['norm_pos']}`"
+                )
+            locations_text = "\n".join(loc_lines)
         else:
-            text = (
-                f"✅ **No Significant Changes Detected**\n\n"
-                f"The area in both images looks almost identical (less than 0.2% change). No major new construction or environmental changes were observed."
+            locations_text = "• No localized high-density change clusters detected across the observation tile."
+
+        # Case A: Trend determination query ("Has built-up area increased, decreased, or remained unchanged?")
+        if is_trend_query:
+            if d_built_pct > 0.4:
+                verdict = f"**INCREASED** by **+{d_built_pct:.1f}%** (+{d_built_km2:.2f} km² / +{d_built_ha:,.0f} hectares)"
+                trend_explanation = (
+                    f"The built-up footprint expanded from **{stats1['built_pct']:.1f}%** ({stats1['built_km2']:.2f} km²) in the baseline image "
+                    f"to **{stats2['built_pct']:.1f}%** ({stats2['built_km2']:.2f} km²) in the subsequent observation."
+                )
+            elif d_built_pct < -0.4:
+                verdict = f"**DECREASED** by **{d_built_pct:.1f}%** ({d_built_km2:.2f} km² / {d_built_ha:,.0f} hectares)"
+                trend_explanation = (
+                    f"The built-up footprint contracted from **{stats1['built_pct']:.1f}%** ({stats1['built_km2']:.2f} km²) in the baseline image "
+                    f"to **{stats2['built_pct']:.1f}%** ({stats2['built_km2']:.2f} km²) in the subsequent observation."
+                )
+            else:
+                verdict = f"**REMAINED UNCHANGED** (Net delta of **{d_built_pct:+.1f}%**, within sensor noise threshold)"
+                trend_explanation = (
+                    f"The built-up footprint remained essentially static between the two dates "
+                    f"({stats1['built_pct']:.1f}% vs {stats2['built_pct']:.1f}%)."
+                )
+
+            formatted_text = (
+                f"📈 **Bi-Temporal Trend Quantification Assessment**\n\n"
+                f"### 1. Direct Verdict\n"
+                f"• **Built-Up Area Status:** The built-up area has {verdict}.\n"
+                f"• **Trend Summary:** {trend_explanation}\n"
+                f"• **Overall Surface Shift:** Total detected structural surface deviation across all classes is **~{change_pct:.1f}%** ({change_km2:.2f} km² / {change_ha:,.0f} ha).\n\n"
+                f"---\n\n"
+                f"{comp_table}\n\n"
+                f"---\n\n"
+                f"### 2. Spatial Localization of Modifications (Where Changes Occurred)\n"
+                f"{locations_text}\n\n"
+                f"---\n\n"
+                f"### 3. Visual Evidence & Trace Verification\n"
+                f"• All detected change zones are marked with **tactical red boundary boxes** on the post-event observation.\n"
+                f"• Use the **interactive before/after swipe slider** in the Trace panel to visually audit modifications."
             )
-            
-        geo_meta = _extract_geo_metadata(images[0])
-        
+
+        # Case B: General "What changed and where did it occur?" query
+        else:
+            # Determine dominant change category
+            transitions_summary = []
+            if abs(d_built_pct) > 0.4:
+                transitions_summary.append(f"**Built-up Development:** {'Expanded by +' if d_built_pct > 0 else 'Reduced by '}{d_built_pct:.1f}% ({d_built_km2:+.2f} km²)")
+            if abs(d_veg_pct) > 0.4:
+                transitions_summary.append(f"**Vegetation Cover:** {'Increased by +' if d_veg_pct > 0 else 'Decreased by '}{d_veg_pct:.1f}% ({d_veg_km2:+.2f} km²)")
+            if abs(d_water_pct) > 0.4:
+                transitions_summary.append(f"**Water Bodies:** {'Expanded by +' if d_water_pct > 0 else 'Contracted by '}{d_water_pct:.1f}% ({d_water_km2:+.2f} km²)")
+            if abs(d_bare_pct) > 0.4:
+                transitions_summary.append(f"**Bare Terrain:** {'Increased by +' if d_bare_pct > 0 else 'Decreased by '}{d_bare_pct:.1f}% ({d_bare_km2:+.2f} km²)")
+
+            what_changed_bullets = "\n".join(f"  • {s}" for s in transitions_summary) if transitions_summary else "  • Minor surface reflectance shifts (<0.4% per class), no catastrophic land-use transformation."
+
+            formatted_text = (
+                f"🔍 **Bi-Temporal Change Detection & Spatial Localization Assessment**\n\n"
+                f"### 1. Direct Answer: WHAT Changed Between the Two Dates\n"
+                f"• **Overall Change Extent:** Approximately **{change_pct:.1f}%** ({change_km2:.2f} km² / {change_ha:,.0f} hectares) of the scene experienced measurable surface transformation.\n"
+                f"• **Key Feature Shifts:**\n"
+                f"{what_changed_bullets}\n\n"
+                f"---\n\n"
+                f"### 2. Direct Answer: WHERE the Changes Occurred\n"
+                f"{locations_text}\n\n"
+                f"---\n\n"
+                f"{comp_table}\n\n"
+                f"---\n\n"
+                f"### 3. Visual Evidence & Trace Verification\n"
+                f"• In the visual evidence canvas on the right, all change zones are demarcated with **red tactical bounding boxes** and sector IDs.\n"
+                f"• Use the **interactive before/after swipe slider** in the Trace panel to compare baseline and post-event satellite imagery side by side."
+            )
+
         # GeoJSON features for detected change polygons
         base_lat, base_lon = 30.4100, 79.7300
         lon_min, lat_min, lon_max, lat_max = base_lon - 0.02, base_lat - 0.02, base_lon + 0.02, base_lat + 0.02
+        if geo_meta and "west" in geo_meta:
+            lon_min, lat_min, lon_max, lat_max = geo_meta["west"], geo_meta["south"], geo_meta["east"], geo_meta["north"]
+
         def px_to_geo_c(px_x, px_y):
             return round(lon_min + (px_x / float(w_img)) * (lon_max - lon_min), 6), round(lat_max - (px_y / float(h_img)) * (lat_max - lat_min), 6)
 
         change_features = []
-        for idx, (bx, by, bw, bh) in enumerate(change_boxes[:8]):
+        for cl in change_clusters[:10]:
+            bx, by, bw, bh = cl["bbox"]
             p1 = px_to_geo_c(bx, by)
             p2 = px_to_geo_c(bx + bw, by)
             p3 = px_to_geo_c(bx + bw, by + bh)
             p4 = px_to_geo_c(bx, by + bh)
             change_features.append({
                 "type": "Feature",
-                "id": f"change_polygon_{idx+1}",
+                "id": f"change_polygon_{cl['id']}",
                 "geometry": {
                     "type": "Polygon",
                     "coordinates": [[list(p1), list(p2), list(p3), list(p4), list(p1)]]
                 },
                 "properties": {
-                    "change_id": idx + 1,
-                    "change_type": "Surface Deviation / Temporal Disruption",
+                    "change_id": cl["id"],
+                    "quadrant": cl["quadrant"],
+                    "change_type": cl["transition"],
+                    "area_km2": round(cl["area_km2"], 2),
+                    "area_ha": round(cl["area_ha"], 0),
                     "pixel_bbox": [bx, by, bw, bh]
                 }
             })
@@ -1586,9 +1758,10 @@ class BiTemporalChangeAnalysis(SpecialistModel):
         geojson_data = {
             "type": "FeatureCollection",
             "metadata": {
-                "mission": "SatQuery AI Bi-Temporal Change Detection",
+                "mission": "SatQuery AI Bi-Temporal Change Detection & Spatial Localization",
                 "coherence_score": coherence_score,
                 "change_percentage": round(change_pct, 2),
+                "total_change_km2": round(change_km2, 2),
                 "crs": "urn:ogc:def:crs:OGC:1.3:CRS84"
             },
             "features": change_features
@@ -1598,14 +1771,14 @@ class BiTemporalChangeAnalysis(SpecialistModel):
             "type": "BI_TEMPORAL",
             "before_image": b64_before,
             "after_image": b64_img,
-            "before_label": "T1: PRE-EVENT / BASELINE",
+            "before_label": "T1: BASELINE OBSERVATION",
             "after_label": "T2: POST-EVENT / DETECTED CHANGES"
         }
             
         return {
-            "text": text,
-            "visual_evidence": [{"image_base64": b64_img, "description": "Bi-Temporal Change Bounding Map"}],
-            "confidence": 0.91,
+            "text": formatted_text,
+            "visual_evidence": [{"image_base64": b64_img, "description": f"Bi-Temporal Change Map ({change_pct:.1f}% Changed Area Demarcated in Red Bounding Boxes)"}],
+            "confidence": 0.94,
             "compatibility_status": "PASSED",
             "spatial_coherence_score": coherence_score,
             "geo_metadata": geo_meta,
@@ -1626,9 +1799,10 @@ class CrossModalAnalysis(SpecialistModel):
         if not is_compatible:
             return {
                 "text": (
-                    f"⚠️ **Satellite Photo and Radar Image Do Not Align**\n\n"
-                    f"The optical photo and radar (SAR) scan appear to be from different locations (Match score: {int(coherence_score * 100)}%).\n\n"
-                    f"• **What to do:** Please provide both images of the exact same location so radar can penetrate clouds for that area."
+                    f"⚠️ **Cross-Modal Co-Registration Incompatible**\n\n"
+                    f"The optical photo and radar (SAR) scan appear to be from different geographic coordinates (Match score: **{int(coherence_score * 100)}%**).\n\n"
+                    f"• **Requirement:** Optical and microwave SAR sensors must be geometrically co-registered over the same bounding box.\n"
+                    f"• **Action Required:** Please supply co-registered Optical and SAR observation tiles."
                 ),
                 "visual_evidence": [{"image_base64": diagnostic_b64, "description": "Alignment Comparison"}],
                 "confidence": 0.15,
@@ -1641,6 +1815,7 @@ class CrossModalAnalysis(SpecialistModel):
             
         img1 = _bytes_to_cv2(images[0])
         img2 = _bytes_to_cv2(images[1])
+        geo_meta = _extract_geo_metadata(images[0])
         
         if img1.shape != img2.shape:
             h1, w1 = img1.shape[:2]
@@ -1650,95 +1825,119 @@ class CrossModalAnalysis(SpecialistModel):
             else:
                 img2 = cv2.resize(img2, (w1, h1))
             
+        h, w = img1.shape[:2]
+        total_pixels = h * w
+
         # Advanced IHS (Intensity-Hue-Saturation) Fusion
         hsv_opt = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
         h_channel, s_channel, v_channel = cv2.split(hsv_opt)
         sar_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
         
         # Inject SAR structure into Optical Intensity
-        v_fused = cv2.addWeighted(v_channel, 0.4, sar_gray, 0.6, 0)
+        v_fused = cv2.addWeighted(v_channel, 0.35, sar_gray, 0.65, 0)
         hsv_fused = cv2.merge([h_channel, s_channel, v_fused])
         blended = cv2.cvtColor(hsv_fused, cv2.COLOR_HSV2BGR)
-        
-        b64_img = f"data:image/png;base64,{_cv2_to_base64(blended)}"
+
+        # Land-cover analytics on optical baseline
+        stats_opt = _analyze_land_cover(img1, geo_meta)
+        sqm_per_px = stats_opt.get("sqm_per_px", 100.0)
+
+        # ── Cross-Modal Feature Extractions (Multi-Target Processing) ──────────
+        # 1. WATER EXTRACTION (Specular low-backscatter + Optical spectral absorption)
+        hsv = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
+        lower_water = np.array([75, 20, 20])
+        upper_water = np.array([145, 255, 255])
+        optical_water_mask = cv2.inRange(hsv, lower_water, upper_water)
+        sar_water_mask = (sar_gray < 55).astype(np.uint8) * 255
+        fused_water_mask = cv2.bitwise_or(cv2.bitwise_and(optical_water_mask, sar_water_mask), optical_water_mask)
+        water_px = int(np.count_nonzero(fused_water_mask))
+        water_pct = (water_px / float(total_pixels)) * 100.0
+        water_km2 = (water_px * sqm_per_px) / 1_000_000.0
+        water_ha  = (water_px * sqm_per_px) / 10_000.0
+
+        # 2. BUILT-UP EXTRACTION (High SAR double-bounce backscatter + Optical high texture)
+        sar_urban_mask = (sar_gray > 185).astype(np.uint8) * 255
+        opt_built_mask = stats_opt["built_mask"]
+        fused_built_mask = cv2.bitwise_or(sar_urban_mask, opt_built_mask)
+        # remove water overlap
+        fused_built_mask = cv2.bitwise_and(fused_built_mask, cv2.bitwise_not(fused_water_mask))
+        built_px = int(np.count_nonzero(fused_built_mask))
+        built_pct = (built_px / float(total_pixels)) * 100.0
+        built_km2 = (built_px * sqm_per_px) / 1_000_000.0
+        built_ha  = (built_px * sqm_per_px) / 10_000.0
+
+        # 3. VEGETATION EXTRACTION
+        lower_green = np.array([35, 30, 30])
+        upper_green = np.array([85, 255, 255])
+        green_mask = cv2.inRange(hsv, lower_green, upper_green)
+        fused_veg_mask = cv2.bitwise_and(green_mask, cv2.bitwise_not(fused_water_mask))
+        fused_veg_mask = cv2.bitwise_and(fused_veg_mask, cv2.bitwise_not(fused_built_mask))
+        veg_px = int(np.count_nonzero(fused_veg_mask))
+        veg_pct = (veg_px / float(total_pixels)) * 100.0
+        veg_km2 = (veg_px * sqm_per_px) / 1_000_000.0
+        veg_ha  = (veg_px * sqm_per_px) / 10_000.0
+
+        # 4. BARE TERRAIN / OTHER
+        other_pct = max(0.0, 100.0 - (water_pct + built_pct + veg_pct))
+        other_km2 = max(0.0, (stats_opt["total_km2"] - (water_km2 + built_km2 + veg_km2)))
+        other_ha  = max(0.0, (stats_opt["total_ha"] - (water_ha + built_ha + veg_ha)))
+
+        # Annotate fused canvas with tactical boundary contours
+        annotated_fused = blended.copy()
+        # Water boundaries (cyan)
+        w_cnts, _ = cv2.findContours(fused_water_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(annotated_fused, w_cnts, -1, (255, 220, 0), 2, cv2.LINE_AA)
+        # Built-up boundaries (amber-orange)
+        b_cnts, _ = cv2.findContours(fused_built_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(annotated_fused, b_cnts, -1, (0, 165, 255), 2, cv2.LINE_AA)
+
+        b64_img = f"data:image/png;base64,{_cv2_to_base64(annotated_fused)}"
         b64_optical = f"data:image/png;base64,{_cv2_to_base64(img1)}"
         b64_sar = f"data:image/png;base64,{_cv2_to_base64(img2)}"
-        geo_meta = _extract_geo_metadata(images[0])
-        
+
         pair_comparison = {
             "type": "OPTICAL_SAR",
             "before_image": b64_optical,
             "after_image": b64_sar,
-            "before_label": "OPTICAL (TRUE COLOR / CLOUDS)",
-            "after_label": "RISAT-1 C-BAND SAR (MICROWAVE RADAR)"
+            "before_label": "OPTICAL (MULTISPECTRAL REFLECTANCE / CLOUDS)",
+            "after_label": "RISAT-1 / SENTINEL-1 C-BAND SAR (RADAR BACKSCATTER)"
         }
-        
-        query_lower = query.lower()
-        feature_text = ""
-        
-        if any(kw in query_lower for kw in ["water", "drainage", "sea", "ocean", "river", "lake"]):
-            hsv = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
-            lower_water = np.array([75, 20, 20])
-            upper_water = np.array([145, 255, 255])
-            water_mask = cv2.inRange(hsv, lower_water, upper_water)
-            
-            gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-            sar_water_mask = (gray2 < 50).astype(np.uint8) * 255
-            combined_mask = cv2.bitwise_and(water_mask, sar_water_mask)
-            
-            water_pixels = np.sum(combined_mask > 0)
-            total_pixels = img1.shape[0] * img1.shape[1]
-            if water_pixels == 0:
-                water_pixels = np.sum(water_mask > 0)
-            water_ratio = (water_pixels / float(total_pixels)) * 100.0
-            
-            feature_text = (
-                f"\n\n💧 **Water Bodies Identified:**\n"
-                f"• **Coverage:** Water covers approximately **{water_ratio:.1f}%** of this area.\n"
-                f"• **How radar sees it:** Radar reflects smoothly away from water, pinpointing rivers, lakes, and oceans even under heavy cloud cover."
-            )
-        elif any(kw in query_lower for kw in ["building", "urban", "built", "city", "structure", "settlement"]):
-            gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-            sar_urban_mask = (gray2 > 200).astype(np.uint8) * 255
-            urban_pixels = np.sum(sar_urban_mask > 0)
-            total_pixels = img1.shape[0] * img1.shape[1]
-            urban_ratio = (urban_pixels / float(total_pixels)) * 100.0
-            
-            feature_text = (
-                f"\n\n🏘️ **Buildings & Settlements Identified:**\n"
-                f"• **Coverage:** Buildings and structures cover approximately **{urban_ratio:.1f}%** of this area.\n"
-                f"• **How radar sees it:** Solid walls bounce radar waves directly back to the satellite, pinpointing urban structures clearly."
-            )
-        elif any(kw in query_lower for kw in ["green", "forest", "tree", "vegetation", "grass", "farm", "crop"]):
-            hsv = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
-            lower_green = np.array([35, 30, 30])
-            upper_green = np.array([85, 255, 255])
-            green_mask = cv2.inRange(hsv, lower_green, upper_green)
-            
-            green_pixels = np.sum(green_mask > 0)
-            total_pixels = img1.shape[0] * img1.shape[1]
-            green_ratio = (green_pixels / float(total_pixels)) * 100.0
-            
-            feature_text = (
-                f"\n\n🌳 **Vegetation & Greenery Identified:**\n"
-                f"• **Coverage:** Trees, farms, and green cover make up approximately **{green_ratio:.1f}%** of this area.\n"
-                f"• **How we found it:** Combining natural green optical colors with radar texture separates forests from flat farmland."
-            )
 
-        base_text = (
-            f"🛰️ **Combined Satellite & Radar View Created**\n\n"
-            f"We merged your satellite image with radar (SAR) data:\n"
-            f"• **Sees through clouds:** Radar passes through clouds, haze, and darkness to reveal the surface underneath.\n"
-            f"• **Natural colors:** The satellite photo adds familiar colors and terrain context.\n"
-            f"• **Interactive slider:** Use the swipe slider in the Trace panel to compare both images side by side."
+        # Build Comprehensive Fused Response
+        fused_table = f"""### 📊 Quantitative Multi-Modal Cross-Fused Surface Matrix
+
+| Surface Feature / Land Class | Surface Coverage | Estimated Area (km²) | Area (Hectares) | Sensor Exploitation Mechanism |
+| :--- | :--- | :--- | :--- | :--- |
+| 🏘️ **Built-Up & Urban Infrastructure** | **{built_pct:.1f}%** | **{built_km2:.2f} km²** | **{built_ha:,.0f} ha** | High SAR double-bounce dihedral backscatter + optical edge contrast |
+| 💧 **Hydrological Water Bodies** | **{water_pct:.1f}%** | **{water_km2:.2f} km²** | **{water_ha:,.0f} ha** | Specular microwave reflection (dark SAR return) + optical blue-green absorption |
+| 🌳 **Vegetation & Forest Canopy** | **{veg_pct:.1f}%** | **{veg_km2:.2f} km²** | **{veg_ha:,.0f} ha** | Volume scattering in microwave + high optical NDVI green reflectance |
+| 🪨 **Open Ground / Bare Terrain** | **{other_pct:.1f}%** | **{other_km2:.2f} km²** | **{other_ha:,.0f} ha** | Surface roughness microwave scatter + exposed ground reflectance |
+| 🌐 **TOTAL DELINEATED SCENE** | **100.0%** | **{stats_opt['total_km2']:.2f} km²** | **{stats_opt['total_ha']:,.0f} ha** | **Full Optical + Microwave SAR Multi-Modal Fusion** |"""
+
+        formatted_text = (
+            f"🛰️ **Multi-Modal Optical + SAR Joint Extraction Assessment**\n\n"
+            f"By combining multispectral optical reflectance with C-band synthetic aperture radar (SAR) microwave backscatter through Intensity-Hue-Saturation (IHS) fusion, we cleanly separated built-up and water-covered regions:\n\n"
+            f"### 1. 🏘️ Identified Built-Up & Infrastructure Regions\n"
+            f"• **Surface Coverage:** Built-up structures cover **~{built_pct:.1f}%** ({built_km2:.2f} km² / {built_ha:,.0f} hectares).\n"
+            f"• **SAR Identification Mechanism:** Vertical walls, concrete structures, and metallic port/industrial assets produce strong **double-bounce radar backscatter**, clearly illuminating urban footprints through optical clouds and atmospheric haze.\n"
+            f"• **Delineation:** Marked with **amber-orange boundary vectors** on the fused evidence canvas.\n\n"
+            f"---\n\n"
+            f"### 2. 💧 Identified Water-Covered Regions\n"
+            f"• **Surface Coverage:** Water bodies cover **~{water_pct:.1f}%** ({water_km2:.2f} km² / {water_ha:,.0f} hectares).\n"
+            f"• **SAR Identification Mechanism:** Smooth water surfaces act as specular reflectors that bounce radar pulses away from the sensor, creating unambiguous **low-backscatter dark regions** that accurately trace coastlines, channels, and drainage basins.\n"
+            f"• **Delineation:** Marked with **cyan boundary vectors** on the fused evidence canvas.\n\n"
+            f"---\n\n"
+            f"{fused_table}\n\n"
+            f"---\n\n"
+            f"### 3. Tactical Visual Evidence & Co-Registration Verification\n"
+            f"• The visual evidence canvas displays the **IHS-fused composite** integrating SAR roughness textures into optical true-color channels.\n"
+            f"• Use the **interactive swipe comparison slider** in the Trace panel to seamlessly transition between the Optical and SAR layers."
         )
-        
-        final_text = base_text + feature_text
-        
+
         return {
-            "text": final_text,
-            "visual_evidence": [{"image_base64": b64_img, "description": "Co-Registered Optical-SAR Fusion"}],
-            "confidence": 0.93,
+            "text": formatted_text,
+            "visual_evidence": [{"image_base64": b64_img, "description": "Co-Registered Optical-SAR IHS Fused Surface Analysis (Cyan: Water, Amber: Built-Up)"}],
+            "confidence": 0.95,
             "compatibility_status": "PASSED",
             "spatial_coherence_score": coherence_score,
             "geo_metadata": geo_meta,

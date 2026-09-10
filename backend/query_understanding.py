@@ -95,7 +95,7 @@ _COMPARE_VERBS  = r'\b(compare|contrast|difference between|vs|versus|east.*west|
 _DIRECTION_WORDS = r'\b(north(?:ern)?|south(?:ern)?|east(?:ern)?|west(?:ern)?|upper|lower|upper.?left|upper.?right|lower.?left|lower.?right|center|central|middle|northwest|northeast|southwest|southeast)\b'
 
 # Land-cover specific
-_LANDCOVER_WORDS = r'\b(land\s*cover|lulc|classification|breakdown|classes|percentage|distribution|proportion|statistics|what\s+type|dominant|cover\s+type)\b'
+_LANDCOVER_WORDS = r'\b(land[\s\-_]*cover|lulc|classification|breakdown|classes|percentage|distribution|proportion|statistics|what\s+type|dominant|cover\s+type)\b'
 
 
 def _extract_targets(q: str) -> List[str]:
@@ -105,6 +105,9 @@ def _extract_targets(q: str) -> List[str]:
         if re.search(pattern, q, re.IGNORECASE):
             if canonical not in found:
                 found.append(canonical)
+    # If query mentions "objects" or "structures" generally, provide structural targets
+    if not found and re.search(r'\b(objects?|structures?|features?)\b', q, re.IGNORECASE):
+        found = ["building", "road", "water_body", "vegetation"]
     return found
 
 
@@ -147,7 +150,7 @@ def _has_spatial_relation(q: str) -> bool:
 
 def _has_change_intent(q: str) -> bool:
     return bool(re.search(
-        r'\b(change|changed|changes|before.*after|temporal|different dates|expansion|growth|new|loss|deforestation|urban.*expansion)\b',
+        r'\b(change|changed|changes|before.*after|temporal|different dates|two dates|expansion|growth|new|loss|deforestation|urban.*expansion|increased|decreased|unchanged|increase|decrease|remained unchanged)\b',
         q, re.IGNORECASE
     ))
 
@@ -191,9 +194,15 @@ def _classify_primary_intent(
     """
     sub_intents = []
 
-    # Change detection (high priority — usually multi-image)
+    # Change detection (high priority — usually multi-image or temporal change queries)
     if has_change and not has_locate:
-        return INTENT_CHANGE_DETECTION, 0.92, []
+        if any(t in ["building", "urban_area", "water_body", "vegetation", "forest", "agricultural_field"] for t in targets):
+            sub_intents = [INTENT_AREA_QUANTIFICATION]
+        return INTENT_CHANGE_DETECTION, 0.95, sub_intents
+
+    # Compound request: "Describe land-cover and major objects"
+    if (has_describe or has_landcover) and re.search(r'\b(objects?|structures?|features?|buildings?)\b', q, re.IGNORECASE) and has_landcover:
+        return INTENT_MULTI_TASK, 0.96, [INTENT_SCENE_UNDERSTANDING, INTENT_LAND_COVER, INTENT_OBJECT_LOCALIZATION]
 
     # Counting
     if has_count:
@@ -236,9 +245,11 @@ def _classify_primary_intent(
         if has_direction:
             sub_intents.append(INTENT_REGION_DIRECTION)
 
-        # Water body specific
+        # Water body specific ("Highlight the water body", "Locate rivers", etc.)
         if all(t in ["water_body","coastline","river","lake"] for t in targets):
-            return INTENT_WATER_BODY, 0.94, sub_intents
+            if has_area:
+                sub_intents.append(INTENT_AREA_QUANTIFICATION)
+            return INTENT_WATER_BODY, 0.96, sub_intents
         # Road network specific
         if all(t in ["road","railway","bridge"] for t in targets):
             return INTENT_ROAD_NETWORK, 0.93, sub_intents
