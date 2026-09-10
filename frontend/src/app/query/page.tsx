@@ -361,39 +361,33 @@ export default function Home() {
 
   const queryCategories = [
     {
-      category: "TERRAIN & LAND COVER ANALYSIS",
+      category: "1. SCENE & OBJECT LOCALIZATION",
       queries: [
-        "Classify land cover breakdown",
-        "How much green cover and vegetation is there?",
-        "Are there any water bodies or rivers in this area?",
-        "Identify buildings, roads, and settlements",
-        "Give a plain-English overview of this scene"
+        "Describe the land-cover and major objects visible in this image."
       ]
     },
     {
-      category: "CHANGE DETECTION (BEFORE & AFTER)",
+      category: "2. WATER BODY HIGHLIGHTING & GROUNDING",
       queries: [
-        "What changed between these two dates?",
-        "Measure new construction and building expansion",
-        "Check for deforestation and tree loss",
-        "Analyze flood extent and submerged land"
+        "Highlight the water body referred to in the query."
       ]
     },
     {
-      category: "FIND & HIGHLIGHT FEATURES (GROUNDING)",
+      category: "3. BI-TEMPORAL CHANGE DETECTION",
       queries: [
-        "Highlight all water bodies and lakes",
-        "Locate buildings and storage facilities",
-        "Pinpoint roads and transport networks",
-        "Find green parks and farmland"
+        "What changed between these two dates, and where did the change occur?"
       ]
     },
     {
-      category: "CLOUD PENETRATION (RADAR / SAR)",
+      category: "4. OPTICAL & SAR CROSS-MODAL FUSION",
       queries: [
-        "See through clouds using radar (SAR)",
-        "Identify water bodies hidden under clouds",
-        "Detect ships and structures beneath cloud cover"
+        "Use the optical and SAR images together to identify built-up and water-covered regions."
+      ]
+    },
+    {
+      category: "5. BUILT-UP AREA TREND QUANTIFICATION",
+      queries: [
+        "Has the built-up area increased, decreased, or remained unchanged?"
       ]
     }
   ];
@@ -1058,13 +1052,13 @@ export default function Home() {
                         </button>
                       </div>
 
-                      <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2.5">
                         {queryCategories.map((cat, idx) => (
-                          <div key={idx} className="flex flex-col gap-1.5">
-                            <div className="text-[9px] tracking-widest text-white/40 font-mono font-semibold uppercase">
+                          <div key={idx} className="flex flex-col gap-1">
+                            <div className="text-[9px] tracking-widest text-emerald-400 font-mono font-semibold uppercase">
                               {cat.category}
                             </div>
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex flex-col gap-1">
                               {cat.queries.map((q, qIdx) => (
                                 <button
                                   key={qIdx}
@@ -1073,9 +1067,9 @@ export default function Home() {
                                     setQuery(q);
                                     setShowPresets(false);
                                   }}
-                                  className="text-left text-xs px-2.5 sm:px-3 py-1.5 rounded-md bg-white/5 hover:bg-white text-white/80 hover:text-black transition-all border border-white/10 hover:border-white cursor-pointer"
+                                  className="w-full text-left text-xs px-3 py-2 rounded-lg bg-white/5 hover:bg-white text-white/90 hover:text-black transition-all border border-white/10 hover:border-white cursor-pointer font-sans leading-relaxed"
                                 >
-                                  {q}
+                                  "{q}"
                                 </button>
                               ))}
                             </div>
