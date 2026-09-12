@@ -127,10 +127,13 @@ function LaunchAnimation() {
 
     const pStage1Sep = getProgress(offset, 0.30, 0.60); 
     if (stage1GroupRef.current) {
-      // Local -Y moves it backwards away from the rocket, perfectly mirroring gravity and momentum
-      stage1GroupRef.current.position.y = -pStage1Sep * 40; 
-      stage1GroupRef.current.position.x = -pStage1Sep * 2; // slight drift
-      stage1GroupRef.current.rotation.z = pStage1Sep * 2; // tumble
+      // Local -Y moves it backwards, but we don't want it to shoot past Earth.
+      stage1GroupRef.current.position.y = -pStage1Sep * 15; 
+      stage1GroupRef.current.position.x = -pStage1Sep * 2; 
+      stage1GroupRef.current.rotation.z = pStage1Sep * 4; // fast tumble
+      // Burn up in atmosphere!
+      const scale = Math.max(0, 1 - (pStage1Sep * 1.2));
+      stage1GroupRef.current.scale.setScalar(scale);
     }
 
     // --- FAIRINGS ---
@@ -144,15 +147,19 @@ function LaunchAnimation() {
       fairingRightWrapperRef.current.rotation.z = fairingTraj.rotZ;
     }
 
-    const pFairingSep = getProgress(offset, 0.40, 0.70);
+    const pFairingSep = getProgress(offset, 0.40, 0.65);
     if (fairingLeftRef.current && fairingRightRef.current) {
-      fairingLeftRef.current.position.x = -pFairingSep * 10;
-      fairingLeftRef.current.position.y = -pFairingSep * 30; // drop behind
-      fairingLeftRef.current.rotation.z = pFairingSep * 3;
+      fairingLeftRef.current.position.x = -pFairingSep * 5;
+      fairingLeftRef.current.position.y = -pFairingSep * 10; 
+      fairingLeftRef.current.rotation.z = pFairingSep * 4;
 
-      fairingRightRef.current.position.x = pFairingSep * 10;
-      fairingRightRef.current.position.y = -pFairingSep * 30;
-      fairingRightRef.current.rotation.z = -pFairingSep * 3;
+      fairingRightRef.current.position.x = pFairingSep * 5;
+      fairingRightRef.current.position.y = -pFairingSep * 10;
+      fairingRightRef.current.rotation.z = -pFairingSep * 4;
+
+      const fScale = Math.max(0, 1 - (pFairingSep * 1.5));
+      fairingLeftRef.current.scale.setScalar(fScale);
+      fairingRightRef.current.scale.setScalar(fScale);
     }
 
     // --- STAGE 2 (Upper Stage) ---
@@ -164,10 +171,13 @@ function LaunchAnimation() {
       stage2WrapperRef.current.rotation.z = s2Traj.rotZ;
     }
 
-    const pStage2Sep = getProgress(offset, 0.70, 1.0);
+    const pStage2Sep = getProgress(offset, 0.70, 0.90);
     if (stage2GroupRef.current) {
-      stage2GroupRef.current.position.y = -pStage2Sep * 30; 
-      stage2GroupRef.current.rotation.z = pStage2Sep * 0.5; // slight tumble
+      stage2GroupRef.current.position.y = -pStage2Sep * 15; 
+      stage2GroupRef.current.rotation.z = pStage2Sep * 2; 
+      
+      const s2Scale = Math.max(0, 1 - (pStage2Sep * 1.5));
+      stage2GroupRef.current.scale.setScalar(s2Scale);
     }
 
     // CAMERA LOGIC
