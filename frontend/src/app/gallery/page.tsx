@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import SpaceGallery from '@/components/SpaceGallery';
-import SatelliteExplodedView from '@/components/SatelliteExplodedView';
+import RocketLaunchSequence from '@/components/RocketLaunchSequence';
 
 export default function GalleryPage() {
   return (
@@ -22,8 +22,8 @@ export default function GalleryPage() {
       {/* 3D Solar System (Top Section) */}
       <SpaceGallery />
 
-      {/* 3D Exploded Satellite View (Scroll Section) */}
-      <SatelliteExplodedView />
+      {/* 3D Rocket Launch Sequence (Scroll Section) */}
+      <RocketLaunchSequence />
     </main>
   );
 }
