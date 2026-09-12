@@ -94,35 +94,35 @@ function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => vo
     const pOrbitRaise = getProgress(offset, 0.85, 1.0);   // Steps 15-16
 
     // CAMERA LOGIC
-    // Follow the vehicle throughout the sequence
-    let targetCamPos = new THREE.Vector3(0, 2, 14);
-    let targetLookAt = new THREE.Vector3(0, 2, 0);
+    // Follow the vehicle throughout the sequence, but zoomed out significantly more
+    let targetCamPos = new THREE.Vector3(0, 2, 22);
+    let targetLookAt = new THREE.Vector3(0, 4, 0);
 
     if (pLiftoff > 0 && pOrbitInsert < 1) {
-      // Ascending
-      targetCamPos.set(0, 2 - pLiftoff * 6 + pOrbitInsert * 4, 14 + pLiftoff * 8 - pOrbitInsert * 6);
-      targetLookAt.set(0, 0, 0);
+      // Ascending - camera tracks up but stays far back
+      targetCamPos.set(0, 2 - pLiftoff * 6 + pOrbitInsert * 4, 22 + pLiftoff * 10 - pOrbitInsert * 8);
+      targetLookAt.set(0, 4 + pLiftoff * 2, 0);
     } else if (pOrbitInsert === 1 && pSatSep < 1) {
-      // Orbiting
-      targetCamPos.set(0, 4, 10);
-      targetLookAt.set(0, 4, 0);
+      // Orbiting - pulled back view
+      targetCamPos.set(0, 6, 18);
+      targetLookAt.set(0, 6, 0);
     } else if (pSatSep > 0) {
-      // Focusing on Satellite
-      targetCamPos.set(0, 5 + pSatSep * 2, 8 - pSatAcq * 2);
-      targetLookAt.set(0, 5 + pSatSep * 2, 0);
+      // Focusing on Satellite but not too close
+      targetCamPos.set(0, 7 + pSatSep * 2, 14 - pSatAcq * 2);
+      targetLookAt.set(0, 7 + pSatSep * 2, 0);
     }
 
-    state.camera.position.lerp(targetCamPos, 0.05);
+    state.camera.position.lerp(targetCamPos, 0.04);
     state.camera.lookAt(targetLookAt);
 
     // EARTH / ATMOSPHERE (Simulate Altitude)
     if (earthRef.current && atmosphereRef.current && cloudsRef.current) {
-      const scale = 1 - (pLiftoff * 0.92) - (pOrbitInsert * 0.03); 
+      const scale = 1 - (pLiftoff * 0.92) - (pOrbitInsert * 0.04); 
       earthRef.current.scale.set(scale, scale, scale);
       cloudsRef.current.scale.set(scale * 1.01, scale * 1.01, scale * 1.01);
       atmosphereRef.current.scale.set(scale * 1.03, scale * 1.03, scale * 1.03);
       
-      const dropY = -20 - (pLiftoff * 80) - (pOrbitInsert * 20);
+      const dropY = -20 - (pLiftoff * 90) - (pOrbitInsert * 30);
       earthRef.current.position.y = dropY;
       cloudsRef.current.position.y = dropY;
       atmosphereRef.current.position.y = dropY;
@@ -250,6 +250,21 @@ function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => vo
             <cylinderGeometry args={[0.6, 0.6, 6, 64]} />
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
+          
+          {/* Structural Bands */}
+          <mesh position={[0, 1.4, 0]} rotation={[Math.PI/2, 0, 0]}>
+            <torusGeometry args={[0.6, 0.02, 16, 64]} />
+            <primitive object={darkMetal} attach="material" />
+          </mesh>
+          <mesh position={[0, -1.5, 0]} rotation={[Math.PI/2, 0, 0]}>
+            <torusGeometry args={[0.6, 0.02, 16, 64]} />
+            <primitive object={darkMetal} attach="material" />
+          </mesh>
+          <mesh position={[0, -4.4, 0]} rotation={[Math.PI/2, 0, 0]}>
+            <torusGeometry args={[0.6, 0.04, 16, 64]} />
+            <primitive object={darkMetal} attach="material" />
+          </mesh>
+
           <mesh position={[0, -4.5, 0]}>
             <cylinderGeometry args={[0.4, 0.7, 0.6, 32]} />
             <primitive object={darkMetal} attach="material" />
@@ -276,6 +291,12 @@ function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => vo
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
           
+          {/* Stage 2 Structural Band */}
+          <mesh position={[0, -1.4, 0]} rotation={[Math.PI/2, 0, 0]}>
+            <torusGeometry args={[0.6, 0.02, 16, 64]} />
+            <primitive object={darkMetal} attach="material" />
+          </mesh>
+
           {/* Stage 2 Engine */}
           <mesh position={[0, -1.6, 0]}>
             <cylinderGeometry args={[0.2, 0.5, 0.4, 32]} />
