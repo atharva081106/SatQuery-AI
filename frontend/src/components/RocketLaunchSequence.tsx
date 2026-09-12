@@ -188,14 +188,19 @@ function LaunchAnimation() {
       const vPos = new THREE.Vector3();
       satelliteGroupRef.current.getWorldPosition(vPos); // Always look at the satellite
       
+      const aspect = state.size.width / state.size.height;
+      const isMobile = aspect < 1;
+
       if (offset < 0.9) {
         // Follow closely but zoomed out enough to see the whole rocket
-        targetCamPos.set(vPos.x, vPos.y + 6, vPos.z + 25);
+        const launchZoom = isMobile ? 35 : 25;
+        targetCamPos.set(vPos.x, vPos.y + 6, vPos.z + launchZoom);
         targetLookAt.set(vPos.x, vPos.y + 6, vPos.z);
       } else {
         // Grand finale pull-back (orbit view)
         // Center on Earth (Y=-20) and pull back enough to make it smaller
-        targetCamPos.set(0, -20, 65); 
+        const finalZoom = isMobile ? 100 : 65; // Pull back further on tall screens
+        targetCamPos.set(0, -20, finalZoom); 
         targetLookAt.set(0, -20, 0);
       }
     }
