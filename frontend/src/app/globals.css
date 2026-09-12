@@ -235,3 +235,5 @@
     border-bottom-color: #0a0a0a !important;
   }
 }
+
+@layer utilities { .gibs-layer { mix-blend-mode: lighten; } }

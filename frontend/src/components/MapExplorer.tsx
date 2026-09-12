@@ -249,6 +249,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         attribution: 'NASA GIBS',
         maxZoom: 9,
         opacity: 0.9,
+        className: 'gibs-layer',
         bounds: [[-85.0511287776, -180], [85.0511287776, 180]]
       }
     );
