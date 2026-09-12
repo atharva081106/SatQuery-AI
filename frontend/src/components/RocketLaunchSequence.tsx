@@ -1,157 +1,227 @@
 "use client";
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, useScroll, Html, Stars, useTexture, Environment } from '@react-three/drei';
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
-function LaunchAnimation() {
+const MISSION_STEPS = [
+  { title: "1. Satellite Integration", desc: "Satellite is tested, fueled, and attached to the payload adapter. Fairing is installed." },
+  { title: "2. Launch Preparation", desc: "Rocket at launch pad. Propellant loading and final system checks. Systems armed." },
+  { title: "3. Ignition & Liftoff (T+0)", desc: "Main engines ignite. Thrust reaches maximum, restraints release, vertical ascent begins." },
+  { title: "4. Initial Ascent", desc: "Rocket clears the tower and gradually pitches over toward the desired launch azimuth." },
+  { title: "5. Max-Q", desc: "Maximum aerodynamic pressure. Thrust temporarily reduced to limit structural loads." },
+  { title: "6. First-Stage Burnout", desc: "First-stage propellant is depleted. Main engines shut down." },
+  { title: "7. Stage Separation", desc: "Spent first stage separates and falls away from the upper vehicle." },
+  { title: "8. Second-Stage Ignition", desc: "Upper-stage engine starts. Trajectory becomes increasingly horizontal." },
+  { title: "9. Fairing Separation", desc: "Atmospheric drag is no longer significant. Payload fairing is released." },
+  { title: "10. Upper-Stage Ascent", desc: "Upper stage accelerates, building horizontal velocity required for orbital flight." },
+  { title: "11. Orbital Insertion", desc: "Final burn required to reach the target low-Earth orbit (velocity ~7.8 km/s)." },
+  { title: "12. Engine Cutoff", desc: "Upper-stage engine shuts down. Rocket and satellite travel on desired trajectory." },
+  { title: "13. Satellite Separation", desc: "Separation mechanism releases the satellite with a small relative velocity." },
+  { title: "14. Satellite Acquisition", desc: "Onboard computer boots into orbital mode. Solar panels and antennas deploy." },
+  { title: "15. Orbit Commissioning", desc: "Satellite determines position. Reaction wheels establish correct orientation." },
+  { title: "16. Orbit Raising / Correction", desc: "Propulsion system performs additional maneuvers to reach final altitude." },
+  { title: "17. Operational Orbit", desc: "Final orbit reached. Instruments activated. Satellite enters normal service." }
+];
+
+function getStepIndex(offset: number) {
+  // Map offset (0 to 1) to an index 0 to 16
+  const index = Math.floor(offset * 17);
+  return Math.min(Math.max(index, 0), 16);
+}
+
+// Utility to create a timeline progress between two offsets [start, end]
+function getProgress(offset: number, start: number, end: number) {
+  return Math.max(0, Math.min(1, (offset - start) / (end - start)));
+}
+
+function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => void }) {
   const scroll = useScroll();
   
-  // References
+  // Scenery Refs
   const earthRef = useRef<THREE.Mesh>(null);
   const cloudsRef = useRef<THREE.Mesh>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
   
-  const rocketGroupRef = useRef<THREE.Group>(null);
-  const exhaustRef = useRef<THREE.Mesh>(null);
-  const exhaustLightRef = useRef<THREE.PointLight>(null);
+  // Vehicle Structure Refs
+  const vehicleGroupRef = useRef<THREE.Group>(null);
   
+  // Stage 1
+  const stage1GroupRef = useRef<THREE.Group>(null);
+  const exhaust1Ref = useRef<THREE.Mesh>(null);
+  const light1Ref = useRef<THREE.PointLight>(null);
+  
+  // Stage 2
+  const stage2GroupRef = useRef<THREE.Group>(null);
+  const exhaust2Ref = useRef<THREE.Mesh>(null);
+  const light2Ref = useRef<THREE.PointLight>(null);
+  
+  // Fairings
   const fairingLeftRef = useRef<THREE.Group>(null);
   const fairingRightRef = useRef<THREE.Group>(null);
   
+  // Satellite
   const satelliteGroupRef = useRef<THREE.Group>(null);
   const leftPanelRef = useRef<THREE.Mesh>(null);
   const rightPanelRef = useRef<THREE.Mesh>(null);
-  
-  const htmlRef = useRef<HTMLDivElement>(null);
 
   const earthTexture = useTexture('/textures/2k_earth_daymap.jpg');
   const cloudsTexture = useTexture('/textures/2k_earth_clouds.jpg');
 
   useFrame((state, delta) => {
-    const offset = scroll.offset; // 0 to 1
+    const offset = scroll.offset;
+    const currentStep = getStepIndex(offset);
+    onStepChange(currentStep);
     
     // Rotate Earth slowly
-    if (earthRef.current) earthRef.current.rotation.y += 0.05 * delta;
-    if (cloudsRef.current) cloudsRef.current.rotation.y += 0.06 * delta; // clouds move slightly faster
+    if (earthRef.current) earthRef.current.rotation.y += 0.02 * delta;
+    if (cloudsRef.current) cloudsRef.current.rotation.y += 0.03 * delta;
+
+    // --- TIMELINES --- //
+    const pLiftoff = getProgress(offset, 0.1, 0.3);       // Steps 2-5
+    const pPitchOver = getProgress(offset, 0.15, 0.4);    // Steps 3-7
+    const pMaxQ = getProgress(offset, 0.2, 0.25);         // Step 4
+    const pStage1Burnout = getProgress(offset, 0.25, 0.28); // Step 5
+    const pStage1Sep = getProgress(offset, 0.3, 0.35);    // Step 6
+    const pStage2Ignition = getProgress(offset, 0.35, 0.65); // Steps 7-10
+    const pFairingSep = getProgress(offset, 0.4, 0.45);   // Step 8
+    const pOrbitInsert = getProgress(offset, 0.45, 0.65); // Steps 9-10
+    const pStage2Cutoff = getProgress(offset, 0.65, 0.68); // Step 11
+    const pSatSep = getProgress(offset, 0.7, 0.75);       // Step 12
+    const pSatAcq = getProgress(offset, 0.75, 0.85);      // Steps 13-14
+    const pOrbitRaise = getProgress(offset, 0.85, 1.0);   // Steps 15-16
 
     // CAMERA LOGIC
-    if (offset < 0.2) {
-      state.camera.position.lerp(new THREE.Vector3(0, 2, 14), 0.05);
-      state.camera.lookAt(0, 2, 0);
-    } else if (offset < 0.5) {
-      const t = (offset - 0.2) / 0.3;
-      state.camera.position.lerp(new THREE.Vector3(0, 2 - t * 4, 14 + t * 4), 0.05);
-      state.camera.lookAt(0, 0, 0);
-    } else {
-      state.camera.position.lerp(new THREE.Vector3(0, 4, 8), 0.05);
-      state.camera.lookAt(0, 4, 0);
+    // Follow the vehicle throughout the sequence
+    let targetCamPos = new THREE.Vector3(0, 2, 14);
+    let targetLookAt = new THREE.Vector3(0, 2, 0);
+
+    if (pLiftoff > 0 && pOrbitInsert < 1) {
+      // Ascending
+      targetCamPos.set(0, 2 - pLiftoff * 6 + pOrbitInsert * 4, 14 + pLiftoff * 8 - pOrbitInsert * 6);
+      targetLookAt.set(0, 0, 0);
+    } else if (pOrbitInsert === 1 && pSatSep < 1) {
+      // Orbiting
+      targetCamPos.set(0, 4, 10);
+      targetLookAt.set(0, 4, 0);
+    } else if (pSatSep > 0) {
+      // Focusing on Satellite
+      targetCamPos.set(0, 5 + pSatSep * 2, 8 - pSatAcq * 2);
+      targetLookAt.set(0, 5 + pSatSep * 2, 0);
     }
 
-    // ANIMATION STAGES
+    state.camera.position.lerp(targetCamPos, 0.05);
+    state.camera.lookAt(targetLookAt);
 
-    // Stage 1: Liftoff & Earth Descent (offset 0.1 to 0.45)
-    const liftoffProgress = Math.max(0, Math.min(1, (offset - 0.1) / 0.35));
-    
+    // EARTH / ATMOSPHERE (Simulate Altitude)
     if (earthRef.current && atmosphereRef.current && cloudsRef.current) {
-      const targetScale = 1 - (liftoffProgress * 0.95);
-      earthRef.current.scale.set(targetScale, targetScale, targetScale);
-      cloudsRef.current.scale.set(targetScale * 1.01, targetScale * 1.01, targetScale * 1.01);
-      atmosphereRef.current.scale.set(targetScale * 1.03, targetScale * 1.03, targetScale * 1.03);
+      const scale = 1 - (pLiftoff * 0.92) - (pOrbitInsert * 0.03); 
+      earthRef.current.scale.set(scale, scale, scale);
+      cloudsRef.current.scale.set(scale * 1.01, scale * 1.01, scale * 1.01);
+      atmosphereRef.current.scale.set(scale * 1.03, scale * 1.03, scale * 1.03);
       
-      const dropY = -20 - (liftoffProgress * 60);
+      const dropY = -20 - (pLiftoff * 80) - (pOrbitInsert * 20);
       earthRef.current.position.y = dropY;
       cloudsRef.current.position.y = dropY;
       atmosphereRef.current.position.y = dropY;
     }
-    
-    if (exhaustRef.current && exhaustLightRef.current) {
-      if (liftoffProgress > 0 && liftoffProgress < 1) {
-        exhaustRef.current.scale.set(1 + Math.random() * 0.2, 1 + Math.random() * 0.8, 1 + Math.random() * 0.2);
-        exhaustRef.current.visible = true;
-        // Flicker intensity for realism
-        exhaustLightRef.current.intensity = 15 + Math.random() * 10;
-        (exhaustRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = 5 + Math.random() * 5;
+
+    // VEHICLE TRAJECTORY (Pitch Over)
+    if (vehicleGroupRef.current) {
+      // Pitch over translates to rotating on Z axis (visually going horizontal)
+      vehicleGroupRef.current.rotation.z = -pPitchOver * (Math.PI / 2);
+      // Add some vibration during Max-Q
+      if (pMaxQ > 0 && pMaxQ < 1) {
+        vehicleGroupRef.current.position.x = (Math.random() - 0.5) * 0.1;
       } else {
-        exhaustRef.current.visible = false;
-        exhaustLightRef.current.intensity = 0;
-      }
-    }
-    
-    if (rocketGroupRef.current) {
-      if (liftoffProgress > 0 && liftoffProgress < 1) {
-        const shake = (1 - liftoffProgress) * 0.08;
-        rocketGroupRef.current.position.x = (Math.random() - 0.5) * shake;
-        rocketGroupRef.current.position.z = (Math.random() - 0.5) * shake;
-      } else {
-        rocketGroupRef.current.position.x = 0;
-        rocketGroupRef.current.position.z = 0;
+        vehicleGroupRef.current.position.x = 0;
       }
     }
 
-    // Stage 2: Fairing Separation
-    const fairingProgress = Math.max(0, Math.min(1, (offset - 0.5) / 0.2));
-    
-    if (fairingLeftRef.current) {
-      fairingLeftRef.current.position.x = -fairingProgress * 8;
-      fairingLeftRef.current.rotation.z = fairingProgress * 1.5;
-    }
-    if (fairingRightRef.current) {
-      fairingRightRef.current.position.x = fairingProgress * 8;
-      fairingRightRef.current.rotation.z = -fairingProgress * 1.5;
+    // STAGE 1 LOGIC
+    if (stage1GroupRef.current) {
+      if (pStage1Sep > 0) {
+        // Stage 1 falls away and rotates slightly
+        stage1GroupRef.current.position.y = -pStage1Sep * 10;
+        stage1GroupRef.current.position.x = -pStage1Sep * 2;
+        stage1GroupRef.current.rotation.z = pStage1Sep * 0.5;
+      }
     }
 
-    // Stage 3: Satellite Deployment
-    const deployProgress = Math.max(0, Math.min(1, (offset - 0.7) / 0.25));
-    
+    // EXHAUST 1 (Booster)
+    if (exhaust1Ref.current && light1Ref.current) {
+      if (pLiftoff > 0 && pStage1Burnout < 1) {
+        exhaust1Ref.current.visible = true;
+        
+        // Intense during Max Q, tapers off at burnout
+        const intensity = pMaxQ > 0 && pMaxQ < 1 ? 1.5 : (1 - pStage1Burnout);
+        exhaust1Ref.current.scale.set(1 + Math.random() * 0.2, (1 + Math.random() * 0.8) * intensity, 1 + Math.random() * 0.2);
+        light1Ref.current.intensity = (15 + Math.random() * 10) * intensity;
+        (exhaust1Ref.current.material as THREE.MeshStandardMaterial).emissiveIntensity = (5 + Math.random() * 5) * intensity;
+      } else {
+        exhaust1Ref.current.visible = false;
+        light1Ref.current.intensity = 0;
+      }
+    }
+
+    // EXHAUST 2 (Upper Stage)
+    if (exhaust2Ref.current && light2Ref.current) {
+      if (pStage2Ignition > 0 && pStage2Cutoff < 1) {
+        exhaust2Ref.current.visible = true;
+        // Upper stage engine is smaller, more vacuum-optimized (wider, less intense)
+        exhaust2Ref.current.scale.set(1.5 + Math.random() * 0.2, 0.8 + Math.random() * 0.4, 1.5 + Math.random() * 0.2);
+        light2Ref.current.intensity = 5 + Math.random() * 5;
+        (exhaust2Ref.current.material as THREE.MeshStandardMaterial).emissiveIntensity = 3 + Math.random() * 2;
+      } else {
+        exhaust2Ref.current.visible = false;
+        light2Ref.current.intensity = 0;
+      }
+    }
+
+    // FAIRING LOGIC
+    if (fairingLeftRef.current && fairingRightRef.current) {
+      fairingLeftRef.current.position.x = -pFairingSep * 6;
+      fairingLeftRef.current.rotation.z = pFairingSep * 1;
+      
+      fairingRightRef.current.position.x = pFairingSep * 6;
+      fairingRightRef.current.rotation.z = -pFairingSep * 1;
+    }
+
+    // SATELLITE SEPARATION & COMMISSIONING
     if (satelliteGroupRef.current) {
-      satelliteGroupRef.current.position.y = 2.5 + (deployProgress * 2.5);
-      if (deployProgress > 0) {
-        satelliteGroupRef.current.rotation.y += 0.8 * delta;
-        satelliteGroupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+      // Sat pushes forward from the second stage
+      satelliteGroupRef.current.position.y = 1.5 + (pSatSep * 3);
+      
+      // Orbit raising moves it further away
+      satelliteGroupRef.current.position.x = pOrbitRaise * 5;
+      satelliteGroupRef.current.position.y += pOrbitRaise * 2;
+      
+      if (pSatSep > 0) {
+        // Spin stabilizes
+        satelliteGroupRef.current.rotation.y += 0.5 * delta;
+        // Correct orientation
+        satelliteGroupRef.current.rotation.x = THREE.MathUtils.lerp(0, Math.PI / 4, pSatAcq);
       }
     }
-    
-    if (leftPanelRef.current) {
-      leftPanelRef.current.position.x = THREE.MathUtils.lerp(0, -1.8, deployProgress);
-      leftPanelRef.current.rotation.y = THREE.MathUtils.lerp(Math.PI/2, 0, deployProgress);
-    }
-    if (rightPanelRef.current) {
-      rightPanelRef.current.position.x = THREE.MathUtils.lerp(0, 1.8, deployProgress);
-      rightPanelRef.current.rotation.y = THREE.MathUtils.lerp(-Math.PI/2, 0, deployProgress);
-    }
 
-    // HTML HUD
-    if (htmlRef.current) {
-      const opacity = offset > 0.95 ? (offset - 0.95) * 20 : 0;
-      htmlRef.current.style.opacity = Math.min(1, opacity).toString();
-      htmlRef.current.style.transform = `translateY(${Math.max(0, 20 - opacity * 20)}px)`;
+    // SOLAR PANELS
+    if (leftPanelRef.current && rightPanelRef.current) {
+      leftPanelRef.current.position.x = THREE.MathUtils.lerp(0, -1.8, pSatAcq);
+      leftPanelRef.current.rotation.y = THREE.MathUtils.lerp(Math.PI/2, 0, pSatAcq);
+      
+      rightPanelRef.current.position.x = THREE.MathUtils.lerp(0, 1.8, pSatAcq);
+      rightPanelRef.current.rotation.y = THREE.MathUtils.lerp(-Math.PI/2, 0, pSatAcq);
     }
   });
 
-  // Physically Based Materials (PBR)
-  const rocketMaterial = useMemo(() => new THREE.MeshStandardMaterial({ 
-    color: '#ffffff', 
-    metalness: 0.7, 
-    roughness: 0.2,
-    envMapIntensity: 2.0 // highly reflective to environment
-  }), []);
-
-  const darkMetal = useMemo(() => new THREE.MeshStandardMaterial({ 
-    color: '#222222', 
-    metalness: 0.9, 
-    roughness: 0.3,
-    envMapIntensity: 1.5
-  }), []);
-
-  const goldFoil = useMemo(() => new THREE.MeshStandardMaterial({ 
-    color: '#ffcc00', 
-    metalness: 0.8, 
-    roughness: 0.4, 
-    envMapIntensity: 1.5
-  }), []);
+  // PBR Materials
+  const rocketMaterial = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.7, roughness: 0.2, envMapIntensity: 2.0 }), []);
+  const darkMetal = useMemo(() => new THREE.MeshStandardMaterial({ color: '#222222', metalness: 0.9, roughness: 0.3, envMapIntensity: 1.5 }), []);
+  const goldFoil = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ffcc00', metalness: 0.8, roughness: 0.4, envMapIntensity: 1.5 }), []);
+  const engineFlame = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ff5500', emissive: '#ffaa00', emissiveIntensity: 5, transparent: true, opacity: 0.9 }), []);
+  const vacFlame = useMemo(() => new THREE.MeshStandardMaterial({ color: '#3388ff', emissive: '#00ccff', emissiveIntensity: 3, transparent: true, opacity: 0.8 }), []);
 
   return (
     <group>
@@ -161,116 +231,116 @@ function LaunchAnimation() {
         <meshStandardMaterial map={earthTexture} roughness={0.7} metalness={0.1} />
       </mesh>
       
-      {/* CLOUDS LAYER (Realistic volumetric look) */}
       <mesh ref={cloudsRef} position={[0, -20, 0]}>
         <sphereGeometry args={[18.05, 64, 64]} />
         <meshStandardMaterial map={cloudsTexture} transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
 
-      {/* ATMOSPHERE GLOW */}
       <mesh ref={atmosphereRef} position={[0, -20, 0]}>
         <sphereGeometry args={[18.4, 64, 64]} />
         <meshBasicMaterial color="#4b70dd" transparent opacity={0.15} side={THREE.BackSide} />
       </mesh>
 
-      {/* ROCKET OVERALL GROUP */}
-      <group ref={rocketGroupRef} position={[0, -1, 0]}>
+      {/* VEHICLE GROUP (Handles pitch over) */}
+      <group ref={vehicleGroupRef} position={[0, -1, 0]}>
         
-        {/* ROCKET STAGE 1 (Booster) */}
-        <mesh position={[0, -0.5, 0]}>
-          <cylinderGeometry args={[0.6, 0.6, 5, 64]} />
-          <primitive object={rocketMaterial} attach="material" />
-        </mesh>
-
-        {/* ENGINE BELL */}
-        <mesh position={[0, -3.2, 0]}>
-          <cylinderGeometry args={[0.4, 0.7, 0.6, 32]} />
-          <primitive object={darkMetal} attach="material" />
-        </mesh>
-        
-        {/* EXHAUST FLAME (Uses bloom postprocessing) */}
-        <mesh ref={exhaustRef} position={[0, -4.5, 0]} visible={false}>
-          <coneGeometry args={[0.5, 2.5, 32]} />
-          <meshStandardMaterial color="#ff5500" emissive="#ffaa00" emissiveIntensity={5} transparent opacity={0.9} />
-          <pointLight ref={exhaustLightRef} color="#ff7700" distance={30} decay={1.5} intensity={0} />
-        </mesh>
-
-        {/* FINS */}
-        <group position={[0, -2.5, 0]}>
-          {[0, Math.PI/2, Math.PI, Math.PI*1.5].map((rot, i) => (
-            <mesh key={i} rotation={[0, rot, 0]} position={[Math.sin(rot)*0.7, 0, Math.cos(rot)*0.7]}>
-              <boxGeometry args={[0.1, 1.2, 0.8]} />
-              <primitive object={rocketMaterial} attach="material" />
-            </mesh>
-          ))}
-        </group>
-
-        {/* FAIRING LEFT */}
-        <group ref={fairingLeftRef} position={[0, 2, 0]}>
-          <mesh position={[-0.3, 0.5, 0]}>
-            <cylinderGeometry args={[0.6, 0.6, 2, 32, 1, false, Math.PI, Math.PI]} />
+        {/* === STAGE 1 (Booster) === */}
+        <group ref={stage1GroupRef}>
+          <mesh position={[0, -1.5, 0]}>
+            <cylinderGeometry args={[0.6, 0.6, 6, 64]} />
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
-          <mesh position={[-0.3, 2, 0]}>
-            <coneGeometry args={[0.6, 1.5, 32, 1, false, Math.PI, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
-          </mesh>
-        </group>
-
-        {/* FAIRING RIGHT */}
-        <group ref={fairingRightRef} position={[0, 2, 0]}>
-          <mesh position={[0.3, 0.5, 0]}>
-            <cylinderGeometry args={[0.6, 0.6, 2, 32, 1, false, 0, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
-          </mesh>
-          <mesh position={[0.3, 2, 0]}>
-            <coneGeometry args={[0.6, 1.5, 32, 1, false, 0, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
-          </mesh>
-        </group>
-
-        {/* PAYLOAD (Satellite) */}
-        <group ref={satelliteGroupRef} position={[0, 2.5, 0]} scale={[0.5, 0.5, 0.5]}>
-          {/* Main Bus (Gold Foil) */}
-          <mesh>
-            <boxGeometry args={[1.2, 1.5, 1.2]} />
-            <primitive object={goldFoil} attach="material" />
-          </mesh>
-          
-          {/* Solar Panel Left */}
-          <mesh ref={leftPanelRef} position={[0, 0, 0]}>
-            <boxGeometry args={[2, 4, 0.05]} />
-            <meshStandardMaterial color="#0a1b2c" metalness={1} roughness={0.2} envMapIntensity={2} />
-            <gridHelper args={[2, 10, 0x4488ff, 0x4488ff]} rotation={[Math.PI/2, 0, 0]} position={[0, 0, 0.03]} />
-          </mesh>
-
-          {/* Solar Panel Right */}
-          <mesh ref={rightPanelRef} position={[0, 0, 0]}>
-            <boxGeometry args={[2, 4, 0.05]} />
-            <meshStandardMaterial color="#0a1b2c" metalness={1} roughness={0.2} envMapIntensity={2} />
-            <gridHelper args={[2, 10, 0x4488ff, 0x4488ff]} rotation={[Math.PI/2, 0, 0]} position={[0, 0, 0.03]} />
-          </mesh>
-
-          {/* Dish */}
-          <mesh position={[0, 1.0, 0]} rotation={[-0.2, 0, 0]}>
-            <cylinderGeometry args={[0.8, 0.1, 0.4, 32]} />
-            <meshStandardMaterial color="#ffffff" metalness={0.5} roughness={0.5} />
-          </mesh>
-          
-          {/* Antenna mast */}
-          <mesh position={[0, 1.4, 0]}>
-            <cylinderGeometry args={[0.05, 0.05, 1, 16]} />
+          <mesh position={[0, -4.5, 0]}>
+            <cylinderGeometry args={[0.4, 0.7, 0.6, 32]} />
             <primitive object={darkMetal} attach="material" />
           </mesh>
+          <mesh ref={exhaust1Ref} position={[0, -5.8, 0]} visible={false}>
+            <coneGeometry args={[0.6, 3, 32]} />
+            <primitive object={engineFlame} attach="material" />
+            <pointLight ref={light1Ref} color="#ff7700" distance={30} decay={1.5} intensity={0} />
+          </mesh>
+          <group position={[0, -3.8, 0]}>
+            {[0, Math.PI/2, Math.PI, Math.PI*1.5].map((rot, i) => (
+              <mesh key={i} rotation={[0, rot, 0]} position={[Math.sin(rot)*0.7, 0, Math.cos(rot)*0.7]}>
+                <boxGeometry args={[0.1, 1.2, 0.8]} />
+                <primitive object={rocketMaterial} attach="material" />
+              </mesh>
+            ))}
+          </group>
+        </group>
 
-          <Html distanceFactor={10} position={[0, 2.5, 0]} center>
-            <div ref={htmlRef} className="flex flex-col items-center opacity-0 transition-all duration-500 pointer-events-none">
-              <div className="text-[#00ffcc] font-mono text-lg md:text-2xl tracking-widest font-bold bg-black/60 px-4 py-2 border border-[#00ffcc]/50 rounded-sm shadow-[0_0_15px_rgba(0,255,204,0.5)] backdrop-blur-sm text-center">
-                ORBIT ACHIEVED
-              </div>
-              <div className="w-[1px] h-8 bg-gradient-to-b from-[#00ffcc]/80 to-transparent mt-2"></div>
-            </div>
-          </Html>
+        {/* === STAGE 2 (Upper Stage & Payload) === */}
+        <group ref={stage2GroupRef} position={[0, 1.5, 0]}>
+          <mesh position={[0, -0.5, 0]}>
+            <cylinderGeometry args={[0.6, 0.6, 2, 32]} />
+            <primitive object={rocketMaterial} attach="material" />
+          </mesh>
+          
+          {/* Stage 2 Engine */}
+          <mesh position={[0, -1.6, 0]}>
+            <cylinderGeometry args={[0.2, 0.5, 0.4, 32]} />
+            <primitive object={darkMetal} attach="material" />
+          </mesh>
+          <mesh ref={exhaust2Ref} position={[0, -2.5, 0]} visible={false}>
+            {/* Vacuum engine flame is typically wider and bluer */}
+            <coneGeometry args={[0.8, 2, 32]} />
+            <primitive object={vacFlame} attach="material" />
+            <pointLight ref={light2Ref} color="#00aaff" distance={20} decay={2} intensity={0} />
+          </mesh>
+
+          {/* FAIRING LEFT */}
+          <group ref={fairingLeftRef} position={[0, 0.5, 0]}>
+            <mesh position={[-0.3, 0.5, 0]}>
+              <cylinderGeometry args={[0.6, 0.6, 2, 32, 1, false, Math.PI, Math.PI]} />
+              <primitive object={rocketMaterial} attach="material" />
+            </mesh>
+            <mesh position={[-0.3, 2, 0]}>
+              <coneGeometry args={[0.6, 1.5, 32, 1, false, Math.PI, Math.PI]} />
+              <primitive object={rocketMaterial} attach="material" />
+            </mesh>
+          </group>
+
+          {/* FAIRING RIGHT */}
+          <group ref={fairingRightRef} position={[0, 0.5, 0]}>
+            <mesh position={[0.3, 0.5, 0]}>
+              <cylinderGeometry args={[0.6, 0.6, 2, 32, 1, false, 0, Math.PI]} />
+              <primitive object={rocketMaterial} attach="material" />
+            </mesh>
+            <mesh position={[0.3, 2, 0]}>
+              <coneGeometry args={[0.6, 1.5, 32, 1, false, 0, Math.PI]} />
+              <primitive object={rocketMaterial} attach="material" />
+            </mesh>
+          </group>
+
+          {/* SATELLITE PAYLOAD */}
+          <group ref={satelliteGroupRef} position={[0, 1.5, 0]} scale={[0.5, 0.5, 0.5]}>
+            <mesh>
+              <boxGeometry args={[1.2, 1.5, 1.2]} />
+              <primitive object={goldFoil} attach="material" />
+            </mesh>
+            
+            <mesh ref={leftPanelRef} position={[0, 0, 0]}>
+              <boxGeometry args={[2, 4, 0.05]} />
+              <meshStandardMaterial color="#0a1b2c" metalness={1} roughness={0.2} envMapIntensity={2} />
+              <gridHelper args={[2, 10, 0x4488ff, 0x4488ff]} rotation={[Math.PI/2, 0, 0]} position={[0, 0, 0.03]} />
+            </mesh>
+
+            <mesh ref={rightPanelRef} position={[0, 0, 0]}>
+              <boxGeometry args={[2, 4, 0.05]} />
+              <meshStandardMaterial color="#0a1b2c" metalness={1} roughness={0.2} envMapIntensity={2} />
+              <gridHelper args={[2, 10, 0x4488ff, 0x4488ff]} rotation={[Math.PI/2, 0, 0]} position={[0, 0, 0.03]} />
+            </mesh>
+
+            <mesh position={[0, 1.0, 0]} rotation={[-0.2, 0, 0]}>
+              <cylinderGeometry args={[0.8, 0.1, 0.4, 32]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.5} roughness={0.5} />
+            </mesh>
+            
+            <mesh position={[0, 1.4, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 1, 16]} />
+              <primitive object={darkMetal} attach="material" />
+            </mesh>
+          </group>
         </group>
 
       </group>
@@ -279,40 +349,53 @@ function LaunchAnimation() {
 }
 
 export default function RocketLaunchSequence() {
+  const [activeStep, setActiveStep] = useState(0);
+
   return (
     <div className="w-full h-[100dvh] bg-[#000005] relative flex flex-col">
-      <div className="absolute top-24 w-full z-20 text-center pointer-events-none px-4">
-        <h2 className="text-white text-2xl md:text-4xl font-mono tracking-[0.3em] font-bold uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-          Launch Sequence
-        </h2>
-        <p className="text-[#00ffcc] text-xs mt-3 font-mono uppercase tracking-[0.2em] animate-pulse">
-          Scroll Down to Initiate
-        </p>
+      
+      {/* CINEMATIC HUD SUBTITLES */}
+      <div className="absolute bottom-16 left-0 w-full z-20 pointer-events-none px-8 flex justify-center">
+        <div className="max-w-3xl bg-black/50 backdrop-blur-md border-l-4 border-[#00ffcc] p-6 rounded-r-lg shadow-2xl transition-all duration-300 transform">
+          <h2 className="text-[#00ffcc] text-xl md:text-2xl font-mono tracking-widest font-bold uppercase mb-2">
+            {MISSION_STEPS[activeStep].title}
+          </h2>
+          <p className="text-white/90 text-sm md:text-base font-mono tracking-wide leading-relaxed">
+            {MISSION_STEPS[activeStep].desc}
+          </p>
+          
+          {/* Progress Bar */}
+          <div className="w-full h-1 bg-white/10 mt-4 rounded overflow-hidden">
+            <div 
+              className="h-full bg-[#00ffcc] transition-all duration-300"
+              style={{ width: `${((activeStep + 1) / MISSION_STEPS.length) * 100}%` }}
+            ></div>
+          </div>
+        </div>
       </div>
 
-      <Canvas camera={{ position: [0, 2, 12], fov: 45 }}>
-        {/* Photorealistic Lighting via HDRI Environment */}
+      <div className="absolute top-24 w-full z-20 text-center pointer-events-none px-4">
+        <h2 className="text-white/20 text-4xl font-mono tracking-[0.5em] font-bold uppercase">
+          Mission Timeline
+        </h2>
+      </div>
+
+      <Canvas camera={{ position: [0, 2, 14], fov: 45 }}>
         <Environment preset="night" background={false} />
-        
         <ambientLight intensity={0.2} />
         <directionalLight position={[10, 10, 10]} intensity={2.5} color="#ffeedd" castShadow />
         
         <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
         
-        <ScrollControls pages={5} damping={0.2}>
-          <LaunchAnimation />
+        <ScrollControls pages={20} damping={0.2}>
+          <LaunchAnimation onStepChange={setActiveStep} />
         </ScrollControls>
 
-        {/* Cinematic Post-Processing */}
         <EffectComposer disableNormalPass>
           <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
           <ToneMapping />
         </EffectComposer>
       </Canvas>
-      
-      <div className="absolute bottom-10 w-full z-20 flex flex-col items-center justify-center pointer-events-none">
-        <div className="w-[2px] h-12 bg-gradient-to-b from-white/80 to-transparent animate-bounce"></div>
-      </div>
     </div>
   );
 }
