@@ -43,7 +43,6 @@ function LaunchAnimation() {
 
   const earthTexture = useTexture('/textures/2k_earth_daymap.jpg');
   const cloudsTexture = useTexture('/textures/2k_earth_clouds.jpg');
-  const moonTexture = useTexture('/textures/2k_mercury.jpg'); // Looks identical to moon!
 
   useFrame((state, delta) => {
     const offset = scroll.offset;
@@ -279,15 +278,7 @@ function LaunchAnimation() {
         {/* ORBIT PATH */}
         <mesh>
           <ringGeometry args={[21.95, 22.05, 128]} />
-          <meshBasicMaterial color="#00ffcc" transparent opacity={0.15} side={THREE.DoubleSide} />
-        </mesh>
-      </group>
-
-      {/* MOON SYSTEM */}
-      <group position={[-60, 40, -150]}>
-        <mesh>
-          <sphereGeometry args={[12, 64, 64]} />
-          <meshStandardMaterial map={moonTexture} roughness={0.9} metalness={0.1} color="#cccccc" />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.2} side={THREE.DoubleSide} />
         </mesh>
       </group>
 
