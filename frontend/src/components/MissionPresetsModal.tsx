@@ -51,7 +51,10 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     query: "Run Change Detection between pre-flood baseline and post-flood event",
     description: "Catastrophic cloudburst and glacial lake outburst flood in Chamoli. Demonstrates bi-temporal difference mapping, swollen silt channel boundary delineation, and affected transport infrastructure isolation.",
     technicalNote: "Directly solves PS 26167 requirement: Bi-temporal satellite pair processing with pixel-level displaced terrain identification.",
-    images: []
+    images: [
+      { name: "uttarakhand_pre_event_t1.png", base64: "/demo/uttarakhand_pre_event_t1.png", label: "T1: BASELINE ACQUISITION" },
+      { name: "uttarakhand_post_event_t2.png", base64: "/demo/uttarakhand_post_event_t2.png", label: "T2: POST-DISASTER TILE" }
+    ]
   },
   {
     id: "mumbai_port_recon",
@@ -67,7 +70,9 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     query: "Highlight industrial storage facilities, maritime docks, and cargo vessels",
     description: "Deep-water seaport terminal evaluation. Isolates commercial container ships, docking berths, and cylindrical petroleum liquid storage clusters with sub-meter spatial precision.",
     technicalNote: "Validates high-resolution panchromatic spatial grounding with zero false alarms across ocean-land boundaries.",
-    images: []
+    images: [
+      { name: "mumbai_cartosat2s_optical.png", base64: "/demo/mumbai_cartosat2s_optical.png", label: "CARTOSAT-2S PANCHROMATIC" }
+    ]
   },
   {
     id: "bay_of_bengal_sar",
@@ -83,7 +88,10 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     query: "Penetrate cloud cover using SAR radar backscatter channels and extract obscured maritime features",
     description: "Overcomes 100% thick monsoon cloud cover obscuring optical satellites by fusing synthetic aperture radar backscatter returns to pinpoint maritime vessels and island coastlines.",
     technicalNote: "Demonstrates ISRO RISAT-1 microwave radar capabilities for all-weather 24/7 disaster and strategic surveillance.",
-    images: []
+    images: [
+      { name: "cyclone_cloud_obscured_optical.png", base64: "/demo/cyclone_cloud_obscured_optical.png", label: "OPTICAL (CLOUD OBSCURED)" },
+      { name: "risat1_cband_radar_sar.png", base64: "/demo/risat1_cband_radar_sar.png", label: "RISAT-1 SAR (PENETRATED)" }
+    ]
   },
   {
     id: "sambhar_salt_lake",
@@ -99,7 +107,9 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     query: "Detect water body boundary and calculate total wetland surface area in km²",
     description: "Ramsar wetland desiccation monitoring. Isolates hypersaline brine lagoons from industrial salt evaporation pans and computes accurate surface area vector polygons in RFC 7946 GeoJSON.",
     technicalNote: "Validates multispectral SWIR/NIR water indices and automatic polygon area calculation in square kilometers.",
-    images: []
+    images: [
+      { name: "sambhar_lake_liss4.png", base64: "/demo/sambhar_lake_liss4.png", label: "RESOURCESAT-2 LISS-4" }
+    ]
   },
   {
     id: "bengaluru_urban_sprawl",
@@ -115,7 +125,9 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     query: "Detect built-up structures, commercial buildings, and calculate built-up density percentage",
     description: "Rapid urban densification analysis isolating tech park footprints, multi-lane arterial roads, and remaining vegetative buffers with built-up ratio percentage.",
     technicalNote: "Evaluates sub-30cm Cartosat-3 high-detail resolving power for smart city planning and tax boundary audits.",
-    images: []
+    images: [
+      { name: "bengaluru_cartosat3.png", base64: "/demo/bengaluru_cartosat3.png", label: "CARTOSAT-3 SUB-METER" }
+    ]
   }
 ];
 
