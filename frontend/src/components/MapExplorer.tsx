@@ -43,6 +43,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [bbox, setBbox] = useState<number[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [acquisitionMode, setAcquisitionMode] = useState<"single" | "dual">("single");
+  const [liveLocationName, setLiveLocationName] = useState<string | null>(null);
   
   const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
@@ -160,6 +161,33 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     };
   }, [L]);
 
+  // Fetch location name when bbox changes
+  useEffect(() => {
+    if (!bbox) {
+      setLiveLocationName(null);
+      return;
+    }
+    
+    let isMounted = true;
+    const fetchLocation = async () => {
+      try {
+        setLiveLocationName("Locating...");
+        const centerLat = (bbox[1] + bbox[3]) / 2;
+        const centerLng = (bbox[0] + bbox[2]) / 2;
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${centerLat}&lon=${centerLng}&format=json`);
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          setLiveLocationName(data.display_name || "Unknown Location");
+        }
+      } catch (e) {
+        if (isMounted) setLiveLocationName("Unknown Location");
+      }
+    };
+    fetchLocation();
+    
+    return () => { isMounted = false; };
+  }, [bbox]);
+
   // Switch basemap when selection changes
   useEffect(() => {
     if (!L || !mapInstanceRef.current) return;
@@ -232,18 +260,20 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
       
-      // Step 1: Reverse Geocoding
-      let locationName = "Unknown Location";
-      try {
-        const centerLat = (bbox[1] + bbox[3]) / 2;
-        const centerLng = (bbox[0] + bbox[2]) / 2;
-        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${centerLat}&lon=${centerLng}&format=json`);
-        if (geoRes.ok) {
-          const geoData = await geoRes.json();
-          locationName = geoData.display_name || "Unknown Location";
+      // Step 1: Use pre-fetched location if available, otherwise fetch
+      let locationName = liveLocationName && liveLocationName !== "Locating..." ? liveLocationName : "Unknown Location";
+      if (locationName === "Unknown Location") {
+        try {
+          const centerLat = (bbox[1] + bbox[3]) / 2;
+          const centerLng = (bbox[0] + bbox[2]) / 2;
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${centerLat}&lon=${centerLng}&format=json`);
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            locationName = geoData.display_name || "Unknown Location";
+          }
+        } catch (e) {
+          console.warn("Geocoding failed", e);
         }
-      } catch (e) {
-        console.warn("Geocoding failed", e);
       }
       
       const fetchImage = async (targetDate: string) => {
@@ -573,8 +603,13 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         )}
       </div>
 
-      {/* LAT/LNG TRACKER */}
-      <div className="absolute top-16 sm:bottom-6 right-3 sm:right-16 z-[400] pointer-events-none">
+      {/* LAT/LNG TRACKER & LOCATION */}
+      <div className="absolute top-16 sm:bottom-6 right-3 sm:right-16 z-[400] pointer-events-none flex flex-col items-end gap-2">
+        {liveLocationName && (
+          <div className="bg-black/80 backdrop-blur-md border border-[#00F0FF]/30 px-3 py-2 text-[10px] tracking-widest text-[#00F0FF] rounded-lg max-w-[250px] text-right truncate">
+            {liveLocationName}
+          </div>
+        )}
         <div className="bg-black/70 backdrop-blur-md border border-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] text-[#00F0FF] rounded-lg">
           LAT: {mousePos.lat.toFixed(3)} / LNG: {mousePos.lng.toFixed(3)}
         </div>
