@@ -11,8 +11,16 @@ function getProgress(offset: number, start: number, end: number) {
   return Math.max(0, Math.min(1, (offset - start) / (end - start)));
 }
 
+// Cubic ease-out for smooth natural deceleration
+function easeOut(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 function LaunchAnimation() {
   const scroll = useScroll();
+  
+  // Camera smoothing ref
+  const currentLookAt = useRef(new THREE.Vector3(0, 6, 0));
   
   // Scenery Refs
   const earthGroupRef = useRef<THREE.Group>(null);
@@ -125,14 +133,15 @@ function LaunchAnimation() {
       stage1WrapperRef.current.rotation.z = s1Traj.rotZ;
     }
 
-    const pStage1Sep = getProgress(offset, 0.30, 0.60); 
+    const pStage1SepRaw = getProgress(offset, 0.30, 0.60); 
+    const pStage1Sep = easeOut(pStage1SepRaw);
     if (stage1GroupRef.current) {
       // Local -Y moves it backwards, but we don't want it to shoot past Earth.
       stage1GroupRef.current.position.y = -pStage1Sep * 15; 
       stage1GroupRef.current.position.x = -pStage1Sep * 2; 
       stage1GroupRef.current.rotation.z = pStage1Sep * 4; // fast tumble
       // Burn up in atmosphere!
-      const scale = Math.max(0, 1 - (pStage1Sep * 1.2));
+      const scale = Math.max(0, 1 - (pStage1SepRaw * 1.2));
       stage1GroupRef.current.scale.setScalar(scale);
     }
 
@@ -147,7 +156,8 @@ function LaunchAnimation() {
       fairingRightWrapperRef.current.rotation.z = fairingTraj.rotZ;
     }
 
-    const pFairingSep = getProgress(offset, 0.40, 0.65);
+    const pFairingSepRaw = getProgress(offset, 0.40, 0.65);
+    const pFairingSep = easeOut(pFairingSepRaw);
     if (fairingLeftRef.current && fairingRightRef.current) {
       fairingLeftRef.current.position.x = -pFairingSep * 5;
       fairingLeftRef.current.position.y = -pFairingSep * 10; 
@@ -157,7 +167,7 @@ function LaunchAnimation() {
       fairingRightRef.current.position.y = -pFairingSep * 10;
       fairingRightRef.current.rotation.z = -pFairingSep * 4;
 
-      const fScale = Math.max(0, 1 - (pFairingSep * 1.5));
+      const fScale = Math.max(0, 1 - (pFairingSepRaw * 1.5));
       fairingLeftRef.current.scale.setScalar(fScale);
       fairingRightRef.current.scale.setScalar(fScale);
     }
@@ -171,12 +181,13 @@ function LaunchAnimation() {
       stage2WrapperRef.current.rotation.z = s2Traj.rotZ;
     }
 
-    const pStage2Sep = getProgress(offset, 0.70, 0.90);
+    const pStage2SepRaw = getProgress(offset, 0.70, 0.90);
+    const pStage2Sep = easeOut(pStage2SepRaw);
     if (stage2GroupRef.current) {
       stage2GroupRef.current.position.y = -pStage2Sep * 15; 
       stage2GroupRef.current.rotation.z = pStage2Sep * 2; 
       
-      const s2Scale = Math.max(0, 1 - (pStage2Sep * 1.5));
+      const s2Scale = Math.max(0, 1 - (pStage2SepRaw * 1.5));
       stage2GroupRef.current.scale.setScalar(s2Scale);
     }
 
@@ -205,8 +216,10 @@ function LaunchAnimation() {
       }
     }
 
+    // Smoothly lerp both position AND lookAt target to prevent violent snapping
     state.camera.position.lerp(targetCamPos, 0.04);
-    state.camera.lookAt(targetLookAt);
+    currentLookAt.current.lerp(targetLookAt, 0.04);
+    state.camera.lookAt(currentLookAt.current);
 
     // EXHAUST 1 (Booster)
     const pStage1Burnout = getProgress(offset, 0.28, 0.30); 
@@ -427,8 +440,8 @@ export default function RocketLaunchSequence() {
         
         <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
         
-        {/* Adjusted pages to 6 for snappy but detailed pacing */}
-        <ScrollControls pages={6} damping={0.2}>
+        {/* Adjusted pages to 6 for snappy but detailed pacing, increased damping for smoothness */}
+        <ScrollControls pages={6} damping={0.4}>
           <LaunchAnimation />
         </ScrollControls>
 
