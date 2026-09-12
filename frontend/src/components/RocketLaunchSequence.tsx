@@ -89,22 +89,23 @@ function LaunchAnimation() {
 
       if (pOrbitInsert > 0) {
         // Curve around earth
-        // Increased revolution speed for a more dynamic final orbit (time * 0.8 instead of 0.2)
+        // Increased revolution speed for a more dynamic final orbit
         orbitAngle = pOrbitInsert * (Math.PI / 4) + (pOrbitContinuous * time * 0.8);
-        const radius = 20; // Even closer to Earth (Earth radius is 18)
+        const radius = 20; 
         
         const rawX = Math.sin(orbitAngle) * radius;
         const rawY = Math.cos(orbitAngle) * radius;
         
-        // Smoothly interpolate a 30-degree orbital tilt (polar/diagonal) during insertion
-        const tilt = pOrbitInsert * (Math.PI / 6); 
+        // Smoothly interpolate a 90-degree orbital tilt around X-axis (polar to equatorial)
+        const tilt = pOrbitInsert * (Math.PI / 2); 
         
-        posX = rawX * Math.cos(tilt);
-        posZ = rawX * Math.sin(tilt);
-        posY = -20 + rawY;
+        posX = rawX;
+        posY = -20 + (rawY * Math.cos(tilt));
+        posZ = rawY * Math.sin(tilt);
         
         rotZ = -orbitAngle;
-        rotY = tilt;
+        rotX = tilt; // Orient the vehicle to follow the horizontal path
+        rotY = 0;
       }
 
       // Max-Q vibration applies to all attached components evenly
@@ -223,9 +224,9 @@ function LaunchAnimation() {
         targetLookAt.set(vPos.x, vPos.y + 6, vPos.z);
       } else {
         // Grand finale pull-back (orbit view)
-        // Center on Earth (Y=-20) and pull back enough to make it smaller
-        const finalZoom = isMobile ? 100 : 65; // Pull back further on tall screens
-        targetCamPos.set(0, -20, finalZoom); 
+        // Center on Earth (Y=-20) and elevate the camera (Y=-5) to look down at the horizontal orbit
+        const finalZoom = isMobile ? 100 : 65; 
+        targetCamPos.set(0, -5, finalZoom); 
         targetLookAt.set(0, -20, 0);
       }
     }
