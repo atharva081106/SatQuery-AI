@@ -930,7 +930,7 @@ export default function Dashboard() {
           </div>
 
           {/* Academic Citations */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-[10px] text-white/40 font-mono">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-[10px] text-white/40 font-mono">
             <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
               <p className="text-white/60 mb-1 font-semibold">RSVQA REFERENCE</p>
               <p>Lobry, S., et al. (2020). RSVQA: Visual Question Answering for Remote Sensing Data. <em>IEEE TGRS</em> 58(12).</p>
@@ -938,17 +938,22 @@ export default function Dashboard() {
             </div>
             <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
               <p className="text-white/60 mb-1 font-semibold">CDVQA REFERENCE</p>
-              <p>Yuan, Z., Mou, L., &amp; Zhu, X. X. (2022). Change Detection Meets Visual Question Answering. <em>IEEE IGARSS 2022</em>.</p>
+              <p>Yuan, Z., Mou, L., Xiong, Z., &amp; Zhu, X. X. (2022). Change Detection Meets Visual Question Answering. <em>IEEE TGRS</em> 60.</p>
               <p className="mt-1 text-emerald-400/70">arXiv:2112.06343</p>
             </div>
             <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
-              <p className="text-white/60 mb-1 font-semibold">BIGEARTHNET REFERENCE</p>
-              <p>Sumbul, G., et al. (2019). BigEarthNet: A Large-Scale Benchmark Archive. <em>IEEE IGARSS 2019</em>.</p>
-              <p className="mt-1 text-white/30">DOI: 10.1109/IGARSS.2019.8900532</p>
+              <p className="text-white/60 mb-1 font-semibold">BIGEARTHNET.TXT</p>
+              <p>Herzog, J.-L., Adler, M. J., Demir, B., et al. (2026). Multi-Sensor Image-Text Benchmark. <em>arXiv:2603.29630</em>.</p>
+              <p className="mt-1 text-cyan-400/70">txt.bigearth.net</p>
+            </div>
+            <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
+              <p className="text-white/60 mb-1 font-semibold">VRSBENCH REFERENCE</p>
+              <p>Li, X., Ding, J., &amp; Elhoseiny, M. (2024). VRSBench: Remote Sensing Vision-Language Benchmark. <em>NeurIPS 2024</em>.</p>
+              <p className="mt-1 text-purple-400/70">arXiv:2406.12384</p>
             </div>
             <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
               <p className="text-white/60 mb-1 font-semibold">EARTHGPT REFERENCE</p>
-              <p>Zhang, W., et al. (2024). EarthGPT: Universal Multi-modal LLM for Remote Sensing. <em>IEEE TGRS</em>.</p>
+              <p>Zhang, W., Cai, M., Mao, X., et al. (2024). EarthGPT: Multi-sensor Foundation Model. <em>IEEE TGRS / arXiv</em>.</p>
               <p className="mt-1 text-white/30">arXiv:2401.16822</p>
             </div>
           </div>

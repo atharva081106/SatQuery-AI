@@ -402,6 +402,13 @@ export default function Home() {
       const acquiredBase64 = sessionStorage.getItem("satquery_acquired_image");
       const targetDate = sessionStorage.getItem("satquery_target_date");
       
+      const formatDDMMYY = (d: string | null) => {
+        if (!d) return "";
+        const parts = d.split('-');
+        if (parts.length !== 3) return d;
+        return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+      };
+      
       if (acquiredBase64) {
         fetch(acquiredBase64)
           .then(res => res.blob())
@@ -411,7 +418,7 @@ export default function Home() {
               if (!prev.some(f => f.name.includes("acquired_satellite_image")) && prev.length === 0) {
                 setMessages([{ 
                   role: "assistant", 
-                  content: `I have successfully acquired satellite imagery for **${locationName}** from **${targetDate}** using the **${acquiredLayer}** layer. The area is ready for analysis. What would you like me to look for?`
+                  content: `I have successfully acquired satellite imagery for **${locationName}** from **${formatDDMMYY(targetDate)}** using the **${acquiredLayer}** layer. The area is ready for analysis. What would you like me to look for?`
                 }]);
               }
               return [...prev, file].slice(0, 2);
@@ -430,6 +437,13 @@ export default function Home() {
       const date1 = sessionStorage.getItem("satquery_target_date_1");
       const date2 = sessionStorage.getItem("satquery_target_date_2");
 
+      const formatDDMMYY = (d: string | null) => {
+        if (!d) return "";
+        const parts = d.split('-');
+        if (parts.length !== 3) return d;
+        return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+      };
+
       if (base64_1 && base64_2) {
         Promise.all([
           fetch(base64_1).then(res => res.blob()),
@@ -442,7 +456,7 @@ export default function Home() {
             if (!prev.some(f => f.name.includes("acquired_")) && prev.length === 0) {
               setMessages([{ 
                 role: "assistant", 
-                content: `I have successfully acquired satellite imagery for **${locationName}** from **${date1}** and **${date2}** using the **${acquiredLayer}** layer. The area is ready for analysis. Would you like me to detect what changed between these two dates?`
+                content: `I have successfully acquired satellite imagery for **${locationName}** from **${formatDDMMYY(date1)}** and **${formatDDMMYY(date2)}** using the **${acquiredLayer}** layer. The area is ready for analysis. Would you like me to detect what changed between these two dates?`
               }]);
             }
             return [file1, file2];
