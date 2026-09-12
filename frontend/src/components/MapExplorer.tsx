@@ -46,6 +46,25 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
+  // Sync configuration preset with recommended layer
+  useEffect(() => {
+    if (configuration === "Agriculture") setLayer("NDVI");
+    else if (configuration === "Atmosphere and Air Pollution") setLayer("Highlight Optimized Natural Color");
+    else if (configuration === "Floods and Droughts") setLayer("NDWI");
+    else if (configuration === "Geology") setLayer("SWIR");
+    else if (configuration === "Ocean and Water Bodies") setLayer("NDWI");
+    else if (configuration === "Snow and Glaciers") setLayer("NDSI");
+    else if (configuration === "Urban") setLayer("False color (urban)");
+    else if (configuration === "Default") setLayer("True color");
+  }, [configuration]);
+
+  // Adjust layer options if dataset is Radar (s1)
+  useEffect(() => {
+    if (dataset === "s1") {
+      setLayer("True color"); // S1 maps to VV/VH
+    }
+  }, [dataset]);
+
   useEffect(() => {
     // Dynamic import of Leaflet
     const initLeaflet = async () => {
@@ -243,6 +262,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         } else {
           sessionStorage.setItem("satquery_acquired_image", base64data);
           sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
+          sessionStorage.setItem("satquery_acquired_layer", layer);
           router.push("/query");
         }
       };
@@ -363,23 +383,32 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
 
         {/* Spectral Layer */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs text-white/50 tracking-widest uppercase">Data Layer</label>
+          <div className="flex justify-between items-center">
+            <label className="text-xs text-white/50 tracking-widest uppercase">Data Layer</label>
+            {configuration !== "Default" && (
+              <span className="text-[9px] text-[#00F0FF] tracking-widest uppercase animate-pulse">RECOMMENDED</span>
+            )}
+          </div>
           <select 
             value={layer} 
             onChange={e => setLayer(e.target.value)}
             className="bg-transparent border border-white/20 text-white text-xs px-3 py-2 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
           >
-            <option value="True color" className="bg-black">True color</option>
-            <option value="False color" className="bg-black">False color</option>
-            <option value="Highlight Optimized Natural Color" className="bg-black">Highlight Optimized Natural Color</option>
-            <option value="Wildfires" className="bg-black">Wildfires</option>
-            <option value="NDVI" className="bg-black">NDVI</option>
-            <option value="False color (urban)" className="bg-black">False color (urban)</option>
-            <option value="Moisture index" className="bg-black">Moisture index</option>
-            <option value="SWIR" className="bg-black">SWIR</option>
-            <option value="NDWI" className="bg-black">NDWI</option>
-            <option value="NDSI" className="bg-black">NDSI</option>
-            <option value="Scene classification map" className="bg-black">Scene classification map</option>
+            <option value="True color" className="bg-black">{dataset === 's1' ? 'Radar VV/VH' : 'True color'}</option>
+            {dataset !== "s1" && (
+              <>
+                <option value="False color" className="bg-black">False color (NIR)</option>
+                <option value="Highlight Optimized Natural Color" className="bg-black">Highlight Optimized Natural Color</option>
+                <option value="Wildfires" className="bg-black">Wildfires</option>
+                <option value="NDVI" className="bg-black">NDVI (Vegetation)</option>
+                <option value="False color (urban)" className="bg-black">False color (Urban)</option>
+                <option value="Moisture index" className="bg-black">Moisture index (NDMI)</option>
+                <option value="SWIR" className="bg-black">SWIR</option>
+                <option value="NDWI" className="bg-black">NDWI (Water)</option>
+                <option value="NDSI" className="bg-black">NDSI (Snow)</option>
+                <option value="Scene classification map" className="bg-black">Scene classification map</option>
+              </>
+            )}
           </select>
         </div>
 

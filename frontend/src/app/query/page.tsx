@@ -395,6 +395,8 @@ export default function Home() {
   useEffect(() => {
     // Check for acquired image from Map Explorer
     const acquiredBase64 = sessionStorage.getItem("satquery_acquired_image");
+    const acquiredLayer = sessionStorage.getItem("satquery_acquired_layer") || "True color";
+    
     if (acquiredBase64) {
       // Convert base64 back to File
       fetch(acquiredBase64)
@@ -406,7 +408,7 @@ export default function Home() {
             if (!prev.some(f => f.name === "acquired_satellite_image.png") && prev.length === 0) {
               setMessages([{ 
                 role: "assistant", 
-                content: "I have successfully acquired and loaded your satellite imagery from the Map Explorer. The target area is ready for analysis. What would you like me to look for?"
+                content: `I have successfully acquired and loaded your satellite imagery (${acquiredLayer}) from the Map Explorer. The target area is ready for analysis. What would you like me to look for?`
               }]);
             }
             
@@ -419,6 +421,7 @@ export default function Home() {
           // Clean up
           sessionStorage.removeItem("satquery_acquired_image");
           sessionStorage.removeItem("satquery_acquired_bbox");
+          sessionStorage.removeItem("satquery_acquired_layer");
         });
     }
   }, []);

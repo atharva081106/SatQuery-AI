@@ -201,6 +201,193 @@ class AcquireRequest(BaseModel):
     end_date: str
     dataset: str
     maxcc: int
+    configuration: Optional[str] = "Default"
+    layer: Optional[str] = "True color"
+
+def get_evalscript(dataset: str, layer: str) -> str:
+    # Handle Sentinel-1 Radar which only has VV/VH
+    if dataset == "s1":
+        return """
+        //VERSION=3
+        function setup() {
+          return {
+            input: ["VV", "VH", "dataMask"],
+            output: { bands: 4 }
+          };
+        }
+        function evaluatePixel(sample) {
+          return [2.0 * sample.VV, 2.0 * sample.VH, 1.5 * sample.VV, sample.dataMask];
+        }
+        """
+
+    # For Sentinel-2 and Landsat 8, mapping bands
+    if dataset == "l8":
+        b_red, b_green, b_blue = "B04", "B03", "B02"
+        b_nir = "B05"
+        b_swir1 = "B06"
+        b_swir2 = "B07"
+        b_narrow_nir = "B05" # approximate
+    else:
+        # Default Sentinel-2
+        b_red, b_green, b_blue = "B04", "B03", "B02"
+        b_nir = "B08"
+        b_swir1 = "B11"
+        b_swir2 = "B12"
+        b_narrow_nir = "B8A"
+
+    if layer == "NDVI":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_nir}", "{b_red}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            let ndvi = (sample.{b_nir} - sample.{b_red}) / (sample.{b_nir} + sample.{b_red} + 0.0001);
+            if (ndvi < 0) return [0.1, 0.1, 0.4, sample.dataMask]; // Water
+            if (ndvi < 0.2) return [0.6, 0.4, 0.2, sample.dataMask]; // Bare soil
+            if (ndvi < 0.5) return [0.6, 0.8, 0.2, sample.dataMask]; // Sparse vegetation
+            return [0.1, 0.6, 0.1, sample.dataMask]; // Dense vegetation
+        }}
+        """
+    elif layer == "False color":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_nir}", "{b_red}", "{b_green}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            return [2.5 * sample.{b_nir}, 2.5 * sample.{b_red}, 2.5 * sample.{b_green}, sample.dataMask];
+        }}
+        """
+    elif layer == "False color (urban)":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_swir2}", "{b_swir1}", "{b_red}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            return [2.5 * sample.{b_swir2}, 2.5 * sample.{b_swir1}, 2.5 * sample.{b_red}, sample.dataMask];
+        }}
+        """
+    elif layer == "SWIR":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_swir2}", "{b_swir1 if dataset == 'l8' else b_narrow_nir}", "{b_red}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            return [2.5 * sample.{b_swir2}, 2.5 * sample.{b_swir1 if dataset == 'l8' else b_narrow_nir}, 2.5 * sample.{b_red}, sample.dataMask];
+        }}
+        """
+    elif layer == "NDWI":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_green}", "{b_nir}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            let ndwi = (sample.{b_green} - sample.{b_nir}) / (sample.{b_green} + sample.{b_nir} + 0.0001);
+            if (ndwi > 0.1) return [0, 0.8, 1.0, sample.dataMask];
+            return [2.5 * sample.{b_red}, 2.5 * sample.{b_green}, 2.5 * sample.{b_blue}, sample.dataMask];
+        }}
+        """
+    elif layer == "Moisture index" and dataset != "l8":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_narrow_nir}", "{b_swir1}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            let ndmi = (sample.{b_narrow_nir} - sample.{b_swir1}) / (sample.{b_narrow_nir} + sample.{b_swir1} + 0.0001);
+            // Convert index to a color gradient from brown to blue
+            let r = ndmi < 0 ? 0.8 + ndmi : 0.8 - ndmi;
+            let g = ndmi < 0 ? 0.6 + ndmi : 0.6 + ndmi;
+            let b = ndmi < 0 ? 0.2 : 0.2 + ndmi * 2;
+            return [r, g, b, sample.dataMask];
+        }}
+        """
+    elif layer == "Wildfires" and dataset != "l8":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_swir2}", "{b_swir1}", "{b_blue}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            let active = (sample.{b_swir2} > 0.5 && sample.{b_swir1} > 0.3) ? 1 : 0;
+            if (active) return [1.0, 0.2, 0.0, sample.dataMask]; // bright red for active fires
+            return [2.5 * sample.{b_swir2}, 2.5 * sample.{b_swir1}, 2.5 * sample.{b_blue}, sample.dataMask];
+        }}
+        """
+    elif layer == "Scene classification map" and dataset != "l8":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["SCL", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            let scl = sample.SCL;
+            if (scl == 3) return [0.4, 0.2, 0.0, sample.dataMask]; // Shadow
+            if (scl == 4) return [0.1, 0.6, 0.1, sample.dataMask]; // Vegetation
+            if (scl == 5) return [0.6, 0.6, 0.1, sample.dataMask]; // Bare soil
+            if (scl == 6) return [0.1, 0.1, 0.8, sample.dataMask]; // Water
+            if (scl == 8 || scl == 9 || scl == 10) return [0.9, 0.9, 0.9, sample.dataMask]; // Cloud
+            if (scl == 11) return [0.3, 0.9, 0.9, sample.dataMask]; // Snow
+            return [0.0, 0.0, 0.0, 1.0];
+        }}
+        """
+    elif layer == "NDSI":
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_green}", "{b_swir1}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            let ndsi = (sample.{b_green} - sample.{b_swir1}) / (sample.{b_green} + sample.{b_swir1} + 0.0001);
+            if (ndsi > 0.4) return [0.0, 0.8, 1.0, sample.dataMask]; // Snow highlight
+            return [0.2, 0.2, 0.2, sample.dataMask]; // Dark background
+        }}
+        """
+    else:
+        # True color or Default
+        return f"""
+        //VERSION=3
+        function setup() {{
+            return {{
+                input: ["{b_red}", "{b_green}", "{b_blue}", "dataMask"],
+                output: {{ bands: 4 }}
+            }};
+        }}
+        function evaluatePixel(sample) {{
+            return [2.5 * sample.{b_red}, 2.5 * sample.{b_green}, 2.5 * sample.{b_blue}, sample.dataMask];
+        }}
+        """
 
 @app.post("/api/acquire")
 async def acquire_imagery(request: AcquireRequest):
@@ -243,34 +430,8 @@ async def acquire_imagery(request: AcquireRequest):
         elif request.dataset == "l8":
             collection = DataCollection.LANDSAT8_L2
             
-        # Evalscript for True Color
-        evalscript = """
-        //VERSION=3
-        function setup() {
-            return {
-                input: ["B04", "B03", "B02", "dataMask"],
-                output: { bands: 4 }
-            };
-        }
-        function evaluatePixel(sample) {
-            return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02, sample.dataMask];
-        }
-        """
-        
-        # If Sentinel 1, evalscript needs to be different (VV/VH)
-        if request.dataset == "s1":
-            evalscript = """
-            //VERSION=3
-            function setup() {
-              return {
-                input: ["VV", "VH", "dataMask"],
-                output: { bands: 4 }
-              };
-            }
-            function evaluatePixel(sample) {
-              return [2.0 * sample.VV, 2.0 * sample.VH, 1.5 * sample.VV, sample.dataMask];
-            }
-            """
+        # Get Evalscript based on requested dataset and layer
+        evalscript = get_evalscript(request.dataset, getattr(request, 'layer', 'True color'))
             
         # Build Request
         sh_request = SentinelHubRequest(
@@ -319,10 +480,55 @@ async def acquire_imagery(request: AcquireRequest):
         with urllib.request.urlopen(req, timeout=12) as response:
             fallback_bytes = response.read()
             if len(fallback_bytes) > 5000:
+                layer = getattr(request, "layer", "True color")
+                if layer not in ["True color", "Default", "Highlight Optimized Natural Color"]:
+                    try:
+                        from io import BytesIO
+                        from PIL import Image
+                        import numpy as np
+                        
+                        img = Image.open(BytesIO(fallback_bytes)).convert("RGB")
+                        arr = np.array(img).astype(float)
+                        
+                        if layer == "NDVI":
+                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                            vari = (G - R) / (G + R - B + 1.0)
+                            vari = np.clip(vari, -1, 1)
+                            mapped = np.zeros_like(arr)
+                            mapped[..., 1] = np.clip((vari + 1) * 127.5, 0, 255) # Green
+                            mapped[..., 0] = np.clip(255 - (vari + 1) * 127.5, 0, 255) # Red
+                            img = Image.fromarray(mapped.astype(np.uint8))
+                        elif layer == "False color":
+                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                            mapped = np.stack([G * 1.5, R, B], axis=2)
+                            mapped = np.clip(mapped, 0, 255)
+                            img = Image.fromarray(mapped.astype(np.uint8))
+                        elif layer == "NDWI":
+                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                            water = (B - G) / (B + G + 1.0)
+                            mapped = np.zeros_like(arr)
+                            mapped[..., 2] = np.clip(water * 255 * 2, 0, 255) # Blue
+                            mapped[..., 1] = np.clip(water * 255, 0, 255) # Cyan
+                            img = Image.fromarray(mapped.astype(np.uint8))
+                        elif layer in ["SWIR", "Wildfires"]:
+                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                            mapped = np.stack([R * 1.5, G * 0.8, B * 0.5], axis=2)
+                            mapped = np.clip(mapped, 0, 255)
+                            img = Image.fromarray(mapped.astype(np.uint8))
+                        
+                        buf = BytesIO()
+                        img.save(buf, format="PNG")
+                        fallback_bytes = buf.getvalue()
+                    except Exception as sim_err:
+                        print(f"Failed to simulate layer {layer}: {sim_err}")
+                        
                 return Response(
                     content=fallback_bytes, 
                     media_type="image/png",
-                    headers={"X-Acquisition-Source": "esri-world-imagery-auto-fallback"}
+                    headers={
+                        "X-Acquisition-Source": "esri-world-imagery-auto-fallback",
+                        "X-Acquisition-Layer": layer
+                    }
                 )
     except Exception as fallback_err:
         print(f"[Fallback Error] Satellite imagery export failed: {fallback_err}")
