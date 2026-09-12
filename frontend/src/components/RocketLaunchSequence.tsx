@@ -72,14 +72,14 @@ function LaunchAnimation() {
       
       let orbitAngle = 0;
       let posX = 0;
-      // Start altitude is Y=-1, climbs to Y=2 (closer to Earth)
-      let posY = -1 + (pLiftoff * 3);
+      // Start altitude is Y=-1, climbs to Y=1 (even closer to Earth)
+      let posY = -1 + (pLiftoff * 2);
       let rotZ = -pPitchOver * (Math.PI / 2);
 
       if (pOrbitInsert > 0) {
         // Curve around earth
         orbitAngle = pOrbitInsert * (Math.PI / 4) + (pOrbitContinuous * time * 0.2);
-        const radius = 22; // Closer to Earth (Earth radius is 18)
+        const radius = 20; // Even closer to Earth (Earth radius is 18)
         posX = Math.sin(orbitAngle) * radius;
         posY = -20 + Math.cos(orbitAngle) * radius;
         rotZ = -orbitAngle;
@@ -194,8 +194,9 @@ function LaunchAnimation() {
         targetLookAt.set(vPos.x, vPos.y + 6, vPos.z);
       } else {
         // Grand finale pull-back (orbit view)
-        targetCamPos.set(0, -5, 45); 
-        targetLookAt.set(0, -10, 0);
+        // Center on Earth (Y=-20) and pull back enough to make it smaller
+        targetCamPos.set(0, -20, 65); 
+        targetLookAt.set(0, -20, 0);
       }
     }
 
@@ -273,12 +274,6 @@ function LaunchAnimation() {
         <mesh>
           <sphereGeometry args={[18.4, 64, 64]} />
           <meshBasicMaterial color="#4b70dd" transparent opacity={0.15} side={THREE.BackSide} />
-        </mesh>
-        
-        {/* ORBIT PATH */}
-        <mesh>
-          <ringGeometry args={[21.95, 22.05, 128]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.2} side={THREE.DoubleSide} />
         </mesh>
       </group>
 
