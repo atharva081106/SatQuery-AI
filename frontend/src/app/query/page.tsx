@@ -394,35 +394,69 @@ export default function Home() {
 
   useEffect(() => {
     // Check for acquired image from Map Explorer
-    const acquiredBase64 = sessionStorage.getItem("satquery_acquired_image");
+    const acquisitionMode = sessionStorage.getItem("satquery_acquisition_mode");
     const acquiredLayer = sessionStorage.getItem("satquery_acquired_layer") || "True color";
-    
-    if (acquiredBase64) {
-      // Convert base64 back to File
-      fetch(acquiredBase64)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], "acquired_satellite_image.png", { type: "image/png" });
+    const locationName = sessionStorage.getItem("satquery_location_name") || "the selected area";
+
+    if (acquisitionMode === "single") {
+      const acquiredBase64 = sessionStorage.getItem("satquery_acquired_image");
+      const targetDate = sessionStorage.getItem("satquery_target_date");
+      
+      if (acquiredBase64) {
+        fetch(acquiredBase64)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], `acquired_satellite_image_${targetDate}.png`, { type: "image/png" });
+            setImages(prev => {
+              if (!prev.some(f => f.name.includes("acquired_satellite_image")) && prev.length === 0) {
+                setMessages([{ 
+                  role: "assistant", 
+                  content: `I have successfully acquired satellite imagery for **${locationName}** from **${targetDate}** using the **${acquiredLayer}** layer. The area is ready for analysis. What would you like me to look for?`
+                }]);
+              }
+              return [...prev, file].slice(0, 2);
+            });
+            sessionStorage.removeItem("satquery_acquired_image");
+            sessionStorage.removeItem("satquery_acquired_bbox");
+            sessionStorage.removeItem("satquery_acquired_layer");
+            sessionStorage.removeItem("satquery_location_name");
+            sessionStorage.removeItem("satquery_target_date");
+            sessionStorage.removeItem("satquery_acquisition_mode");
+          });
+      }
+    } else if (acquisitionMode === "dual") {
+      const base64_1 = sessionStorage.getItem("satquery_acquired_image_1");
+      const base64_2 = sessionStorage.getItem("satquery_acquired_image_2");
+      const date1 = sessionStorage.getItem("satquery_target_date_1");
+      const date2 = sessionStorage.getItem("satquery_target_date_2");
+
+      if (base64_1 && base64_2) {
+        Promise.all([
+          fetch(base64_1).then(res => res.blob()),
+          fetch(base64_2).then(res => res.blob())
+        ]).then(([blob1, blob2]) => {
+          const file1 = new File([blob1], `acquired_${date1}.png`, { type: "image/png" });
+          const file2 = new File([blob2], `acquired_${date2}.png`, { type: "image/png" });
+          
           setImages(prev => {
-            // Add a welcome message to prompt the user (only if not already there)
-            if (!prev.some(f => f.name === "acquired_satellite_image.png") && prev.length === 0) {
+            if (!prev.some(f => f.name.includes("acquired_")) && prev.length === 0) {
               setMessages([{ 
                 role: "assistant", 
-                content: `I have successfully acquired and loaded your satellite imagery (${acquiredLayer}) from the Map Explorer. The target area is ready for analysis. What would you like me to look for?`
+                content: `I have successfully acquired satellite imagery for **${locationName}** from **${date1}** and **${date2}** using the **${acquiredLayer}** layer. The area is ready for analysis. Would you like me to detect what changed between these two dates?`
               }]);
             }
-            
-            // Generate a unique filename if adding multiple acquired images
-            const uniqueName = `acquired_satellite_image_${Date.now()}.png`;
-            const file = new File([blob], uniqueName, { type: "image/png" });
-
-            return [...prev, file].slice(0, 2); // Max 2 images
+            return [file1, file2];
           });
-          // Clean up
-          sessionStorage.removeItem("satquery_acquired_image");
+          sessionStorage.removeItem("satquery_acquired_image_1");
+          sessionStorage.removeItem("satquery_acquired_image_2");
           sessionStorage.removeItem("satquery_acquired_bbox");
           sessionStorage.removeItem("satquery_acquired_layer");
+          sessionStorage.removeItem("satquery_location_name");
+          sessionStorage.removeItem("satquery_target_date_1");
+          sessionStorage.removeItem("satquery_target_date_2");
+          sessionStorage.removeItem("satquery_acquisition_mode");
         });
+      }
     }
   }, []);
 

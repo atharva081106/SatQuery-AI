@@ -42,6 +42,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [basemap, setBasemap] = useState<"esri" | "bhuvan" | "osm">("esri");
   const [bbox, setBbox] = useState<number[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [acquisitionMode, setAcquisitionMode] = useState<"single" | "dual">("single");
   
   const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
@@ -230,32 +231,59 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     
     try {
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-      const res = await fetch(`${backendUrl}/api/acquire`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          bbox,
-          start_date: startDate,
-          end_date: endDate,
-          dataset,
-          maxcc: maxCC,
-          configuration,
-          layer
-        })
-      });
       
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Failed to acquire imagery");
+      // Step 1: Reverse Geocoding
+      let locationName = "Unknown Location";
+      try {
+        const centerLat = (bbox[1] + bbox[3]) / 2;
+        const centerLng = (bbox[0] + bbox[2]) / 2;
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${centerLat}&lon=${centerLng}&format=json`);
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          locationName = geoData.display_name || "Unknown Location";
+        }
+      } catch (e) {
+        console.warn("Geocoding failed", e);
       }
       
-      const blob = await res.blob();
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64data = reader.result as string;
+      const fetchImage = async (targetDate: string) => {
+        // Compute start_date (15 days prior) to give the satellite a search window
+        const target = new Date(targetDate);
+        target.setDate(target.getDate() - 15);
+        const searchStartDate = target.toISOString().split('T')[0];
+
+        const res = await fetch(`${backendUrl}/api/acquire`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            bbox,
+            start_date: searchStartDate,
+            end_date: targetDate,
+            dataset,
+            maxcc: maxCC,
+            configuration,
+            layer
+          })
+        });
+        
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || `Failed to acquire imagery for ${targetDate}`);
+        }
+        
+        const blob = await res.blob();
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
+      if (acquisitionMode === "single") {
+        const base64data = await fetchImage(endDate);
         incrementMapCount();
         if (onAcquire) {
           onAcquire(base64data, bbox);
@@ -263,10 +291,34 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           sessionStorage.setItem("satquery_acquired_image", base64data);
           sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
           sessionStorage.setItem("satquery_acquired_layer", layer);
+          sessionStorage.setItem("satquery_location_name", locationName);
+          sessionStorage.setItem("satquery_target_date", endDate);
+          sessionStorage.setItem("satquery_acquisition_mode", "single");
           router.push("/query");
         }
-      };
-      reader.readAsDataURL(blob);
+      } else {
+        // Dual Mode
+        const [base64_1, base64_2] = await Promise.all([
+          fetchImage(startDate),
+          fetchImage(endDate)
+        ]);
+        
+        incrementMapCount();
+        if (onAcquire) {
+          // If onAcquire is provided, it doesn't currently support multiple images, so just pass the first one.
+          onAcquire(base64_1, bbox);
+        } else {
+          sessionStorage.setItem("satquery_acquired_image_1", base64_1);
+          sessionStorage.setItem("satquery_acquired_image_2", base64_2);
+          sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
+          sessionStorage.setItem("satquery_acquired_layer", layer);
+          sessionStorage.setItem("satquery_location_name", locationName);
+          sessionStorage.setItem("satquery_target_date_1", startDate);
+          sessionStorage.setItem("satquery_target_date_2", endDate);
+          sessionStorage.setItem("satquery_acquisition_mode", "dual");
+          router.push("/query");
+        }
+      }
       
     } catch (e: any) {
       alert(e.message);
@@ -412,26 +464,67 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           </select>
         </div>
 
-        {/* Date Range */}
+        {/* Acquisition Mode Toggle */}
+        <div className="flex flex-col gap-2 pt-2">
+          <label className="text-xs text-white/50 tracking-widest uppercase">Acquisition Mode</label>
+          <div className="grid grid-cols-2 gap-1">
+            <button
+              onClick={() => setAcquisitionMode("single")}
+              className={`text-[10px] py-2 px-1 uppercase tracking-wider border transition-all ${
+                acquisitionMode === "single"
+                  ? 'border-[#00F0FF] text-[#00F0FF] bg-[#00F0FF]/10 font-bold'
+                  : 'border-white/20 text-white/50 hover:border-white/50'
+              }`}
+            >
+              Single Image
+            </button>
+            <button
+              onClick={() => setAcquisitionMode("dual")}
+              className={`text-[10px] py-2 px-1 uppercase tracking-wider border transition-all ${
+                acquisitionMode === "dual"
+                  ? 'border-[#00F0FF] text-[#00F0FF] bg-[#00F0FF]/10 font-bold'
+                  : 'border-white/20 text-white/50 hover:border-white/50'
+              }`}
+            >
+              Change Detection
+            </button>
+          </div>
+        </div>
+
+        {/* Date Range / Selection */}
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between">
-            <label className="text-xs text-white/50 tracking-widest uppercase">Start Date</label>
-            <label className="text-xs text-white/50 tracking-widest uppercase">End Date</label>
-          </div>
-          <div className="flex items-center gap-2">
-            <input 
-              type="date" 
-              value={startDate} 
-              onChange={e => setStartDate(e.target.value)} 
-              className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
-            />
-            <input 
-              type="date" 
-              value={endDate} 
-              onChange={e => setEndDate(e.target.value)} 
-              className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
-            />
-          </div>
+          {acquisitionMode === "single" ? (
+            <>
+              <label className="text-xs text-white/50 tracking-widest uppercase">Target Date</label>
+              <input 
+                type="date" 
+                value={endDate} 
+                onChange={e => setEndDate(e.target.value)} 
+                className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
+              />
+            </>
+          ) : (
+            <>
+              <div className="flex justify-between">
+                <label className="text-xs text-white/50 tracking-widest uppercase">Date 1 (Before)</label>
+                <label className="text-xs text-white/50 tracking-widest uppercase">Date 2 (After)</label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="date" 
+                  value={startDate} 
+                  onChange={e => setStartDate(e.target.value)} 
+                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
+                />
+                <input 
+                  type="date" 
+                  value={endDate} 
+                  onChange={e => setEndDate(e.target.value)} 
+                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
+                />
+              </div>
+            </>
+          )}
         </div>
 
         {/* Cloud Cover */}
