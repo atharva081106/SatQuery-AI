@@ -3,7 +3,7 @@
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, useScroll, Stars, useTexture, Environment } from '@react-three/drei';
-import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 // Utility to create a timeline progress between two offsets [start, end]
@@ -278,12 +278,42 @@ function LaunchAnimation() {
     }
   });
 
-  // PBR Materials
-  const rocketMaterial = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.7, roughness: 0.2, envMapIntensity: 2.0 }), []);
-  const darkMetal = useMemo(() => new THREE.MeshStandardMaterial({ color: '#222222', metalness: 0.9, roughness: 0.3, envMapIntensity: 1.5 }), []);
-  const goldFoil = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ffcc00', metalness: 0.8, roughness: 0.4, envMapIntensity: 1.5 }), []);
-  const engineFlame = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ff5500', emissive: '#ffaa00', emissiveIntensity: 5, transparent: true, opacity: 0.9 }), []);
-  const vacFlame = useMemo(() => new THREE.MeshStandardMaterial({ color: '#3388ff', emissive: '#00ccff', emissiveIntensity: 3, transparent: true, opacity: 0.8 }), []);
+  // High-Fidelity Physical Materials
+  const rocketMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({ 
+    color: '#eeeeee', 
+    metalness: 0.8, 
+    roughness: 0.1, 
+    clearcoat: 1.0, 
+    clearcoatRoughness: 0.1,
+    envMapIntensity: 2.0 
+  }), []);
+  const darkMetal = useMemo(() => new THREE.MeshPhysicalMaterial({ 
+    color: '#111111', 
+    metalness: 0.9, 
+    roughness: 0.4, 
+    envMapIntensity: 1.5 
+  }), []);
+  const goldFoil = useMemo(() => new THREE.MeshPhysicalMaterial({ 
+    color: '#ffcc00', 
+    metalness: 1.0, 
+    roughness: 0.2,
+    clearcoat: 0.5,
+    envMapIntensity: 2.5 
+  }), []);
+  const engineFlame = useMemo(() => new THREE.MeshStandardMaterial({ 
+    color: '#ffffff', 
+    emissive: '#ffaa00', 
+    emissiveIntensity: 15, // Extremely high for Bloom
+    transparent: true, 
+    opacity: 0.9 
+  }), []);
+  const vacFlame = useMemo(() => new THREE.MeshStandardMaterial({ 
+    color: '#ffffff', 
+    emissive: '#00aaff', 
+    emissiveIntensity: 10, 
+    transparent: true, 
+    opacity: 0.8 
+  }), []);
 
   // EXACT GEOMETRY ALIGNMENTS
   // Base of the rocket is at Y = 0.
@@ -296,17 +326,24 @@ function LaunchAnimation() {
     <group>
       {/* EARTH SYSTEM */}
       <group ref={earthGroupRef} position={[0, -20, 0]}>
+        {/* Main Earth Sphere */}
         <mesh>
           <sphereGeometry args={[18, 64, 64]} />
-          <meshStandardMaterial map={earthTexture} roughness={0.7} metalness={0.1} />
+          <meshStandardMaterial map={earthTexture} roughness={0.9} metalness={0.1} />
         </mesh>
+        {/* Clouds Layer */}
         <mesh ref={cloudsRef}>
           <sphereGeometry args={[18.1, 64, 64]} />
-          <meshStandardMaterial map={cloudsTexture} transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />
+          <meshStandardMaterial map={cloudsTexture} transparent opacity={0.5} depthWrite={false} blending={THREE.AdditiveBlending} />
+        </mesh>
+        {/* Outer Atmospheric Glow */}
+        <mesh>
+          <sphereGeometry args={[18.5, 64, 64]} />
+          <meshBasicMaterial color="#3366ff" transparent opacity={0.1} side={THREE.BackSide} blending={THREE.AdditiveBlending} />
         </mesh>
         <mesh>
-          <sphereGeometry args={[18.4, 64, 64]} />
-          <meshBasicMaterial color="#4b70dd" transparent opacity={0.15} side={THREE.BackSide} />
+          <sphereGeometry args={[18.2, 64, 64]} />
+          <meshBasicMaterial color="#5588ff" transparent opacity={0.2} side={THREE.FrontSide} blending={THREE.AdditiveBlending} />
         </mesh>
       </group>
 
@@ -446,12 +483,14 @@ function LaunchAnimation() {
 
 export default function RocketLaunchSequence() {
   return (
-    <div className="w-full h-[100dvh] bg-[#000005] relative flex flex-col">
-      <Canvas camera={{ position: [0, 2, 14], fov: 45 }}>
-        <Environment preset="night" background={false} />
-        <ambientLight intensity={0.2} />
-        <directionalLight position={[10, 10, 10]} intensity={2.5} color="#ffeedd" castShadow />
-        <directionalLight position={[-10, -10, -10]} intensity={0.5} color="#4b70dd" />
+    <div className="w-full h-screen bg-black">
+      <Canvas shadows camera={{ position: [0, 6, 25], fov: 45 }}>
+        {/* Environmental Lighting for Realistic Reflections */}
+        <Environment preset="city" />
+        
+        {/* Harsh directional light for space sunlight */}
+        <directionalLight position={[50, 20, 20]} intensity={3} color="#fffcf5" castShadow />
+        <ambientLight intensity={0.05} />
         
         <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
         
@@ -460,11 +499,18 @@ export default function RocketLaunchSequence() {
           <LaunchAnimation />
         </ScrollControls>
 
+        {/* Cinematic Post-Processing */}
         <EffectComposer disableNormalPass>
-          <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} />
-          <ToneMapping />
+          <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1.5} />
+          <Noise opacity={0.02} />
+          <Vignette eskil={false} offset={0.1} darkness={1.1} />
         </EffectComposer>
       </Canvas>
+      
+      {/* Subtle overlay to guide user */}
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white/50 text-sm tracking-widest uppercase pointer-events-none animate-pulse">
+        Scroll to Launch
+      </div>
     </div>
   );
 }
