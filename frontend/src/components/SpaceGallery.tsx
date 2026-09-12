@@ -13,6 +13,18 @@ const planetaryImages = [
   { src: "/planets/saturn.jpg", title: "SATURN", desc: "Ringed World" },
   { src: "/planets/uranus.jpg", title: "URANUS", desc: "Ice Giant" },
   { src: "/planets/neptune.jpg", title: "NEPTUNE", desc: "Outer Solar System" },
+  { src: "/planets/pluto.jpg", title: "PLUTO", desc: "Kuiper Belt Object" },
+  { src: "/planets/ceres.jpg", title: "CERES", desc: "Dwarf Planet" },
+  { src: "/planets/moon.jpg", title: "THE MOON", desc: "Earth's Satellite" },
+  { src: "/planets/io.jpg", title: "IO", desc: "Volcanic Moon of Jupiter" },
+  { src: "/planets/europa.jpg", title: "EUROPA", desc: "Icy Moon of Jupiter" },
+  { src: "/planets/ganymede.jpg", title: "GANYMEDE", desc: "Largest Moon in Solar System" },
+  { src: "/planets/callisto.jpg", title: "CALLISTO", desc: "Heavily Cratered Moon" },
+  { src: "/planets/titan.jpg", title: "TITAN", desc: "Saturn's Largest Moon" },
+  { src: "/planets/enceladus.jpg", title: "ENCELADUS", desc: "Ice Geysers of Saturn" },
+  { src: "/planets/triton.jpg", title: "TRITON", desc: "Retrograde Moon of Neptune" },
+  { src: "/planets/sun.jpg", title: "THE SUN", desc: "G-Type Main-Sequence Star" },
+  { src: "/planets/vesta.jpg", title: "VESTA", desc: "Protoplanet Asteroid" },
 ];
 
 export default function SpaceGallery() {
