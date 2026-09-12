@@ -116,9 +116,9 @@ export default function GeoJSONMapOverlay({ geojsonData }: GeoJSONMapOverlayProp
   return (
     <div className="flex flex-col gap-2 mb-6">
       <div className="micro-cap text-white/50 mb-1 flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+        <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
         GIS VECTOR MAP OVERLAY
-        <span className="text-cyan-400 text-[10px]">• RFC 7946 WGS84</span>
+        <span className="text-white text-[10px]">• RFC 7946 WGS84</span>
       </div>
       <div
         ref={mapRef}

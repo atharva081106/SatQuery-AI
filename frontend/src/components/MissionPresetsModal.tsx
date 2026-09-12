@@ -346,7 +346,7 @@ export default function MissionPresetsModal({
                 >
                   <span>&larr;</span> <span>ALL SCENARIOS</span>
                 </button>
-                <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase">
+                <span className="text-[9px] font-mono text-white font-bold uppercase">
                   {currentMission.tag}
                 </span>
               </div>

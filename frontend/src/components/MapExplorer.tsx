@@ -400,7 +400,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           <h2 className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase font-mono">Acquisition Config</h2>
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
-              <span className="text-[9px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-white bg-white/10 border border-white/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 PRO UNLIMITED
               </span>
             ) : (
@@ -437,7 +437,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
             ))}
           </div>
           {basemap === 'bhuvan' && (
-            <div className="text-[10px] text-cyan-400 tracking-wider">
+            <div className="text-[10px] text-white tracking-wider">
               ✓ ISRO Bhuvan NRSC — National Geoportal
             </div>
           )}

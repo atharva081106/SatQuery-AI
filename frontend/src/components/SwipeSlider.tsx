@@ -62,13 +62,13 @@ export default function SwipeSlider({
       {/* HEADER CONTROLS */}
       <div className="flex justify-between items-center text-[9px] font-mono tracking-widest text-white/50 px-1">
         <span className="flex items-center gap-1.5 text-white/80">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
           {beforeLabel}
         </span>
         <span className="text-white/40">DRAG CURTAIN TO COMPARE</span>
         <span className="flex items-center gap-1.5 text-white/80">
           {afterLabel}
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
         </span>
       </div>
 

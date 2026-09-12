@@ -80,13 +80,13 @@ export default function LandingPage() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-6 pt-20 safe-bottom animate-in fade-in duration-200 md:hidden font-mono">
           <div className="flex flex-col gap-6 text-left">
-            <div className="text-[10px] tracking-widest uppercase text-cyan-400 font-bold border-b border-white/15 pb-2">
+            <div className="text-[10px] tracking-widest uppercase text-white font-bold border-b border-white/15 pb-2">
               MISSION NAVIGATION
             </div>
             <Link
               href="/acquire"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-xl font-bold tracking-wider text-white hover:text-cyan-300 transition-colors py-1 flex items-center justify-between"
+              className="text-xl font-bold tracking-wider text-white hover:text-white/80 transition-colors py-1 flex items-center justify-between"
             >
               <span>SATELLITE MAP</span>
               <span className="text-xs text-white/40">&rarr;</span>
@@ -94,7 +94,7 @@ export default function LandingPage() {
             <Link
               href="/query"
               onClick={(e) => handleEnterSystem(e, '/query')}
-              className="text-xl font-bold tracking-wider text-white hover:text-cyan-300 transition-colors py-1 flex items-center justify-between"
+              className="text-xl font-bold tracking-wider text-white hover:text-white/80 transition-colors py-1 flex items-center justify-between"
             >
               <span>AI QUERY WORKSPACE</span>
               <span className="text-xs text-white/40">&rarr;</span>
@@ -102,7 +102,7 @@ export default function LandingPage() {
             <Link
               href="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-xl font-bold tracking-wider text-white hover:text-cyan-300 transition-colors py-1 flex items-center justify-between"
+              className="text-xl font-bold tracking-wider text-white hover:text-white/80 transition-colors py-1 flex items-center justify-between"
             >
               <span>BENCHMARKS &amp; TELEMETRY</span>
               <span className="text-xs text-white/40">&rarr;</span>
@@ -110,7 +110,7 @@ export default function LandingPage() {
             <Link
               href="/gallery"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-xl font-bold tracking-wider text-white hover:text-cyan-300 transition-colors py-1 flex items-center justify-between"
+              className="text-xl font-bold tracking-wider text-white hover:text-white/80 transition-colors py-1 flex items-center justify-between"
             >
               <span>3D SPACE GALLERY</span>
               <span className="text-xs text-white/40">&rarr;</span>
@@ -118,7 +118,7 @@ export default function LandingPage() {
             <Link
               href="/faq"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-xl font-bold tracking-wider text-white hover:text-cyan-300 transition-colors py-1 flex items-center justify-between"
+              className="text-xl font-bold tracking-wider text-white hover:text-white/80 transition-colors py-1 flex items-center justify-between"
             >
               <span>SYSTEM FAQS</span>
               <span className="text-xs text-white/40">&rarr;</span>
@@ -140,8 +140,8 @@ export default function LandingPage() {
             ) : (
               <div className="flex items-center justify-between bg-white/5 border border-white/15 p-3 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-xs text-cyan-300 font-bold uppercase">{user?.name || "OPERATOR"}</span>
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <span className="text-xs text-white/80 font-bold uppercase">{user?.name || "OPERATOR"}</span>
                 </div>
                 <button
                   type="button"
@@ -194,7 +194,7 @@ export default function LandingPage() {
             </button>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="text-[10px] px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono font-bold tracking-widest uppercase">
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-white/20 text-white/80 border border-white/40 font-mono font-bold tracking-widest uppercase">
                 {user?.name?.slice(0, 14).toUpperCase() || "OPERATOR"}
               </span>
               <button
