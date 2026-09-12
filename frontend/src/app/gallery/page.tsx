@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import SpaceGallery from '@/components/SpaceGallery';
+import SatelliteExplodedView from '@/components/SatelliteExplodedView';
 
 export default function GalleryPage() {
   return (
-    <main className="bg-black text-white min-h-screen w-full relative">
+    <main className="bg-black text-white min-h-[200vh] w-full relative">
       {/* FIXED TOP NAV */}
-      <nav className="absolute top-0 left-0 w-full flex justify-between items-center px-4 sm:px-8 py-3 sm:py-6 z-50 mix-blend-difference pointer-events-none safe-top">
+      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-4 sm:px-8 py-3 sm:py-6 z-50 mix-blend-difference pointer-events-none safe-top">
         <Link href="/" className="text-sm sm:text-xl md:display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto font-mono font-bold">
           SATQUERY AI.
         </Link>
@@ -18,7 +19,11 @@ export default function GalleryPage() {
         </div>
       </nav>
 
+      {/* 3D Solar System (Top Section) */}
       <SpaceGallery />
+
+      {/* 3D Exploded Satellite View (Scroll Section) */}
+      <SatelliteExplodedView />
     </main>
   );
 }

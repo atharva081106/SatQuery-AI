@@ -142,7 +142,7 @@ export default function SpaceGallery() {
             <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
             <OrbitControls 
               enablePan={true} 
-              enableZoom={true} 
+              enableZoom={false} 
               enableRotate={true}
               minDistance={3}
               maxDistance={80}
@@ -153,7 +153,7 @@ export default function SpaceGallery() {
 
       <div className="absolute bottom-6 left-0 right-0 z-20 text-center pointer-events-none">
         <p className="text-white/50 text-[10px] sm:text-xs tracking-widest uppercase font-mono bg-black/40 inline-block px-4 py-2 rounded-full backdrop-blur-sm border border-white/10">
-          ( Touch &amp; Drag to Orbit • Scroll to Zoom )
+          ( Touch &amp; Drag to Orbit )
         </p>
       </div>
     </div>
