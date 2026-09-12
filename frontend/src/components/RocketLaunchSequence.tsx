@@ -86,7 +86,8 @@ function LaunchAnimation() {
 
       if (pOrbitInsert > 0) {
         // Curve around earth
-        orbitAngle = pOrbitInsert * (Math.PI / 4) + (pOrbitContinuous * time * 0.2);
+        // Increased revolution speed for a more dynamic final orbit (time * 0.8 instead of 0.2)
+        orbitAngle = pOrbitInsert * (Math.PI / 4) + (pOrbitContinuous * time * 0.8);
         const radius = 20; // Even closer to Earth (Earth radius is 18)
         posX = Math.sin(orbitAngle) * radius;
         posY = -20 + Math.cos(orbitAngle) * radius;
