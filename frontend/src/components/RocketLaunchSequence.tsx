@@ -189,12 +189,12 @@ function LaunchAnimation() {
       satelliteGroupRef.current.getWorldPosition(vPos); // Always look at the satellite
       
       if (offset < 0.9) {
-        // Follow closely during launch and insertion
-        targetCamPos.set(vPos.x, vPos.y + 2, vPos.z + 10); // zoom in slightly more
-        targetLookAt.set(vPos.x, vPos.y + 2, vPos.z);
+        // Follow closely but zoomed out enough to see the whole rocket
+        targetCamPos.set(vPos.x, vPos.y + 6, vPos.z + 25);
+        targetLookAt.set(vPos.x, vPos.y + 6, vPos.z);
       } else {
         // Grand finale pull-back (orbit view)
-        targetCamPos.set(0, -5, 45); // pull back less since orbit is smaller
+        targetCamPos.set(0, -5, 45); 
         targetLookAt.set(0, -10, 0);
       }
     }
