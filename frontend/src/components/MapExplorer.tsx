@@ -27,6 +27,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const mapInstanceRef = useRef<any>(null);
   const gibsLayerRef = useRef<any>(null);
   const basemapLayerRef = useRef<any>(null);
+  const labelLayerRef = useRef<any>(null);
   const router = useRouter();
   const [L, setL] = useState<any>(null);
   
@@ -196,6 +197,9 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     if (basemapLayerRef.current) {
       mapInstanceRef.current.removeLayer(basemapLayerRef.current);
     }
+    if (labelLayerRef.current) {
+      mapInstanceRef.current.removeLayer(labelLayerRef.current);
+    }
     const BASEMAPS: Record<string, any> = {
       esri: L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -219,7 +223,15 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     newLayer.addTo(mapInstanceRef.current);
     newLayer.bringToBack();
     basemapLayerRef.current = newLayer;
-  }, [L, basemap]);
+
+    // Add labels overlay if not OSM (OSM already has labels)
+    if (basemap !== 'osm') {
+      labelLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 20 }
+      ).addTo(mapInstanceRef.current);
+    }
+  }, [basemap, L]);
 
   // Dynamic NASA GIBS Tile Layer Effect
   useEffect(() => {
