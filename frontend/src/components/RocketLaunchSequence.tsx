@@ -1,43 +1,17 @@
 "use client";
 
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, useScroll, Html, Stars, useTexture, Environment } from '@react-three/drei';
+import { ScrollControls, useScroll, Stars, useTexture, Environment } from '@react-three/drei';
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
 import * as THREE from 'three';
-
-const MISSION_STEPS = [
-  { title: "1. Satellite Integration", desc: "Satellite is tested, fueled, and attached to the payload adapter. Fairing is installed." },
-  { title: "2. Launch Preparation", desc: "Rocket at launch pad. Propellant loading and final system checks. Systems armed." },
-  { title: "3. Ignition & Liftoff (T+0)", desc: "Main engines ignite. Thrust reaches maximum, restraints release, vertical ascent begins." },
-  { title: "4. Initial Ascent", desc: "Rocket clears the tower and gradually pitches over toward the desired launch azimuth." },
-  { title: "5. Max-Q", desc: "Maximum aerodynamic pressure. Thrust temporarily reduced to limit structural loads." },
-  { title: "6. First-Stage Burnout", desc: "First-stage propellant is depleted. Main engines shut down." },
-  { title: "7. Stage Separation", desc: "Spent first stage separates and falls away from the upper vehicle." },
-  { title: "8. Second-Stage Ignition", desc: "Upper-stage engine starts. Trajectory becomes increasingly horizontal." },
-  { title: "9. Fairing Separation", desc: "Atmospheric drag is no longer significant. Payload fairing is released." },
-  { title: "10. Upper-Stage Ascent", desc: "Upper stage accelerates, building horizontal velocity required for orbital flight." },
-  { title: "11. Orbital Insertion", desc: "Final burn required to reach the target low-Earth orbit (velocity ~7.8 km/s)." },
-  { title: "12. Engine Cutoff", desc: "Upper-stage engine shuts down. Rocket and satellite travel on desired trajectory." },
-  { title: "13. Satellite Separation", desc: "Separation mechanism releases the satellite with a small relative velocity." },
-  { title: "14. Satellite Acquisition", desc: "Onboard computer boots into orbital mode. Solar panels and antennas deploy." },
-  { title: "15. Orbit Commissioning", desc: "Satellite determines position. Reaction wheels establish correct orientation." },
-  { title: "16. Orbit Raising / Correction", desc: "Propulsion system performs additional maneuvers to reach final altitude." },
-  { title: "17. Operational Orbit", desc: "Final orbit reached. Instruments activated. Satellite enters normal service." }
-];
-
-function getStepIndex(offset: number) {
-  // Map offset (0 to 1) to an index 0 to 16
-  const index = Math.floor(offset * 17);
-  return Math.min(Math.max(index, 0), 16);
-}
 
 // Utility to create a timeline progress between two offsets [start, end]
 function getProgress(offset: number, start: number, end: number) {
   return Math.max(0, Math.min(1, (offset - start) / (end - start)));
 }
 
-function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => void }) {
+function LaunchAnimation() {
   const scroll = useScroll();
   
   // Scenery Refs
@@ -72,8 +46,6 @@ function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => vo
 
   useFrame((state, delta) => {
     const offset = scroll.offset;
-    const currentStep = getStepIndex(offset);
-    onStepChange(currentStep);
     
     // Rotate Earth slowly
     if (earthRef.current) earthRef.current.rotation.y += 0.02 * delta;
@@ -370,37 +342,8 @@ function LaunchAnimation({ onStepChange }: { onStepChange: (index: number) => vo
 }
 
 export default function RocketLaunchSequence() {
-  const [activeStep, setActiveStep] = useState(0);
-
   return (
     <div className="w-full h-[100dvh] bg-[#000005] relative flex flex-col">
-      
-      {/* CINEMATIC HUD SUBTITLES */}
-      <div className="absolute bottom-16 left-0 w-full z-20 pointer-events-none px-8 flex justify-center">
-        <div className="max-w-3xl bg-black/50 backdrop-blur-md border-l-4 border-[#00ffcc] p-6 rounded-r-lg shadow-2xl transition-all duration-300 transform">
-          <h2 className="text-[#00ffcc] text-xl md:text-2xl font-mono tracking-widest font-bold uppercase mb-2">
-            {MISSION_STEPS[activeStep].title}
-          </h2>
-          <p className="text-white/90 text-sm md:text-base font-mono tracking-wide leading-relaxed">
-            {MISSION_STEPS[activeStep].desc}
-          </p>
-          
-          {/* Progress Bar */}
-          <div className="w-full h-1 bg-white/10 mt-4 rounded overflow-hidden">
-            <div 
-              className="h-full bg-[#00ffcc] transition-all duration-300"
-              style={{ width: `${((activeStep + 1) / MISSION_STEPS.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute top-24 w-full z-20 text-center pointer-events-none px-4">
-        <h2 className="text-white/20 text-4xl font-mono tracking-[0.5em] font-bold uppercase">
-          Mission Timeline
-        </h2>
-      </div>
-
       <Canvas camera={{ position: [0, 2, 14], fov: 45 }}>
         <Environment preset="night" background={false} />
         <ambientLight intensity={0.2} />
@@ -408,8 +351,8 @@ export default function RocketLaunchSequence() {
         
         <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
         
-        <ScrollControls pages={20} damping={0.2}>
-          <LaunchAnimation onStepChange={setActiveStep} />
+        <ScrollControls pages={6} damping={0.2}>
+          <LaunchAnimation />
         </ScrollControls>
 
         <EffectComposer disableNormalPass>
