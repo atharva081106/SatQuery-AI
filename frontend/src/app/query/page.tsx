@@ -92,7 +92,7 @@ function renderTable(tableLinesText: string, key: any) {
                   <td
                     key={cIdx}
                     className={`py-2.5 px-4 ${
-                      cIdx === row.length - 1 ? 'text-right font-mono text-emerald-300 font-medium' : ''
+                      cIdx === row.length - 1 ? 'text-right font-mono text-cyan-300 font-medium' : ''
                     } ${isTotal ? 'text-white' : ''}`}
                   >
                     {renderInline(cell)}
@@ -164,7 +164,7 @@ function FormattedMessage({ content }: { content: string }) {
                   const bulletText = line.replace(/^[•\-]\s*/, "");
                   return (
                     <div key={lIdx} className="flex items-start gap-2.5 pl-1 text-xs sm:text-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-2 shrink-0"></span>
                       <span className="text-white/90 leading-relaxed">{renderInline(bulletText)}</span>
                     </div>
                   );
@@ -232,16 +232,16 @@ function QueryUnderstandingPanel({ result }: { result: any }) {
     <div className={`w-full mb-2 rounded-xl border text-xs font-mono overflow-hidden ${
       hasIssues
         ? "border-amber-500/40 bg-amber-500/5"
-        : "border-emerald-500/25 bg-emerald-500/5"
+        : "border-cyan-500/25 bg-cyan-500/5"
     }`}>
       {/* Header bar */}
       <div className={`flex items-center gap-2 px-3 py-2 border-b ${
-        hasIssues ? "border-amber-500/20 bg-amber-500/10" : "border-emerald-500/20 bg-emerald-500/10"
+        hasIssues ? "border-amber-500/20 bg-amber-500/10" : "border-cyan-500/20 bg-cyan-500/10"
       }`}>
         <span className="text-base">{icon}</span>
         <div className="flex-1 min-w-0">
           <div className={`font-bold tracking-wider uppercase text-[10px] truncate ${
-            hasIssues ? "text-amber-300" : "text-emerald-300"
+            hasIssues ? "text-amber-300" : "text-cyan-300"
           }`}>
             {task || qu?.intent?.replace(/_/g, " ") || "ANALYSIS"}
           </div>
@@ -268,7 +268,7 @@ function QueryUnderstandingPanel({ result }: { result: any }) {
         {detectionCount > 0 && (
           <div className="flex items-center gap-1.5">
             <span className="text-white/40 text-[10px] uppercase tracking-wider">Detections:</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+            <span className="px-1.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">
               {detectionCount} object{detectionCount !== 1 ? "s" : ""}
             </span>
           </div>
@@ -845,7 +845,7 @@ export default function Home() {
           <a href="/" className="text-sm sm:text-xl lg:display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-1.5 font-mono font-bold">
             <span>SATQUERY AI.</span>
           </a>
-          <span className="hidden md:inline-block text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-mono font-bold tracking-wider border border-emerald-500/30">
+          <span className="hidden md:inline-block text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 font-mono font-bold tracking-wider border border-cyan-500/30">
             ISRO / SAC — PS 26167
           </span>
         </div>
@@ -866,8 +866,8 @@ export default function Home() {
           {/* Authenticated User Callsign */}
           {isAuthenticated && (
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold tracking-widest uppercase flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono font-bold tracking-widest uppercase flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
                 <span>{user?.name?.slice(0, 10).toUpperCase() || "OPERATOR"}</span>
               </span>
               <button
@@ -920,11 +920,11 @@ export default function Home() {
               onClick={() => setMobileTab("trace")}
               className={`flex-1 py-2 rounded-lg font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 ${
                 mobileTab === "trace"
-                  ? "bg-emerald-400 text-black shadow-md font-extrabold"
-                  : "text-emerald-300 hover:text-white"
+                  ? "bg-cyan-400 text-black shadow-md font-extrabold"
+                  : "text-cyan-300 hover:text-white"
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               <span>TRACE &amp; EVIDENCE</span>
               {latestResult.visual_evidence?.length > 0 && (
                 <span className="text-[9px] px-1.5 py-0.5 bg-black/40 text-white rounded font-mono font-bold">
@@ -1106,7 +1106,7 @@ export default function Home() {
                       <div className="flex flex-col gap-2.5">
                         {queryCategories.map((cat, idx) => (
                           <div key={idx} className="flex flex-col gap-1">
-                            <div className="text-[9px] tracking-widest text-emerald-400 font-mono font-semibold uppercase">
+                            <div className="text-[9px] tracking-widest text-cyan-400 font-mono font-semibold uppercase">
                               {cat.category}
                             </div>
                             <div className="flex flex-col gap-1">
@@ -1191,9 +1191,9 @@ export default function Home() {
                     </span>
                   </div>
                 ) : (
-                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded p-2.5 flex items-center gap-2">
-                    <span className="text-emerald-400 text-xs font-bold">✓</span>
-                    <span className="text-emerald-300 font-semibold text-xs tracking-wider uppercase">
+                  <div className="bg-cyan-500/10 border border-cyan-500/30 rounded p-2.5 flex items-center gap-2">
+                    <span className="text-cyan-400 text-xs font-bold">✓</span>
+                    <span className="text-cyan-300 font-semibold text-xs tracking-wider uppercase">
                       VERIFIED CO-REGISTERED PAIR
                     </span>
                   </div>
@@ -1303,7 +1303,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={handleDownloadGeoJSON}
-                  className="w-full py-2.5 px-4 bg-emerald-400 text-black font-semibold text-xs tracking-wider uppercase rounded hover:bg-emerald-300 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                  className="w-full py-2.5 px-4 bg-cyan-400 text-black font-semibold text-xs tracking-wider uppercase rounded hover:bg-cyan-300 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                   title="Export Tactical Vector Layers for QGIS / ArcGIS / ISRO Bhuvan"
                 >
                   <span>📍</span> EXPORT GEOJSON (.GEOJSON) → QGIS / Bhuvan

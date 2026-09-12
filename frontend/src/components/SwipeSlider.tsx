@@ -68,7 +68,7 @@ export default function SwipeSlider({
         <span className="text-white/40">DRAG CURTAIN TO COMPARE</span>
         <span className="flex items-center gap-1.5 text-white/80">
           {afterLabel}
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
         </span>
       </div>
 

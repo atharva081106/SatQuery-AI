@@ -173,8 +173,8 @@ export default function AuthModal() {
         <div className="flex items-start justify-between border-b border-white/15 pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-              <span className="text-[10px] font-mono tracking-widest text-emerald-300 font-bold uppercase">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+              <span className="text-[10px] font-mono tracking-widest text-cyan-300 font-bold uppercase">
                 AUTHENTICATION REQUIRED
               </span>
             </div>
@@ -195,7 +195,7 @@ export default function AuthModal() {
         {/* Quota Limit Reached Banner - ONLY rendered when the user has completed their free queries */}
         {queryCount >= maxFreeQueries && (
           <div className="bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-2xl p-3.5 text-xs shadow-inner">
-            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-emerald-400 tracking-wider uppercase mb-1">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-cyan-400 tracking-wider uppercase mb-1">
               <span>QUOTA LIMIT REACHED</span>
               <span>{queryCount}/{maxFreeQueries} FREE QUERIES USED</span>
             </div>
@@ -341,7 +341,7 @@ export default function AuthModal() {
           <button
             type="button"
             onClick={loginAsJudge}
-            className="w-full py-2.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 rounded-2xl text-[11px] font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            className="w-full py-2.5 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 rounded-2xl text-[11px] font-mono font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
             <span>⚡</span>
             <span>INSTANT SIH EVALUATOR PASS</span>

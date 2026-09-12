@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useEffect, useRef } from "react";
 
 interface GeoJSONMapOverlayProps {
@@ -8,14 +8,14 @@ interface GeoJSONMapOverlayProps {
 const CLASS_COLORS: Record<string, string> = {
   "Water Bodies":  "#22d3ee",
   "Water":         "#22d3ee",
-  "Vegetation":    "#4ade80",
-  "Forest":        "#22c55e",
+  "Vegetation":    "#22d3ee",
+  "Forest":        "#06b6d4",
   "Built-up":      "#f97316",
   "Built-Up":      "#f97316",
   "Bare Soil":     "#a16207",
   "Cloud":         "#94a3b8",
   "Background":    "#475569",
-  "Land":          "#86efac",
+  "Land":          "#67e8f9",
 };
 
 function getColor(label: string) {
@@ -116,9 +116,9 @@ export default function GeoJSONMapOverlay({ geojsonData }: GeoJSONMapOverlayProp
   return (
     <div className="flex flex-col gap-2 mb-6">
       <div className="micro-cap text-white/50 mb-1 flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
         GIS VECTOR MAP OVERLAY
-        <span className="text-emerald-400 text-[10px]">• RFC 7946 WGS84</span>
+        <span className="text-cyan-400 text-[10px]">• RFC 7946 WGS84</span>
       </div>
       <div
         ref={mapRef}

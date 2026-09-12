@@ -189,7 +189,7 @@ export default function Dashboard() {
 
       {/* Ambient background glow */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-emerald-500/5 blur-[140px] rounded-full" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-cyan-500/5 blur-[140px] rounded-full" />
         <div className="absolute top-1/3 right-10 w-[500px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full" />
         <div className="absolute bottom-10 left-1/3 w-[550px] h-[300px] bg-blue-500/5 blur-[130px] rounded-full" />
       </div>
@@ -199,7 +199,7 @@ export default function Dashboard() {
         <FadeInScroll delay={100}>
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="micro-cap text-emerald-400 font-mono tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px]">
+              <span className="micro-cap text-cyan-400 font-mono tracking-widest bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px]">
                 AUDITED PARAMETERS &amp; VERIFIED BENCHMARKS
               </span>
               <span className="text-[9px] sm:text-[10px] font-mono text-white/40">ISRO / SAC PS 26167</span>
@@ -208,15 +208,15 @@ export default function Dashboard() {
               SYSTEM BENCHMARKS &amp; TELEMETRY
             </h1>
             <p className="text-[11px] sm:text-xs text-white/70 max-w-2xl font-mono leading-relaxed">
-              Real measured parameters extracted directly from trained checkpoint artifacts (<span className="text-emerald-300">best_satsegnet.pth</span>, 482.8K params), active runtime CPU latencies (ONNX INT8 vs PyTorch), and 491,520 test pixel evaluations.
+              Real measured parameters extracted directly from trained checkpoint artifacts (<span className="text-cyan-300">best_satsegnet.pth</span>, 482.8K params), active runtime CPU latencies (ONNX INT8 vs PyTorch), and 491,520 test pixel evaluations.
             </p>
           </div>
         </FadeInScroll>
         <FadeInScroll delay={200}>
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <div className="hidden sm:flex flex-col items-end text-right font-mono text-[10px]">
-              <span className="text-emerald-400 font-semibold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+              <span className="text-cyan-400 font-semibold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse inline-block" />
                 DETERMINISTIC VERIFICATION ACTIVE
               </span>
               <span className="text-white/40">HOST CPU MULTI-THREAD (8 CORES)</span>
@@ -237,10 +237,10 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
             
             {/* Metric 1 */}
-            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-emerald-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+            <div className="bg-[#0b0b0e] border border-[#232328] hover:border-cyan-500/40 transition-colors rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
               <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Overall Accuracy</span>
               <div className="my-1 sm:my-2">
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-emerald-400">90.20<span className="text-xs sm:text-sm font-normal text-emerald-400/70 ml-0.5">%</span></span>
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-cyan-400">90.20<span className="text-xs sm:text-sm font-normal text-cyan-400/70 ml-0.5">%</span></span>
               </div>
               <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">443,358 / 491,520 pixels</span>
             </div>
@@ -282,12 +282,12 @@ export default function Dashboard() {
             </div>
 
             {/* Metric 6 */}
-            <div className="bg-[#0b0b0e] border border-emerald-500/30 bg-emerald-950/10 rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
-              <span className="text-emerald-400/80 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Spatial False Pos.</span>
+            <div className="bg-[#0b0b0e] border border-cyan-500/30 bg-cyan-950/10 rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-between">
+              <span className="text-cyan-400/80 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Spatial False Pos.</span>
               <div className="my-1 sm:my-2">
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-emerald-400">0.00<span className="text-xs sm:text-sm font-normal text-emerald-400/70 ml-0.5">FPR</span></span>
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-cyan-400">0.00<span className="text-xs sm:text-sm font-normal text-cyan-400/70 ml-0.5">FPR</span></span>
               </div>
-              <span className="text-[8px] sm:text-[9px] text-emerald-400/70 font-mono">Coherence &lt; 0.28 Gate</span>
+              <span className="text-[8px] sm:text-[9px] text-cyan-400/70 font-mono">Coherence &lt; 0.28 Gate</span>
             </div>
 
           </div>
@@ -362,7 +362,7 @@ export default function Dashboard() {
                     <div key={item.class} className="bg-[#121216] p-1.5 rounded border border-[#232328]">
                       <span className="text-white/40 block truncate">{item.class.split(" ")[0]}</span>
                       <span className="text-white font-semibold block">{item.iou.toFixed(1)}% IoU</span>
-                      <span className="text-emerald-400/80 text-[8px]">{item.pixels}</span>
+                      <span className="text-cyan-400/80 text-[8px]">{item.pixels}</span>
                     </div>
                   ))}
                 </div>
@@ -376,7 +376,7 @@ export default function Dashboard() {
               <div className="px-5 py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="w-2 h-2 rounded-full bg-cyan-400" />
                     <h2 className="font-mono text-xs font-semibold uppercase tracking-wider text-white">
                       Training Convergence &amp; Optimization Trajectory
                     </h2>
@@ -385,7 +385,7 @@ export default function Dashboard() {
                     AdamW (lr=2e-3) + Cosine Annealing · 10 Epochs in 90.24s · Best Epoch 9 (mIoU 72.60%)
                   </p>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded">
+                <span className="text-[10px] font-mono px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded">
                   FIG 02
                 </span>
               </div>
@@ -446,9 +446,9 @@ export default function Dashboard() {
                     <span className="text-white/40 block">VAL LOSS DROP</span>
                     <span className="text-red-400 font-semibold">1.1230 &rarr; 0.4703</span>
                   </div>
-                  <div className="bg-[#121216] p-1.5 rounded border border-emerald-500/30 bg-emerald-950/20">
-                    <span className="text-emerald-400/70 block">BEST VAL MIOU</span>
-                    <span className="text-emerald-400 font-semibold">72.60% (Epoch 9)</span>
+                  <div className="bg-[#121216] p-1.5 rounded border border-cyan-500/30 bg-cyan-950/20">
+                    <span className="text-cyan-400/70 block">BEST VAL MIOU</span>
+                    <span className="text-cyan-400 font-semibold">72.60% (Epoch 9)</span>
                   </div>
                   <div className="bg-[#121216] p-1.5 rounded border border-[#232328]">
                     <span className="text-white/40 block">TOTAL WALL TIME</span>
@@ -521,7 +521,7 @@ export default function Dashboard() {
                   </div>
                   <div className="bg-[#121216] p-1.5 rounded border border-[#232328]">
                     <span className="text-white/40 block">FRAME RATE</span>
-                    <span className="text-emerald-400 font-semibold">103.3 FPS</span>
+                    <span className="text-cyan-400 font-semibold">103.3 FPS</span>
                   </div>
                   <div className="bg-[#121216] p-1.5 rounded border border-cyan-500/30 bg-cyan-950/20">
                     <span className="text-cyan-400/70 block">ACCELERATION</span>
@@ -573,7 +573,7 @@ export default function Dashboard() {
 
                 <div className="px-3 py-2 bg-[#121216] border border-[#27272a] rounded-lg flex justify-between items-center text-[10px] font-mono">
                   <span className="text-white/60">AUDIT VERIFIED: 0.00 SPATIAL FPR ON UNREGISTERED SATELLITE PAIRS</span>
-                  <span className="text-emerald-400 font-semibold px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">
+                  <span className="text-cyan-400 font-semibold px-2 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/30">
                     HARD GATE BLOCKED
                   </span>
                 </div>
@@ -590,7 +590,7 @@ export default function Dashboard() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-emerald-400 text-xs font-mono">02. DENSE PIXEL EVALUATION</span>
+                <span className="text-cyan-400 text-xs font-mono">02. DENSE PIXEL EVALUATION</span>
                 <span className="text-white/40 text-xs font-mono">• 491,520 PIXELS CLASSIFIED</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
@@ -602,7 +602,7 @@ export default function Dashboard() {
             </div>
             <div className="font-mono text-xs text-left md:text-right bg-[#0e0e12] border border-[#232328] px-3 sm:px-4 py-2 rounded-lg shrink-0">
               <span className="text-white/40 block text-[9px] sm:text-[10px]">MACRO PIXEL ACCURACY</span>
-              <span className="text-emerald-400 font-bold text-base sm:text-lg">90.20%</span>
+              <span className="text-cyan-400 font-bold text-base sm:text-lg">90.20%</span>
               <span className="text-white/50 text-[9px] sm:text-[10px] block">443,358 Correct Pixels</span>
             </div>
           </div>
@@ -619,11 +619,11 @@ export default function Dashboard() {
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px]">Ground Truth Class</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px]">GT Total (Pixels)</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-blue-400">Pred Water</th>
-                    <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-emerald-400">Pred Veg</th>
+                    <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-cyan-400">Pred Veg</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-pink-400">Pred Built-up</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-amber-400">Pred Soil</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-cyan-400">Pred Cloud</th>
-                    <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-emerald-300">Recall (%)</th>
+                    <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-cyan-300">Recall (%)</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-white">Class IoU</th>
                   </tr>
                 </thead>
@@ -649,9 +649,9 @@ export default function Dashboard() {
                       </td>
 
                       {/* Veg */}
-                      <td className={`py-3.5 px-4 ${row.gtClass.includes("Veg") ? "bg-emerald-950/30 text-emerald-300 font-bold" : "text-white/50"}`}>
+                      <td className={`py-3.5 px-4 ${row.gtClass.includes("Veg") ? "bg-cyan-950/30 text-cyan-300 font-bold" : "text-white/50"}`}>
                         {row.predVeg.toLocaleString()}
-                        {row.gtClass.includes("Veg") && <span className="text-[9px] block text-emerald-400/80">(84.06%)</span>}
+                        {row.gtClass.includes("Veg") && <span className="text-[9px] block text-cyan-400/80">(84.06%)</span>}
                       </td>
 
                       {/* Built-up */}
@@ -673,7 +673,7 @@ export default function Dashboard() {
                       </td>
 
                       {/* Metrics */}
-                      <td className="py-3.5 px-4 text-emerald-400 font-semibold">{row.recallPct.toFixed(2)}%</td>
+                      <td className="py-3.5 px-4 text-cyan-400 font-semibold">{row.recallPct.toFixed(2)}%</td>
                       <td className="py-3.5 px-4 text-white font-bold">{row.iouPct.toFixed(2)}%</td>
                     </tr>
                   ))}
@@ -682,7 +682,7 @@ export default function Dashboard() {
             </div>
             <div className="p-3.5 bg-[#070709] border-t border-[#232328] flex flex-col md:flex-row justify-between items-center gap-2 text-[10px] font-mono text-white/50">
               <span className="flex items-center gap-2">
-                <span className="text-emerald-400 font-semibold">DIAGONAL ACCURACY:</span> 
+                <span className="text-cyan-400 font-semibold">DIAGONAL ACCURACY:</span> 
                 Highest accuracy on Cloud (96.83%) and Water (94.48%). Minor confusion between Built-up vs Cloud due to high-albedo concrete roofs.
               </span>
               <span className="text-white/70">AUDIT HASH: SatSegNet-482K-EVAL-491K</span>
@@ -734,11 +734,11 @@ export default function Dashboard() {
                   {modelComparisons.map((model) => (
                     <tr 
                       key={model.architecture} 
-                      className={`transition-colors ${model.highlight ? "bg-emerald-950/15 hover:bg-emerald-950/25" : "hover:bg-white/[0.02]"}`}
+                      className={`transition-colors ${model.highlight ? "bg-cyan-950/15 hover:bg-cyan-950/25" : "hover:bg-white/[0.02]"}`}
                     >
                       <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap flex items-center gap-2">
-                        {model.highlight && <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />}
-                        <span className={model.highlight ? "text-emerald-300 font-bold" : "text-white/80"}>
+                        {model.highlight && <span className="w-2 h-2 rounded-full bg-cyan-400 inline-block animate-pulse" />}
+                        <span className={model.highlight ? "text-cyan-300 font-bold" : "text-white/80"}>
                           {model.architecture}
                         </span>
                       </td>
@@ -747,7 +747,7 @@ export default function Dashboard() {
                       <td className={`py-3.5 px-4 font-semibold ${model.highlight ? "text-cyan-300" : "text-white/50"}`}>
                         {model.latency128}
                       </td>
-                      <td className={`py-3.5 px-4 font-bold ${model.highlight ? "text-emerald-400" : "text-white/70"}`}>
+                      <td className={`py-3.5 px-4 font-bold ${model.highlight ? "text-cyan-400" : "text-white/70"}`}>
                         {model.mIoU}
                       </td>
                       <td className="py-3.5 px-4 text-white/80">{model.pixelAcc}</td>
@@ -759,7 +759,7 @@ export default function Dashboard() {
             </div>
             <div className="p-3.5 bg-[#070709] border-t border-[#232328] flex justify-between items-center text-[10px] font-mono text-white/50">
               <span>SatSegNet Attention U-Net achieves 67x parameter reduction with only 1.94MB storage footprint.</span>
-              <span className="text-emerald-400">EDGE DEPLOYABLE ON RASPBERRY PI &amp; AIR-GAPPED LAPTOPS</span>
+              <span className="text-cyan-400">EDGE DEPLOYABLE ON RASPBERRY PI &amp; AIR-GAPPED LAPTOPS</span>
             </div>
           </div>
         </FadeInScroll>
@@ -801,7 +801,7 @@ export default function Dashboard() {
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-cyan-400">ONNX SegNet</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-indigo-400">ORB Coherence</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-amber-400">SSIM Change</th>
-                    <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-emerald-400">Total Pipeline</th>
+                    <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-cyan-400">Total Pipeline</th>
                     <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-[10px] text-white">Throughput</th>
                   </tr>
                 </thead>
@@ -814,7 +814,7 @@ export default function Dashboard() {
                       <td className="py-3.5 px-4 text-cyan-300 font-semibold">{row.onnxSeg.toFixed(1)} ms</td>
                       <td className="py-3.5 px-4 text-indigo-300">{row.orbMatch.toFixed(1)} ms</td>
                       <td className="py-3.5 px-4 text-amber-300">{row.ssimChange.toFixed(1)} ms</td>
-                      <td className="py-3.5 px-4 text-emerald-400 font-bold">{row.totalPipeline.toFixed(1)} ms</td>
+                      <td className="py-3.5 px-4 text-cyan-400 font-bold">{row.totalPipeline.toFixed(1)} ms</td>
                       <td className="py-3.5 px-4 text-white font-semibold">{row.throughputMpx.toFixed(2)} MPx/s</td>
                     </tr>
                   ))}
@@ -835,14 +835,14 @@ export default function Dashboard() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-emerald-400 text-xs font-mono">05. FORMAL PROTOCOL</span>
+                <span className="text-cyan-400 text-xs font-mono">05. FORMAL PROTOCOL</span>
                 <span className="text-white/40 text-xs font-mono">• PROBLEM STATEMENT 26167</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 ISRO / SAC 6-TRACK EVALUATION &amp; JUDGING CRITERIA
               </h2>
             </div>
-            <div className="font-mono text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-full">
+            <div className="font-mono text-xs text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-3.5 py-1.5 rounded-full">
               • ISRO/SAC PS 26167 COMPLIANT
             </div>
           </div>
@@ -869,7 +869,7 @@ export default function Dashboard() {
                     <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap">T1: VQA</td>
                     <td className="py-3.5 px-4 text-white/70">Cartosat-2S (0.65m) single-tile optical</td>
                     <td className="py-3.5 px-4">Terrain, hydrology &amp; installation queries</td>
-                    <td className="py-3.5 px-4 text-emerald-400 whitespace-nowrap">Exact Match Acc, Macro-F1</td>
+                    <td className="py-3.5 px-4 text-cyan-400 whitespace-nowrap">Exact Match Acc, Macro-F1</td>
                     <td className="py-3.5 px-4 text-white/60">Acc_norm = Correct / Total</td>
                     <td className="py-3.5 px-4 text-white/70">SatSegNet 6-class neural masks + BLIP-VQA; gradient saliency overlay</td>
                   </tr>
@@ -877,7 +877,7 @@ export default function Dashboard() {
                     <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap">T2: GROUNDING</td>
                     <td className="py-3.5 px-4 text-white/70">Cartosat-2S Pan/MS single-tile</td>
                     <td className="py-3.5 px-4">Localize infrastructure (tanks, runways, berths)</td>
-                    <td className="py-3.5 px-4 text-emerald-400 whitespace-nowrap">mAP@0.50, Box IoU</td>
+                    <td className="py-3.5 px-4 text-cyan-400 whitespace-nowrap">mAP@0.50, Box IoU</td>
                     <td className="py-3.5 px-4 text-white/60">Min-max box IoU &rarr; [0, 1]</td>
                     <td className="py-3.5 px-4 text-white/70">ORB contour boxes [x,y,w,h] + RFC 7946 GeoJSON WGS84 export</td>
                   </tr>
@@ -885,7 +885,7 @@ export default function Dashboard() {
                     <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap">T3: CHANGE</td>
                     <td className="py-3.5 px-4 text-white/70">Co-registered Cartosat-2S T1/T2 pairs</td>
                     <td className="py-3.5 px-4">Inundation, construction, terrain shift</td>
-                    <td className="py-3.5 px-4 text-emerald-400 whitespace-nowrap">Change IoU, Pixel F1, SSIM</td>
+                    <td className="py-3.5 px-4 text-cyan-400 whitespace-nowrap">Change IoU, Pixel F1, SSIM</td>
                     <td className="py-3.5 px-4 text-white/60">Harmonic mean F1+SSIM</td>
                     <td className="py-3.5 px-4 text-white/70">skimage SSIM + Otsu masks; difference contours; interactive swipe panel</td>
                   </tr>
@@ -905,18 +905,18 @@ export default function Dashboard() {
                     <td className="py-3.5 px-4 text-white/60">Min-max vs. SOTA ceilings</td>
                     <td className="py-3.5 px-4 text-white/70">SatSegNet + BLIP-VQA — land cover metrics &amp; semantic captions</td>
                   </tr>
-                  <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-950/20">
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-cyan-950/20">
                     <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap">
                       <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse inline-block" />
                         T6: RELIABILITY
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-white/70">Incompatible / non-co-registered image pairs</td>
                     <td className="py-3.5 px-4">Block false change detection; hallucination defense</td>
-                    <td className="py-3.5 px-4 text-emerald-400 whitespace-nowrap">Spatial FPR, Coherence Acc</td>
+                    <td className="py-3.5 px-4 text-cyan-400 whitespace-nowrap">Spatial FPR, Coherence Acc</td>
                     <td className="py-3.5 px-4 text-white/60">Binary Pass/Fail + score [0, 1]</td>
-                    <td className="py-3.5 px-4 text-white font-semibold">GeoTIFF CRS/IoU + ORB/RANSAC &rarr; <span className="text-emerald-400">0.00 FPR (code-verified)</span></td>
+                    <td className="py-3.5 px-4 text-white font-semibold">GeoTIFF CRS/IoU + ORB/RANSAC &rarr; <span className="text-cyan-400">0.00 FPR (code-verified)</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -939,7 +939,7 @@ export default function Dashboard() {
             <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
               <p className="text-white/60 mb-1 font-semibold">CDVQA REFERENCE</p>
               <p>Yuan, Z., Mou, L., Xiong, Z., &amp; Zhu, X. X. (2022). Change Detection Meets Visual Question Answering. <em>IEEE TGRS</em> 60.</p>
-              <p className="mt-1 text-emerald-400/70">arXiv:2112.06343</p>
+              <p className="mt-1 text-cyan-400/70">arXiv:2112.06343</p>
             </div>
             <div className="bg-[#0a0a0d] border border-[#232328] rounded-lg p-3">
               <p className="text-white/60 mb-1 font-semibold">BIGEARTHNET.TXT</p>
