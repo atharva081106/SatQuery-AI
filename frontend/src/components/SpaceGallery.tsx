@@ -63,7 +63,12 @@ function Planet({ data }: { data: typeof PLANETS[0] }) {
           }}
         >
           <sphereGeometry args={[data.size, 64, 64]} />
-          <meshStandardMaterial map={texture} roughness={0.7} metalness={0.1} />
+          <meshStandardMaterial 
+            map={texture} 
+            roughness={0.7} 
+            metalness={0.1} 
+            emissive={new THREE.Color(0x333333)}
+          />
           
           {data.ring && ringTexture && (
             <mesh rotation={[-Math.PI / 2 + 0.2, 0, 0]}>
@@ -101,8 +106,8 @@ function Sun() {
   return (
     <mesh ref={sunRef}>
       <sphereGeometry args={[1.5, 64, 64]} />
-      <meshBasicMaterial map={texture} />
-      <pointLight color="#ffffff" intensity={2.5} distance={100} decay={1.5} />
+      <meshBasicMaterial map={texture} color="#ffffee" />
+      <pointLight color="#ffffff" intensity={15} distance={200} decay={1.0} />
     </mesh>
   );
 }
@@ -127,7 +132,7 @@ export default function SpaceGallery() {
         }>
           <Canvas camera={{ position: [0, 15, 30], fov: 45 }}>
             <color attach="background" args={['#000005']} />
-            <ambientLight intensity={0.1} />
+            <ambientLight intensity={1.5} />
             
             <Sun />
             {PLANETS.map((planet) => (
