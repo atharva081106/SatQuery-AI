@@ -82,16 +82,29 @@ function LaunchAnimation() {
       let posX = 0;
       // Start altitude is Y=-1, climbs to Y=1 (even closer to Earth)
       let posY = -1 + (pLiftoff * 2);
+      let posZ = 0;
       let rotZ = -pPitchOver * (Math.PI / 2);
+      let rotY = 0;
+      let rotX = 0;
 
       if (pOrbitInsert > 0) {
         // Curve around earth
         // Increased revolution speed for a more dynamic final orbit (time * 0.8 instead of 0.2)
         orbitAngle = pOrbitInsert * (Math.PI / 4) + (pOrbitContinuous * time * 0.8);
         const radius = 20; // Even closer to Earth (Earth radius is 18)
-        posX = Math.sin(orbitAngle) * radius;
-        posY = -20 + Math.cos(orbitAngle) * radius;
+        
+        const rawX = Math.sin(orbitAngle) * radius;
+        const rawY = Math.cos(orbitAngle) * radius;
+        
+        // Smoothly interpolate a 30-degree orbital tilt (polar/diagonal) during insertion
+        const tilt = pOrbitInsert * (Math.PI / 6); 
+        
+        posX = rawX * Math.cos(tilt);
+        posZ = rawX * Math.sin(tilt);
+        posY = -20 + rawY;
+        
         rotZ = -orbitAngle;
+        rotY = tilt;
       }
 
       // Max-Q vibration applies to all attached components evenly
@@ -99,7 +112,7 @@ function LaunchAnimation() {
         posX += (Math.random() - 0.5) * 0.1;
       }
 
-      return { posX, posY, rotZ };
+      return { posX, posY, posZ, rotZ, rotY, rotX };
     };
 
     // --- SATELLITE (Main Payload) ---
@@ -107,8 +120,8 @@ function LaunchAnimation() {
     const satTraj = getTrajectory(offset, pOrbit, state.clock.elapsedTime);
     
     if (satelliteWrapperRef.current) {
-      satelliteWrapperRef.current.position.set(satTraj.posX, satTraj.posY, 0);
-      satelliteWrapperRef.current.rotation.z = satTraj.rotZ;
+      satelliteWrapperRef.current.position.set(satTraj.posX, satTraj.posY, satTraj.posZ);
+      satelliteWrapperRef.current.rotation.set(satTraj.rotX, satTraj.rotY, satTraj.rotZ, 'YXZ');
     }
 
     const pSatSep = getProgress(offset, 0.7, 0.75); // separation impulse
@@ -130,8 +143,8 @@ function LaunchAnimation() {
     const s1Offset = Math.min(offset, 0.30);
     const s1Traj = getTrajectory(s1Offset, 0, 0);
     if (stage1WrapperRef.current) {
-      stage1WrapperRef.current.position.set(s1Traj.posX, s1Traj.posY, 0);
-      stage1WrapperRef.current.rotation.z = s1Traj.rotZ;
+      stage1WrapperRef.current.position.set(s1Traj.posX, s1Traj.posY, s1Traj.posZ);
+      stage1WrapperRef.current.rotation.set(s1Traj.rotX, s1Traj.rotY, s1Traj.rotZ, 'YXZ');
     }
 
     const pStage1SepRaw = getProgress(offset, 0.30, 0.60); 
@@ -151,10 +164,10 @@ function LaunchAnimation() {
     const fairingOffset = Math.min(offset, 0.40);
     const fairingTraj = getTrajectory(fairingOffset, 0, 0);
     if (fairingLeftWrapperRef.current && fairingRightWrapperRef.current) {
-      fairingLeftWrapperRef.current.position.set(fairingTraj.posX, fairingTraj.posY, 0);
-      fairingLeftWrapperRef.current.rotation.z = fairingTraj.rotZ;
-      fairingRightWrapperRef.current.position.set(fairingTraj.posX, fairingTraj.posY, 0);
-      fairingRightWrapperRef.current.rotation.z = fairingTraj.rotZ;
+      fairingLeftWrapperRef.current.position.set(fairingTraj.posX, fairingTraj.posY, fairingTraj.posZ);
+      fairingLeftWrapperRef.current.rotation.set(fairingTraj.rotX, fairingTraj.rotY, fairingTraj.rotZ, 'YXZ');
+      fairingRightWrapperRef.current.position.set(fairingTraj.posX, fairingTraj.posY, fairingTraj.posZ);
+      fairingRightWrapperRef.current.rotation.set(fairingTraj.rotX, fairingTraj.rotY, fairingTraj.rotZ, 'YXZ');
     }
 
     const pFairingSepRaw = getProgress(offset, 0.40, 0.65);
@@ -178,8 +191,8 @@ function LaunchAnimation() {
     const s2Offset = Math.min(offset, 0.70);
     const s2Traj = getTrajectory(s2Offset, 0, 0);
     if (stage2WrapperRef.current) {
-      stage2WrapperRef.current.position.set(s2Traj.posX, s2Traj.posY, 0);
-      stage2WrapperRef.current.rotation.z = s2Traj.rotZ;
+      stage2WrapperRef.current.position.set(s2Traj.posX, s2Traj.posY, s2Traj.posZ);
+      stage2WrapperRef.current.rotation.set(s2Traj.rotX, s2Traj.rotY, s2Traj.rotZ, 'YXZ');
     }
 
     const pStage2SepRaw = getProgress(offset, 0.70, 0.90);
