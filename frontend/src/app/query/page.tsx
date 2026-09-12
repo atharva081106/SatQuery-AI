@@ -898,7 +898,7 @@ export default function Home() {
       </nav>
 
       {/* MAIN APPLICATION CONTAINER */}
-      <div className={`flex-1 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-4.5rem)] sm:max-h-[calc(100dvh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-3 sm:p-4 lg:p-6 gap-3 sm:gap-6 z-10 min-h-0 overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
+      <div className={`flex-1 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-4.5rem)] sm:max-h-[calc(100dvh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 lg:p-6 gap-3 sm:gap-6 z-10 min-h-0 overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
         
         {/* MOBILE DUAL-MODE SEGMENTED TABS (< 1024px) */}
         {latestResult && (

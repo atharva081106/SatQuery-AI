@@ -556,7 +556,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
                 <label className="text-xs text-white/50 tracking-widest uppercase">Date 1 (Before)</label>
                 <label className="text-xs text-white/50 tracking-widest uppercase">Date 2 (After)</label>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row w-full gap-2">
                 <DatePicker
                   selected={startDate ? new Date(startDate) : null}
                   onChange={(date: Date | null) => {
@@ -637,7 +637,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       </div>
 
       {/* MOBILE FLOATING TOGGLE PILL */}
-      <div className="sm:hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-[480] pointer-events-auto">
+      <div className="sm:hidden absolute bottom-8 left-1/2 -translate-x-1/2 z-[480] pointer-events-auto pb-[env(safe-area-inset-bottom)]">
         <button
           type="button"
           onClick={() => setMobilePanelOpen(!mobilePanelOpen)}
