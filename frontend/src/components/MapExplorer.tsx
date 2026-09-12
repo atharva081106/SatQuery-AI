@@ -292,9 +292,9 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       }
       
       const fetchImage = async (targetDate: string) => {
-        // Compute start_date (15 days prior) to give the satellite a search window
+        // Compute start_date (1 day prior) to strictly enforce the selected date rather than pulling an old image
         const target = new Date(targetDate);
-        target.setDate(target.getDate() - 15);
+        target.setDate(target.getDate() - 1);
         const searchStartDate = target.toISOString().split('T')[0];
 
         const res = await fetch(`${backendUrl}/api/acquire`, {
