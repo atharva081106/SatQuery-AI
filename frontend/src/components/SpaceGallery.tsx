@@ -5,13 +5,14 @@ import FramerGlobe from '@/components/FramerGlobe';
 import GlobeCarousel3d from '@/components/GlobeCarousel3d';
 
 const planetaryImages = [
-  { src: "/demo/uttarakhand_pre_event_t1.png", title: "UTTARAKHAND PRE-FLOOD", desc: "Cartosat-2S Baseline" },
-  { src: "/demo/uttarakhand_post_event_t2.png", title: "UTTARAKHAND POST-FLOOD", desc: "Change Detection Target" },
-  { src: "/demo/mumbai_cartosat2s_optical.png", title: "MUMBAI HARBOR", desc: "High-Res Sub-Meter Optical" },
-  { src: "/demo/cyclone_cloud_obscured_optical.png", title: "BAY OF BENGAL (OPTICAL)", desc: "100% Cloud Obscuration" },
-  { src: "/demo/risat1_cband_radar_sar.png", title: "BAY OF BENGAL (SAR)", desc: "C-Band Cloud Penetrating Radar" },
-  { src: "/demo/sambhar_lake_liss4.png", title: "SAMBHAR SALT LAKE", desc: "Resourcesat-2 LISS-4 Multispectral" },
-  { src: "/demo/bengaluru_cartosat3.png", title: "BENGALURU URBAN", desc: "Cartosat-3 Urban Expansion" },
+  { src: "/planets/mercury.jpg", title: "MERCURY", desc: "Inner Solar System" },
+  { src: "/planets/venus.jpg", title: "VENUS", desc: "Atmospheric Phenomenon" },
+  { src: "/planets/earth.jpg", title: "EARTH", desc: "The Blue Marble" },
+  { src: "/planets/mars.jpg", title: "MARS", desc: "The Red Planet" },
+  { src: "/planets/jupiter.jpg", title: "JUPITER", desc: "Gas Giant" },
+  { src: "/planets/saturn.jpg", title: "SATURN", desc: "Ringed World" },
+  { src: "/planets/uranus.jpg", title: "URANUS", desc: "Ice Giant" },
+  { src: "/planets/neptune.jpg", title: "NEPTUNE", desc: "Outer Solar System" },
 ];
 
 export default function SpaceGallery() {
