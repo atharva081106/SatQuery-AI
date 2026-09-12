@@ -5,19 +5,13 @@ import FramerGlobe from '@/components/FramerGlobe';
 import GlobeCarousel3d from '@/components/GlobeCarousel3d';
 
 const planetaryImages = [
-  { src: "/gallery/photo-1443456066412-3e3ea69ee37c.avif", title: "SPACE OBSERVATION", desc: "Local space imagery." },
-  { src: "/gallery/photo-1446776811953-b23d57bd21aa.avif", title: "EARTH LEO", desc: "Local space imagery." },
-  { src: "/gallery/photo-1517866184231-7ef94c2ea930.avif", title: "DEEP SPACE", desc: "Local space imagery." },
-  { src: "/gallery/photo-1529788295308-1eace6f67388.avif", title: "STARS", desc: "Local space imagery." },
-  { src: "/gallery/photo-1534996858221-380b92700493.avif", title: "GALAXY", desc: "Local space imagery." },
-  { src: "/gallery/photo-1543722530-d2c3201371e7.avif", title: "NEBULA", desc: "Local space imagery." },
-  { src: "/gallery/photo-1558158539-226f4a45f7b3.avif", title: "COSMOS", desc: "Local space imagery." },
-  { src: "/gallery/photo-1614729939124-032f0b56c9ce.avif", title: "ASTRONOMY", desc: "Local space imagery." },
-  { src: "/gallery/photo-1670884307247-d1e905df653d.avif", title: "CONSTELLATION", desc: "Local space imagery." },
-  { src: "/gallery/premium_photo-1677511580659-f5fa0675a547.avif", title: "ORBITAL", desc: "Local premium space imagery." },
-  { src: "/gallery/premium_photo-1690571200236-0f9098fc6ca9.avif", title: "SATELLITE", desc: "Local premium space imagery." },
-  { src: "/gallery/premium_photo-1712039658659-7019cfe912e1.avif", title: "LUNAR", desc: "Local premium space imagery." },
-  { src: "/gallery/premium_photo-1722018576685-45a415a4ff67.avif", title: "EXPLORATION", desc: "Local premium space imagery." },
+  { src: "/demo/uttarakhand_pre_event_t1.png", title: "UTTARAKHAND PRE-FLOOD", desc: "Cartosat-2S Baseline" },
+  { src: "/demo/uttarakhand_post_event_t2.png", title: "UTTARAKHAND POST-FLOOD", desc: "Change Detection Target" },
+  { src: "/demo/mumbai_cartosat2s_optical.png", title: "MUMBAI HARBOR", desc: "High-Res Sub-Meter Optical" },
+  { src: "/demo/cyclone_cloud_obscured_optical.png", title: "BAY OF BENGAL (OPTICAL)", desc: "100% Cloud Obscuration" },
+  { src: "/demo/risat1_cband_radar_sar.png", title: "BAY OF BENGAL (SAR)", desc: "C-Band Cloud Penetrating Radar" },
+  { src: "/demo/sambhar_lake_liss4.png", title: "SAMBHAR SALT LAKE", desc: "Resourcesat-2 LISS-4 Multispectral" },
+  { src: "/demo/bengaluru_cartosat3.png", title: "BENGALURU URBAN", desc: "Cartosat-3 Urban Expansion" },
 ];
 
 export default function SpaceGallery() {
