@@ -486,6 +486,9 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
               <span className="text-[9px] text-[#00F0FF] tracking-widest uppercase animate-pulse">RECOMMENDED</span>
             )}
           </div>
+          <span className="text-[9px] text-white/40 italic -mt-1 leading-tight">
+            *Applied upon acquisition (Map preview remains True Color)
+          </span>
           <select 
             value={layer} 
             onChange={e => setLayer(e.target.value)}
