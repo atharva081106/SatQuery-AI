@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useAuth } from "@/context/AuthContext";
 
 interface MapExplorerProps {
@@ -526,11 +528,13 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           {acquisitionMode === "single" ? (
             <>
               <label className="text-xs text-white/50 tracking-widest uppercase">Target Date</label>
-              <input 
-                type="date" 
-                value={endDate} 
-                onChange={e => setEndDate(e.target.value)} 
-                className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
+              <DatePicker
+                selected={endDate ? new Date(endDate) : null}
+                onChange={(date: Date | null) => {
+                  if (date) setEndDate(date.toISOString().split('T')[0]);
+                }}
+                dateFormat="dd/MM/yy"
+                className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF]"
               />
             </>
           ) : (
@@ -540,17 +544,21 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
                 <label className="text-xs text-white/50 tracking-widest uppercase">Date 2 (After)</label>
               </div>
               <div className="flex items-center gap-2">
-                <input 
-                  type="date" 
-                  value={startDate} 
-                  onChange={e => setStartDate(e.target.value)} 
-                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
+                <DatePicker
+                  selected={startDate ? new Date(startDate) : null}
+                  onChange={(date: Date | null) => {
+                    if (date) setStartDate(date.toISOString().split('T')[0]);
+                  }}
+                  dateFormat="dd/MM/yy"
+                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF]"
                 />
-                <input 
-                  type="date" 
-                  value={endDate} 
-                  onChange={e => setEndDate(e.target.value)} 
-                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF] [color-scheme:dark]"
+                <DatePicker
+                  selected={endDate ? new Date(endDate) : null}
+                  onChange={(date: Date | null) => {
+                    if (date) setEndDate(date.toISOString().split('T')[0]);
+                  }}
+                  dateFormat="dd/MM/yy"
+                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF]"
                 />
               </div>
             </>
