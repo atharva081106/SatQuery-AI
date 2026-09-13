@@ -22,6 +22,9 @@ function LaunchAnimation() {
   // Camera smoothing ref
   const currentLookAt = useRef(new THREE.Vector3(0, 6, 0));
   
+  // Continuous orbit tracking
+  const continuousAngleRef = useRef(0);
+  
   // Scenery Refs
   const earthGroupRef = useRef<THREE.Group>(null);
   const cloudsRef = useRef<THREE.Mesh>(null);
@@ -55,6 +58,11 @@ function LaunchAnimation() {
   useFrame((state, delta) => {
     const offset = scroll.offset;
     
+    // Accumulate continuous angle for the final orbit view
+    if (offset >= 0.9) {
+      continuousAngleRef.current += delta * 0.2; // Smooth constant speed
+    }
+
     // Rotate Earth slowly on its axis
     if (earthGroupRef.current) earthGroupRef.current.rotation.y += 0.02 * delta;
     if (cloudsRef.current) cloudsRef.current.rotation.y += 0.03 * delta;
@@ -91,7 +99,8 @@ function LaunchAnimation() {
       let rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch);
 
       if (pOrbit > 0) {
-        orbitAngle = pOrbit * (Math.PI / 2);
+        // Scroll angle up to 90 degrees, plus any continuous accumulated angle
+        orbitAngle = (pOrbit * (Math.PI / 2)) + pOrbitContinuous;
         posX = Math.sin(orbitAngle) * orbitRadius;
         posY = -20 + Math.cos(orbitAngle) * orbitRadius; // Centered exactly on Earth (-20)
         rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
@@ -107,8 +116,8 @@ function LaunchAnimation() {
     };
 
     // --- SATELLITE (Main Payload) ---
-    const pOrbit = getProgress(offset, 0.9, 1.0);
-    const satTraj = getTrajectory(offset, pOrbit, state.clock.elapsedTime);
+    // Pass the accumulated delta angle as the continuous parameter
+    const satTraj = getTrajectory(offset, continuousAngleRef.current, state.clock.elapsedTime);
     
     if (satelliteWrapperRef.current) {
       satelliteWrapperRef.current.position.set(satTraj.posX, satTraj.posY, satTraj.posZ);
