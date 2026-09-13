@@ -91,7 +91,7 @@ function LaunchAnimation() {
       let rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch);
 
       if (pOrbit > 0) {
-        orbitAngle = pOrbit * (Math.PI / 2) + (pOrbitContinuous * time * 0.8);
+        orbitAngle = pOrbit * (Math.PI / 2);
         posX = Math.sin(orbitAngle) * orbitRadius;
         posY = -20 + Math.cos(orbitAngle) * orbitRadius; // Centered exactly on Earth (-20)
         rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
@@ -221,9 +221,10 @@ function LaunchAnimation() {
       }
     }
 
-    // Smoothly lerp both position AND lookAt target to prevent violent snapping
-    state.camera.position.lerp(targetCamPos, 0.04);
-    currentLookAt.current.lerp(targetLookAt, 0.04);
+    // Tighter tracking during the fast launch sequence, slower cinematic drift for the finale
+    const lerpFactor = offset < 0.9 ? 0.2 : 0.04;
+    state.camera.position.lerp(targetCamPos, lerpFactor);
+    currentLookAt.current.lerp(targetLookAt, lerpFactor);
     state.camera.lookAt(currentLookAt.current);
 
     // EXHAUST 1 (Booster)
