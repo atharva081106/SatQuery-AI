@@ -71,19 +71,20 @@ function LaunchAnimation() {
     // 0.90 - 1.00: Orbiting
 
     const pMaxQ = getProgress(offset, 0.2, 0.3);         
-
     const getTrajectory = (clampedOffset: number, pOrbitContinuous: number, time: number) => {
       // 0.0 - 0.2: Vertical climb
       const pLiftoff = getProgress(clampedOffset, 0.0, 0.2);
-      // 0.2 - 0.7: Horizontal orbit in X-Z plane
+      // 0.2 - 0.7: Perfect circular orbit around Earth's center in X-Y plane
       const pOrbit = getProgress(clampedOffset, 0.2, 0.7);
-      // 0.1 - 0.3: Pitch over maneuver (rotZ goes 0 to -90)
-      const pPitch = getProgress(clampedOffset, 0.1, 0.3);
+      // 0.1 - 0.2: Pitch over maneuver
+      const pPitch = getProgress(clampedOffset, 0.1, 0.2);
+      
+      const orbitRadius = 25; // Exactly 25 units from Earth center (-20)
       
       let orbitAngle = 0;
       let posX = 0;
-      let posY = -2 + (pLiftoff * 8); // climbs from -2 to Y=6
-      let posZ = 20; // fixed distance from camera
+      let posY = -1 + (pLiftoff * 6); // Climbs exactly to Y=5
+      let posZ = 0;
       
       let rotX = 0;
       let rotY = 0;
@@ -91,12 +92,12 @@ function LaunchAnimation() {
 
       if (pOrbit > 0) {
         orbitAngle = pOrbit * (Math.PI / 2) + (pOrbitContinuous * time * 0.8);
-        posX = Math.sin(orbitAngle) * 20;
-        posZ = Math.cos(orbitAngle) * 20;
-        rotY = orbitAngle; // Yaw to follow the circular tangent
+        posX = Math.sin(orbitAngle) * orbitRadius;
+        posY = -20 + Math.cos(orbitAngle) * orbitRadius; // Centered exactly on Earth (-20)
+        rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
       }
 
-      // Max-Q vibration
+      // Max-Q vibration applies to all attached components evenly
       const pMaxQ = getProgress(clampedOffset, 0.15, 0.25);
       if (pMaxQ > 0 && pMaxQ < 1) {
         posX += (Math.random() - 0.5) * 0.1;
@@ -209,13 +210,13 @@ function LaunchAnimation() {
       if (offset < 0.9) {
         // Follow closely but zoomed out enough to see the whole rocket
         const launchZoom = isMobile ? 35 : 25;
-        targetCamPos.set(vPos.x, vPos.y + 6, vPos.z + launchZoom);
-        targetLookAt.set(vPos.x, vPos.y + 6, vPos.z);
+        targetCamPos.set(vPos.x, vPos.y + 6, launchZoom);
+        targetLookAt.set(vPos.x, vPos.y + 6, 0);
       } else {
         // Grand finale pull-back (orbit view)
-        // Center on Earth (Y=-20) and elevate the camera (Y=-5) to look down at the horizontal orbit
-        const finalZoom = isMobile ? 100 : 65; 
-        targetCamPos.set(0, -5, finalZoom); 
+        // Center perfectly on Earth's core (Y=-20)
+        const finalZoom = isMobile ? 85 : 55; 
+        targetCamPos.set(0, -20, finalZoom); 
         targetLookAt.set(0, -20, 0);
       }
     }
