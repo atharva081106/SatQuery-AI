@@ -74,39 +74,41 @@ function LaunchAnimation() {
 
     // Shared trajectory helper
     const getTrajectory = (clampedOffset: number, pOrbitContinuous: number, time: number) => {
-      const pLiftoff = getProgress(clampedOffset, 0.0, 0.1);
-      const pFlight = getProgress(clampedOffset, 0.1, 0.7);
-      const pPitch = getProgress(clampedOffset, 0.1, 0.3);
+      const pLiftoff = getProgress(clampedOffset, 0.0, 0.25);
+      const pPitchOver = getProgress(clampedOffset, 0.2, 0.5);
+      const pOrbitInsert = getProgress(clampedOffset, 0.4, 0.7);
       
       let orbitAngle = 0;
       let posX = 0;
-      let posY = -2 + (pLiftoff * 2);
+      // Start altitude is Y=-1, climbs to Y=1 (even closer to Earth)
+      let posY = -1 + (pLiftoff * 2);
       let posZ = 0;
-      let rotX = 0;
+      let rotZ = -pPitchOver * (Math.PI / 2);
       let rotY = 0;
-      let rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch);
+      let rotX = 0;
 
-      if (pFlight > 0) {
-        // Orbit angle goes from 0 to 90 degrees during insertion
-        orbitAngle = pFlight * (Math.PI / 2) + (pOrbitContinuous * time * 0.8);
+      if (pOrbitInsert > 0) {
+        // Curve around earth
+        // Increased revolution speed for a more dynamic final orbit
+        orbitAngle = pOrbitInsert * (Math.PI / 4) + (pOrbitContinuous * time * 0.8);
         const radius = 20; 
         
         const rawX = Math.sin(orbitAngle) * radius;
         const rawY = Math.cos(orbitAngle) * radius;
         
         // Smoothly interpolate a 90-degree orbital tilt around X-axis (polar to equatorial)
-        const tilt = pFlight * (Math.PI / 2); 
+        const tilt = pOrbitInsert * (Math.PI / 2); 
         
         posX = rawX;
         posY = -20 + (rawY * Math.cos(tilt));
         posZ = rawY * Math.sin(tilt);
         
+        rotZ = -orbitAngle;
         rotX = tilt; // Orient the vehicle to follow the horizontal path
-        rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
+        rotY = 0;
       }
 
       // Max-Q vibration applies to all attached components evenly
-      const pMaxQ = getProgress(clampedOffset, 0.15, 0.25);
       if (pMaxQ > 0 && pMaxQ < 1) {
         posX += (Math.random() - 0.5) * 0.1;
       }
@@ -382,12 +384,12 @@ function LaunchAnimation() {
       {/* FAIRING LEFT WRAPPER */}
       <group ref={fairingLeftWrapperRef}>
         <group ref={fairingLeftRef}>
-          <mesh position={[0, 10, 0]}> {/* Base of fairing cylinder */}
-            <cylinderGeometry args={[0.62, 0.62, 2, 32, 1, false, Math.PI, Math.PI]} />
+          <mesh position={[-0.3, 10, 0]}> {/* Base of fairing cylinder */}
+            <cylinderGeometry args={[0.6, 0.6, 2, 32, 1, false, Math.PI, Math.PI]} />
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
-          <mesh position={[0, 11.75, 0]}> {/* Cone on top */}
-            <coneGeometry args={[0.62, 1.5, 32, 1, false, Math.PI, Math.PI]} />
+          <mesh position={[-0.3, 11.75, 0]}> {/* Cone on top */}
+            <coneGeometry args={[0.6, 1.5, 32, 1, false, Math.PI, Math.PI]} />
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
         </group>
@@ -396,12 +398,12 @@ function LaunchAnimation() {
       {/* FAIRING RIGHT WRAPPER */}
       <group ref={fairingRightWrapperRef}>
         <group ref={fairingRightRef}>
-          <mesh position={[0, 10, 0]}>
-            <cylinderGeometry args={[0.62, 0.62, 2, 32, 1, false, 0, Math.PI]} />
+          <mesh position={[0.3, 10, 0]}>
+            <cylinderGeometry args={[0.6, 0.6, 2, 32, 1, false, 0, Math.PI]} />
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
-          <mesh position={[0, 11.75, 0]}>
-            <coneGeometry args={[0.62, 1.5, 32, 1, false, 0, Math.PI]} />
+          <mesh position={[0.3, 11.75, 0]}>
+            <coneGeometry args={[0.6, 1.5, 32, 1, false, 0, Math.PI]} />
             <primitive object={rocketMaterial} attach="material" />
           </mesh>
         </group>
