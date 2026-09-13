@@ -209,13 +209,13 @@ function LaunchAnimation() {
 
       if (offset < 0.9) {
         // Follow closely but zoomed out enough to see the whole rocket
-        const launchZoom = isMobile ? 35 : 25;
+        const launchZoom = isMobile ? 65 : 45;
         targetCamPos.set(vPos.x, vPos.y + 6, launchZoom);
         targetLookAt.set(vPos.x, vPos.y + 6, 0);
       } else {
         // Grand finale pull-back (orbit view)
         // Center perfectly on Earth's core (Y=-20)
-        const finalZoom = isMobile ? 85 : 55; 
+        const finalZoom = isMobile ? 110 : 80; 
         targetCamPos.set(0, -20, finalZoom); 
         targetLookAt.set(0, -20, 0);
       }
