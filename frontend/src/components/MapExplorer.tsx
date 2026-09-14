@@ -391,13 +391,13 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       {/* FLOATING ACQUISITION PANEL (Collapsible on Mobile, Persistent on Desktop) */}
       <div 
         data-lenis-prevent
-        className={`fixed sm:absolute inset-x-3 bottom-20 sm:bottom-auto sm:top-24 sm:left-8 w-[calc(100vw-1.5rem)] sm:w-84 max-h-[70dvh] sm:max-h-[calc(100vh-7.5rem)] overflow-y-auto custom-scrollbar bg-black/90 backdrop-blur-2xl border border-white/20 p-4 sm:p-6 z-[450] flex-col gap-4 shadow-2xl rounded-2xl sm:rounded-xl pointer-events-auto touch-pan-y animate-slide-up ${
+        className={`fixed sm:absolute inset-x-3 bottom-20 sm:bottom-auto sm:top-18 sm:left-6 w-[calc(100vw-1.5rem)] sm:w-[350px] max-h-[85dvh] sm:max-h-[calc(100vh-5.5rem)] overflow-y-auto custom-scrollbar bg-black/90 backdrop-blur-2xl border border-white/20 p-3 sm:p-4 z-[450] flex flex-col gap-2.5 shadow-2xl rounded-2xl sm:rounded-xl pointer-events-auto touch-pan-y animate-slide-up ${
           mobilePanelOpen ? 'flex' : 'hidden sm:flex'
         }`}
         onWheel={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-white/20 pb-2 shrink-0">
-          <h2 className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase font-mono">Acquisition Config</h2>
+        <div className="flex items-center justify-between border-b border-white/20 pb-1.5 shrink-0">
+          <h2 className="text-xs font-bold tracking-[0.2em] uppercase font-mono">Acquisition Config</h2>
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <span className="text-[9px] font-bold text-white bg-white/10 border border-white/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -419,14 +419,15 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         </div>
 
         {/* Basemap Switcher */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs text-white/50 tracking-widest uppercase">Base Map</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] text-white/50 tracking-widest uppercase font-mono">Base Map</label>
           <div className="grid grid-cols-3 gap-1">
             {([['esri', 'ESRI Sat'], ['bhuvan', '🇮🇳 Bhuvan'], ['osm', 'OpenStreet']] as const).map(([val, label]) => (
               <button
                 key={val}
+                type="button"
                 onClick={() => setBasemap(val)}
-                className={`text-[10px] py-1.5 px-1 uppercase tracking-wider border transition-all ${
+                className={`text-[9px] sm:text-[10px] py-1 px-1 uppercase tracking-wider border transition-all ${
                   basemap === val
                     ? 'border-[#00F0FF] text-[#00F0FF] bg-[#00F0FF]/10 font-bold'
                     : 'border-white/20 text-white/50 hover:border-white/50'
@@ -437,62 +438,64 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
             ))}
           </div>
           {basemap === 'bhuvan' && (
-            <div className="text-[10px] text-white tracking-wider">
+            <div className="text-[9px] text-[#00F0FF]/80 tracking-wider font-mono">
               ✓ ISRO Bhuvan NRSC — National Geoportal
             </div>
           )}
         </div>
         
-        {/* Dataset Selection */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs text-white/50 tracking-widest uppercase">Target Dataset</label>
-          <select 
-            value={dataset} 
-            onChange={e => setDataset(e.target.value)}
-            className="bg-transparent border border-white/20 text-white text-xs px-3 py-2 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
-          >
-            <option value="s2" className="bg-black">Sentinel-2 (Optical)</option>
-            <option value="s1" className="bg-black">Sentinel-1 (Radar)</option>
-            <option value="l8" className="bg-black">Landsat 8-9</option>
-          </select>
-        </div>
+        {/* Dataset & Configuration (2-Column Compact Row) */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Dataset Selection */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] text-white/50 tracking-widest uppercase font-mono truncate">Target Dataset</label>
+            <select 
+              value={dataset} 
+              onChange={e => setDataset(e.target.value)}
+              className="bg-black/60 border border-white/20 text-white text-[11px] px-2 py-1.5 outline-none focus:border-[#00F0FF] uppercase tracking-wider truncate"
+            >
+              <option value="s2" className="bg-black">Sentinel-2 (Optical)</option>
+              <option value="s1" className="bg-black">Sentinel-1 (Radar)</option>
+              <option value="l8" className="bg-black">Landsat 8-9</option>
+            </select>
+          </div>
 
-        {/* Configuration */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs text-white/50 tracking-widest uppercase">Configuration</label>
-          <select 
-            value={configuration} 
-            onChange={e => setConfiguration(e.target.value)}
-            className="bg-transparent border border-white/20 text-white text-xs px-3 py-2 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
-          >
-            <option value="Default" className="bg-black">Default</option>
-            <option value="Monitoring Earth from Space" className="bg-black">Monitoring Earth from Space</option>
-            <option value="Agriculture" className="bg-black">Agriculture</option>
-            <option value="Atmosphere and Air Pollution" className="bg-black">Atmosphere and Air Pollution</option>
-            <option value="Change Detection through Time" className="bg-black">Change Detection through Time</option>
-            <option value="Floods and Droughts" className="bg-black">Floods and Droughts</option>
-            <option value="Geology" className="bg-black">Geology</option>
-            <option value="Ocean and Water Bodies" className="bg-black">Ocean and Water Bodies</option>
-            <option value="Snow and Glaciers" className="bg-black">Snow and Glaciers</option>
-            <option value="Urban" className="bg-black">Urban</option>
-          </select>
+          {/* Configuration */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] text-white/50 tracking-widest uppercase font-mono truncate">Configuration</label>
+            <select 
+              value={configuration} 
+              onChange={e => setConfiguration(e.target.value)}
+              className="bg-black/60 border border-white/20 text-white text-[11px] px-2 py-1.5 outline-none focus:border-[#00F0FF] uppercase tracking-wider truncate"
+            >
+              <option value="Default" className="bg-black">Default</option>
+              <option value="Monitoring Earth from Space" className="bg-black">Monitoring Earth</option>
+              <option value="Agriculture" className="bg-black">Agriculture</option>
+              <option value="Atmosphere and Air Pollution" className="bg-black">Atmosphere & Air</option>
+              <option value="Change Detection through Time" className="bg-black">Change Detection</option>
+              <option value="Floods and Droughts" className="bg-black">Floods & Droughts</option>
+              <option value="Geology" className="bg-black">Geology</option>
+              <option value="Ocean and Water Bodies" className="bg-black">Ocean & Water</option>
+              <option value="Snow and Glaciers" className="bg-black">Snow & Glaciers</option>
+              <option value="Urban" className="bg-black">Urban</option>
+            </select>
+          </div>
         </div>
 
         {/* Spectral Layer */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <div className="flex justify-between items-center">
-            <label className="text-xs text-white/50 tracking-widest uppercase">Data Layer</label>
-            {configuration !== "Default" && (
-              <span className="text-[9px] text-[#00F0FF] tracking-widest uppercase animate-pulse">RECOMMENDED</span>
+            <label className="text-[10px] text-white/50 tracking-widest uppercase font-mono">Data Layer</label>
+            {configuration !== "Default" ? (
+              <span className="text-[8px] text-[#00F0FF] tracking-widest uppercase animate-pulse">RECOMMENDED</span>
+            ) : (
+              <span className="text-[8px] text-white/40 italic">Preview: True Color</span>
             )}
           </div>
-          <span className="text-[9px] text-white/40 italic -mt-1 leading-tight">
-            *Applied upon acquisition (Map preview remains True Color)
-          </span>
           <select 
             value={layer} 
             onChange={e => setLayer(e.target.value)}
-            className="bg-transparent border border-white/20 text-white text-xs px-3 py-2 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
+            className="bg-black/60 border border-white/20 text-white text-[11px] px-2.5 py-1.5 outline-none focus:border-[#00F0FF] uppercase tracking-wider"
           >
             <option value="True color" className="bg-black">{dataset === 's1' ? 'Radar VV/VH' : 'True color'}</option>
             {dataset !== "s1" && (
@@ -512,95 +515,96 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           </select>
         </div>
 
-        {/* Acquisition Mode Toggle */}
-        <div className="flex flex-col gap-2 pt-2">
-          <label className="text-xs text-white/50 tracking-widest uppercase">Acquisition Mode</label>
-          <div className="grid grid-cols-2 gap-1">
-            <button
-              onClick={() => setAcquisitionMode("single")}
-              className={`text-[10px] py-2 px-1 uppercase tracking-wider border transition-all ${
-                acquisitionMode === "single"
-                  ? 'border-[#00F0FF] text-[#00F0FF] bg-[#00F0FF]/10 font-bold'
-                  : 'border-white/20 text-white/50 hover:border-white/50'
-              }`}
-            >
-              Single Image
-            </button>
-            <button
-              onClick={() => setAcquisitionMode("dual")}
-              className={`text-[10px] py-2 px-1 uppercase tracking-wider border transition-all ${
-                acquisitionMode === "dual"
-                  ? 'border-[#00F0FF] text-[#00F0FF] bg-[#00F0FF]/10 font-bold'
-                  : 'border-white/20 text-white/50 hover:border-white/50'
-              }`}
-            >
-              Change Detection
-            </button>
+        {/* Acquisition Mode & Date Range */}
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between items-center">
+            <label className="text-[10px] text-white/50 tracking-widest uppercase font-mono">
+              {acquisitionMode === "single" ? "Target Date" : "Date Range"}
+            </label>
+            <div className="inline-flex rounded border border-white/20 p-0.5 bg-black/40">
+              <button
+                type="button"
+                onClick={() => setAcquisitionMode("single")}
+                className={`text-[9px] px-2 py-0.5 uppercase tracking-wider transition-all rounded-[2px] ${
+                  acquisitionMode === "single"
+                    ? 'bg-[#00F0FF]/20 text-[#00F0FF] font-bold'
+                    : 'text-white/50 hover:text-white'
+                }`}
+              >
+                Single
+              </button>
+              <button
+                type="button"
+                onClick={() => setAcquisitionMode("dual")}
+                className={`text-[9px] px-2 py-0.5 uppercase tracking-wider transition-all rounded-[2px] ${
+                  acquisitionMode === "dual"
+                    ? 'bg-[#00F0FF]/20 text-[#00F0FF] font-bold'
+                    : 'text-white/50 hover:text-white'
+                }`}
+              >
+                Change Detect
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Date Range / Selection */}
-        <div className="flex flex-col gap-2">
           {acquisitionMode === "single" ? (
-            <>
-              <label className="text-xs text-white/50 tracking-widest uppercase">Target Date</label>
-              <DatePicker
-                selected={endDate ? new Date(endDate) : null}
-                onChange={(date: Date | null) => {
-                  if (date) setEndDate(date.toISOString().split('T')[0]);
-                }}
-                dateFormat="dd/MM/yy"
-                className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF]"
-              />
-            </>
+            <DatePicker
+              selected={endDate ? new Date(endDate) : null}
+              onChange={(date: Date | null) => {
+                if (date) setEndDate(date.toISOString().split('T')[0]);
+              }}
+              dateFormat="dd/MM/yy"
+              className="w-full bg-black/60 border border-white/20 text-white text-[11px] px-2.5 py-1.5 outline-none focus:border-[#00F0FF]"
+            />
           ) : (
-            <>
-              <div className="flex justify-between">
-                <label className="text-xs text-white/50 tracking-widest uppercase">Date 1 (Before)</label>
-                <label className="text-xs text-white/50 tracking-widest uppercase">Date 2 (After)</label>
-              </div>
-              <div className="flex flex-col sm:flex-row w-full gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <span className="text-[8px] text-white/40 uppercase tracking-wider block mb-0.5">Before (T1)</span>
                 <DatePicker
                   selected={startDate ? new Date(startDate) : null}
                   onChange={(date: Date | null) => {
                     if (date) setStartDate(date.toISOString().split('T')[0]);
                   }}
                   dateFormat="dd/MM/yy"
-                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF]"
+                  className="w-full bg-black/60 border border-white/20 text-white text-[11px] px-2 py-1.5 outline-none focus:border-[#00F0FF]"
                 />
+              </div>
+              <div>
+                <span className="text-[8px] text-white/40 uppercase tracking-wider block mb-0.5">After (T2)</span>
                 <DatePicker
                   selected={endDate ? new Date(endDate) : null}
                   onChange={(date: Date | null) => {
                     if (date) setEndDate(date.toISOString().split('T')[0]);
                   }}
                   dateFormat="dd/MM/yy"
-                  className="w-full bg-transparent border border-white/20 text-white text-xs px-2 py-2 outline-none focus:border-[#00F0FF]"
+                  className="w-full bg-black/60 border border-white/20 text-white text-[11px] px-2 py-1.5 outline-none focus:border-[#00F0FF]"
                 />
               </div>
-            </>
+            </div>
           )}
         </div>
 
         {/* Cloud Cover */}
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <label className="text-xs text-white/50 tracking-widest uppercase">Max Cloud Cover</label>
-            <span className="text-xs font-bold text-[#00F0FF]">{maxCC}%</span>
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between items-center text-[10px]">
+            <label className="text-white/50 tracking-widest uppercase font-mono">Max Cloud Cover</label>
+            <span className="font-bold text-[#00F0FF] font-mono">{maxCC}%</span>
           </div>
           <input 
             type="range" 
             min="0" max="100" 
             value={maxCC} 
             onChange={e => setMaxCC(parseInt(e.target.value))} 
-            className="w-full accent-[#00F0FF]"
+            className="w-full h-1.5 accent-[#00F0FF] bg-white/10 rounded cursor-pointer"
           />
         </div>
 
         {/* Action Button */}
         <button 
+          type="button"
           onClick={handleAcquire}
           disabled={loading}
-          className={`w-full py-3 mt-2 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border shrink-0 cursor-pointer ${
+          className={`w-full py-2.5 mt-1 text-[11px] font-bold tracking-[0.2em] uppercase transition-all duration-300 border shrink-0 cursor-pointer ${
             loading 
             ? 'border-white/20 text-white/40 cursor-not-allowed bg-transparent' 
             : 'border-white text-white hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.5)]'
@@ -611,9 +615,10 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         
         {onCancel && (
           <button 
+            type="button"
             onClick={onCancel}
             disabled={loading}
-            className="w-full py-3 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 border border-white/20 text-white/60 hover:text-white hover:border-white shrink-0 cursor-pointer"
+            className="w-full py-1.5 text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 border border-white/20 text-white/60 hover:text-white hover:border-white shrink-0 cursor-pointer"
           >
             Cancel
           </button>
@@ -621,7 +626,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         
         {/* Helper text */}
         {!bbox && (
-          <div className="text-[10px] text-[#00F0FF] tracking-widest uppercase text-center mt-2 animate-pulse">
+          <div className="text-[9px] text-[#00F0FF] tracking-widest uppercase text-center animate-pulse">
             Draw bounding box to enable
           </div>
         )}
