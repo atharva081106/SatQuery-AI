@@ -7,11 +7,34 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useAuth } from "@/context/AuthContext";
+import { 
+  Search, 
+  RotateCw, 
+  RotateCcw, 
+  Navigation, 
+  X, 
+  MapPin, 
+  Crosshair, 
+  Loader2 
+} from "lucide-react";
 
 interface MapExplorerProps {
   onAcquire?: (base64data: string, bbox: number[]) => void;
   onCancel?: () => void;
 }
+
+// Curated Earth Observation and ISRO strategic hubs
+const TARGET_PRESETS = [
+  { name: "Mumbai Naval Dockyard", location: "Mumbai, Maharashtra, India", lat: 18.9288, lon: 72.8447, desc: "Naval port & coastal shipping" },
+  { name: "Sriharikota (SDSC SHAR)", location: "Sriharikota, Andhra Pradesh, India", lat: 13.7199, lon: 80.2305, desc: "ISRO primary orbital launch center" },
+  { name: "New Delhi Capital", location: "Delhi, India", lat: 28.6139, lon: 77.2090, desc: "Urban infrastructure & administration" },
+  { name: "Bengaluru ISRO HQ", location: "Bengaluru, Karnataka, India", lat: 12.9716, lon: 77.5946, desc: "Space agency command headquarters" },
+  { name: "Brahmaputra Flood Basin", location: "Guwahati, Assam, India", lat: 26.1445, lon: 91.7362, desc: "Dynamic riverine flood ecosystem" },
+  { name: "Sundarbans Delta", location: "West Bengal, India", lat: 21.9497, lon: 89.1833, desc: "World's largest mangrove reserve" },
+  { name: "Suez Canal Transit", location: "Ismailia, Egypt", lat: 30.5852, lon: 32.2654, desc: "Strategic maritime waterway" },
+  { name: "Tokyo Bay Coastal Zone", location: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, desc: "Reclaimed coastal megacity infrastructure" },
+  { name: "Cape Canaveral Space Force", location: "Florida, United States", lat: 28.3922, lon: -80.6077, desc: "NASA & commercial space launch pads" },
+];
 
 export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = {}) {
   const {
@@ -51,6 +74,18 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
+  // Map Rotation & Bearing State
+  const [bearing, setBearing] = useState(0);
+
+  // Search & Auto-Zoom State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const searchMarkerRef = useRef<any>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
   // Sync configuration preset with recommended layer
   useEffect(() => {
     if (configuration === "Agriculture") setLayer("NDVI");
@@ -71,10 +106,22 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   }, [dataset]);
 
   useEffect(() => {
-    // Dynamic import of Leaflet
+    // Dynamic import of Leaflet and plugins
     const initLeaflet = async () => {
       const leaflet = (await import("leaflet")).default;
-      require("leaflet-draw");
+      if (typeof window !== "undefined") {
+        (window as any).L = leaflet;
+        try {
+          require("leaflet-rotate");
+        } catch (e) {
+          console.warn("[MapExplorer] leaflet-rotate error:", e);
+        }
+        try {
+          require("leaflet-draw");
+        } catch (e) {
+          console.warn("[MapExplorer] leaflet-draw error:", e);
+        }
+      }
       setL(leaflet);
     };
     initLeaflet();
@@ -88,13 +135,26 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       return;
     }
 
-    const map = L.map(container, {
+    const map = (L as any).map(container, {
       center: [50.16, 20.78],
       zoom: 5,
       zoomControl: false,
       attributionControl: false,
+      rotate: true,
+      bearing: 0,
+      touchRotate: true,
+      shiftKeyRotate: true,
+      rotateControl: false,
     });
     mapInstanceRef.current = map;
+
+    // Listen for rotation events from touch gesture or programmatic rotation
+    if (typeof map.on === "function") {
+      map.on("rotate", () => {
+        const b = typeof map.getBearing === "function" ? Math.round(map.getBearing()) : 0;
+        setBearing(((b % 360) + 360) % 360);
+      });
+    }
 
     // Default basemap: ESRI World Imagery
     basemapLayerRef.current = L.tileLayer(
@@ -163,6 +223,157 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       mapInstanceRef.current = null;
     };
   }, [L]);
+
+  // Click outside to close search dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Map Rotation Functions
+  const rotateMapBy = (delta: number) => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    const newBearing = (((bearing + delta) % 360) + 360) % 360;
+    setBearing(newBearing);
+    if (typeof map.setBearing === "function") {
+      map.setBearing(newBearing);
+    } else {
+      const pane = mapRef.current?.querySelector(".leaflet-map-pane") as HTMLElement;
+      if (pane) {
+        pane.style.transition = "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
+        pane.style.transform = `rotate(${newBearing}deg)`;
+      }
+    }
+  };
+
+  const resetNorth = () => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    setBearing(0);
+    if (typeof map.setBearing === "function") {
+      map.setBearing(0);
+    } else {
+      const pane = mapRef.current?.querySelector(".leaflet-map-pane") as HTMLElement;
+      if (pane) {
+        pane.style.transition = "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
+        pane.style.transform = "rotate(0deg)";
+      }
+    }
+  };
+
+  // Auto-Zoom to Searched Place or Preset
+  const zoomToPlace = (lat: number, lon: number, title: string, boundingbox?: string[]) => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    setLiveLocationName(title);
+    setMousePos({ lat, lng: lon });
+    setShowSearchDropdown(false);
+    setSearchQuery(title);
+
+    // Remove previous target marker if exists
+    if (searchMarkerRef.current && map.hasLayer(searchMarkerRef.current)) {
+      map.removeLayer(searchMarkerRef.current);
+    }
+
+    // Auto-zoom to bounding box or coordinates
+    if (boundingbox && boundingbox.length === 4) {
+      const south = parseFloat(boundingbox[0]);
+      const north = parseFloat(boundingbox[1]);
+      const west = parseFloat(boundingbox[2]);
+      const east = parseFloat(boundingbox[3]);
+      map.flyToBounds([[south, west], [north, east]], {
+        duration: 1.6,
+        maxZoom: 15,
+        padding: [60, 60],
+      });
+    } else {
+      map.flyTo([lat, lon], 13, { duration: 1.6 });
+    }
+
+    // Drop glowing target marker
+    if (L) {
+      const targetIcon = L.divIcon({
+        className: "satquery-search-pulse",
+        html: `
+          <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <span class="absolute w-10 h-10 rounded-full bg-[#00F0FF]/30 animate-ping"></span>
+            <span class="absolute w-6 h-6 rounded-full border border-[#00F0FF] animate-pulse"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#00F0FF] border-2 border-white shadow-[0_0_12px_#00F0FF]"></span>
+          </div>
+        `,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+      });
+
+      const marker = L.marker([lat, lon], { icon: targetIcon }).addTo(map);
+      marker.bindPopup(
+        `<div style="font-family: monospace; font-size: 11px; color: #fff; background: #0b0b0f; border: 1px solid #00F0FF; padding: 6px 10px; border-radius: 8px;">
+          <div style="color: #00F0FF; font-weight: bold; text-transform: uppercase; font-size: 9px; letter-spacing: 0.1em;">TARGET ACQUIRED</div>
+          <div style="font-weight: 600; margin-top: 2px;">${title}</div>
+          <div style="color: rgba(255,255,255,0.6); font-size: 9px; margin-top: 2px;">${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E</div>
+        </div>`
+      ).openPopup();
+      searchMarkerRef.current = marker;
+    }
+  };
+
+  // Search Submission Handler
+  const handleSearch = async (e?: React.FormEvent, customQuery?: string) => {
+    if (e) e.preventDefault();
+    const queryToUse = (customQuery !== undefined ? customQuery : searchQuery).trim();
+    if (!queryToUse) return;
+
+    // Check if coordinates entered directly (lat, lon)
+    const coordMatch = queryToUse.match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
+    if (coordMatch) {
+      const lat = parseFloat(coordMatch[1]);
+      const lon = parseFloat(coordMatch[2]);
+      if (!isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        zoomToPlace(lat, lon, `Coord [${lat.toFixed(4)}, ${lon.toFixed(4)}]`);
+        return;
+      }
+    }
+
+    setIsSearching(true);
+    setSearchError(null);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryToUse)}&limit=6&addressdetails=1`,
+        { headers: { "Accept-Language": "en" } }
+      );
+      if (!res.ok) throw new Error("Search service failed");
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setSearchResults(data);
+        setShowSearchDropdown(true);
+        // If user submitted via Enter key or Locate button, auto-zoom to the top result immediately!
+        if (e) {
+          const first = data[0];
+          zoomToPlace(
+            parseFloat(first.lat),
+            parseFloat(first.lon),
+            first.display_name.split(",").slice(0, 3).join(","),
+            first.boundingbox
+          );
+        }
+      } else {
+        setSearchError("No geographic regions found for query.");
+        setShowSearchDropdown(true);
+      }
+    } catch (err) {
+      setSearchError("Geocoding service unavailable.");
+      setShowSearchDropdown(true);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   // Fetch location name when bbox changes
   useEffect(() => {
@@ -632,15 +843,202 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         )}
       </div>
 
+      {/* ── AUTO-ZOOM SEARCH BAR & EO TARGET HUBS ── */}
+      <div 
+        ref={searchContainerRef}
+        className="fixed sm:absolute top-16 sm:top-5 left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto sm:w-[460px] md:w-[520px] z-[550] pointer-events-auto font-mono"
+      >
+        <form 
+          onSubmit={(e) => handleSearch(e)}
+          className="relative flex items-center rounded-2xl sm:rounded-full bg-black/90 backdrop-blur-2xl border border-white/25 shadow-2xl p-1.5 px-3 focus-within:border-[#00F0FF] focus-within:shadow-[0_0_20px_rgba(0,240,255,0.25)] transition-all"
+        >
+          <Search className="w-4 h-4 text-white/40 ml-1.5 shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (!showSearchDropdown) setShowSearchDropdown(true);
+            }}
+            onFocus={() => setShowSearchDropdown(true)}
+            placeholder="Search city, region, or coords (lat, lon)..."
+            className="flex-1 bg-transparent px-2.5 py-1 text-xs text-white placeholder-white/40 outline-none font-mono"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setSearchResults([]);
+                setSearchError(null);
+              }}
+              className="p-1 text-white/40 hover:text-white transition-colors cursor-pointer mr-1"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={isSearching}
+            className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#00F0FF] text-black font-bold text-[10px] uppercase tracking-wider transition-all disabled:opacity-50 flex items-center gap-1 shrink-0 cursor-pointer shadow-md"
+          >
+            {isSearching ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span>Scanning</span>
+              </>
+            ) : (
+              <span>Locate</span>
+            )}
+          </button>
+        </form>
+
+        {/* Search Results & Quick Preset Dropdown */}
+        {showSearchDropdown && (
+          <div className="absolute top-full left-0 w-full mt-2 rounded-2xl bg-black/95 backdrop-blur-2xl border border-white/20 shadow-2xl p-3 max-h-[60vh] overflow-y-auto custom-scrollbar animate-slide-up">
+            {/* Geocoded Search Results */}
+            {searchResults.length > 0 && (
+              <div className="flex flex-col gap-1 mb-3">
+                <div className="text-[9px] text-[#00F0FF] font-bold tracking-widest uppercase mb-1 flex items-center justify-between">
+                  <span>RESOLVED GEOGRAPHIC TARGETS</span>
+                  <span>{searchResults.length} RESULTS</span>
+                </div>
+                {searchResults.map((result: any, idx: number) => {
+                  const title = result.display_name.split(",").slice(0, 3).join(",");
+                  const subtitle = result.display_name.split(",").slice(3).join(",");
+                  const lat = parseFloat(result.lat);
+                  const lon = parseFloat(result.lon);
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => zoomToPlace(lat, lon, title, result.boundingbox)}
+                      className="w-full text-left p-2.5 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/20 transition-all flex items-start gap-2.5 cursor-pointer group"
+                    >
+                      <MapPin className="w-4 h-4 text-[#00F0FF] shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-white group-hover:text-[#00F0FF] truncate">
+                          {title}
+                        </div>
+                        <div className="text-[10px] text-white/50 truncate mt-0.5">
+                          {subtitle || result.type}
+                        </div>
+                        <div className="text-[9px] text-white/40 font-mono mt-0.5">
+                          {lat.toFixed(4)}° N, {lon.toFixed(4)}° E
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {searchError && (
+              <div className="p-2 mb-2 rounded-lg bg-red-950/40 border border-red-500/40 text-red-300 text-[10px]">
+                {searchError}
+              </div>
+            )}
+
+            {/* Curated EO Target Presets */}
+            <div className="flex flex-col gap-1 pt-1 border-t border-white/10">
+              <div className="text-[9px] text-white/50 font-bold tracking-widest uppercase mb-1 flex items-center justify-between">
+                <span>QUICK TARGET HUBS</span>
+                <span className="text-[8px] text-white/40">1-TAP AUTO-ZOOM</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {TARGET_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => zoomToPlace(preset.lat, preset.lon, preset.name)}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-[#00F0FF]/50 transition-all text-left flex items-start gap-2 cursor-pointer group"
+                  >
+                    <Crosshair className="w-3.5 h-3.5 text-[#00F0FF] shrink-0 mt-0.5 group-hover:rotate-45 transition-transform" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] font-semibold text-white truncate group-hover:text-[#00F0FF]">
+                        {preset.name}
+                      </div>
+                      <div className="text-[9px] text-white/40 truncate">
+                        {preset.desc}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── MAP ROTATION & COMPASS HUD ── */}
+      <div className="fixed sm:absolute top-32 sm:top-20 right-3 sm:right-5 z-[550] flex flex-col items-center gap-2 pointer-events-auto font-mono">
+        {/* Compass Disc */}
+        <div className="relative group">
+          <button
+            type="button"
+            onClick={resetNorth}
+            className={`w-12 h-12 rounded-full backdrop-blur-xl border flex flex-col items-center justify-center transition-all shadow-2xl cursor-pointer ${
+              bearing !== 0
+                ? "bg-black/95 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.4)]"
+                : "bg-black/80 border-white/20 text-white/80 hover:border-white/50 hover:text-white"
+            }`}
+            title={`Bearing: ${bearing}° — Click to Reset North (0°)`}
+          >
+            {/* Animated Needle */}
+            <div
+              className="w-full h-full flex items-center justify-center transition-transform duration-300"
+              style={{ transform: `rotate(${-bearing}deg)` }}
+            >
+              <Navigation className={`w-6 h-6 ${bearing !== 0 ? "text-[#00F0FF] fill-[#00F0FF]/30" : "text-red-400 fill-red-400/40"}`} />
+            </div>
+            {/* Bearing degree badge */}
+            <span className="absolute -bottom-2 px-1.5 py-0.2 rounded-full bg-black border border-white/30 text-[8px] font-bold tracking-tight text-white shadow">
+              {bearing}°
+            </span>
+          </button>
+        </div>
+
+        {/* Rotate Left / Right buttons */}
+        <div className="flex flex-col gap-1 bg-black/80 backdrop-blur-xl border border-white/20 p-1 rounded-xl shadow-xl">
+          <button
+            type="button"
+            onClick={() => rotateMapBy(-45)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-[#00F0FF] hover:bg-white/10 transition-colors cursor-pointer"
+            title="Rotate 45° Counter-Clockwise (↺)"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => rotateMapBy(45)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-[#00F0FF] hover:bg-white/10 transition-colors cursor-pointer"
+            title="Rotate 45° Clockwise (↻)"
+          >
+            <RotateCw className="w-3.5 h-3.5" />
+          </button>
+          {bearing !== 0 && (
+            <button
+              type="button"
+              onClick={resetNorth}
+              className="w-8 h-6 rounded-md bg-[#00F0FF]/15 border border-[#00F0FF]/40 text-[#00F0FF] text-[8px] font-bold uppercase tracking-wider flex items-center justify-center hover:bg-[#00F0FF] hover:text-black transition-all cursor-pointer"
+              title="Reset to 0° North"
+            >
+              0°
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* LAT/LNG TRACKER & LOCATION */}
-      <div className="absolute top-16 sm:bottom-6 right-3 sm:right-16 z-[400] pointer-events-none flex flex-col items-end gap-2">
+      <div className="absolute bottom-20 sm:bottom-6 right-3 sm:right-16 z-[400] pointer-events-none flex flex-col items-end gap-2">
         {liveLocationName && (
           <div className="bg-black/80 backdrop-blur-md border border-[#00F0FF]/30 px-3 py-2 text-[10px] tracking-widest text-[#00F0FF] rounded-lg max-w-[250px] text-right truncate">
             {liveLocationName}
           </div>
         )}
         <div className="bg-black/70 backdrop-blur-md border border-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] text-[#00F0FF] rounded-lg">
-          LAT: {mousePos.lat.toFixed(3)} / LNG: {mousePos.lng.toFixed(3)}
+          LAT: {mousePos.lat.toFixed(3)} / LNG: {mousePos.lng.toFixed(3)} {bearing !== 0 && `// BRG: ${bearing}°`}
         </div>
       </div>
 
