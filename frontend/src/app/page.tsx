@@ -247,12 +247,7 @@ export default function LandingPage() {
 
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-16 sm:pt-0 pb-16 sm:pb-32 px-4 text-center">
-          <FadeInScroll delay={100}>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-mono tracking-widest uppercase text-white/90 mb-3 sm:mb-4 backdrop-blur-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ISRO SAC // PS 26167 TELEMETRY ACTIVE</span>
-            </div>
-          </FadeInScroll>
+
           <FadeInScroll delay={200}>
             <h1 className="display-xxl mb-3 sm:mb-4">
               MAKING SENSE<br/>OF THE EARTH.

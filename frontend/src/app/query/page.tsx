@@ -941,64 +941,9 @@ export default function Home() {
           <div data-lenis-prevent className={`overflow-y-auto mb-2 sm:mb-4 custom-scrollbar pr-2 sm:pr-4 flex flex-col gap-4 sm:gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-2 sm:p-4 my-auto z-20 pointer-events-auto animate-in fade-in duration-300">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-mono tracking-widest text-white/90 uppercase mb-2 sm:mb-3 backdrop-blur-md">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  <span>MISSION CONTROL // READY</span>
-                </div>
-                <h2 className="text-base sm:text-xl md:text-2xl font-bold font-mono tracking-wider uppercase text-white mb-1.5 sm:mb-2 max-w-md">
+                <h2 className="text-base sm:text-xl md:text-2xl font-bold font-mono tracking-wider uppercase text-white mb-3 max-w-md drop-shadow-md">
                   WHAT WOULD YOU LIKE TO ANALYZE?
                 </h2>
-                <p className="text-[10px] sm:text-xs text-white/60 font-mono max-w-sm mb-3 sm:mb-4 leading-relaxed">
-                  Select a mission objective below or type a natural language satellite query.
-                </p>
-
-                {/* 4 Clickable Mission Cards on Mobile & Desktop */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl mb-3">
-                  <button
-                    type="button"
-                    onClick={() => setQuery("Detect and count all naval vessels and cargo ships near Mumbai naval port")}
-                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
-                  >
-                    <span className="text-base shrink-0">🚢</span>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">VESSEL RECON</span>
-                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Detect &amp; count ships in Mumbai port</span>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQuery("Quantify spatial flood inundation boundary and calculate submerged land extent")}
-                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
-                  >
-                    <span className="text-base shrink-0">🌊</span>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">FLOOD BOUNDARY</span>
-                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Quantify submerged land extent</span>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQuery("Identify urban infrastructure expansion and highlight newly constructed road corridors")}
-                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
-                  >
-                    <span className="text-base shrink-0">🏗️</span>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">URBAN GROWTH</span>
-                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Segment built-up roads &amp; structures</span>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQuery("Analyze vegetation canopy vigor and compute NDVI spectral index distribution")}
-                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
-                  >
-                    <span className="text-base shrink-0">🌾</span>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">NDVI HEALTH</span>
-                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Compute vegetation vigor map</span>
-                    </div>
-                  </button>
-                </div>
 
                 {/* Quick Action Shortcuts */}
                 <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] font-mono text-white/60">
