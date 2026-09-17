@@ -15,7 +15,10 @@ import {
   X, 
   MapPin, 
   Crosshair, 
-  Loader2 
+  Loader2,
+  Dices,
+  SlidersHorizontal,
+  Compass
 } from "lucide-react";
 
 interface MapExplorerProps {
@@ -74,8 +77,12 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [mousePos, setMousePos] = useState({ lat: 50.16, lng: 20.78 });
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
-  // Map Rotation & Bearing State
+  // Map Rotation & Bearing State (Arbitrary & Random Degrees)
   const [bearing, setBearing] = useState(0);
+  const [isDraggingCompass, setIsDraggingCompass] = useState(false);
+  const [showRotationFineTune, setShowRotationFineTune] = useState(false);
+  const compassDiscRef = useRef<HTMLDivElement>(null);
+  const rotationFineTuneRef = useRef<HTMLDivElement>(null);
 
   // Search & Auto-Zoom State
   const [searchQuery, setSearchQuery] = useState("");
@@ -224,46 +231,109 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     };
   }, [L]);
 
-  // Click outside to close search dropdown
+  // Click outside to close search dropdown & rotation fine-tune popover
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
         setShowSearchDropdown(false);
+      }
+      if (rotationFineTuneRef.current && !rotationFineTuneRef.current.contains(e.target as Node)) {
+        setShowRotationFineTune(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Map Rotation Functions
-  const rotateMapBy = (delta: number) => {
+  // Search Pin Management: remove pin marker from map when user clears search
+  const removeSearchPin = () => {
+    const map = mapInstanceRef.current;
+    if (searchMarkerRef.current && map) {
+      if (typeof map.hasLayer === "function" && map.hasLayer(searchMarkerRef.current)) {
+        map.removeLayer(searchMarkerRef.current);
+      }
+      searchMarkerRef.current = null;
+    }
+    if (!bbox) {
+      setLiveLocationName(null);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setSearchError(null);
+    setShowSearchDropdown(false);
+    removeSearchPin();
+  };
+
+  // Map Rotation Functions (Arbitrary Degrees, Random Degrees, and Steps)
+  const setBearingTo = (targetBearing: number) => {
     const map = mapInstanceRef.current;
     if (!map) return;
-    const newBearing = (((bearing + delta) % 360) + 360) % 360;
-    setBearing(newBearing);
+    const normalized = ((Math.round(targetBearing) % 360) + 360) % 360;
+    setBearing(normalized);
     if (typeof map.setBearing === "function") {
-      map.setBearing(newBearing);
+      map.setBearing(normalized);
     } else {
       const pane = mapRef.current?.querySelector(".leaflet-map-pane") as HTMLElement;
       if (pane) {
-        pane.style.transition = "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
-        pane.style.transform = `rotate(${newBearing}deg)`;
+        pane.style.transition = "transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)";
+        pane.style.transform = `rotate(${normalized}deg)`;
       }
     }
   };
 
+  const rotateMapBy = (delta: number) => {
+    setBearingTo(bearing + delta);
+  };
+
+  const rotateRandom = () => {
+    let randomBearing = Math.floor(Math.random() * 360);
+    // Ensure noticeability: change by at least 25 degrees
+    if (Math.abs(randomBearing - bearing) < 25) {
+      randomBearing = (randomBearing + 90) % 360;
+    }
+    setBearingTo(randomBearing);
+  };
+
   const resetNorth = () => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
-    setBearing(0);
-    if (typeof map.setBearing === "function") {
-      map.setBearing(0);
-    } else {
-      const pane = mapRef.current?.querySelector(".leaflet-map-pane") as HTMLElement;
-      if (pane) {
-        pane.style.transition = "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
-        pane.style.transform = "rotate(0deg)";
-      }
+    setBearingTo(0);
+  };
+
+  // Compass Drag / Touch Handling to rotate to ANY arbitrary angle
+  const calculateBearingFromEvent = (clientX: number, clientY: number) => {
+    if (!compassDiscRef.current) return;
+    const rect = compassDiscRef.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    // North is straight up (dy < 0, dx = 0 => 0 deg)
+    const rad = Math.atan2(dy, dx);
+    let deg = Math.round((rad * (180 / Math.PI)) + 90);
+    deg = ((deg % 360) + 360) % 360;
+    setBearingTo(deg);
+  };
+
+  const handleCompassPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    setIsDraggingCompass(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    calculateBearingFromEvent(e.clientX, e.clientY);
+  };
+
+  const handleCompassPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingCompass) return;
+    calculateBearingFromEvent(e.clientX, e.clientY);
+  };
+
+  const handleCompassPointerUp = (e: React.PointerEvent) => {
+    if (isDraggingCompass) {
+      setIsDraggingCompass(false);
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {}
     }
   };
 
@@ -857,8 +927,20 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
             type="text"
             value={searchQuery}
             onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (!showSearchDropdown) setShowSearchDropdown(true);
+              const val = e.target.value;
+              setSearchQuery(val);
+              if (!val.trim()) {
+                removeSearchPin();
+                setSearchResults([]);
+                setSearchError(null);
+              } else {
+                if (!showSearchDropdown) setShowSearchDropdown(true);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                clearSearch();
+              }
             }}
             onFocus={() => setShowSearchDropdown(true)}
             placeholder="Search city, region, or coords (lat, lon)..."
@@ -867,13 +949,9 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           {searchQuery && (
             <button
               type="button"
-              onClick={() => {
-                setSearchQuery("");
-                setSearchResults([]);
-                setSearchError(null);
-              }}
+              onClick={clearSearch}
               className="p-1 text-white/40 hover:text-white transition-colors cursor-pointer mr-1"
-              title="Clear search"
+              title="Clear search and remove target pin"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -971,63 +1049,240 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         )}
       </div>
 
-      {/* ── MAP ROTATION & COMPASS HUD ── */}
-      <div className="fixed sm:absolute top-32 sm:top-20 right-3 sm:right-5 z-[550] flex flex-col items-center gap-2 pointer-events-auto font-mono">
-        {/* Compass Disc */}
-        <div className="relative group">
-          <button
-            type="button"
-            onClick={resetNorth}
-            className={`w-12 h-12 rounded-full backdrop-blur-xl border flex flex-col items-center justify-center transition-all shadow-2xl cursor-pointer ${
-              bearing !== 0
-                ? "bg-black/95 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.4)]"
-                : "bg-black/80 border-white/20 text-white/80 hover:border-white/50 hover:text-white"
-            }`}
-            title={`Bearing: ${bearing}° — Click to Reset North (0°)`}
-          >
-            {/* Animated Needle */}
+      {/* ── MAP ROTATION & COMPASS HUD (ARBITRARY & RANDOM DEGREES) ── */}
+      <div className="fixed sm:absolute top-32 sm:top-20 right-3 sm:right-5 z-[550] flex flex-col items-end gap-2 pointer-events-auto font-mono">
+        {/* Main Compass & Action Toolbar Column */}
+        <div className="flex flex-col items-center gap-1.5">
+          {/* Draggable Aerospace Compass Dial */}
+          <div className="relative select-none" title="Drag compass ring or needle to rotate arbitrary degrees, or double-click to reset North">
             <div
-              className="w-full h-full flex items-center justify-center transition-transform duration-300"
-              style={{ transform: `rotate(${-bearing}deg)` }}
+              ref={compassDiscRef}
+              onPointerDown={handleCompassPointerDown}
+              onPointerMove={handleCompassPointerMove}
+              onPointerUp={handleCompassPointerUp}
+              onPointerCancel={handleCompassPointerUp}
+              onDoubleClick={resetNorth}
+              className={`w-14 h-14 rounded-full backdrop-blur-2xl border flex items-center justify-center transition-all shadow-2xl cursor-grab active:cursor-grabbing touch-none select-none relative ${
+                isDraggingCompass
+                  ? "bg-black/95 border-[#00F0FF] shadow-[0_0_25px_rgba(0,240,255,0.7)] scale-105"
+                  : bearing !== 0
+                    ? "bg-black/90 border-[#00F0FF]/80 shadow-[0_0_16px_rgba(0,240,255,0.4)]"
+                    : "bg-black/80 border-white/20 hover:border-white/50"
+              }`}
             >
-              <Navigation className={`w-6 h-6 ${bearing !== 0 ? "text-[#00F0FF] fill-[#00F0FF]/30" : "text-red-400 fill-red-400/40"}`} />
-            </div>
-            {/* Bearing degree badge */}
-            <span className="absolute -bottom-2 px-1.5 py-0.2 rounded-full bg-black border border-white/30 text-[8px] font-bold tracking-tight text-white shadow">
-              {bearing}°
-            </span>
-          </button>
-        </div>
+              {/* Outer Cardinal Graduation Ticks */}
+              <div className="absolute inset-0 pointer-events-none">
+                <span className="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold text-red-400">N</span>
+                <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[7px] text-white/50">E</span>
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[7px] text-white/50">S</span>
+                <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[7px] text-white/50">W</span>
+              </div>
 
-        {/* Rotate Left / Right buttons */}
-        <div className="flex flex-col gap-1 bg-black/80 backdrop-blur-xl border border-white/20 p-1 rounded-xl shadow-xl">
-          <button
-            type="button"
-            onClick={() => rotateMapBy(-45)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-[#00F0FF] hover:bg-white/10 transition-colors cursor-pointer"
-            title="Rotate 45° Counter-Clockwise (↺)"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => rotateMapBy(45)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-[#00F0FF] hover:bg-white/10 transition-colors cursor-pointer"
-            title="Rotate 45° Clockwise (↻)"
-          >
-            <RotateCw className="w-3.5 h-3.5" />
-          </button>
-          {bearing !== 0 && (
+              {/* Dynamic Rotating Gyro Needle */}
+              <div
+                className="w-full h-full flex items-center justify-center transition-transform duration-100 pointer-events-none"
+                style={{ transform: `rotate(${-bearing}deg)` }}
+              >
+                <Navigation 
+                  className={`w-7 h-7 drop-shadow-md transition-colors ${
+                    bearing !== 0 ? "text-[#00F0FF] fill-[#00F0FF]/40" : "text-red-500 fill-red-500/40"
+                  }`} 
+                />
+              </div>
+
+              {/* Center Pivot Point */}
+              <div className="absolute w-2 h-2 rounded-full bg-white border border-black shadow pointer-events-none" />
+
+              {/* Exact Degree Readout Badge */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowRotationFineTune(!showRotationFineTune);
+                }}
+                className={`absolute -bottom-2.5 px-2 py-0.5 rounded-full border text-[8px] font-bold tracking-tight shadow-md cursor-pointer transition-all ${
+                  bearing !== 0
+                    ? "bg-black border-[#00F0FF] text-[#00F0FF]"
+                    : "bg-black/90 border-white/30 text-white hover:border-white"
+                }`}
+                title="Click to open Degree Slider & Direct Angle Input"
+              >
+                {bearing}°
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Action Toolbar (Steps, Random Degree, Slider Toggle, 0° Reset) */}
+          <div className="flex flex-col gap-1 bg-black/85 backdrop-blur-xl border border-white/20 p-1 rounded-xl shadow-xl mt-1.5 items-center">
+            {/* Step Counter-Clockwise */}
             <button
               type="button"
-              onClick={resetNorth}
-              className="w-8 h-6 rounded-md bg-[#00F0FF]/15 border border-[#00F0FF]/40 text-[#00F0FF] text-[8px] font-bold uppercase tracking-wider flex items-center justify-center hover:bg-[#00F0FF] hover:text-black transition-all cursor-pointer"
-              title="Reset to 0° North"
+              onClick={() => rotateMapBy(-45)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-[#00F0FF] hover:bg-white/10 transition-colors cursor-pointer"
+              title="Rotate -45° (↺)"
             >
-              0°
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
-          )}
+
+            {/* Step Clockwise */}
+            <button
+              type="button"
+              onClick={() => rotateMapBy(45)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-[#00F0FF] hover:bg-white/10 transition-colors cursor-pointer"
+              title="Rotate +45° (↻)"
+            >
+              <RotateCw className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Random Degrees Button (Roll to random angle) */}
+            <button
+              type="button"
+              onClick={rotateRandom}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-[#00F0FF]/90 hover:text-white hover:bg-[#00F0FF]/20 transition-all cursor-pointer group"
+              title="Rotate Random Degrees (🎲 Spin to any angle)"
+            >
+              <Dices className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
+            </button>
+
+            {/* Fine-Tune Slider Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowRotationFineTune(!showRotationFineTune)}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                showRotationFineTune 
+                  ? "bg-[#00F0FF] text-black shadow-[0_0_10px_rgba(0,240,255,0.5)]" 
+                  : "text-white/70 hover:text-white hover:bg-white/10"
+              }`}
+              title="Toggle Degree Slider & Arbitrary Angle Control"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Quick 0° North Reset Button (visible when tilted) */}
+            {bearing !== 0 && (
+              <button
+                type="button"
+                onClick={resetNorth}
+                className="w-8 h-6 rounded-md bg-[#00F0FF]/20 border border-[#00F0FF]/50 text-[#00F0FF] text-[8px] font-bold uppercase tracking-wider flex items-center justify-center hover:bg-[#00F0FF] hover:text-black transition-all cursor-pointer shadow-[0_0_8px_rgba(0,240,255,0.3)]"
+                title="Reset to 0° North"
+              >
+                0° N
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* ── EXPANDED ROTATION FINE-TUNE POPOVER (SLIDER + NUMERIC INPUT + PRESETS) ── */}
+        {showRotationFineTune && (
+          <div 
+            ref={rotationFineTuneRef}
+            className="w-64 bg-black/95 backdrop-blur-2xl border border-white/20 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-3 animate-slide-up mr-1"
+          >
+            <div className="flex items-center justify-between border-b border-white/15 pb-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#00F0FF] uppercase">
+                <Compass className="w-3.5 h-3.5" />
+                <span>Arbitrary Bearing</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRotationFineTune(false)}
+                className="text-white/40 hover:text-white transition-colors cursor-pointer p-0.5"
+                title="Close rotation controls"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Direct Degree Number Input & Display */}
+            <div className="flex items-center justify-between bg-white/5 border border-white/15 rounded-xl px-3 py-2">
+              <span className="text-[10px] text-white/50 tracking-wider uppercase">Custom Degree</span>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min="0"
+                  max="359"
+                  value={bearing}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    setBearingTo(isNaN(val) ? 0 : val);
+                  }}
+                  className="w-14 bg-black/70 border border-white/20 rounded px-1.5 py-0.5 text-right font-bold text-xs text-[#00F0FF] outline-none focus:border-[#00F0FF]"
+                />
+                <span className="text-xs font-bold text-white/60">°</span>
+              </div>
+            </div>
+
+            {/* Continuous 0° - 359° Degree Slider */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between text-[9px] text-white/40 font-mono">
+                <span>0° (N)</span>
+                <span>90°</span>
+                <span>180° (S)</span>
+                <span>270°</span>
+                <span>359°</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="359"
+                step="1"
+                value={bearing}
+                onChange={(e) => setBearingTo(parseInt(e.target.value))}
+                className="w-full h-2 accent-[#00F0FF] bg-white/10 rounded-lg cursor-pointer"
+              />
+            </div>
+
+            {/* Quick Cardinal Presets */}
+            <div className="grid grid-cols-4 gap-1 pt-1 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setBearingTo(0)}
+                className={`py-1 rounded text-[9px] font-bold tracking-wider transition-all cursor-pointer ${
+                  bearing === 0 ? "bg-[#00F0FF] text-black" : "bg-white/5 hover:bg-white/15 text-white/80"
+                }`}
+              >
+                0° N
+              </button>
+              <button
+                type="button"
+                onClick={() => setBearingTo(90)}
+                className={`py-1 rounded text-[9px] font-bold tracking-wider transition-all cursor-pointer ${
+                  bearing === 90 ? "bg-[#00F0FF] text-black" : "bg-white/5 hover:bg-white/15 text-white/80"
+                }`}
+              >
+                90° E
+              </button>
+              <button
+                type="button"
+                onClick={() => setBearingTo(180)}
+                className={`py-1 rounded text-[9px] font-bold tracking-wider transition-all cursor-pointer ${
+                  bearing === 180 ? "bg-[#00F0FF] text-black" : "bg-white/5 hover:bg-white/15 text-white/80"
+                }`}
+              >
+                180° S
+              </button>
+              <button
+                type="button"
+                onClick={() => setBearingTo(270)}
+                className={`py-1 rounded text-[9px] font-bold tracking-wider transition-all cursor-pointer ${
+                  bearing === 270 ? "bg-[#00F0FF] text-black" : "bg-white/5 hover:bg-white/15 text-white/80"
+                }`}
+              >
+                270° W
+              </button>
+            </div>
+
+            {/* Roll Random Degree Button in popover */}
+            <button
+              type="button"
+              onClick={rotateRandom}
+              className="w-full py-2 rounded-xl bg-gradient-to-r from-[#00F0FF]/20 to-cyan-500/20 hover:from-[#00F0FF]/30 hover:to-cyan-500/30 border border-[#00F0FF]/40 text-[#00F0FF] text-[10px] font-bold tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
+            >
+              <Dices className="w-3.5 h-3.5" />
+              <span>Rotate Random Degrees</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* LAT/LNG TRACKER & LOCATION */}
