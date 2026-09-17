@@ -18,7 +18,11 @@ import {
   Loader2,
   Dices,
   SlidersHorizontal,
-  Compass
+  Compass,
+  Hexagon,
+  Square,
+  Circle as CircleIcon,
+  Trash2
 } from "lucide-react";
 
 interface MapExplorerProps {
@@ -92,6 +96,13 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [searchError, setSearchError] = useState<string | null>(null);
   const searchMarkerRef = useRef<any>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Drawing & Shape Selection State (Polygon, Rectangle, Circle)
+  const [selectedShapeType, setSelectedShapeType] = useState<"polygon" | "rectangle" | "circle" | null>(null);
+  const [activeDrawingTool, setActiveDrawingTool] = useState<"polygon" | "rectangle" | "circle" | null>(null);
+  const [selectedGeometry, setSelectedGeometry] = useState<any | null>(null);
+  const drawnItemsRef = useRef<any>(null);
+  const activeDrawerRef = useRef<any>(null);
 
   // Sync configuration preset with recommended layer
   useEffect(() => {
@@ -180,25 +191,39 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
 
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
+    drawnItemsRef.current = drawnItems;
+
+    const shapeOptions = {
+      color: '#00F0FF',
+      weight: 2,
+      fillOpacity: 0.15
+    };
 
     const drawControl = new L.Control.Draw({
       position: 'topright',
       edit: {
-        featureGroup: drawnItems
+        featureGroup: drawnItems,
+        remove: true
       },
       draw: {
-        polygon: false,
-        polyline: false,
-        circle: false,
+        polygon: {
+          allowIntersection: false,
+          showArea: true,
+          drawError: {
+            color: '#ef4444',
+            timeout: 1000
+          },
+          shapeOptions
+        },
+        rectangle: {
+          shapeOptions
+        },
+        circle: {
+          shapeOptions
+        },
         marker: false,
         circlemarker: false,
-        rectangle: {
-          shapeOptions: {
-            color: '#00F0FF',
-            weight: 2,
-            fillOpacity: 0.1
-          }
-        }
+        polyline: false
       }
     });
     map.addControl(drawControl);
@@ -209,8 +234,12 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       
       drawnItems.clearLayers();
       drawnItems.addLayer(layer);
+      setSelectedShapeType(type);
+      setActiveDrawingTool(null);
+      activeDrawerRef.current = null;
       
-      if (type === 'rectangle') {
+      // All vector layers (Polygon, Rectangle, Circle) provide getBounds()
+      if (typeof layer.getBounds === "function") {
         const layerBounds = layer.getBounds();
         setBbox([
           layerBounds.getWest(),
@@ -218,11 +247,53 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           layerBounds.getEast(),
           layerBounds.getNorth()
         ]);
-        // Reopen config panel on mobile so user can immediately click Acquire Data
-        if (typeof window !== "undefined" && window.innerWidth < 640) {
-          setMobilePanelOpen(true);
-        }
       }
+
+      if (typeof layer.toGeoJSON === "function") {
+        setSelectedGeometry(layer.toGeoJSON().geometry);
+      } else if (type === 'circle' && typeof layer.getLatLng === "function") {
+        const center = layer.getLatLng();
+        setSelectedGeometry({
+          type: 'Circle',
+          coordinates: [center.lng, center.lat],
+          radius: layer.getRadius()
+        });
+      }
+
+      // Reopen config panel on mobile so user can immediately click Acquire Data
+      if (typeof window !== "undefined" && window.innerWidth < 640) {
+        setMobilePanelOpen(true);
+      }
+    });
+
+    map.on(L.Draw.Event.EDITED, (e: any) => {
+      const layers = e.layers;
+      layers.eachLayer((layer: any) => {
+        if (typeof layer.getBounds === "function") {
+          const bounds = layer.getBounds();
+          setBbox([
+            bounds.getWest(),
+            bounds.getSouth(),
+            bounds.getEast(),
+            bounds.getNorth()
+          ]);
+        }
+        if (typeof layer.toGeoJSON === "function") {
+          setSelectedGeometry(layer.toGeoJSON().geometry);
+        }
+      });
+    });
+
+    map.on(L.Draw.Event.DELETED, () => {
+      setBbox(null);
+      setSelectedGeometry(null);
+      setSelectedShapeType(null);
+      setActiveDrawingTool(null);
+    });
+
+    map.on(L.Draw.Event.DRAWSTOP, () => {
+      setActiveDrawingTool(null);
+      activeDrawerRef.current = null;
     });
 
     return () => {
@@ -265,6 +336,76 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     setSearchError(null);
     setShowSearchDropdown(false);
     removeSearchPin();
+  };
+
+  // Programmatic Area Selection Draw Handlers (Polygon, Box/Rectangle, Circle)
+  const startDrawShape = (shapeType: 'polygon' | 'rectangle' | 'circle') => {
+    const map = mapInstanceRef.current;
+    if (!map || !L) return;
+
+    // If user clicked the already-active drawing tool, toggle it off
+    if (activeDrawingTool === shapeType && activeDrawerRef.current) {
+      activeDrawerRef.current.disable();
+      activeDrawerRef.current = null;
+      setActiveDrawingTool(null);
+      return;
+    }
+
+    if (activeDrawerRef.current) {
+      activeDrawerRef.current.disable();
+      activeDrawerRef.current = null;
+    }
+
+    const shapeOptions = {
+      color: '#00F0FF',
+      weight: 2,
+      fillOpacity: 0.15
+    };
+
+    let drawer: any = null;
+    if (shapeType === 'polygon') {
+      drawer = new (L as any).Draw.Polygon(map, {
+        allowIntersection: false,
+        showArea: true,
+        drawError: {
+          color: '#ef4444',
+          timeout: 1000
+        },
+        shapeOptions
+      });
+    } else if (shapeType === 'rectangle') {
+      drawer = new (L as any).Draw.Rectangle(map, {
+        shapeOptions
+      });
+    } else if (shapeType === 'circle') {
+      drawer = new (L as any).Draw.Circle(map, {
+        shapeOptions
+      });
+    }
+
+    if (drawer) {
+      activeDrawerRef.current = drawer;
+      drawer.enable();
+      setActiveDrawingTool(shapeType);
+      // Minimize mobile panel so user can draw freely on map
+      if (typeof window !== "undefined" && window.innerWidth < 640) {
+        setMobilePanelOpen(false);
+      }
+    }
+  };
+
+  const clearSelection = () => {
+    if (activeDrawerRef.current) {
+      activeDrawerRef.current.disable();
+      activeDrawerRef.current = null;
+    }
+    setActiveDrawingTool(null);
+    if (drawnItemsRef.current) {
+      drawnItemsRef.current.clearLayers();
+    }
+    setBbox(null);
+    setSelectedGeometry(null);
+    setSelectedShapeType(null);
   };
 
   // Map Rotation Functions (Arbitrary Degrees, Random Degrees, and Steps)
@@ -616,6 +757,10 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         } else {
           sessionStorage.setItem("satquery_acquired_image", base64data);
           sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
+          if (selectedGeometry) {
+            sessionStorage.setItem("satquery_acquired_geometry", JSON.stringify(selectedGeometry));
+          }
+          sessionStorage.setItem("satquery_acquired_shape_type", selectedShapeType || "rectangle");
           sessionStorage.setItem("satquery_acquired_layer", layer);
           sessionStorage.setItem("satquery_location_name", locationName);
           sessionStorage.setItem("satquery_target_date", endDate);
@@ -637,6 +782,10 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           sessionStorage.setItem("satquery_acquired_image_1", base64_1);
           sessionStorage.setItem("satquery_acquired_image_2", base64_2);
           sessionStorage.setItem("satquery_acquired_bbox", JSON.stringify(bbox));
+          if (selectedGeometry) {
+            sessionStorage.setItem("satquery_acquired_geometry", JSON.stringify(selectedGeometry));
+          }
+          sessionStorage.setItem("satquery_acquired_shape_type", selectedShapeType || "rectangle");
           sessionStorage.setItem("satquery_acquired_layer", layer);
           sessionStorage.setItem("satquery_location_name", locationName);
           sessionStorage.setItem("satquery_target_date_1", startDate);
@@ -660,6 +809,29 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         .leaflet-control-container .leaflet-bar {
           filter: invert(1) hue-rotate(180deg);
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+        }
+        .leaflet-draw-tooltip {
+          background: rgba(11, 11, 15, 0.95) !important;
+          border: 1px solid #00F0FF !important;
+          color: #fff !important;
+          font-family: monospace !important;
+          font-size: 11px !important;
+          border-radius: 6px !important;
+          box-shadow: 0 0 15px rgba(0, 240, 255, 0.3) !important;
+        }
+        .leaflet-draw-tooltip:before {
+          border-right-color: #00F0FF !important;
+        }
+        .leaflet-draw-actions {
+          background-color: #0b0b0f !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          border-radius: 6px !important;
+        }
+        .leaflet-draw-actions a {
+          background-color: #0b0b0f !important;
+          color: #00F0FF !important;
+          font-family: monospace !important;
+          font-size: 10px !important;
         }
         input[type="date"]::-webkit-calendar-picker-indicator {
           filter: invert(1);
@@ -880,6 +1052,95 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           />
         </div>
 
+        {/* Area of Interest Selection Tools (Polygon, Box, Circle) */}
+        <div className="flex flex-col gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-white/60 uppercase tracking-widest font-mono font-semibold">
+              Select Area Tool
+            </span>
+            {bbox ? (
+              <span className="text-[9px] text-[#00F0FF] font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-pulse" />
+                {selectedShapeType === 'polygon' ? 'POLYGON DEFINED' : selectedShapeType === 'circle' ? 'CIRCLE DEFINED' : 'BOX DEFINED'}
+              </span>
+            ) : (
+              <span className="text-[9px] text-yellow-400 font-bold">REQUIRED</span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5">
+            {/* Freeform Polygon Button */}
+            <button
+              type="button"
+              onClick={() => startDrawShape('polygon')}
+              className={`px-2 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+                activeDrawingTool === 'polygon'
+                  ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
+                  : 'bg-white/5 hover:bg-white/15 border-white/20'
+              }`}
+              title="Draw Custom Freeform Multi-Point Polygon"
+            >
+              <Hexagon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'polygon' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
+              <span className="text-[9px] font-bold tracking-wider uppercase">Polygon</span>
+            </button>
+
+            {/* Rectangle / Box Button */}
+            <button
+              type="button"
+              onClick={() => startDrawShape('rectangle')}
+              className={`px-2 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+                activeDrawingTool === 'rectangle'
+                  ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
+                  : 'bg-white/5 hover:bg-white/15 border-white/20'
+              }`}
+              title="Draw Rectangle / Square Bounding Box"
+            >
+              <Square className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'rectangle' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
+              <span className="text-[9px] font-bold tracking-wider uppercase">Box</span>
+            </button>
+
+            {/* Circle Radial Button */}
+            <button
+              type="button"
+              onClick={() => startDrawShape('circle')}
+              className={`px-2 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+                activeDrawingTool === 'circle'
+                  ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
+                  : 'bg-white/5 hover:bg-white/15 border-white/20'
+              }`}
+              title="Draw Radial Buffer Circle"
+            >
+              <CircleIcon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'circle' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
+              <span className="text-[9px] font-bold tracking-wider uppercase">Circle</span>
+            </button>
+          </div>
+
+          {activeDrawingTool && (
+            <div className="text-[9px] text-[#00F0FF] font-mono tracking-wider text-center animate-pulse pt-0.5">
+              {activeDrawingTool === 'polygon' && 'Click on map to draw points, click first point to close'}
+              {activeDrawingTool === 'rectangle' && 'Click and drag on map to draw box'}
+              {activeDrawingTool === 'circle' && 'Click center point and drag to set radius'}
+            </div>
+          )}
+
+          {bbox && (
+            <div className="flex items-center justify-between pt-1.5 mt-0.5 border-t border-white/10 text-[9px]">
+              <span className="text-white/50 truncate">
+                Area: {selectedShapeType?.toUpperCase() || 'BOUNDING BOX'}
+              </span>
+              <button
+                type="button"
+                onClick={clearSelection}
+                className="text-red-400 hover:text-red-300 font-bold tracking-wider uppercase flex items-center gap-1 cursor-pointer transition-colors"
+                title="Clear current shape selection"
+              >
+                <Trash2 className="w-3 h-3" />
+                <span>Clear</span>
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Action Button */}
         <button 
           type="button"
@@ -908,7 +1169,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         {/* Helper text */}
         {!bbox && (
           <div className="text-[9px] text-[#00F0FF] tracking-widest uppercase text-center animate-pulse">
-            Draw bounding box to enable
+            Select Polygon, Box, or Circle to draw Area of Interest
           </div>
         )}
       </div>
@@ -1045,6 +1306,84 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
                 ))}
               </div>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── FLOATING AREA SELECTION TOOLBAR ON MAP (POLYGON / BOX / CIRCLE) ── */}
+      <div className="fixed sm:absolute top-28 sm:top-18 left-1/2 -translate-x-1/2 z-[520] pointer-events-auto font-mono flex flex-col items-center">
+        <div className="flex items-center gap-1 bg-black/90 backdrop-blur-2xl border border-white/20 px-2 py-1.5 rounded-full shadow-2xl">
+          <span className="text-[9px] text-white/50 uppercase tracking-widest pl-2 pr-1 hidden sm:inline">
+            Area:
+          </span>
+
+          <button
+            type="button"
+            onClick={() => startDrawShape('polygon')}
+            className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeDrawingTool === 'polygon'
+                ? 'bg-[#00F0FF] text-black shadow-[0_0_12px_rgba(0,240,255,0.6)]'
+                : selectedShapeType === 'polygon' && bbox
+                  ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+            title="Draw Freeform Multi-Point Polygon (Click points on map, click first vertex to finish)"
+          >
+            <Hexagon className="w-3.5 h-3.5" />
+            <span>Polygon</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => startDrawShape('rectangle')}
+            className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeDrawingTool === 'rectangle'
+                ? 'bg-[#00F0FF] text-black shadow-[0_0_12px_rgba(0,240,255,0.6)]'
+                : selectedShapeType === 'rectangle' && bbox
+                  ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+            title="Draw Box / Rectangle (Click and drag on map)"
+          >
+            <Square className="w-3.5 h-3.5" />
+            <span>Box</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => startDrawShape('circle')}
+            className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeDrawingTool === 'circle'
+                ? 'bg-[#00F0FF] text-black shadow-[0_0_12px_rgba(0,240,255,0.6)]'
+                : selectedShapeType === 'circle' && bbox
+                  ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+            title="Draw Radial Circle (Click center and drag to radius)"
+          >
+            <CircleIcon className="w-3.5 h-3.5" />
+            <span>Circle</span>
+          </button>
+
+          {bbox && (
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="ml-1 px-2.5 py-1 rounded-full bg-red-950/40 border border-red-500/30 text-red-300 hover:bg-red-900/60 text-[9px] font-bold tracking-wider uppercase flex items-center gap-1 transition-all cursor-pointer"
+              title="Clear current drawn area"
+            >
+              <Trash2 className="w-3 h-3" />
+              <span className="hidden sm:inline">Clear</span>
+            </button>
+          )}
+        </div>
+
+        {/* Active Drawing Tool Guide Banner */}
+        {activeDrawingTool && (
+          <div className="mt-1.5 px-3 py-1 rounded-full bg-black/95 border border-[#00F0FF]/60 text-[#00F0FF] text-[9px] font-mono tracking-wider text-center backdrop-blur-xl animate-pulse shadow-lg">
+            {activeDrawingTool === 'polygon' && '⬡ Click points on map, click first vertex to finish'}
+            {activeDrawingTool === 'rectangle' && '▢ Click and drag on map to draw bounding box'}
+            {activeDrawingTool === 'circle' && '◯ Click center and drag outward to set radius'}
           </div>
         )}
       </div>
