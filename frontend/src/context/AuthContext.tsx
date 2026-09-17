@@ -48,12 +48,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authModalInitialMode, setAuthModalInitialMode] = useState<"signin" | "signup">("signin");
 
   useEffect(() => {
-    // Hydrate state from localStorage
+    // Hydrate user session from sessionStorage
     try {
-      const savedUser = localStorage.getItem("satquery_user");
+      const savedUser = sessionStorage.getItem("satquery_user");
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
+      // Clear any legacy persistent login from localStorage
+      localStorage.removeItem("satquery_user");
 
       const savedQueryCount = localStorage.getItem("satquery_query_count");
       if (savedQueryCount) {
@@ -65,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setMapCount(parseInt(savedMapCount, 10) || 0);
       }
     } catch (e) {
-      console.warn("Could not read auth/quota from localStorage", e);
+      console.warn("Could not read auth/quota from storage", e);
     }
   }, []);
 
@@ -113,7 +115,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setUser(newUser);
     try {
-      localStorage.setItem("satquery_user", JSON.stringify(newUser));
+      sessionStorage.setItem("satquery_user", JSON.stringify(newUser));
+      localStorage.removeItem("satquery_user");
     } catch (e) {}
     setIsAuthModalOpen(false);
   };
@@ -126,7 +129,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setUser(newUser);
     try {
-      localStorage.setItem("satquery_user", JSON.stringify(newUser));
+      sessionStorage.setItem("satquery_user", JSON.stringify(newUser));
+      localStorage.removeItem("satquery_user");
     } catch (e) {}
     setIsAuthModalOpen(false);
   };
@@ -140,7 +144,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setUser(judgeUser);
     try {
-      localStorage.setItem("satquery_user", JSON.stringify(judgeUser));
+      sessionStorage.setItem("satquery_user", JSON.stringify(judgeUser));
+      localStorage.removeItem("satquery_user");
     } catch (e) {}
     setIsAuthModalOpen(false);
   };
@@ -154,7 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setUser(googleUser);
     try {
-      localStorage.setItem("satquery_user", JSON.stringify(googleUser));
+      sessionStorage.setItem("satquery_user", JSON.stringify(googleUser));
+      localStorage.removeItem("satquery_user");
     } catch (e) {}
     setIsAuthModalOpen(false);
   };
@@ -162,6 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     try {
+      sessionStorage.removeItem("satquery_user");
       localStorage.removeItem("satquery_user");
     } catch (e) {}
   };

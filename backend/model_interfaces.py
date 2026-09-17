@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Tuple
 import io
@@ -111,9 +112,9 @@ def decode_satellite_image(image_bytes: bytes) -> Tuple[np.ndarray, Image.Image,
             "Unsupported or corrupted image format. Please ensure the file is a valid satellite or visual image (GeoTIFF, TIFF, JP2, PNG, JPEG, WebP, AVIF, BMP)."
         )
 
-    # Resolution guard: prevent OOM on massive satellite orthomosaics (> 2048px)
+    # Resolution guard: prevent OOM and reduce CPU latency on cloud containers (e.g. Render 512MB RAM)
     h, w = cv_img.shape[:2]
-    max_dim = 2048
+    max_dim = int(os.getenv("MAX_IMAGE_DIM", "1024"))
     if max(h, w) > max_dim:
         scale = max_dim / float(max(h, w))
         new_w = max(1, int(w * scale))

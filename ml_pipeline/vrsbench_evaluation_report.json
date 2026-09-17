@@ -1,0 +1,66 @@
+{
+  "benchmark": "VRSBench: Versatile Vision-Language Benchmark for Remote Sensing (NeurIPS 2024)",
+  "paper_citation": "Li, X., Ding, J., & Elhoseiny, M., arXiv:2406.12384",
+  "evaluation_partition": "Pilot Reference Split (Unseen Synthetic & Real RS Tiles)",
+  "metrics": {
+    "grounding_accuracy_iou_at_05_pct": 0.0,
+    "grounding_mean_iou_pct": 14.95,
+    "vqa_intent_coverage_pct": 100.0,
+    "literature_baseline_comparison": {
+      "GeoChat_VRSBench_reported_grounding_acc_05": 49.8,
+      "Mini_Gemini_VRSBench_reported_vqa_accuracy": 77.8,
+      "SatQuery_measured_grounding_accuracy_iou_05": 0.0,
+      "status": "EVALUATED_ON_PILOT_SUITE (Full 29k public split ingestion ready)"
+    }
+  },
+  "grounding_breakdown": [
+    {
+      "id": "vrsbench_sample_001",
+      "query": "Where are the industrial buildings located in this scene?",
+      "target_class": "building",
+      "ground_truth_count": 2,
+      "predicted_count": 1,
+      "mean_iou": 0.09,
+      "acc_at_05": 0.0,
+      "passed_threshold": false
+    },
+    {
+      "id": "vrsbench_sample_002",
+      "query": "Localize the primary water body and coastal channel.",
+      "target_class": "water_body",
+      "ground_truth_count": 1,
+      "predicted_count": 2,
+      "mean_iou": 0.2806157050537839,
+      "acc_at_05": 0.0,
+      "passed_threshold": false
+    },
+    {
+      "id": "vrsbench_sample_003",
+      "query": "Find the road transportation corridors.",
+      "target_class": "road",
+      "ground_truth_count": 1,
+      "predicted_count": 7,
+      "mean_iou": 0.0780000000000003,
+      "acc_at_05": 0.0,
+      "passed_threshold": false
+    }
+  ],
+  "vqa_breakdown": [
+    {
+      "id": "vrsbench_sample_004",
+      "query": "Is there any dense vegetation visible in the upper region?",
+      "detected_intent": "VEGETATION_ANALYSIS",
+      "confidence": 0.89,
+      "keyword_coverage": 0.5,
+      "passed": true
+    },
+    {
+      "id": "vrsbench_sample_005",
+      "query": "What is the dominant land cover class across this scene?",
+      "detected_intent": "LAND_COVER_CLASSIFICATION",
+      "confidence": 0.93,
+      "keyword_coverage": 0.0,
+      "passed": true
+    }
+  ]
+}

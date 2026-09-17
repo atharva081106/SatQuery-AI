@@ -8,6 +8,8 @@ load_dotenv()
 
 from fastapi import FastAPI, UploadFile, File, Form, Request, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from starlette.concurrency import run_in_threadpool
 from typing import List, Optional
 import uvicorn
 import time
@@ -22,6 +24,9 @@ app = FastAPI(
     description="Agentic Vision-Language System for Remote Sensing & Earth Observation (ISRO / SAC - PS 26167)",
     version="1.0.0"
 )
+
+# Enable GZip compression for responses (reduces GeoJSON & base64 payload transfer time)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Allow CORS for Next.js frontend (local and deployed on Vercel)
 app.add_middleware(
@@ -140,7 +145,8 @@ async def process_query(
         except Exception:
             pass
             
-    result = agent_controller.execute_query(query, image_bytes_list, history_list)
+    # Execute query in a threadpool so CPU-heavy CV/NumPy operations do not block the event loop
+    result = await run_in_threadpool(agent_controller.execute_query, query, image_bytes_list, history_list)
     
     # Save to persistent database (Supabase PostgreSQL or SQLite)
     if result.get("status") == "success":
@@ -389,24 +395,84 @@ def get_evalscript(dataset: str, layer: str) -> str:
         }}
         """
 
+@app.get("/api/test-sentinel-credentials")
+async def test_sentinel_credentials():
+    """
+    Diagnostic endpoint to verify Sentinel Hub / CDSE credentials.
+    """
+    import requests
+    client_id = os.getenv("SH_CLIENT_ID", "").strip().strip('"\'')
+    client_secret = os.getenv("SH_CLIENT_SECRET", "").strip().strip('"\'')
+    sh_base_url = os.getenv("SH_BASE_URL", "").strip().strip('"\'')
+    sh_token_url = os.getenv("SH_TOKEN_URL", "").strip().strip('"\'')
+
+    if not client_id or not client_secret:
+        return {
+            "status": "missing_credentials",
+            "error": "SH_CLIENT_ID or SH_CLIENT_SECRET environment variable is not set."
+        }
+
+    is_cdse = client_id.startswith("sh-") or ("dataspace.copernicus.eu" in sh_base_url)
+    token_url = sh_token_url or (
+        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+        if is_cdse else
+        "https://services.sentinel-hub.com/oauth/token"
+    )
+
+    try:
+        resp = requests.post(
+            token_url,
+            data={
+                "grant_type": "client_credentials",
+                "client_id": client_id,
+                "client_secret": client_secret
+            },
+            timeout=10
+        )
+        if resp.status_code == 200:
+            return {
+                "status": "success",
+                "message": "Sentinel Hub credentials verified successfully!",
+                "platform": "Copernicus Data Space Ecosystem (CDSE)" if is_cdse else "Sentinel Hub (Sinergise)",
+                "client_id_preview": f"{client_id[:8]}...{client_id[-4:]}"
+            }
+        else:
+            return {
+                "status": "auth_failed",
+                "status_code": resp.status_code,
+                "platform": "Copernicus Data Space Ecosystem (CDSE)" if is_cdse else "Sentinel Hub (Sinergise)",
+                "token_url": token_url,
+                "response": resp.json() if resp.headers.get("content-type", "").startswith("application/json") else resp.text,
+                "client_id_preview": f"{client_id[:8]}...{client_id[-4:]}",
+                "guidance": (
+                    "Common CDSE issues: 1) Ensure 'Client will be used by a single-page application' was left UNTICKED when creating the client. "
+                    "2) Make sure the flow is 'Client Credentials'. 3) Copy the generated client secret immediately from the popup (not your login password). "
+                    "4) Check that no quotes or whitespace were added on Render."
+                )
+            }
+    except Exception as err:
+        return {
+            "status": "connection_error",
+            "error": str(err)
+        }
+
 @app.post("/api/acquire")
 async def acquire_imagery(request: AcquireRequest):
     """
     Endpoint to acquire satellite imagery from Sentinel Hub.
     """
-    client_id = os.getenv("SH_CLIENT_ID")
-    client_secret = os.getenv("SH_CLIENT_SECRET")
+    import requests
+    client_id = os.getenv("SH_CLIENT_ID", "").strip().strip('"\'')
+    client_secret = os.getenv("SH_CLIENT_SECRET", "").strip().strip('"\'')
     
-    if not client_id or not client_secret:
-        raise HTTPException(status_code=500, detail="Sentinel Hub credentials not configured.")
-        
     config = SHConfig()
-    config.sh_client_id = client_id
-    config.sh_client_secret = client_secret
+    if client_id and client_secret:
+        config.sh_client_id = client_id
+        config.sh_client_secret = client_secret
     
     # Support both standard Sentinel Hub and Copernicus Data Space Ecosystem (CDSE)
-    sh_base_url = os.getenv("SH_BASE_URL")
-    sh_token_url = os.getenv("SH_TOKEN_URL")
+    sh_base_url = os.getenv("SH_BASE_URL", "").strip().strip('"\'')
+    sh_token_url = os.getenv("SH_TOKEN_URL", "").strip().strip('"\'')
     if not sh_base_url and client_id and client_id.startswith("sh-"):
         config.sh_base_url = "https://sh.dataspace.copernicus.eu"
         config.sh_token_url = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
@@ -415,125 +481,130 @@ async def acquire_imagery(request: AcquireRequest):
         if sh_token_url:
             config.sh_token_url = sh_token_url
             
-    # Try Sentinel Hub API first; if credentials fail, seamlessly fall back to high-res global satellite imagery
-    try:
-        if not client_id or not client_secret:
-            raise ValueError("Sentinel Hub credentials not configured")
-
-        # Convert bbox array to BBox object
-        bbox_obj = BBox(bbox=request.bbox, crs=CRS.WGS84)
-        
-        # Select standard Data Collection mapped to Sentinel Hub
-        collection = DataCollection.SENTINEL2_L2A
-        if request.dataset == "s1":
-            collection = DataCollection.SENTINEL1_IW
-        elif request.dataset == "l8":
-            collection = DataCollection.LANDSAT8_L2
+    # Try Sentinel Hub API first; if credentials or scene lookup fail, seamlessly fall back to high-res global satellite imagery
+    sentinel_error_details = None
+    if client_id and client_secret:
+        try:
+            # Convert bbox array to BBox object
+            bbox_obj = BBox(bbox=request.bbox, crs=CRS.WGS84)
             
-        # Get Evalscript based on requested dataset and layer
-        evalscript = get_evalscript(request.dataset, getattr(request, 'layer', 'True color'))
-            
-        # Build Request
-        sh_request = SentinelHubRequest(
-            evalscript=evalscript,
-            input_data=[
-                SentinelHubRequest.input_data(
-                    data_collection=collection,
-                    time_interval=(request.start_date, request.end_date),
-                    mosaicking_order="mostRecent",
-                    maxcc=float(request.maxcc) / 100.0
-                )
-            ],
-            responses=[
-                SentinelHubRequest.output_response("default", MimeType.PNG)
-            ],
-            bbox=bbox_obj,
-            size=[1024, 1024], # Request standard 1024x1024
-            config=config
-        )
-        
-        # Execute Request (returns a list of responses, we take the first)
-        response_list = sh_request.get_data(decode_data=False)
-        
-        if response_list and len(response_list) > 0:
-            raw_image_bytes = response_list[0].content
-            return Response(
-                content=raw_image_bytes, 
-                media_type="image/png",
-                headers={"X-Acquisition-Source": "sentinel-hub"}
+            # Select standard Data Collection mapped to Sentinel Hub
+            collection = DataCollection.SENTINEL2_L2A
+            if request.dataset == "s1":
+                collection = DataCollection.SENTINEL1_IW
+            elif request.dataset == "l8":
+                collection = DataCollection.LANDSAT8_L2
+                
+            # Get Evalscript based on requested dataset and layer
+            evalscript = get_evalscript(request.dataset, getattr(request, 'layer', 'True color'))
+                
+            # Build Request
+            sh_request = SentinelHubRequest(
+                evalscript=evalscript,
+                input_data=[
+                    SentinelHubRequest.input_data(
+                        data_collection=collection,
+                        time_interval=(request.start_date, request.end_date),
+                        mosaicking_order="mostRecent",
+                        maxcc=float(request.maxcc) / 100.0
+                    )
+                ],
+                responses=[
+                    SentinelHubRequest.output_response("default", MimeType.PNG)
+                ],
+                bbox=bbox_obj,
+                size=[1024, 1024], # Request standard 1024x1024
+                config=config
             )
-    except Exception as sh_err:
-        print(f"[Acquisition Notice] Sentinel Hub returned error ({sh_err}). Engaging high-resolution Earth observation fallback...")
+            
+            # Execute Request (returns a list of responses, we take the first)
+            response_list = sh_request.get_data(decode_data=False)
+            
+            if response_list and len(response_list) > 0:
+                raw_image_bytes = response_list[0].content
+                return Response(
+                    content=raw_image_bytes, 
+                    media_type="image/png",
+                    headers={"X-Acquisition-Source": "sentinel-hub"}
+                )
+        except Exception as sh_err:
+            sentinel_error_details = str(sh_err)
+            print(f"[Acquisition Notice] Sentinel Hub returned error ({sh_err}). Engaging high-resolution Earth observation fallback...")
+    else:
+        sentinel_error_details = "Credentials not configured"
 
     # High-Resolution Global Satellite Imagery Fallback for the requested Bounding Box
     try:
-        import urllib.request
         min_lon, min_lat, max_lon, max_lat = request.bbox
         fallback_url = (
             f"https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?"
             f"bbox={min_lon},{min_lat},{max_lon},{max_lat}&bboxSR=4326&size=1024,1024&imageSR=4326&format=png&f=image"
         )
-        req = urllib.request.Request(
+        resp = requests.get(
             fallback_url,
-            headers={"User-Agent": "SatQuery-AI/1.0 (Earth Observation Intelligence Engine)"}
+            headers={"User-Agent": "SatQuery-AI/1.0 (Earth Observation Intelligence Engine)"},
+            timeout=20
         )
-        with urllib.request.urlopen(req, timeout=12) as response:
-            fallback_bytes = response.read()
-            if len(fallback_bytes) > 5000:
-                layer = getattr(request, "layer", "True color")
-                if layer not in ["True color", "Default", "Highlight Optimized Natural Color"]:
-                    try:
-                        from io import BytesIO
-                        from PIL import Image
-                        import numpy as np
-                        
-                        img = Image.open(BytesIO(fallback_bytes)).convert("RGB")
-                        arr = np.array(img).astype(float)
-                        
-                        if layer == "NDVI":
-                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
-                            vari = (G - R) / (G + R - B + 1.0)
-                            vari = np.clip(vari, -1, 1)
-                            mapped = np.zeros_like(arr)
-                            mapped[..., 1] = np.clip((vari + 1) * 127.5, 0, 255) # Green
-                            mapped[..., 0] = np.clip(255 - (vari + 1) * 127.5, 0, 255) # Red
-                            img = Image.fromarray(mapped.astype(np.uint8))
-                        elif layer == "False color":
-                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
-                            mapped = np.stack([G * 1.5, R, B], axis=2)
-                            mapped = np.clip(mapped, 0, 255)
-                            img = Image.fromarray(mapped.astype(np.uint8))
-                        elif layer == "NDWI":
-                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
-                            water = (B - G) / (B + G + 1.0)
-                            mapped = np.zeros_like(arr)
-                            mapped[..., 2] = np.clip(water * 255 * 2, 0, 255) # Blue
-                            mapped[..., 1] = np.clip(water * 255, 0, 255) # Cyan
-                            img = Image.fromarray(mapped.astype(np.uint8))
-                        elif layer in ["SWIR", "Wildfires"]:
-                            R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
-                            mapped = np.stack([R * 1.5, G * 0.8, B * 0.5], axis=2)
-                            mapped = np.clip(mapped, 0, 255)
-                            img = Image.fromarray(mapped.astype(np.uint8))
-                        
-                        buf = BytesIO()
-                        img.save(buf, format="PNG")
-                        fallback_bytes = buf.getvalue()
-                    except Exception as sim_err:
-                        print(f"Failed to simulate layer {layer}: {sim_err}")
-                        
-                return Response(
-                    content=fallback_bytes, 
-                    media_type="image/png",
-                    headers={
-                        "X-Acquisition-Source": "esri-world-imagery-auto-fallback",
-                        "X-Acquisition-Layer": layer
-                    }
-                )
+        if resp.status_code == 200 and len(resp.content) > 3000:
+            fallback_bytes = resp.content
+            layer = getattr(request, "layer", "True color")
+            if layer not in ["True color", "Default", "Highlight Optimized Natural Color"]:
+                try:
+                    from io import BytesIO
+                    from PIL import Image
+                    import numpy as np
+                    
+                    img = Image.open(BytesIO(fallback_bytes)).convert("RGB")
+                    arr = np.array(img).astype(float)
+                    
+                    if layer == "NDVI":
+                        R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                        vari = (G - R) / (G + R - B + 1.0)
+                        vari = np.clip(vari, -1, 1)
+                        mapped = np.zeros_like(arr)
+                        mapped[..., 1] = np.clip((vari + 1) * 127.5, 0, 255) # Green
+                        mapped[..., 0] = np.clip(255 - (vari + 1) * 127.5, 0, 255) # Red
+                        img = Image.fromarray(mapped.astype(np.uint8))
+                    elif layer == "False color":
+                        R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                        mapped = np.stack([G * 1.5, R, B], axis=2)
+                        mapped = np.clip(mapped, 0, 255)
+                        img = Image.fromarray(mapped.astype(np.uint8))
+                    elif layer == "NDWI":
+                        R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                        water = (B - G) / (B + G + 1.0)
+                        mapped = np.zeros_like(arr)
+                        mapped[..., 2] = np.clip(water * 255 * 2, 0, 255) # Blue
+                        mapped[..., 1] = np.clip(water * 255, 0, 255) # Cyan
+                        img = Image.fromarray(mapped.astype(np.uint8))
+                    elif layer in ["SWIR", "Wildfires"]:
+                        R, G, B = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+                        mapped = np.stack([R * 1.5, G * 0.8, B * 0.5], axis=2)
+                        mapped = np.clip(mapped, 0, 255)
+                        img = Image.fromarray(mapped.astype(np.uint8))
+                    
+                    buf = BytesIO()
+                    img.save(buf, format="PNG")
+                    fallback_bytes = buf.getvalue()
+                except Exception as sim_err:
+                    print(f"Failed to simulate layer {layer}: {sim_err}")
+                    
+            return Response(
+                content=fallback_bytes, 
+                media_type="image/png",
+                headers={
+                    "X-Acquisition-Source": "esri-world-imagery-auto-fallback",
+                    "X-Acquisition-Layer": layer
+                }
+            )
     except Exception as fallback_err:
         print(f"[Fallback Error] Satellite imagery export failed: {fallback_err}")
 
-    raise HTTPException(status_code=500, detail="Unable to acquire satellite imagery for the selected area. Please verify internet connection or Sentinel Hub credentials.")
+    # Fallback to USGS/NASA static composite or informative error
+    detail_msg = "Unable to acquire satellite imagery for the selected area."
+    if sentinel_error_details:
+        detail_msg += f" Sentinel Hub notice: {sentinel_error_details[:180]}."
+    raise HTTPException(status_code=500, detail=detail_msg)
 
 @app.get("/api/sample-missions")
 async def get_sample_missions():

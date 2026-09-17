@@ -1,0 +1,72 @@
+import type { MetadataRoute } from 'next';
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'SatQuery AI - Earth Observation Intelligence',
+    short_name: 'SatQuery AI',
+    description: 'Multimodal Remote Sensing Image Analysis through Natural Language Queries (ISRO / SAC — PS 26167)',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#030712',
+    theme_color: '#030712',
+    orientation: 'any',
+    scope: '/',
+    id: '/',
+    icons: [
+      {
+        src: '/icons/icon-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/maskable-icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: '/icons/icon.svg',
+        sizes: 'any',
+        type: 'image/svg+xml',
+      },
+    ],
+    shortcuts: [
+      {
+        name: 'AI Query Lab',
+        short_name: 'Query',
+        description: 'Analyze satellite imagery using natural language',
+        url: '/query',
+        icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
+      },
+      {
+        name: 'Acquire Imagery',
+        short_name: 'Acquire',
+        description: 'Explore Sentinel-2 and Bhuvan data feeds',
+        url: '/acquire',
+        icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
+      },
+      {
+        name: 'Mission Dashboard',
+        short_name: 'Dashboard',
+        description: 'View satellite analytics and mission metrics',
+        url: '/dashboard',
+        icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
+      },
+      {
+        name: 'Earth Gallery',
+        short_name: 'Gallery',
+        description: 'Browse curated remote sensing datasets',
+        url: '/gallery',
+        icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
+      },
+    ],
+    categories: ['education', 'productivity', 'utilities'],
+  };
+}
