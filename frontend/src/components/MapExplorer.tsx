@@ -96,6 +96,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const [searchError, setSearchError] = useState<string | null>(null);
   const searchMarkerRef = useRef<any>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const initialViewRef = useRef<{ center: [number, number]; zoom: number }>({ center: [50.16, 20.78], zoom: 5 });
 
   // Drawing & Shape Selection State (Polygon, Rectangle, Circle)
   const [selectedShapeType, setSelectedShapeType] = useState<"polygon" | "rectangle" | "circle" | null>(null);
@@ -166,11 +167,14 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     });
     mapInstanceRef.current = map;
 
-    // Listen for rotation events from touch gesture or programmatic rotation
+    // Listen for rotation and zoom events
     if (typeof map.on === "function") {
       map.on("rotate", () => {
         const b = typeof map.getBearing === "function" ? Math.round(map.getBearing()) : 0;
         setBearing(((b % 360) + 360) % 360);
+      });
+      map.on("zoomstart", () => {
+        map.closePopup();
       });
     }
 
@@ -336,6 +340,26 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     setSearchError(null);
     setShowSearchDropdown(false);
     removeSearchPin();
+
+    // Zoom out and get back to normal
+    const map = mapInstanceRef.current;
+    if (map) {
+      if (typeof map.closePopup === "function") {
+        map.closePopup();
+      }
+      if (bbox && bbox.length === 4) {
+        // If an Area of Interest is defined, frame the selected area
+        map.flyToBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]], {
+          duration: 1.4,
+          padding: [60, 60],
+        });
+      } else {
+        // Zoom back out to normal overview
+        map.flyTo(initialViewRef.current.center, initialViewRef.current.zoom, {
+          duration: 1.4,
+        });
+      }
+    }
   };
 
   // Programmatic Area Selection Draw Handlers (Polygon, Box/Rectangle, Circle)
@@ -488,9 +512,18 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     setShowSearchDropdown(false);
     setSearchQuery(title);
 
-    // Remove previous target marker if exists
+    // Save overview position before zooming if currently at normal overview zoom
+    if (typeof map.getZoom === "function" && map.getZoom() <= 7) {
+      const center = map.getCenter();
+      initialViewRef.current = { center: [center.lat, center.lng], zoom: map.getZoom() };
+    }
+
+    // Remove previous target marker and close any open popups to ensure completely unobstructed view
     if (searchMarkerRef.current && map.hasLayer(searchMarkerRef.current)) {
       map.removeLayer(searchMarkerRef.current);
+    }
+    if (typeof map.closePopup === "function") {
+      map.closePopup();
     }
 
     // Auto-zoom to bounding box or coordinates
@@ -508,7 +541,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       map.flyTo([lat, lon], 13, { duration: 1.6 });
     }
 
-    // Drop glowing target marker
+    // Drop glowing target beacon without big popup obstruction
     if (L) {
       const targetIcon = L.divIcon({
         className: "satquery-search-pulse",
@@ -530,7 +563,8 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           <div style="font-weight: 600; margin-top: 2px;">${title}</div>
           <div style="color: rgba(255,255,255,0.6); font-size: 9px; margin-top: 2px;">${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E</div>
         </div>`
-      ).openPopup();
+      );
+      // NOTE: Do not call .openPopup() so the big popup display does not block the satellite imagery
       searchMarkerRef.current = marker;
     }
   };
@@ -1191,12 +1225,15 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
               const val = e.target.value;
               setSearchQuery(val);
               if (!val.trim()) {
-                removeSearchPin();
-                setSearchResults([]);
-                setSearchError(null);
+                clearSearch();
               } else {
                 if (!showSearchDropdown) setShowSearchDropdown(true);
               }
+            }}
+            onCut={() => {
+              setTimeout(() => {
+                clearSearch();
+              }, 50);
             }}
             onKeyDown={(e) => {
               if (e.key === "Escape") {
