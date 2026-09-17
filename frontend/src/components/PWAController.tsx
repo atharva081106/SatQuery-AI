@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Download, X, WifiOff, Wifi, RefreshCw, Share, PlusSquare, Smartphone, CheckCircle2 } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Download, X, WifiOff, Wifi, RefreshCw, Share, PlusSquare, Smartphone } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -14,6 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export default function PWAController() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const installPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -69,15 +70,33 @@ export default function PWAController() {
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
       setInstallPrompt(promptEvent);
+      installPromptRef.current = promptEvent;
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
-    // 4. Global trigger listener: window.dispatchEvent(new Event("open-pwa-install"))
-    const handleOpenModal = () => {
-      setShowInstallModal(true);
+    // 4. 1-Click Direct Native Install Trigger Listener
+    const handleTriggerInstall = async () => {
+      if (installPromptRef.current) {
+        try {
+          // Immediately trigger native browser install sheet with zero intermediate popups
+          await installPromptRef.current.prompt();
+          const choice = await installPromptRef.current.userChoice;
+          if (choice.outcome === "accepted") {
+            setInstallPrompt(null);
+            installPromptRef.current = null;
+            setShowInstallModal(false);
+          }
+        } catch (err) {
+          console.warn("Direct install prompt error:", err);
+          setShowInstallModal(true);
+        }
+      } else {
+        // Fallback for iOS Safari (which lacks beforeinstallprompt API) or unsupported browsers
+        setShowInstallModal(true);
+      }
     };
-    window.addEventListener("open-pwa-install", handleOpenModal);
+    window.addEventListener("open-pwa-install", handleTriggerInstall);
 
     // 5. Network connectivity listeners
     setIsOnline(navigator.onLine);
@@ -99,29 +118,11 @@ export default function PWAController() {
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
-      window.removeEventListener("open-pwa-install", handleOpenModal);
+      window.removeEventListener("open-pwa-install", handleTriggerInstall);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
-
-  const handleInstallClick = async () => {
-    if (installPrompt) {
-      try {
-        await installPrompt.prompt();
-        const choice = await installPrompt.userChoice;
-        if (choice.outcome === "accepted") {
-          setShowInstallModal(false);
-          setInstallPrompt(null);
-        }
-      } catch (err) {
-        console.warn("Install prompt error:", err);
-        setShowInstallModal(true);
-      }
-    } else {
-      setShowInstallModal(true);
-    }
-  };
 
   const handleUpdate = () => {
     if (waitingWorker) {
@@ -164,7 +165,7 @@ export default function PWAController() {
         </div>
       )}
 
-      {/* ── 4. Dedicated Install Modal (Triggered intentionally from menu/nav/footer) ── */}
+      {/* ── 4. Fallback iOS Safari / Unsupported Browser Instructions Modal ── */}
       {showInstallModal && (
         <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4 animate-in fade-in duration-200 font-mono">
           <div className="relative w-full max-w-md rounded-3xl bg-[#070b14] border border-white/20 p-6 text-white shadow-2xl">
@@ -194,10 +195,10 @@ export default function PWAController() {
 
             {/* Platform Instructions */}
             {isIOS ? (
-              // iOS Safari Instructions
+              // iOS Safari 2-step visual guidance
               <div className="space-y-4 mb-6">
                 <p className="text-xs text-white/70 leading-relaxed">
-                  Install on your iPhone or iPad for borderless fullscreen mode, instant launch, and offline map caching:
+                  Install on your iPhone or iPad for fullscreen mode and offline map caching:
                 </p>
 
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3.5 text-xs">
@@ -206,7 +207,7 @@ export default function PWAController() {
                   </div>
                   <div>
                     <span className="text-white/40 text-[10px] uppercase block">Step 1</span>
-                    <span className="text-white font-medium">Tap the Share icon in the Safari navigation bar</span>
+                    <span className="text-white font-medium">Tap the Share icon in Safari&apos;s toolbar</span>
                   </div>
                 </div>
 
@@ -220,39 +221,11 @@ export default function PWAController() {
                   </div>
                 </div>
               </div>
-            ) : installPrompt ? (
-              // Android / Desktop with Native Prompt
-              <div className="space-y-4 mb-6">
-                <p className="text-xs text-white/70 leading-relaxed">
-                  Add SatQuery AI to your home screen or desktop application drawer for fast offline satellite inspection:
-                </p>
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs">
-                  <div className="flex items-center gap-2 text-white/80">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Borderless standalone window</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Offline satellite map tile caching</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Direct home screen quick shortcuts</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleInstallClick}
-                  className="w-full py-3 rounded-full bg-white text-black font-bold text-xs uppercase tracking-widest hover:bg-white/90 active:scale-95 transition-all cursor-pointer shadow-lg shadow-white/10"
-                >
-                  Confirm Installation
-                </button>
-              </div>
             ) : (
-              // Browser Menu Instructions (Firefox, Samsung Internet, Desktop fallback)
+              // General browser fallback
               <div className="space-y-4 mb-6">
                 <p className="text-xs text-white/70 leading-relaxed">
-                  Install this site as an application using your browser menu:
+                  Install this site as an application directly from your browser menu:
                 </p>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3.5 text-xs">
                   <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white shrink-0 font-bold">
@@ -260,7 +233,7 @@ export default function PWAController() {
                   </div>
                   <div>
                     <span className="text-white/40 text-[10px] uppercase block">Step 1</span>
-                    <span className="text-white font-medium">Tap your browser menu (three dots top-right)</span>
+                    <span className="text-white font-medium">Open your browser menu (top-right corner)</span>
                   </div>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3.5 text-xs">
