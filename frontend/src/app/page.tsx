@@ -123,6 +123,22 @@ export default function LandingPage() {
               <span>SYSTEM FAQS</span>
               <span className="text-xs text-white/40">&rarr;</span>
             </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new Event("open-pwa-install"));
+                }
+              }}
+              className="text-xl font-bold tracking-wider text-cyan-300 hover:text-cyan-200 transition-colors py-1 flex items-center justify-between cursor-pointer text-left"
+            >
+              <span className="flex items-center gap-2">
+                <span>INSTALL APP</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-400/20 text-cyan-300 font-mono tracking-widest uppercase border border-cyan-400/30">PWA</span>
+              </span>
+              <span className="text-xs text-cyan-400">&darr;</span>
+            </button>
           </div>
 
           <div className="flex flex-col gap-3 pt-6 border-t border-white/15">
@@ -181,6 +197,19 @@ export default function LandingPage() {
           <Link href="/gallery" className="micro-cap text-white hover:opacity-70 transition-opacity">
             GALLERY
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new Event("open-pwa-install"));
+              }
+            }}
+            className="micro-cap text-white hover:opacity-70 transition-opacity flex items-center gap-1.5 cursor-pointer font-semibold"
+            title="Install SatQuery AI Standalone App"
+          >
+            <span>INSTALL</span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/15 text-cyan-300 font-mono border border-white/20">PWA</span>
+          </button>
 
           {/* Small Sign In / Sign Up Button */}
           {!isAuthenticated ? (
@@ -314,6 +343,17 @@ export default function LandingPage() {
             ) : null}
             <Link href="/faq" className="hover:text-white transition-colors">FAQS</Link>
             <Link href="/dashboard" className="hover:text-white transition-colors">BENCHMARKS</Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new Event("open-pwa-install"));
+                }
+              }}
+              className="hover:text-white transition-colors cursor-pointer uppercase text-[9px] sm:text-[10px]"
+            >
+              INSTALL APP
+            </button>
             <Link href="#" className="hover:text-white transition-colors">DOCUMENTATION</Link>
             <Link href="#" className="hover:text-white transition-colors">PRIVACY</Link>
             <Link href="#" className="hover:text-white transition-colors">TERMS</Link>
