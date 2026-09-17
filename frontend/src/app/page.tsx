@@ -60,14 +60,14 @@ export default function LandingPage() {
       )}
 
       {/* MOBILE NAVBAR (< 768px) */}
-      <header className="fixed top-0 left-0 w-full flex justify-between items-center px-5 py-4 z-50 mix-blend-difference md:hidden">
-        <div className="text-base tracking-[0.2em] font-mono font-bold text-white">
+      <header className="fixed top-0 left-0 w-full flex justify-between items-center pwa-safe-header z-50 md:hidden">
+        <div className="text-base tracking-[0.2em] font-mono font-bold text-white drop-shadow-md">
           SATQUERY AI.
         </div>
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-full border border-white/30 text-white cursor-pointer touch-manipulation"
+          className="w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-full border border-white/30 text-white cursor-pointer touch-manipulation bg-black/40 backdrop-blur-md shrink-0 active:scale-95 transition-all shadow-lg"
           aria-label="Toggle mobile menu"
         >
           <span className={`w-5 h-0.5 bg-white transition-transform duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
@@ -78,7 +78,7 @@ export default function LandingPage() {
 
       {/* MOBILE FULLSCREEN MENU DRAWER */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-6 pt-20 safe-bottom animate-in fade-in duration-200 md:hidden font-mono">
+        <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between pwa-safe-header safe-bottom animate-in fade-in duration-200 md:hidden font-mono">
           <div className="flex flex-col gap-6 text-left">
             <div className="text-[10px] tracking-widest uppercase text-white font-bold border-b border-white/15 pb-2">
               MISSION NAVIGATION
@@ -180,8 +180,8 @@ export default function LandingPage() {
       )}
 
       {/* DESKTOP TOP NAV OVERLAY (>= 768px) */}
-      <nav className="fixed top-0 left-0 w-full justify-between items-center px-8 py-6 z-50 mix-blend-difference hidden md:flex">
-        <div className="display-lg tracking-widest text-white">
+      <nav className="fixed top-0 left-0 w-full justify-between items-center pwa-safe-header z-50 hidden md:flex">
+        <div className="display-lg tracking-widest text-white drop-shadow-md">
           SATQUERY AI.
         </div>
         <div className="flex gap-7 items-center">
@@ -246,7 +246,7 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-16 sm:pt-0 pb-16 sm:pb-32 px-4 text-center">
+        <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-28 sm:pt-0 pb-16 sm:pb-32 px-4 safe-x text-center">
 
           <FadeInScroll delay={200}>
             <h1 className="display-xxl mb-3 sm:mb-4">

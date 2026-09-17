@@ -167,13 +167,37 @@
     background: rgba(255, 255, 255, 0.45);
   }
 
-  /* Mobile Safe Area & Touch Utilities */
+  /* Mobile Safe Area & Touch Utilities for PWA & Notch Displays */
   .safe-bottom {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    padding-bottom: max(0.75rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem));
   }
   .safe-top {
-    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-top: max(1.25rem, calc(env(safe-area-inset-top, 0px) + 0.85rem));
   }
+  .safe-x {
+    padding-left: max(1.25rem, calc(env(safe-area-inset-left, 0px) + 1.25rem));
+    padding-right: max(1.25rem, calc(env(safe-area-inset-right, 0px) + 1.25rem));
+  }
+  .pwa-safe-header {
+    padding-top: max(1.25rem, calc(env(safe-area-inset-top, 0px) + 0.85rem));
+    padding-left: max(1.25rem, calc(env(safe-area-inset-left, 0px) + 1.25rem));
+    padding-right: max(1.25rem, calc(env(safe-area-inset-right, 0px) + 1.25rem));
+  }
+
+  /* PWA Standalone Mode: guarantee content never collides with iOS status bar/notch/island */
+  @media all and (display-mode: standalone) {
+    .safe-top, .pwa-safe-header {
+      padding-top: max(3.25rem, calc(env(safe-area-inset-top, 0px) + 1rem)) !important;
+    }
+    .safe-x {
+      padding-left: max(1.5rem, calc(env(safe-area-inset-left, 0px) + 1.25rem)) !important;
+      padding-right: max(1.5rem, calc(env(safe-area-inset-right, 0px) + 1.25rem)) !important;
+    }
+    .safe-bottom {
+      padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem)) !important;
+    }
+  }
+
   .touch-target {
     min-height: 44px;
     min-width: 44px;

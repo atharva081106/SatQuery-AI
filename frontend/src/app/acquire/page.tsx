@@ -32,7 +32,7 @@ export default function AcquirePage() {
     <main className="h-screen h-[100dvh] w-full bg-black relative overflow-hidden flex flex-col">
       
       {/* FIXED TOP NAV OVERLAY */}
-      <nav className="absolute top-0 left-0 w-full flex justify-between items-center px-4 sm:px-8 py-3 sm:py-5 z-[1000] pointer-events-none safe-top">
+      <nav className="absolute top-0 left-0 w-full flex justify-between items-center pwa-safe-header z-[1000] pointer-events-none">
         <div className="text-sm sm:text-lg md:display-lg tracking-widest text-white pointer-events-auto mix-blend-difference drop-shadow-md font-mono font-bold">
           SATQUERY AI.
         </div>

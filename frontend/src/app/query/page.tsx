@@ -840,7 +840,7 @@ export default function Home() {
       )}
 
       {/* FIXED TOP NAV OVERLAY */}
-      <nav className="w-full flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3 sm:py-4 z-50 transition-all safe-top">
+      <nav className="w-full flex justify-between items-center pwa-safe-header z-50 transition-all">
         <div className="flex items-center gap-2 sm:gap-3">
           <a href="/" className="text-sm sm:text-xl lg:display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-1.5 font-mono font-bold">
             <span>SATQUERY AI.</span>

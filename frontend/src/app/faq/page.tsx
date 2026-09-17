@@ -8,7 +8,7 @@ export default function FAQPage() {
   return (
     <main className="bg-black bg-cosmic-glow text-white min-h-screen min-h-[100dvh] w-full relative overflow-y-auto custom-scrollbar flex flex-col">
       {/* FIXED TOP NAV */}
-      <nav className="w-full flex justify-between items-center px-4 sm:px-8 py-3 sm:py-6 z-50 shrink-0 safe-top border-b border-white/10">
+      <nav className="w-full flex justify-between items-center pwa-safe-header z-50 shrink-0 border-b border-white/10">
         <Link href="/" className="text-base sm:text-xl md:display-lg tracking-widest text-white hover:opacity-70 transition-opacity font-mono font-bold">
           SATQUERY AI.
         </Link>
