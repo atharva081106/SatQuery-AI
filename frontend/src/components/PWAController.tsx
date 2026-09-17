@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Download, X, WifiOff, Wifi, RefreshCw, Share, PlusSquare, Smartphone, Monitor, CheckCircle2 } from "lucide-react";
+import { Download, X, WifiOff, Wifi, RefreshCw, Share, PlusSquare, Smartphone, CheckCircle2 } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -14,10 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export default function PWAController() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
-  const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [showOnlineToast, setShowOnlineToast] = useState(false);
@@ -25,37 +22,23 @@ export default function PWAController() {
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
 
   useEffect(() => {
-    // 1. Standalone / installed check
-    const checkStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as unknown as { standalone?: boolean }).standalone === true ||
-      document.referrer.includes("android-app://");
-    setIsStandalone(checkStandalone);
-
-    // 2. Mobile and iOS detection
+    // 1. Mobile and iOS detection
     const ua = navigator.userAgent;
     const isIOSDevice =
       /iPad|iPhone|iPod/.test(ua) &&
       !(window as unknown as { MSStream?: unknown }).MSStream;
     setIsIOS(isIOSDevice);
 
-    const isMobileDevice =
-      /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(ua) ||
-      window.innerWidth < 768;
-    setIsMobile(isMobileDevice);
-
-    // 3. Register Service Worker
+    // 2. Register Service Worker
     if ("serviceWorker" in navigator && process.env.NODE_ENV !== "test") {
       navigator.serviceWorker
         .register("/sw.js")
         .then((reg) => {
-          // Check if waiting worker exists
           if (reg.waiting) {
             setWaitingWorker(reg.waiting);
             setHasUpdate(true);
           }
 
-          // Detect new updates
           reg.addEventListener("updatefound", () => {
             const newWorker = reg.installing;
             if (newWorker) {
@@ -72,7 +55,6 @@ export default function PWAController() {
           console.warn("[PWA] Service Worker registration failed:", err);
         });
 
-      // Reload when new SW takes control
       let refreshing = false;
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (!refreshing) {
@@ -82,34 +64,22 @@ export default function PWAController() {
       });
     }
 
-    // 4. Capture beforeinstallprompt (Chrome / Edge / Android)
+    // 3. Capture beforeinstallprompt (Chrome / Edge / Android)
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
       setInstallPrompt(promptEvent);
-      
-      const dismissed = sessionStorage.getItem("pwa_banner_dismissed");
-      if (!dismissed) {
-        setShowInstallBanner(true);
-      }
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
-    // 5. On Mobile: If not standalone and not dismissed, show mobile install badge
-    const dismissed = sessionStorage.getItem("pwa_banner_dismissed");
-    if (!checkStandalone && !dismissed) {
-      // Show install banner on phone browser
-      setShowInstallBanner(true);
-    }
-
-    // 6. Global custom trigger listener: window.dispatchEvent(new Event("open-pwa-install"))
+    // 4. Global trigger listener: window.dispatchEvent(new Event("open-pwa-install"))
     const handleOpenModal = () => {
       setShowInstallModal(true);
     };
     window.addEventListener("open-pwa-install", handleOpenModal);
 
-    // 7. Network connectivity listeners
+    // 5. Network connectivity listeners
     setIsOnline(navigator.onLine);
 
     const handleOnline = () => {
@@ -141,7 +111,6 @@ export default function PWAController() {
         await installPrompt.prompt();
         const choice = await installPrompt.userChoice;
         if (choice.outcome === "accepted") {
-          setShowInstallBanner(false);
           setShowInstallModal(false);
           setInstallPrompt(null);
         }
@@ -150,14 +119,8 @@ export default function PWAController() {
         setShowInstallModal(true);
       }
     } else {
-      // Open step-by-step installation guide
       setShowInstallModal(true);
     }
-  };
-
-  const handleDismissBanner = () => {
-    setShowInstallBanner(false);
-    sessionStorage.setItem("pwa_banner_dismissed", "true");
   };
 
   const handleUpdate = () => {
@@ -201,59 +164,7 @@ export default function PWAController() {
         </div>
       )}
 
-      {/* ── 4. Mobile & Desktop Install Floating Banner (Design System Compliant) ── */}
-      {showInstallBanner && !isStandalone && (
-        <aside
-          aria-label="PWA Installation Prompt"
-          className={`fixed z-[9998] animate-in fade-in duration-300 ${
-            isMobile
-              ? "bottom-4 left-4 right-4 safe-bottom"
-              : "top-20 right-6 max-w-md w-full"
-          }`}
-        >
-          <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-black/90 border border-white/20 text-white shadow-[0_10px_40px_rgba(0,0,0,0.9)] backdrop-blur-2xl font-mono">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                <Download className="w-5 h-5 text-white" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold tracking-wider text-xs uppercase text-white truncate">
-                    SatQuery AI
-                  </span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/15 text-cyan-300 font-mono tracking-widest uppercase border border-white/10 shrink-0">
-                    APP
-                  </span>
-                </div>
-                <div className="text-[10px] text-white/50 tracking-wider uppercase truncate mt-0.5">
-                  Offline Maps &amp; Fullscreen
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={handleInstallClick}
-                className="px-4 py-2 rounded-full bg-white text-black font-bold text-[11px] uppercase tracking-widest hover:bg-white/90 active:scale-95 transition-all cursor-pointer shadow-md shadow-white/10"
-              >
-                Install
-              </button>
-              <button
-                type="button"
-                onClick={handleDismissBanner}
-                className="p-2 rounded-full border border-white/15 text-white/40 hover:text-white hover:border-white/30 transition-colors cursor-pointer"
-                title="Dismiss"
-                aria-label="Dismiss installation prompt"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </aside>
-      )}
-
-      {/* ── 5. Dedicated Step-by-Step Install Modal (iOS, Android, & Desktop) ── */}
+      {/* ── 4. Dedicated Install Modal (Triggered intentionally from menu/nav/footer) ── */}
       {showInstallModal && (
         <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4 animate-in fade-in duration-200 font-mono">
           <div className="relative w-full max-w-md rounded-3xl bg-[#070b14] border border-white/20 p-6 text-white shadow-2xl">
@@ -276,7 +187,7 @@ export default function PWAController() {
                   Install SatQuery AI
                 </div>
                 <div className="text-[10px] text-white/50 tracking-wider uppercase mt-0.5">
-                  Progressive Web Application (PWA)
+                  Standalone Application
                 </div>
               </div>
             </div>

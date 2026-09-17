@@ -131,13 +131,10 @@ export default function LandingPage() {
                   window.dispatchEvent(new Event("open-pwa-install"));
                 }
               }}
-              className="text-xl font-bold tracking-wider text-cyan-300 hover:text-cyan-200 transition-colors py-1 flex items-center justify-between cursor-pointer text-left"
+              className="text-xl font-bold tracking-wider text-white hover:text-white/80 transition-colors py-1 flex items-center justify-between cursor-pointer text-left"
             >
-              <span className="flex items-center gap-2">
-                <span>INSTALL APP</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-400/20 text-cyan-300 font-mono tracking-widest uppercase border border-cyan-400/30">PWA</span>
-              </span>
-              <span className="text-xs text-cyan-400">&darr;</span>
+              <span>INSTALL APP</span>
+              <span className="text-xs text-white/40">&rarr;</span>
             </button>
           </div>
 
@@ -204,11 +201,10 @@ export default function LandingPage() {
                 window.dispatchEvent(new Event("open-pwa-install"));
               }
             }}
-            className="micro-cap text-white hover:opacity-70 transition-opacity flex items-center gap-1.5 cursor-pointer font-semibold"
+            className="micro-cap text-white hover:opacity-70 transition-opacity cursor-pointer font-semibold"
             title="Install SatQuery AI Standalone App"
           >
-            <span>INSTALL</span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/15 text-cyan-300 font-mono border border-white/20">PWA</span>
+            INSTALL APP
           </button>
 
           {/* Small Sign In / Sign Up Button */}
