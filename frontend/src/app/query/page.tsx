@@ -826,13 +826,13 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen bg-black relative overflow-hidden flex flex-col">
+    <main className="h-screen min-h-[100dvh] h-[100dvh] bg-black bg-cosmic-glow relative overflow-hidden flex flex-col">
       
       {/* NATURAL COLOUR GLOBE BACKGROUND (EMPTY STATE) */}
       {!messages.some(m => m.role === 'user') && (
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-          <div className="relative z-[6] pointer-events-auto w-[600px] h-[600px] rounded-full flex items-center justify-center">
-            <div className="w-full h-full opacity-100">
+          <div className="relative z-[6] pointer-events-auto w-[260px] h-[260px] sm:w-[380px] sm:h-[380px] lg:w-[540px] lg:h-[540px] rounded-full flex items-center justify-center">
+            <div className="w-full h-full opacity-60 sm:opacity-85">
               <FramerGlobe />
             </div>
           </div>
@@ -840,7 +840,7 @@ export default function Home() {
       )}
 
       {/* FIXED TOP NAV OVERLAY */}
-      <nav className="w-full flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3 sm:py-4 z-50 transition-all">
+      <nav className="w-full flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3 sm:py-4 z-50 transition-all safe-top">
         <div className="flex items-center gap-2 sm:gap-3">
           <a href="/" className="text-sm sm:text-xl lg:display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-1.5 font-mono font-bold">
             <span>SATQUERY AI.</span>
@@ -898,7 +898,7 @@ export default function Home() {
       </nav>
 
       {/* MAIN APPLICATION CONTAINER */}
-      <div className={`flex-1 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-4.5rem)] sm:max-h-[calc(100dvh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4 lg:p-6 gap-3 sm:gap-6 z-10 min-h-0 overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
+      <div className={`flex-1 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-4.5rem)] sm:max-h-[calc(100dvh-4.5rem)] flex flex-col lg:flex-row w-full mx-auto p-2 sm:p-4 lg:p-6 pb-[calc(0.75rem+env(safe-area-inset-bottom))] gap-2 sm:gap-6 z-10 min-h-0 overflow-hidden transition-all duration-500 ${latestResult || messages.length > 0 ? 'pointer-events-auto' : 'pointer-events-none'} ${latestResult ? 'max-w-[1500px]' : 'max-w-4xl'}`}>
         
         {/* MOBILE DUAL-MODE SEGMENTED TABS (< 1024px) */}
         {latestResult && (
@@ -938,9 +938,78 @@ export default function Home() {
         {/* LEFT/MAIN: CHAT & INPUT */}
         <div className={`flex-1 flex-col justify-end relative min-h-0 h-full max-h-full overflow-hidden ${mobileTab === 'trace' ? 'hidden lg:flex' : 'flex'}`}>
           
-          <div data-lenis-prevent className={`overflow-y-auto mb-4 custom-scrollbar pr-4 flex flex-col gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
+          <div data-lenis-prevent className={`overflow-y-auto mb-2 sm:mb-4 custom-scrollbar pr-2 sm:pr-4 flex flex-col gap-4 sm:gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
-              <div className="flex-1 flex flex-col items-center justify-center pointer-events-none h-full mt-32">
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-2 sm:p-4 my-auto z-20 pointer-events-auto animate-in fade-in duration-300">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-mono tracking-widest text-white/90 uppercase mb-2 sm:mb-3 backdrop-blur-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span>MISSION CONTROL // READY</span>
+                </div>
+                <h2 className="text-base sm:text-xl md:text-2xl font-bold font-mono tracking-wider uppercase text-white mb-1.5 sm:mb-2 max-w-md">
+                  WHAT WOULD YOU LIKE TO ANALYZE?
+                </h2>
+                <p className="text-[10px] sm:text-xs text-white/60 font-mono max-w-sm mb-3 sm:mb-4 leading-relaxed">
+                  Select a mission objective below or type a natural language satellite query.
+                </p>
+
+                {/* 4 Clickable Mission Cards on Mobile & Desktop */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setQuery("Detect and count all naval vessels and cargo ships near Mumbai naval port")}
+                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
+                  >
+                    <span className="text-base shrink-0">🚢</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">VESSEL RECON</span>
+                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Detect &amp; count ships in Mumbai port</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("Quantify spatial flood inundation boundary and calculate submerged land extent")}
+                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
+                  >
+                    <span className="text-base shrink-0">🌊</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">FLOOD BOUNDARY</span>
+                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Quantify submerged land extent</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("Identify urban infrastructure expansion and highlight newly constructed road corridors")}
+                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
+                  >
+                    <span className="text-base shrink-0">🏗️</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">URBAN GROWTH</span>
+                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Segment built-up roads &amp; structures</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("Analyze vegetation canopy vigor and compute NDVI spectral index distribution")}
+                    className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-black/80 hover:bg-white hover:text-black text-white/90 border border-white/20 hover:border-white transition-all text-left group cursor-pointer backdrop-blur-md shadow-lg"
+                  >
+                    <span className="text-base shrink-0">🌾</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-mono font-bold tracking-wider uppercase group-hover:text-black">NDVI HEALTH</span>
+                      <span className="text-[10px] text-white/60 group-hover:text-black/70 truncate">Compute vegetation vigor map</span>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Quick Action Shortcuts */}
+                <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] font-mono text-white/60">
+                  <a href="/acquire" className="hover:text-white underline flex items-center gap-1">
+                    <span>🗺️</span> Acquire from Satellite Map
+                  </a>
+                  <span>•</span>
+                  <button type="button" onClick={() => setShowMissionPresets(true)} className="hover:text-white underline flex items-center gap-1 cursor-pointer">
+                    <span>⚡</span> 6 Demo Queries
+                  </button>
+                </div>
               </div>
             )}
 

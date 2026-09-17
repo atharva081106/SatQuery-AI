@@ -184,6 +184,19 @@
   .no-tap-highlight {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Cosmic Depth & Ambient Backgrounds (Eliminates flat black voids on mobile/OLED) */
+  .bg-cosmic-glow {
+    background: radial-gradient(ellipse at 50% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 85%, rgba(99, 102, 241, 0.06) 0%, transparent 65%),
+                #000000;
+  }
+  .bg-cosmic-card {
+    background-color: rgba(12, 12, 16, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
 }
 
 @layer utilities {

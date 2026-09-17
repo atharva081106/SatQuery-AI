@@ -246,21 +246,32 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-end h-full pb-24 sm:pb-32 px-4 text-center">
+        <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-16 sm:pt-0 pb-16 sm:pb-32 px-4 text-center">
+          <FadeInScroll delay={100}>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-mono tracking-widest uppercase text-white/90 mb-3 sm:mb-4 backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>ISRO SAC // PS 26167 TELEMETRY ACTIVE</span>
+            </div>
+          </FadeInScroll>
           <FadeInScroll delay={200}>
             <h1 className="display-xxl mb-3 sm:mb-4">
               MAKING SENSE<br/>OF THE EARTH.
             </h1>
           </FadeInScroll>
           <FadeInScroll delay={400}>
-            <p className="body-md uppercase tracking-[2px] sm:tracking-[4px] opacity-70 mb-8 sm:mb-12 text-xs sm:text-base px-2">
+            <p className="body-md uppercase tracking-[2px] sm:tracking-[4px] opacity-75 mb-6 sm:mb-12 text-xs sm:text-base px-2 max-w-lg">
               Multimodal Remote Sensing Image Analysis
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
-            <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark min-w-[180px] sm:min-w-[200px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2">
-              TRY FOR FREE
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none">
+              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm">
+                TRY FOR FREE
+              </a>
+              <Link href="/acquire" className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white hover:text-black transition-all text-center text-xs font-mono font-bold tracking-widest uppercase text-white/80 backdrop-blur-sm">
+                SATELLITE MAP &rarr;
+              </Link>
+            </div>
           </FadeInScroll>
         </div>
 
@@ -283,15 +294,22 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-start justify-end h-full pb-24 sm:pb-32 px-6 sm:px-8 md:px-24 w-full max-w-[1500px] mx-auto">
+        <div className="relative z-10 flex flex-col items-start justify-center sm:justify-end h-full py-16 sm:pb-32 px-5 sm:px-8 md:px-24 w-full max-w-[1500px] mx-auto">
           <FadeInScroll>
-            <div className="micro-cap mb-3 opacity-50 text-[10px]">CAPABILITY 01</div>
-            <h2 className="display-xl mb-4 sm:mb-6 max-w-3xl">
-              NATURAL LANGUAGE<br/>QUERIES
-            </h2>
-            <p className="body-md opacity-80 max-w-xl text-xs sm:text-base leading-relaxed">
-              Interact with complex remote sensing data using everyday language. Our advanced agentic pipeline interprets your intent and extracts precise insights from vast geographical areas.
-            </p>
+            <div className="p-5 sm:p-0 rounded-2xl sm:rounded-none bg-black/60 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border border-white/15 sm:border-none shadow-2xl sm:shadow-none max-w-2xl w-full">
+              <div className="micro-cap mb-2 sm:mb-3 opacity-60 text-[10px]">CAPABILITY 01</div>
+              <h2 className="display-xl mb-3 sm:mb-6">
+                NATURAL LANGUAGE<br/>QUERIES
+              </h2>
+              <p className="body-md opacity-80 text-xs sm:text-base leading-relaxed">
+                Interact with complex remote sensing data using everyday language. Our advanced agentic pipeline interprets your intent and extracts precise insights from vast geographical areas.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10 font-mono text-[10px]">
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">⚡ &lt;10ms ONNX INT8</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🎯 90.2% Accuracy</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🛰️ Agentic VQA</span>
+              </div>
+            </div>
           </FadeInScroll>
         </div>
       </section>
@@ -308,23 +326,30 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-start justify-end h-full pb-28 sm:pb-32 px-6 sm:px-8 md:px-24 w-full max-w-[1500px] mx-auto">
+        <div className="relative z-10 flex flex-col items-start justify-center sm:justify-end h-full py-16 sm:pb-36 px-5 sm:px-8 md:px-24 w-full max-w-[1500px] mx-auto">
           <FadeInScroll>
-            <div className="micro-cap mb-3 opacity-50 text-[10px]">CAPABILITY 02</div>
-            <h2 className="display-xl mb-3 sm:mb-6 max-w-3xl">
-              SPATIAL<br/>LOCALIZATION
-            </h2>
-            <p className="body-md opacity-80 max-w-xl mb-6 sm:mb-8 text-xs sm:text-base leading-relaxed">
-              Identify and bound critical infrastructure, environmental changes, and specific geographical features directly onto the image canvas with millimeter precision.
-            </p>
-            <Link href="/query" className="button-ghost-on-dark hover:bg-white hover:text-black text-xs sm:text-sm py-2.5 px-6">
-              TRY THE DEMO
-            </Link>
+            <div className="p-5 sm:p-0 rounded-2xl sm:rounded-none bg-black/60 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border border-white/15 sm:border-none shadow-2xl sm:shadow-none max-w-2xl w-full">
+              <div className="micro-cap mb-2 sm:mb-3 opacity-60 text-[10px]">CAPABILITY 02</div>
+              <h2 className="display-xl mb-3 sm:mb-6">
+                SPATIAL<br/>LOCALIZATION
+              </h2>
+              <p className="body-md opacity-80 mb-4 sm:mb-6 text-xs sm:text-base leading-relaxed">
+                Identify and bound critical infrastructure, environmental changes, and specific geographical features directly onto the image canvas with millimeter precision.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4 pt-2 border-t border-white/10 font-mono text-[10px]">
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">📐 Millimeter Precision</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🛡️ Zero FPR Gate</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🇮🇳 Bhuvan &amp; Sentinel</span>
+              </div>
+              <Link href="/query" className="button-ghost-on-dark inline-block hover:bg-white hover:text-black text-xs sm:text-sm py-2.5 px-6">
+                TRY THE DEMO
+              </Link>
+            </div>
           </FadeInScroll>
         </div>
         
         {/* OVERLAID MINIMAL FOOTER */}
-        <div className="absolute bottom-4 sm:bottom-8 w-full px-4 sm:px-8 flex flex-col md:flex-row justify-center items-center gap-3 sm:gap-6 text-[9px] sm:text-[10px] tracking-widest uppercase text-white/60 font-semibold z-20">
+        <div className="absolute bottom-3 sm:bottom-8 w-full px-4 sm:px-8 flex flex-col md:flex-row justify-center items-center gap-2 sm:gap-6 text-[9px] sm:text-[10px] tracking-widest uppercase text-white/60 font-semibold z-20">
           <span>SATQUERY AI &copy; {new Date().getFullYear()}</span>
           <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
             <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="hover:text-white transition-colors cursor-pointer">SYSTEM ACCESS</a>

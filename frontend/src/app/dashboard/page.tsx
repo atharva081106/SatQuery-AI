@@ -185,17 +185,17 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"segmentation" | "latency" | "convergence" | "radar">("segmentation");
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col relative overflow-y-auto custom-scrollbar">
+    <div className="min-h-screen min-h-[100dvh] bg-black bg-cosmic-glow text-white flex flex-col relative overflow-y-auto custom-scrollbar">
 
       {/* Ambient background glow */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-white/5 blur-[140px] rounded-full" />
-        <div className="absolute top-1/3 right-10 w-[500px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-10 left-1/3 w-[550px] h-[300px] bg-blue-500/5 blur-[130px] rounded-full" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-cyan-500/10 blur-[140px] rounded-full" />
+        <div className="absolute top-1/3 right-10 w-[500px] h-[300px] bg-indigo-500/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-10 left-1/3 w-[550px] h-[300px] bg-blue-500/10 blur-[130px] rounded-full" />
       </div>
 
       {/* Navigation Header */}
-      <header className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 relative z-10 w-full max-w-[1500px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 sm:mt-2 gap-3 shrink-0 border-b border-white/10">
+      <header className="px-4 sm:px-6 lg:px-8 py-3 sm:py-5 relative z-10 w-full max-w-[1500px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 sm:mt-2 gap-3 shrink-0 border-b border-white/10 safe-top">
         <FadeInScroll delay={100}>
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -300,8 +300,8 @@ export default function Dashboard() {
 
           {/* PANEL 1: Per-Class Segmentation Performance (IoU, Precision, Recall, F1) */}
           <FadeInScroll delay={200}>
-            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden h-[440px] shadow-xl">
-              <div className="px-5 py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
+            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden min-h-[360px] sm:h-[440px] shadow-xl">
+              <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-400" />
@@ -318,8 +318,8 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div className="h-[250px] w-full">
+              <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                <div className="h-[200px] sm:h-[250px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={segmentationMetrics} margin={{ top: 15, right: 10, left: -20, bottom: 25 }}>
                       <CartesianGrid strokeDasharray="2 2" stroke="#1f1f23" vertical={false} />
@@ -372,8 +372,8 @@ export default function Dashboard() {
 
           {/* PANEL 2: Training Convergence & Loss Dynamics (10 Epochs) */}
           <FadeInScroll delay={300}>
-            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden h-[440px] shadow-xl">
-              <div className="px-5 py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
+            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden min-h-[360px] sm:h-[440px] shadow-xl">
+              <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-white" />
@@ -390,8 +390,8 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div className="h-[250px] w-full">
+              <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                <div className="h-[200px] sm:h-[250px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={trainingHistory} margin={{ top: 15, right: 15, left: -20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="2 2" stroke="#1f1f23" vertical={false} />
@@ -461,8 +461,8 @@ export default function Dashboard() {
 
           {/* PANEL 3: Quantized ONNX INT8 vs PyTorch CPU Acceleration */}
           <FadeInScroll delay={400}>
-            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden h-[440px] shadow-xl">
-              <div className="px-5 py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
+            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden min-h-[360px] sm:h-[440px] shadow-xl">
+              <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-white" />
@@ -479,8 +479,8 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div className="h-[250px] w-full">
+              <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                <div className="h-[200px] sm:h-[250px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={accelerationBenchmarks} margin={{ top: 15, right: 10, left: -20, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="2 2" stroke="#1f1f23" vertical={false} />
@@ -538,8 +538,8 @@ export default function Dashboard() {
 
           {/* PANEL 4: 8-Axis Architectural Capability Radar */}
           <FadeInScroll delay={500}>
-            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden h-[440px] shadow-xl">
-              <div className="px-5 py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
+            <div className="bg-[#0a0a0d] border border-[#232328] rounded-xl flex flex-col overflow-hidden min-h-[360px] sm:h-[440px] shadow-xl">
+              <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#232328] flex justify-between items-center bg-[#070709]">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-purple-400" />
@@ -556,8 +556,8 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div className="h-[255px] w-full">
+              <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                <div className="h-[210px] sm:h-[255px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="68%" data={capabilitiesData}>
                       <PolarGrid stroke="#232328" />
