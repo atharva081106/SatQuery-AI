@@ -22,7 +22,9 @@ import {
   Hexagon,
   Square,
   Circle as CircleIcon,
-  Trash2
+  Trash2,
+  Pencil,
+  Lasso
 } from "lucide-react";
 
 interface MapExplorerProps {
@@ -98,12 +100,21 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const initialViewRef = useRef<{ center: [number, number]; zoom: number }>({ center: [50.16, 20.78], zoom: 5 });
 
-  // Drawing & Shape Selection State (Polygon, Rectangle, Circle)
-  const [selectedShapeType, setSelectedShapeType] = useState<"polygon" | "rectangle" | "circle" | null>(null);
-  const [activeDrawingTool, setActiveDrawingTool] = useState<"polygon" | "rectangle" | "circle" | null>(null);
+  // Drawing & Shape Selection State (Freehand, Polygon, Rectangle, Circle)
+  const [selectedShapeType, setSelectedShapeType] = useState<"freehand" | "polygon" | "rectangle" | "circle" | null>(null);
+  const [activeDrawingTool, setActiveDrawingTool] = useState<"freehand" | "polygon" | "rectangle" | "circle" | null>(null);
+  const activeDrawingToolRef = useRef<"freehand" | "polygon" | "rectangle" | "circle" | null>(null);
+  const isDrawingFreehandRef = useRef(false);
+  const freehandPointsRef = useRef<any[]>([]);
+  const freehandPolylineRef = useRef<any>(null);
   const [selectedGeometry, setSelectedGeometry] = useState<any | null>(null);
   const drawnItemsRef = useRef<any>(null);
   const activeDrawerRef = useRef<any>(null);
+
+  // Sync activeDrawingTool with ref for seamless pointer event tracking
+  useEffect(() => {
+    activeDrawingToolRef.current = activeDrawingTool;
+  }, [activeDrawingTool]);
 
   // Sync configuration preset with recommended layer
   useEffect(() => {
@@ -300,7 +311,126 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       activeDrawerRef.current = null;
     });
 
+    // Freehand / Lasso drawing pointer events on map container
+    const mapElement = map.getContainer();
+
+    const handlePointerDown = (e: PointerEvent) => {
+      if (activeDrawingToolRef.current !== 'freehand') return;
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      isDrawingFreehandRef.current = true;
+      try {
+        mapElement.setPointerCapture(e.pointerId);
+      } catch {}
+
+      // Clear existing drawn items if any
+      drawnItems.clearLayers();
+      if (freehandPolylineRef.current) {
+        map.removeLayer(freehandPolylineRef.current);
+        freehandPolylineRef.current = null;
+      }
+
+      const latlng = map.mouseEventToLatLng(e);
+      freehandPointsRef.current = [latlng];
+
+      // Create polyline trace feedback
+      const polyline = L.polyline([latlng], {
+        color: '#00F0FF',
+        weight: 3,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round',
+      }).addTo(map);
+      freehandPolylineRef.current = polyline;
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isDrawingFreehandRef.current || activeDrawingToolRef.current !== 'freehand') return;
+      e.preventDefault();
+
+      const latlng = map.mouseEventToLatLng(e);
+      const pts = freehandPointsRef.current;
+      if (pts.length > 0) {
+        const lastPt = map.latLngToContainerPoint(pts[pts.length - 1]);
+        const currPt = map.latLngToContainerPoint(latlng);
+        const distSq = (lastPt.x - currPt.x) ** 2 + (lastPt.y - currPt.y) ** 2;
+        if (distSq < 16) return; // Sample point every ~4px to maintain smooth 60fps
+      }
+
+      pts.push(latlng);
+      if (freehandPolylineRef.current) {
+        freehandPolylineRef.current.setLatLngs(pts);
+      }
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (!isDrawingFreehandRef.current) return;
+      isDrawingFreehandRef.current = false;
+      try {
+        if (mapElement.hasPointerCapture(e.pointerId)) {
+          mapElement.releasePointerCapture(e.pointerId);
+        }
+      } catch {}
+
+      const pts = freehandPointsRef.current;
+      if (freehandPolylineRef.current) {
+        map.removeLayer(freehandPolylineRef.current);
+        freehandPolylineRef.current = null;
+      }
+
+      // Restore map dragging & normal cursor
+      map.dragging.enable();
+      mapElement.style.cursor = '';
+      setActiveDrawingTool(null);
+
+      if (pts.length < 3) {
+        freehandPointsRef.current = [];
+        return;
+      }
+
+      // Convert freehand points into a closed polygon
+      const polygon = L.polygon(pts, {
+        color: '#00F0FF',
+        weight: 2,
+        fillOpacity: 0.15
+      });
+
+      drawnItems.clearLayers();
+      drawnItems.addLayer(polygon);
+      setSelectedShapeType('freehand');
+
+      const bounds = polygon.getBounds();
+      setBbox([
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth()
+      ]);
+
+      if (typeof polygon.toGeoJSON === 'function') {
+        setSelectedGeometry(polygon.toGeoJSON().geometry);
+      }
+
+      freehandPointsRef.current = [];
+
+      // Reopen config panel on mobile so user can immediately click Acquire Data
+      if (typeof window !== "undefined" && window.innerWidth < 640) {
+        setMobilePanelOpen(true);
+      }
+    };
+
+    mapElement.addEventListener('pointerdown', handlePointerDown);
+    mapElement.addEventListener('pointermove', handlePointerMove);
+    mapElement.addEventListener('pointerup', handlePointerUp);
+    mapElement.addEventListener('pointercancel', handlePointerUp);
+
     return () => {
+      mapElement.removeEventListener('pointerdown', handlePointerDown);
+      mapElement.removeEventListener('pointermove', handlePointerMove);
+      mapElement.removeEventListener('pointerup', handlePointerUp);
+      mapElement.removeEventListener('pointercancel', handlePointerUp);
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -362,15 +492,26 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     }
   };
 
-  // Programmatic Area Selection Draw Handlers (Polygon, Box/Rectangle, Circle)
-  const startDrawShape = (shapeType: 'polygon' | 'rectangle' | 'circle') => {
+  // Programmatic Area Selection Draw Handlers (Freehand, Polygon, Box/Rectangle, Circle)
+  const startDrawShape = (shapeType: 'freehand' | 'polygon' | 'rectangle' | 'circle') => {
     const map = mapInstanceRef.current;
     if (!map || !L) return;
 
     // If user clicked the already-active drawing tool, toggle it off
-    if (activeDrawingTool === shapeType && activeDrawerRef.current) {
-      activeDrawerRef.current.disable();
-      activeDrawerRef.current = null;
+    if (activeDrawingTool === shapeType) {
+      if (activeDrawerRef.current) {
+        activeDrawerRef.current.disable();
+        activeDrawerRef.current = null;
+      }
+      if (shapeType === 'freehand') {
+        map.dragging.enable();
+        map.getContainer().style.cursor = '';
+        if (freehandPolylineRef.current) {
+          map.removeLayer(freehandPolylineRef.current);
+          freehandPolylineRef.current = null;
+        }
+        isDrawingFreehandRef.current = false;
+      }
       setActiveDrawingTool(null);
       return;
     }
@@ -379,6 +520,26 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
       activeDrawerRef.current.disable();
       activeDrawerRef.current = null;
     }
+
+    if (freehandPolylineRef.current) {
+      map.removeLayer(freehandPolylineRef.current);
+      freehandPolylineRef.current = null;
+    }
+    isDrawingFreehandRef.current = false;
+
+    if (shapeType === 'freehand') {
+      map.dragging.disable();
+      map.getContainer().style.cursor = 'crosshair';
+      setActiveDrawingTool('freehand');
+      // Minimize mobile panel so user can draw freely on map
+      if (typeof window !== "undefined" && window.innerWidth < 640) {
+        setMobilePanelOpen(false);
+      }
+      return;
+    }
+
+    map.dragging.enable();
+    map.getContainer().style.cursor = '';
 
     const shapeOptions = {
       color: '#00F0FF',
@@ -422,6 +583,16 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     if (activeDrawerRef.current) {
       activeDrawerRef.current.disable();
       activeDrawerRef.current = null;
+    }
+    if (freehandPolylineRef.current && mapInstanceRef.current) {
+      mapInstanceRef.current.removeLayer(freehandPolylineRef.current);
+      freehandPolylineRef.current = null;
+    }
+    isDrawingFreehandRef.current = false;
+    freehandPointsRef.current = [];
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.dragging.enable();
+      mapInstanceRef.current.getContainer().style.cursor = '';
     }
     setActiveDrawingTool(null);
     if (drawnItemsRef.current) {
@@ -1086,7 +1257,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
           />
         </div>
 
-        {/* Area of Interest Selection Tools (Polygon, Box, Circle) */}
+        {/* Area of Interest Selection Tools (Freehand, Polygon, Box, Circle) */}
         <div className="flex flex-col gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
           <div className="flex items-center justify-between text-[10px]">
             <span className="text-white/60 uppercase tracking-widest font-mono font-semibold">
@@ -1095,19 +1266,34 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
             {bbox ? (
               <span className="text-[9px] text-[#00F0FF] font-bold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-pulse" />
-                {selectedShapeType === 'polygon' ? 'POLYGON DEFINED' : selectedShapeType === 'circle' ? 'CIRCLE DEFINED' : 'BOX DEFINED'}
+                {selectedShapeType === 'freehand' ? 'FREEHAND DEFINED' : selectedShapeType === 'polygon' ? 'POLYGON DEFINED' : selectedShapeType === 'circle' ? 'CIRCLE DEFINED' : 'BOX DEFINED'}
               </span>
             ) : (
               <span className="text-[9px] text-yellow-400 font-bold">REQUIRED</span>
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-4 gap-1.5">
+            {/* Freehand Lasso Button */}
+            <button
+              type="button"
+              onClick={() => startDrawShape('freehand')}
+              className={`px-1 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+                activeDrawingTool === 'freehand'
+                  ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
+                  : 'bg-white/5 hover:bg-white/15 border-white/20'
+              }`}
+              title="Draw Freehand Lasso (Click & drag smoothly across map)"
+            >
+              <Pencil className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'freehand' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
+              <span className="text-[8.5px] font-bold tracking-wider uppercase">Draw</span>
+            </button>
+
             {/* Freeform Polygon Button */}
             <button
               type="button"
               onClick={() => startDrawShape('polygon')}
-              className={`px-2 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+              className={`px-1 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
                 activeDrawingTool === 'polygon'
                   ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
                   : 'bg-white/5 hover:bg-white/15 border-white/20'
@@ -1115,14 +1301,14 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
               title="Draw Custom Freeform Multi-Point Polygon"
             >
               <Hexagon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'polygon' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
-              <span className="text-[9px] font-bold tracking-wider uppercase">Polygon</span>
+              <span className="text-[8.5px] font-bold tracking-wider uppercase">Polygon</span>
             </button>
 
             {/* Rectangle / Box Button */}
             <button
               type="button"
               onClick={() => startDrawShape('rectangle')}
-              className={`px-2 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+              className={`px-1 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
                 activeDrawingTool === 'rectangle'
                   ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
                   : 'bg-white/5 hover:bg-white/15 border-white/20'
@@ -1130,14 +1316,14 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
               title="Draw Rectangle / Square Bounding Box"
             >
               <Square className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'rectangle' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
-              <span className="text-[9px] font-bold tracking-wider uppercase">Box</span>
+              <span className="text-[8.5px] font-bold tracking-wider uppercase">Box</span>
             </button>
 
             {/* Circle Radial Button */}
             <button
               type="button"
               onClick={() => startDrawShape('circle')}
-              className={`px-2 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
+              className={`px-1 py-2 rounded-lg border text-white flex flex-col items-center gap-1 transition-all cursor-pointer group ${
                 activeDrawingTool === 'circle'
                   ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.4)]'
                   : 'bg-white/5 hover:bg-white/15 border-white/20'
@@ -1145,12 +1331,13 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
               title="Draw Radial Buffer Circle"
             >
               <CircleIcon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeDrawingTool === 'circle' ? 'text-[#00F0FF]' : 'text-white/70'}`} />
-              <span className="text-[9px] font-bold tracking-wider uppercase">Circle</span>
+              <span className="text-[8.5px] font-bold tracking-wider uppercase">Circle</span>
             </button>
           </div>
 
           {activeDrawingTool && (
             <div className="text-[9px] text-[#00F0FF] font-mono tracking-wider text-center animate-pulse pt-0.5">
+              {activeDrawingTool === 'freehand' && 'Click & drag freely across map to outline area'}
               {activeDrawingTool === 'polygon' && 'Click on map to draw points, click first point to close'}
               {activeDrawingTool === 'rectangle' && 'Click and drag on map to draw box'}
               {activeDrawingTool === 'circle' && 'Click center point and drag to set radius'}
@@ -1203,7 +1390,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         {/* Helper text */}
         {!bbox && (
           <div className="text-[9px] text-[#00F0FF] tracking-widest uppercase text-center animate-pulse">
-            Select Polygon, Box, or Circle to draw Area of Interest
+            Select Freehand, Polygon, Box, or Circle to draw Area of Interest
           </div>
         )}
       </div>
@@ -1347,12 +1534,28 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         )}
       </div>
 
-      {/* ── FLOATING AREA SELECTION TOOLBAR ON MAP (POLYGON / BOX / CIRCLE) ── */}
+      {/* ── FLOATING AREA SELECTION TOOLBAR ON MAP (FREEHAND / POLYGON / BOX / CIRCLE) ── */}
       <div className="fixed sm:absolute top-28 sm:top-18 left-1/2 -translate-x-1/2 z-[520] pointer-events-auto font-mono flex flex-col items-center">
         <div className="flex items-center gap-1 bg-black/90 backdrop-blur-2xl border border-white/20 px-2 py-1.5 rounded-full shadow-2xl">
           <span className="text-[9px] text-white/50 uppercase tracking-widest pl-2 pr-1 hidden sm:inline">
             Area:
           </span>
+
+          <button
+            type="button"
+            onClick={() => startDrawShape('freehand')}
+            className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeDrawingTool === 'freehand'
+                ? 'bg-[#00F0FF] text-black shadow-[0_0_12px_rgba(0,240,255,0.6)]'
+                : selectedShapeType === 'freehand' && bbox
+                  ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+            title="Draw Freehand (Click & drag finger/cursor freely across map)"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            <span>Freehand</span>
+          </button>
 
           <button
             type="button"
@@ -1418,6 +1621,7 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
         {/* Active Drawing Tool Guide Banner */}
         {activeDrawingTool && (
           <div className="mt-1.5 px-3 py-1 rounded-full bg-black/95 border border-[#00F0FF]/60 text-[#00F0FF] text-[9px] font-mono tracking-wider text-center backdrop-blur-xl animate-pulse shadow-lg">
+            {activeDrawingTool === 'freehand' && '✎ Click & drag across map to draw freehand outline'}
             {activeDrawingTool === 'polygon' && '⬡ Click points on map, click first vertex to finish'}
             {activeDrawingTool === 'rectangle' && '▢ Click and drag on map to draw bounding box'}
             {activeDrawingTool === 'circle' && '◯ Click center and drag outward to set radius'}
