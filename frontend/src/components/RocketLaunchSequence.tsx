@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, useScroll, Stars, useTexture, Environment } from '@react-three/drei';
+import { ScrollControls, useScroll, Stars, useTexture } from '@react-three/drei';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
@@ -483,28 +483,29 @@ function LaunchAnimation() {
 
 export default function RocketLaunchSequence() {
   return (
-    <div className="w-full h-screen bg-black">
+    <div className="w-full h-screen bg-black relative">
       <Canvas shadows camera={{ position: [0, 6, 25], fov: 45 }}>
-        {/* Environmental Lighting for Realistic Reflections */}
-        <Environment preset="city" />
-        
-        {/* Harsh directional light for space sunlight */}
-        <directionalLight position={[50, 20, 20]} intensity={3} color="#fffcf5" castShadow />
-        <ambientLight intensity={0.05} />
-        
-        <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
-        
-        {/* Adjusted pages to 6 for snappy but detailed pacing, increased damping for smoothness */}
-        <ScrollControls pages={6} damping={0.4}>
-          <LaunchAnimation />
-        </ScrollControls>
+        <Suspense fallback={null}>
+          {/* Robust Realistic Space Studio Lighting */}
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[50, 20, 20]} intensity={3.5} color="#fffcf5" castShadow />
+          <directionalLight position={[-30, -20, -10]} intensity={1.0} color="#0088ff" />
+          <pointLight position={[0, 0, 15]} intensity={0.8} color="#ffffff" />
+          
+          <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
+          
+          {/* Adjusted pages to 6 for snappy but detailed pacing, increased damping for smoothness */}
+          <ScrollControls pages={6} damping={0.4}>
+            <LaunchAnimation />
+          </ScrollControls>
 
-        {/* Cinematic Post-Processing */}
-        <EffectComposer disableNormalPass>
-          <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1.5} />
-          <Noise opacity={0.02} />
-          <Vignette eskil={false} offset={0.1} darkness={1.1} />
-        </EffectComposer>
+          {/* Cinematic Post-Processing */}
+          <EffectComposer disableNormalPass>
+            <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1.5} />
+            <Noise opacity={0.02} />
+            <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          </EffectComposer>
+        </Suspense>
       </Canvas>
       
       {/* Subtle overlay to guide user */}

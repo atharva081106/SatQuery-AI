@@ -239,14 +239,14 @@ export default function LandingPage() {
       <section className="relative min-h-screen min-h-dvh h-[100dvh] w-full flex items-center justify-center overflow-hidden">
         {/* Full Bleed Background */}
         <div className="absolute inset-0 z-0 bg-black">
-          <div className="absolute inset-0 opacity-70">
+          <div className="absolute inset-0 opacity-90">
             <FramerGlobe />
           </div>
-          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 pointer-events-none"></div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 pointer-events-none"></div>
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-28 sm:pt-0 pb-16 sm:pb-32 px-4 safe-x text-center">
+        <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-28 sm:pt-0 pb-16 sm:pb-32 px-4 safe-x text-center pointer-events-none">
 
           <FadeInScroll delay={200}>
             <h1 className="display-xxl mb-3 sm:mb-4">
@@ -259,7 +259,7 @@ export default function LandingPage() {
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none pointer-events-auto">
               <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm">
                 TRY FOR FREE
               </a>
@@ -282,9 +282,9 @@ export default function LandingPage() {
         {/* Full Bleed Background */}
         <div 
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
-          style={{ backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/2/2a/PSLV_C45_EMISAT_campaign_23.jpg')" }}
+          style={{ backgroundImage: "url('/images/pslv_mission.webp')" }}
         >
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-black/45"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-80"></div>
         </div>
 
@@ -314,7 +314,7 @@ export default function LandingPage() {
         {/* Full Bleed Background */}
         <div 
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
-          style={{ backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/b/b4/GSLV_Mk_III_D2_on_Second_Launch_Pad_of_Satish_Dhawan_Space_Centre%2C_Sriharikota_%28SDSC_SHAR%29.jpg')" }}
+          style={{ backgroundImage: "url('/images/gslv_mission.webp')" }}
         >
           <div className="absolute inset-0 bg-black/50"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-80"></div>
