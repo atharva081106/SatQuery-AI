@@ -12,12 +12,18 @@ export default function RealGlobe() {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    let width = container.clientWidth || 800;
-    let height = container.clientHeight || 800;
+    // Get strict 1:1 square dimension
+    const getSquareSize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const size = Math.round(rect.width || rect.height || 800);
+      return Math.max(300, size);
+    };
 
-    // Scene & Camera
+    let size = getSquareSize();
+
+    // Scene & Camera - strict 1:1 aspect ratio ensures a 100% perfect circle
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
     camera.position.set(0, 0, 5.0);
 
     // Renderer
@@ -28,7 +34,7 @@ export default function RealGlobe() {
       powerPreference: "high-performance"
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(width, height);
+    renderer.setSize(size, size);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
 
@@ -146,14 +152,16 @@ export default function RealGlobe() {
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
 
-    // Responsive Resize Handler
+    // Strict 1:1 Responsive Resize Handler
     const handleResize = () => {
-      if (!container) return;
-      width = container.clientWidth || 800;
-      height = container.clientHeight || 800;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
+      if (!canvas) return;
+      const newSize = getSquareSize();
+      if (newSize !== size) {
+        size = newSize;
+        camera.aspect = 1; // Strict 1:1 circle aspect
+        camera.updateProjectionMatrix();
+        renderer.setSize(size, size);
+      }
     };
 
     const resizeObserver = new ResizeObserver(() => handleResize());
@@ -212,7 +220,10 @@ export default function RealGlobe() {
       ref={containerRef}
       className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none overflow-hidden"
     >
-      <canvas ref={canvasRef} className="block w-full h-full max-w-[1100px] max-h-[1100px]" />
+      {/* Strict 1:1 aspect-ratio container guarantees a perfectly round sphere */}
+      <div className="relative flex items-center justify-center w-[850px] h-[850px] max-w-[90vw] max-h-[85vh] aspect-square">
+        <canvas ref={canvasRef} className="block w-full h-full aspect-square" />
+      </div>
     </div>
   );
 }
