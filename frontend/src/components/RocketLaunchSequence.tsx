@@ -271,7 +271,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
         const pill = document.getElementById(`milestone-pill-${i}`);
         if (pill) {
           if (i === tel.activeIndex) {
-            pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-orange-500 text-white font-bold shadow-lg shadow-orange-500/30 transition-all scale-105";
+            pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-white text-black font-bold shadow-lg shadow-white/20 transition-all scale-105";
           } else if (i < tel.activeIndex) {
             pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-white/10 text-white/80 hover:bg-white/20 transition-all";
           } else {
@@ -606,23 +606,23 @@ export default function RocketLaunchSequence() {
         <div className="flex items-center gap-4 text-xs">
           <div className="flex flex-col">
             <span className="text-[10px] text-white/40 tracking-wider">MISSION TIME</span>
-            <span id="hud-met" className="text-orange-400 font-bold tracking-widest text-sm">T+ 00:00:00</span>
+            <span id="hud-met" className="text-white font-bold tracking-widest text-sm">T+ 00:00:00</span>
           </div>
           <div className="w-[1px] h-6 bg-white/20" />
           <div className="flex flex-col">
             <span className="text-[10px] text-white/40 tracking-wider">ALTITUDE</span>
-            <span id="hud-altitude" className="text-cyan-400 font-bold tracking-widest text-sm">0.0 KM</span>
+            <span id="hud-altitude" className="text-white font-bold tracking-widest text-sm">0.0 KM</span>
           </div>
           <div className="w-[1px] h-6 bg-white/20" />
           <div className="flex flex-col">
             <span className="text-[10px] text-white/40 tracking-wider">VELOCITY</span>
-            <span id="hud-velocity" className="text-emerald-400 font-bold tracking-widest text-sm">0.00 KM/S</span>
+            <span id="hud-velocity" className="text-white font-bold tracking-widest text-sm">0.00 KM/S</span>
           </div>
         </div>
 
         {/* Current Flight Status Badge */}
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span className="w-2 h-2 rounded-full bg-white/70 animate-ping" />
           <span id="hud-status" className="text-[11px] sm:text-xs text-white/90 font-bold tracking-widest bg-white/5 border border-white/10 px-3 py-1 rounded-full uppercase backdrop-blur-md">
             PAD T-0 // BOOSTER IGNITION &amp; LIFTOFF
           </span>
@@ -654,7 +654,7 @@ export default function RocketLaunchSequence() {
               onClick={() => setIsAutoPlaying(!isAutoPlaying)}
               className={`px-3 py-1 rounded font-mono text-[10px] tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer font-bold ${
                 isAutoPlaying
-                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                  ? 'bg-white text-black shadow-lg shadow-white/20'
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
@@ -666,7 +666,7 @@ export default function RocketLaunchSequence() {
         {/* Global Progress Bar */}
         <div className="w-full flex items-center gap-3">
           <div className="relative flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <div id="hud-progress-bar" className="h-full bg-gradient-to-r from-orange-500 via-cyan-400 to-emerald-400 rounded-full w-0 transition-all duration-75" />
+            <div id="hud-progress-bar" className="h-full bg-white rounded-full w-0 transition-all duration-75" />
           </div>
           <span id="hud-percent" className="text-[10px] text-white/50 tracking-wider shrink-0 w-10 text-right">0.0%</span>
         </div>
