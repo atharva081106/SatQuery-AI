@@ -154,8 +154,13 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
   // Shared Ring Torus Geometry for stage bands
   const ringGeo = useMemo(() => new THREE.TorusGeometry(0.6, 0.025, 12, 32), []);
 
-  // Trajectory function
-  const getTrajectory = (clampedOffset: number, pOrbitContinuous: number) => {
+  // Refs for tracking DOM updates to prevent layout thrashing
+  const lastState = useRef({
+    met: '', alt: '', vel: '', stageName: '', pct: '', activeIndex: -1
+  });
+
+  // Trajectory function - fully deterministic for perfect bidirectional scrolling
+  const getTrajectory = (clampedOffset: number) => {
     const pLiftoff = getProgress(clampedOffset, 0.0, 0.2);
     const pOrbit = getProgress(clampedOffset, 0.2, 0.7);
     const pPitch = getProgress(clampedOffset, 0.1, 0.2);
@@ -171,7 +176,9 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     let rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch);
 
     if (pOrbit > 0) {
-      orbitAngle = (pOrbit * (Math.PI / 2)) + pOrbitContinuous;
+      // 0.7 to 1.0 adds additional orbit rotation based purely on scroll
+      const additionalOrbit = getProgress(clampedOffset, 0.7, 1.0) * Math.PI * 0.9;
+      orbitAngle = (pOrbit * (Math.PI / 2)) + additionalOrbit;
       posX = Math.sin(orbitAngle) * orbitRadius;
       posY = -20 + Math.cos(orbitAngle) * orbitRadius;
       rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
@@ -180,7 +187,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     // Max-Q subtle vibration
     const pMaxQ = getProgress(clampedOffset, 0.18, 0.26);
     if (pMaxQ > 0 && pMaxQ < 1) {
-      posX += (Math.random() - 0.5) * 0.06;
+      posX += (Math.random() - 0.5) * 0.04;
     }
 
     return { posX, posY, posZ, rotZ, rotY, rotX };
@@ -203,7 +210,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     // Handle Auto-Play
     if (isAutoPlaying && scroll && scroll.el) {
       const maxScroll = scroll.el.scrollHeight - scroll.el.clientHeight;
-      scroll.el.scrollTop += delta * maxScroll * 0.055;
+      scroll.el.scrollTop += delta * maxScroll * 0.045; // Slower cinematic playback
       if (scroll.el.scrollTop >= maxScroll - 2) {
         setIsAutoPlaying(false);
       }
@@ -211,39 +218,52 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
 
     const offset = scroll.offset;
 
-    // Direct HUD DOM updates (60fps, 0 React re-renders)
+    // Direct HUD DOM updates with cache to prevent style recalculation thrashing
     const tel = computeTelemetry(offset);
-    const elMet = document.getElementById('hud-met');
-    const elAlt = document.getElementById('hud-altitude');
-    const elVel = document.getElementById('hud-velocity');
-    const elStatus = document.getElementById('hud-status');
-    const elBar = document.getElementById('hud-progress-bar');
-    const elPct = document.getElementById('hud-percent');
-
-    if (elMet) elMet.textContent = tel.met;
-    if (elAlt) elAlt.textContent = `${tel.altitude} KM`;
-    if (elVel) elVel.textContent = `${tel.velocity} KM/S`;
-    if (elStatus) elStatus.textContent = tel.stageName;
-    if (elBar) elBar.style.width = `${tel.progress}%`;
-    if (elPct) elPct.textContent = `${tel.progress}%`;
-
-    // Highlight active milestone pill
-    for (let i = 0; i < STAGE_MILESTONES.length; i++) {
-      const pill = document.getElementById(`milestone-pill-${i}`);
-      if (pill) {
-        if (i === tel.activeIndex) {
-          pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-orange-500 text-white font-bold shadow-lg shadow-orange-500/30 transition-all scale-105";
-        } else if (i < tel.activeIndex) {
-          pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-white/10 text-white/80 hover:bg-white/20 transition-all";
-        } else {
-          pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-black/40 text-white/40 hover:text-white/70 transition-all border border-white/5";
-        }
-      }
+    
+    if (tel.met !== lastState.current.met) {
+      const el = document.getElementById('hud-met');
+      if (el) el.textContent = tel.met;
+      lastState.current.met = tel.met;
+    }
+    if (tel.altitude !== lastState.current.alt) {
+      const el = document.getElementById('hud-altitude');
+      if (el) el.textContent = `${tel.altitude} KM`;
+      lastState.current.alt = tel.altitude;
+    }
+    if (tel.velocity !== lastState.current.vel) {
+      const el = document.getElementById('hud-velocity');
+      if (el) el.textContent = `${tel.velocity} KM/S`;
+      lastState.current.vel = tel.velocity;
+    }
+    if (tel.stageName !== lastState.current.stageName) {
+      const el = document.getElementById('hud-status');
+      if (el) el.textContent = tel.stageName;
+      lastState.current.stageName = tel.stageName;
+    }
+    if (tel.progress !== lastState.current.pct) {
+      const elBar = document.getElementById('hud-progress-bar');
+      const elPct = document.getElementById('hud-percent');
+      if (elBar) elBar.style.width = `${tel.progress}%`;
+      if (elPct) elPct.textContent = `${tel.progress}%`;
+      lastState.current.pct = tel.progress;
     }
 
-    // Orbit accumulation in finale
-    if (offset >= 0.9) {
-      continuousAngleRef.current += delta * 0.18;
+    // Highlight active milestone pill only if changed
+    if (tel.activeIndex !== lastState.current.activeIndex) {
+      lastState.current.activeIndex = tel.activeIndex;
+      for (let i = 0; i < STAGE_MILESTONES.length; i++) {
+        const pill = document.getElementById(`milestone-pill-${i}`);
+        if (pill) {
+          if (i === tel.activeIndex) {
+            pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-orange-500 text-white font-bold shadow-lg shadow-orange-500/30 transition-all scale-105";
+          } else if (i < tel.activeIndex) {
+            pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-white/10 text-white/80 hover:bg-white/20 transition-all";
+          } else {
+            pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-black/40 text-white/40 hover:text-white/70 transition-all border border-white/5";
+          }
+        }
+      }
     }
 
     // Earth & Cloud gentle axial rotation
@@ -251,7 +271,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     if (cloudsRef.current) cloudsRef.current.rotation.y += 0.022 * delta;
 
     // Trajectory coordinates for payload
-    const satTraj = getTrajectory(offset, continuousAngleRef.current);
+    const satTraj = getTrajectory(offset);
     if (satelliteWrapperRef.current) {
       satelliteWrapperRef.current.position.set(satTraj.posX, satTraj.posY, satTraj.posZ);
       satelliteWrapperRef.current.rotation.set(satTraj.rotX, satTraj.rotY, satTraj.rotZ, 'YXZ');
@@ -270,7 +290,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
 
     // --- STAGE 1 (Booster) ---
     const s1Offset = Math.min(offset, 0.30);
-    const s1Traj = getTrajectory(s1Offset, 0);
+    const s1Traj = getTrajectory(s1Offset);
     if (stage1WrapperRef.current) {
       stage1WrapperRef.current.position.set(s1Traj.posX, s1Traj.posY, s1Traj.posZ);
       stage1WrapperRef.current.rotation.set(s1Traj.rotX, s1Traj.rotY, s1Traj.rotZ, 'YXZ');
@@ -288,7 +308,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
 
     // --- FAIRINGS ---
     const fairingOffset = Math.min(offset, 0.42);
-    const fairingTraj = getTrajectory(fairingOffset, 0);
+    const fairingTraj = getTrajectory(fairingOffset);
     if (fairingLeftWrapperRef.current && fairingRightWrapperRef.current) {
       fairingLeftWrapperRef.current.position.set(fairingTraj.posX, fairingTraj.posY, fairingTraj.posZ);
       fairingLeftWrapperRef.current.rotation.set(fairingTraj.rotX, fairingTraj.rotY, fairingTraj.rotZ, 'YXZ');
@@ -314,7 +334,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
 
     // --- STAGE 2 (Upper Stage) ---
     const s2Offset = Math.min(offset, 0.70);
-    const s2Traj = getTrajectory(s2Offset, 0);
+    const s2Traj = getTrajectory(s2Offset);
     if (stage2WrapperRef.current) {
       stage2WrapperRef.current.position.set(s2Traj.posX, s2Traj.posY, s2Traj.posZ);
       stage2WrapperRef.current.rotation.set(s2Traj.rotX, s2Traj.rotY, s2Traj.rotZ, 'YXZ');
@@ -554,7 +574,7 @@ export default function RocketLaunchSequence() {
           
           <Stars radius={100} depth={50} count={3500} factor={4} saturation={0} fade speed={1.2} />
           
-          <ScrollControls pages={5} damping={0.25}>
+          <ScrollControls pages={5} damping={0.12}>
             <LaunchController isAutoPlaying={isAutoPlaying} setIsAutoPlaying={setIsAutoPlaying} />
           </ScrollControls>
 
