@@ -611,21 +611,37 @@ export default function Home() {
     await executeAnalysis(query, images);
   };
 
-  const handleSelectMission = (mission: SampleMission, autoSubmit = false) => {
+  const handleSelectMission = async (mission: SampleMission, autoSubmit = false) => {
     if (autoSubmit && !canQuery) {
       openAuthModal("Sign in to continue using SatQuery AI. You have used your 3 free satellite analyses.");
       return;
     }
-    const files: File[] = [];
-    for (const img of mission.images) {
-      const f = dataURLtoFile(img.base64, img.name);
-      files.push(f);
-    }
-    setImages(files);
-    setQuery(mission.query);
-    setError(null);
+    
     if (autoSubmit) {
-      executeAnalysis(mission.query, files);
+      setLoading(true);
+    }
+    
+    try {
+      const files: File[] = [];
+      for (const img of mission.images) {
+        if (img.base64.startsWith("data:")) {
+          files.push(dataURLtoFile(img.base64, img.name));
+        } else {
+          const res = await fetch(img.base64);
+          const blob = await res.blob();
+          files.push(new File([blob], img.name, { type: blob.type || 'image/png' }));
+        }
+      }
+      setImages(files);
+      setQuery(mission.query);
+      setError(null);
+      
+      if (autoSubmit) {
+        executeAnalysis(mission.query, files);
+      }
+    } catch (err: any) {
+      setError("Failed to load demo images: " + err.message);
+      if (autoSubmit) setLoading(false);
     }
   };
 
