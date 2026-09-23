@@ -15,8 +15,8 @@ export default function RealGlobe() {
     // Get strict 1:1 square dimension
     const getSquareSize = () => {
       const rect = canvas.getBoundingClientRect();
-      const size = Math.round(rect.width || rect.height || 800);
-      return Math.max(300, size);
+      const size = Math.round(rect.width || rect.height || 640);
+      return Math.max(260, size);
     };
 
     let size = getSquareSize();
@@ -24,7 +24,8 @@ export default function RealGlobe() {
     // Scene & Camera - strict 1:1 aspect ratio ensures a 100% perfect circle
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    camera.position.set(0, 0, 5.0);
+    // Adjusted distance for balanced, elegant globe framing
+    camera.position.set(0, 0, 5.6);
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -64,8 +65,8 @@ export default function RealGlobe() {
     const earthClouds = textureLoader.load("/textures/2k_earth_clouds.jpg");
     earthClouds.colorSpace = THREE.SRGBColorSpace;
 
-    // 1. Earth Sphere
-    const earthRadius = 1.82;
+    // 1. Earth Sphere (proportioned for balanced hero sizing)
+    const earthRadius = 1.72;
     const earthGeometry = new THREE.SphereGeometry(earthRadius, 64, 64);
     const earthMaterial = new THREE.MeshStandardMaterial({
       map: earthDay,
@@ -88,7 +89,7 @@ export default function RealGlobe() {
     globeGroup.add(cloudsMesh);
 
     // 3. Atmosphere Glow Outer Mesh
-    const glowGeometry = new THREE.SphereGeometry(earthRadius + 0.16, 64, 64);
+    const glowGeometry = new THREE.SphereGeometry(earthRadius + 0.15, 64, 64);
     const glowMaterial = new THREE.ShaderMaterial({
       vertexShader: `
         varying vec3 vNormal;
@@ -132,8 +133,8 @@ export default function RealGlobe() {
       const deltaX = e.clientX - previousMousePosition.x;
       const deltaY = e.clientY - previousMousePosition.y;
 
-      velocityX = deltaX * 0.005;
-      velocityY = deltaY * 0.005;
+      velocityX = deltaX * 0.004;
+      velocityY = deltaY * 0.004;
 
       targetRotationY += velocityX;
       targetRotationX += velocityY;
@@ -173,22 +174,22 @@ export default function RealGlobe() {
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
-      // Continuous auto-rotation when not dragging
+      // Smooth, slow, majestic auto-rotation when idle
       if (!isDragging) {
-        targetRotationY += 0.0016;
+        targetRotationY += 0.00065; // Halved speed for serene cosmic drift
         // Damp inertia
-        velocityX *= 0.94;
-        velocityY *= 0.94;
+        velocityX *= 0.92;
+        velocityY *= 0.92;
         targetRotationY += velocityX;
         targetRotationX += velocityY;
       }
 
       // Smooth interpolation
-      globeGroup.rotation.y += (targetRotationY - globeGroup.rotation.y) * 0.08;
-      globeGroup.rotation.x += (targetRotationX - globeGroup.rotation.x) * 0.08;
+      globeGroup.rotation.y += (targetRotationY - globeGroup.rotation.y) * 0.07;
+      globeGroup.rotation.x += (targetRotationX - globeGroup.rotation.x) * 0.07;
 
       // Rotate clouds slightly faster than earth
-      cloudsMesh.rotation.y += 0.0005;
+      cloudsMesh.rotation.y += 0.0002;
 
       renderer.render(scene, camera);
     };
@@ -220,8 +221,8 @@ export default function RealGlobe() {
       ref={containerRef}
       className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none overflow-hidden"
     >
-      {/* Strict 1:1 aspect-ratio container guarantees a perfectly round sphere */}
-      <div className="relative flex items-center justify-center w-[850px] h-[850px] max-w-[90vw] max-h-[85vh] aspect-square">
+      {/* Reduced size container for balanced framing with breathing room */}
+      <div className="relative flex items-center justify-center w-[640px] h-[640px] max-w-[78vw] max-h-[64vh] aspect-square">
         <canvas ref={canvasRef} className="block w-full h-full aspect-square" />
       </div>
     </div>
