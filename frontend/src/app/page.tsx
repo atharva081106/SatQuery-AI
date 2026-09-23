@@ -180,58 +180,20 @@ export default function LandingPage() {
       )}
 
       {/* DESKTOP TOP NAV OVERLAY (>= 768px) */}
-      <nav className="fixed top-0 left-0 w-full justify-between items-center pwa-safe-header z-50 hidden md:flex">
+      <nav className="fixed top-0 left-0 w-full justify-between items-center px-8 py-6 z-50 hidden md:flex mix-blend-difference">
         <div className="display-lg tracking-widest text-white drop-shadow-md">
           SATQUERY AI.
         </div>
-        <div className="flex gap-7 items-center">
-          <Link href="/acquire" className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold">
-            SATELLITE MAP
-          </Link>
+        <div className="flex gap-8 items-center">
           <Link href="/dashboard" className="micro-cap text-white hover:opacity-70 transition-opacity">
             BENCHMARKS
           </Link>
           <Link href="/gallery" className="micro-cap text-white hover:opacity-70 transition-opacity">
             GALLERY
           </Link>
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                window.dispatchEvent(new Event("open-pwa-install"));
-              }
-            }}
-            className="micro-cap text-white hover:opacity-70 transition-opacity cursor-pointer font-semibold"
-            title="Install SatQuery AI Standalone App"
-          >
-            INSTALL APP
-          </button>
-
-          {/* Small Sign In / Sign Up Button */}
-          {!isAuthenticated ? (
-            <button
-              type="button"
-              onClick={() => openAuthModal("Sign in to access advanced earth observation intelligence.", "signin")}
-              className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-3.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer tracking-widest uppercase font-semibold text-[11px]"
-              title="Sign in or register"
-            >
-              SIGN IN
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] px-2.5 py-1 rounded-full bg-white/20 text-white/80 border border-white/40 font-mono font-bold tracking-widest uppercase">
-                {user?.name?.slice(0, 14).toUpperCase() || "OPERATOR"}
-              </span>
-              <button
-                type="button"
-                onClick={logout}
-                className="text-[10px] text-white/50 hover:text-white uppercase tracking-wider underline cursor-pointer"
-                title="Sign out"
-              >
-                Sign Out
-              </button>
-            </div>
-          )}
+          <Link href="/faq" className="micro-cap text-white hover:opacity-70 transition-opacity">
+            FAQ
+          </Link>
         </div>
       </nav>
 
@@ -239,39 +201,36 @@ export default function LandingPage() {
       <section className="relative min-h-screen min-h-dvh h-[100dvh] w-full flex items-center justify-center overflow-hidden">
         {/* Full Bleed Background */}
         <div className="absolute inset-0 z-0 bg-black">
-          <div className="absolute inset-0 opacity-90">
+          <div className="absolute inset-0 opacity-80">
             <FramerGlobe />
           </div>
-          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 pointer-events-none"></div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 pointer-events-none"></div>
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center sm:justify-end h-full pt-28 sm:pt-0 pb-16 sm:pb-32 px-4 safe-x text-center pointer-events-none">
+        <div className="relative z-10 flex flex-col items-center justify-end h-full pb-32 px-4 safe-x text-center pointer-events-none">
 
           <FadeInScroll delay={200}>
-            <h1 className="display-xxl mb-3 sm:mb-4">
+            <h1 className="display-xxl mb-4">
               MAKING SENSE<br/>OF THE EARTH.
             </h1>
           </FadeInScroll>
           <FadeInScroll delay={400}>
-            <p className="body-md uppercase tracking-[2px] sm:tracking-[4px] opacity-75 mb-6 sm:mb-12 text-xs sm:text-base px-2 max-w-lg">
+            <p className="body-md uppercase tracking-[4px] opacity-70 mb-12 text-xs sm:text-base px-2 max-w-lg">
               Multimodal Remote Sensing Image Analysis
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none pointer-events-auto">
-              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm">
-                TRY FOR FREE
+            <div className="flex items-center justify-center w-full pointer-events-auto">
+              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-48 text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-2.5 text-xs sm:text-sm">
+                ENTER SYSTEM
               </a>
-              <Link href="/acquire" className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white hover:text-black transition-all text-center text-xs font-mono font-bold tracking-widest uppercase text-white/80 backdrop-blur-sm">
-                SATELLITE MAP &rarr;
-              </Link>
             </div>
           </FadeInScroll>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 animate-pulse opacity-50 z-10 pointer-events-none">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-pulse opacity-50 z-10 pointer-events-none">
           <span className="micro-cap text-[10px]">SCROLL TO EXPLORE</span>
           <span className="text-xs">&darr;</span>
         </div>
