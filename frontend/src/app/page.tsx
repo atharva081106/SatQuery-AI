@@ -180,11 +180,14 @@ export default function LandingPage() {
       )}
 
       {/* DESKTOP TOP NAV OVERLAY (>= 768px) */}
-      <nav className="fixed top-0 left-0 w-full justify-between items-center px-8 py-6 z-50 hidden md:flex mix-blend-difference">
+      <nav className="fixed top-0 left-0 w-full justify-between items-center pwa-safe-header px-6 md:px-8 py-4 md:py-6 z-50 hidden md:flex">
         <div className="display-lg tracking-widest text-white drop-shadow-md">
           SATQUERY AI.
         </div>
-        <div className="flex gap-8 items-center">
+        <div className="flex gap-6 lg:gap-7 items-center">
+          <Link href="/acquire" className="micro-cap text-white hover:opacity-70 transition-opacity font-semibold">
+            SATELLITE MAP
+          </Link>
           <Link href="/dashboard" className="micro-cap text-white hover:opacity-70 transition-opacity">
             BENCHMARKS
           </Link>
@@ -194,6 +197,44 @@ export default function LandingPage() {
           <Link href="/faq" className="micro-cap text-white hover:opacity-70 transition-opacity">
             FAQ
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new Event("open-pwa-install"));
+              }
+            }}
+            className="micro-cap text-white hover:opacity-70 transition-opacity cursor-pointer font-semibold"
+            title="Install SatQuery AI Standalone App"
+          >
+            INSTALL APP
+          </button>
+
+          {/* Small Sign In / Sign Up Button */}
+          {!isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => openAuthModal("Sign in to access advanced earth observation intelligence.", "signin")}
+              className="micro-cap border border-white/30 hover:border-white text-white hover:bg-white hover:text-black px-3.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer tracking-widest uppercase font-semibold text-[11px]"
+              title="Sign in or register"
+            >
+              SIGN IN
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-white/20 text-white/80 border border-white/40 font-mono font-bold tracking-widest uppercase">
+                {user?.name?.slice(0, 14).toUpperCase() || "OPERATOR"}
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="text-[10px] text-white/50 hover:text-white uppercase tracking-wider underline cursor-pointer"
+                title="Sign out"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -221,10 +262,13 @@ export default function LandingPage() {
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
-            <div className="flex items-center justify-center w-full pointer-events-auto">
-              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-48 text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-2.5 text-xs sm:text-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none pointer-events-auto">
+              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm">
                 ENTER SYSTEM
               </a>
+              <Link href="/acquire" className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white hover:text-black transition-all text-center text-xs font-mono font-bold tracking-widest uppercase text-white/80 backdrop-blur-sm">
+                SATELLITE MAP &rarr;
+              </Link>
             </div>
           </FadeInScroll>
         </div>
