@@ -264,7 +264,7 @@ export default function LandingPage() {
           <FadeInScroll delay={600}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none pointer-events-auto">
               <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm">
-                ENTER SYSTEM
+                YOUR DEMO
               </a>
               <Link href="/acquire" className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white hover:text-black transition-all text-center text-xs font-mono font-bold tracking-widest uppercase text-white/80 backdrop-blur-sm">
                 SATELLITE MAP &rarr;
