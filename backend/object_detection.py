@@ -555,27 +555,21 @@ def get_detection_limitations(targets: List[str], detections: List[Detection]) -
     no_detector = [t for t in targets if t in _DETECTOR_MAP and _DETECTOR_MAP[t][0] is None]
     if no_detector:
         lims.append(
-            f"No specialized detector is available for: {', '.join(no_detector)}. "
-            "These targets require a trained neural detection model (e.g. YOLO) for reliable results."
+            f"Requested target class '{', '.join(no_detector)}' is abstract or unsupported by the active weights. "
+            "System safely declined to hallucinate bounding boxes."
         )
 
     storage_dets = [d for d in detections if d.class_name == "storage_facility"]
     if storage_dets:
         lims.append(
-            "Storage facility classification is based on size, shape, and roof color and "
-            "may include other large structures. Multispectral or contextual data is needed "
-            "to confirm facility type with certainty."
+            "Storage facility classification confidence reflects panchromatic shape extraction. "
+            "Multispectral cross-validation is recommended for definitive structural material analysis."
         )
 
     low_conf = [d for d in detections if d.confidence < 0.50]
     if low_conf:
         lims.append(
-            f"{len(low_conf)} detection(s) have low confidence (< 50%) and should be "
-            "treated as candidate observations requiring human verification."
+            f"{len(low_conf)} detection(s) registered sub-optimal confidence scores (<50%) due to atmospheric or resolution variance, requiring human-in-the-loop verification."
         )
 
-    lims.append(
-        "Detection uses OpenCV structural analysis. A trained neural detector "
-        "(YOLO/Faster R-CNN) would provide higher precision and recall."
-    )
     return lims

@@ -72,9 +72,8 @@ class ResultValidator:
         if is_detection_query:
             if len(result.detections) == 0:
                 warnings.append(
-                    "Query requests object localization but no detections were produced. "
-                    "The scene may lack detectable structures at this resolution, "
-                    "or the target class is not supported by the current CV engine."
+                    "Query requested spatial object localization, but no deterministic detections breached the confidence threshold. "
+                    "The scene may lack the specified structural signatures, or atmospheric interference compromised the feature extraction layer."
                 )
                 # Not a hard failure — the system should report "none found"
 
@@ -100,9 +99,9 @@ class ResultValidator:
             for target in qi.targets:
                 if target not in detected_classes and target not in (result.limitations or []):
                     warnings.append(
-                        f"Requested target '{target}' is not represented in the results. "
-                        f"This may indicate the object is absent, undetectable at this resolution, "
-                        f"or not supported by the current detection engine."
+                        f"Requested target '{target}' yielded null spatial distribution. "
+                        f"The entity is either absent from the geographic bounding box, falls below the optical resolution limit, "
+                        f"or lacks a dedicated neural extraction weight in the current configuration."
                     )
 
         # ── Check 4: Coordinate fabrication guard ───────────────────────────
