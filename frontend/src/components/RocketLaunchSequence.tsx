@@ -159,6 +159,8 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     met: '', alt: '', vel: '', stageName: '', pct: '', activeIndex: -1
   });
 
+  const freeOrbitRef = useRef(0);
+
   // Trajectory function - fully deterministic for perfect bidirectional scrolling
   const getTrajectory = (clampedOffset: number) => {
     const pLiftoff = getProgress(clampedOffset, 0.0, 0.2);
@@ -178,7 +180,7 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     if (pOrbit > 0) {
       // 0.7 to 1.0 adds additional orbit rotation based purely on scroll
       const additionalOrbit = getProgress(clampedOffset, 0.7, 1.0) * Math.PI * 0.9;
-      orbitAngle = (pOrbit * (Math.PI / 2)) + additionalOrbit;
+      orbitAngle = (pOrbit * (Math.PI / 2)) + additionalOrbit + freeOrbitRef.current;
       posX = Math.sin(orbitAngle) * orbitRadius;
       posY = -20 + Math.cos(orbitAngle) * orbitRadius;
       rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
@@ -217,6 +219,19 @@ function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: 
     }
 
     const offset = scroll.offset;
+
+    if (offset > 0.99) {
+      freeOrbitRef.current += delta * 0.12; // Perpetual orbit drift at 100%
+    } else if (freeOrbitRef.current !== 0) {
+      // Normalize to [-PI, PI] to prevent snapping when scrolling back
+      let diff = freeOrbitRef.current % (Math.PI * 2);
+      if (diff > Math.PI) diff -= Math.PI * 2;
+      if (diff < -Math.PI) diff += Math.PI * 2;
+      
+      // Smoothly unwind back to zero, ensuring perfect return to deterministic scroll
+      freeOrbitRef.current = THREE.MathUtils.lerp(diff, 0, 0.1);
+      if (Math.abs(freeOrbitRef.current) < 0.001) freeOrbitRef.current = 0;
+    }
 
     // Direct HUD DOM updates with cache to prevent style recalculation thrashing
     const tel = computeTelemetry(offset);
