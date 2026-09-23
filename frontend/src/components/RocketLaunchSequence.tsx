@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo, Suspense } from 'react';
+import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, useScroll, Stars, useTexture } from '@react-three/drei';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
@@ -16,27 +16,84 @@ function easeOut(t: number) {
   return 1 - Math.pow(1 - t, 3);
 }
 
-function LaunchAnimation() {
+// Stage configuration for interactive milestones
+const STAGE_MILESTONES = [
+  { id: 'liftoff', label: '01. LIFTOFF', offset: 0.0, met: 'T+ 00:00:00', title: 'PAD T-0 // BOOSTER IGNITION & LIFTOFF' },
+  { id: 'maxq', label: '02. MAX-Q', offset: 0.22, met: 'T+ 00:01:12', title: 'MAX-Q // PEAK DYNAMIC PRESSURE' },
+  { id: 'stage1', label: '03. STAGE 1 SEP', offset: 0.34, met: 'T+ 00:01:54', title: 'MECO // STAGE 1 BOOSTER JETTISON' },
+  { id: 'fairing', label: '04. FAIRING SEP', offset: 0.48, met: 'T+ 00:02:40', title: 'PAYLOAD FAIRING JETTISON // EXPOSURE' },
+  { id: 'stage2', label: '05. STAGE 2 SEP', offset: 0.72, met: 'T+ 00:04:30', title: 'SECO // STAGE 2 CUTOFF & PAYLOAD SEP' },
+  { id: 'orbit', label: '06. ORBIT INSERTION', offset: 0.95, met: 'T+ 00:10:15', title: 'ORBIT ACHIEVED // SOLAR ARRAYS DEPLOYED' }
+];
+
+// Helper to format telemetry based on scroll offset
+function computeTelemetry(offset: number) {
+  // Altitude: 0 -> 525 km (non-linear ascent curve)
+  let altitude = 0;
+  if (offset < 0.2) {
+    altitude = offset * 5 * 25; // 0 to 25 km
+  } else if (offset < 0.7) {
+    altitude = 25 + (offset - 0.2) * 2 * 350; // 25 to 375 km
+  } else {
+    altitude = 375 + (offset - 0.7) * 3.33 * 150; // 375 to 525 km
+  }
+
+  // Velocity: 0 -> 7.68 km/s
+  let velocity = 0;
+  if (offset < 0.3) {
+    velocity = (offset / 0.3) * 2.3;
+  } else if (offset < 0.7) {
+    velocity = 2.3 + ((offset - 0.3) / 0.4) * 4.9;
+  } else {
+    velocity = 7.2 + ((offset - 0.7) / 0.3) * 0.48;
+  }
+
+  // Time in seconds: 0 -> 615 seconds
+  const totalSeconds = Math.floor(offset * 615);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const met = `T+ ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+  // Stage description
+  let stageName = STAGE_MILESTONES[0].title;
+  let activeIndex = 0;
+  for (let i = 0; i < STAGE_MILESTONES.length; i++) {
+    if (offset >= STAGE_MILESTONES[i].offset - 0.05) {
+      stageName = STAGE_MILESTONES[i].title;
+      activeIndex = i;
+    }
+  }
+
+  return {
+    altitude: altitude.toFixed(1),
+    velocity: velocity.toFixed(2),
+    met,
+    stageName,
+    activeIndex,
+    progress: (offset * 100).toFixed(1)
+  };
+}
+
+// Controller inside ScrollControls that accesses scroll state & runs 60fps animations
+function LaunchController({ isAutoPlaying, setIsAutoPlaying }: { isAutoPlaying: boolean; setIsAutoPlaying: (v: boolean) => void }) {
   const scroll = useScroll();
   
   // Camera smoothing ref
   const currentLookAt = useRef(new THREE.Vector3(0, 6, 0));
-  
-  // Continuous orbit tracking
   const continuousAngleRef = useRef(0);
   
   // Scenery Refs
   const earthGroupRef = useRef<THREE.Group>(null);
   const cloudsRef = useRef<THREE.Mesh>(null);
   
-  // Wrappers (for world-space trajectory)
+  // Wrappers (trajectory)
   const stage1WrapperRef = useRef<THREE.Group>(null);
   const stage2WrapperRef = useRef<THREE.Group>(null);
   const fairingLeftWrapperRef = useRef<THREE.Group>(null);
   const fairingRightWrapperRef = useRef<THREE.Group>(null);
   const satelliteWrapperRef = useRef<THREE.Group>(null);
   
-  // Local Groups (for local animations like falling, separating, spinning)
+  // Components
   const stage1GroupRef = useRef<THREE.Group>(null);
   const exhaust1Ref = useRef<THREE.Mesh>(null);
   const light1Ref = useRef<THREE.PointLight>(null);
@@ -52,117 +109,186 @@ function LaunchAnimation() {
   const leftPanelRef = useRef<THREE.Mesh>(null);
   const rightPanelRef = useRef<THREE.Mesh>(null);
 
+  // Load textures
   const earthTexture = useTexture('/textures/2k_earth_daymap.jpg');
   const cloudsTexture = useTexture('/textures/2k_earth_clouds.jpg');
 
-  useFrame((state, delta) => {
-    const offset = scroll.offset;
+  // Shared Materials (Optimized: single instances, no primitive re-wrapping)
+  const rocketMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({ 
+    color: '#f0f0f0', 
+    metalness: 0.7, 
+    roughness: 0.2, 
+    clearcoat: 0.8, 
+    clearcoatRoughness: 0.15 
+  }), []);
+
+  const darkMetal = useMemo(() => new THREE.MeshPhysicalMaterial({ 
+    color: '#181818', 
+    metalness: 0.9, 
+    roughness: 0.35 
+  }), []);
+
+  const goldFoil = useMemo(() => new THREE.MeshPhysicalMaterial({ 
+    color: '#ffb703', 
+    metalness: 0.95, 
+    roughness: 0.25, 
+    clearcoat: 0.6 
+  }), []);
+
+  const engineFlame = useMemo(() => new THREE.MeshStandardMaterial({ 
+    color: '#fff', 
+    emissive: '#ff7700', 
+    emissiveIntensity: 12, 
+    transparent: true, 
+    opacity: 0.9 
+  }), []);
+
+  const vacFlame = useMemo(() => new THREE.MeshStandardMaterial({ 
+    color: '#fff', 
+    emissive: '#00b4d8', 
+    emissiveIntensity: 8, 
+    transparent: true, 
+    opacity: 0.85 
+  }), []);
+
+  // Shared Ring Torus Geometry for stage bands
+  const ringGeo = useMemo(() => new THREE.TorusGeometry(0.6, 0.025, 12, 32), []);
+
+  // Trajectory function
+  const getTrajectory = (clampedOffset: number, pOrbitContinuous: number) => {
+    const pLiftoff = getProgress(clampedOffset, 0.0, 0.2);
+    const pOrbit = getProgress(clampedOffset, 0.2, 0.7);
+    const pPitch = getProgress(clampedOffset, 0.1, 0.2);
     
-    // Accumulate continuous angle for the final orbit view
-    if (offset >= 0.9) {
-      continuousAngleRef.current += delta * 0.2; // Smooth constant speed
+    const orbitRadius = 25;
+    let orbitAngle = 0;
+    let posX = 0;
+    let posY = -1 + (pLiftoff * 6);
+    let posZ = 0;
+    
+    let rotX = 0;
+    let rotY = 0;
+    let rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch);
+
+    if (pOrbit > 0) {
+      orbitAngle = (pOrbit * (Math.PI / 2)) + pOrbitContinuous;
+      posX = Math.sin(orbitAngle) * orbitRadius;
+      posY = -20 + Math.cos(orbitAngle) * orbitRadius;
+      rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
     }
 
-    // Rotate Earth slowly on its axis
-    if (earthGroupRef.current) earthGroupRef.current.rotation.y += 0.02 * delta;
-    if (cloudsRef.current) cloudsRef.current.rotation.y += 0.03 * delta;
+    // Max-Q subtle vibration
+    const pMaxQ = getProgress(clampedOffset, 0.18, 0.26);
+    if (pMaxQ > 0 && pMaxQ < 1) {
+      posX += (Math.random() - 0.5) * 0.06;
+    }
 
-    // --- TIMINGS --- //
-    // 0.00 - 0.20: Liftoff
-    // 0.20 - 0.30: Max-Q, Pitch over begins
-    // 0.30: Stage 1 burnout & sep
-    // 0.35: Stage 2 ignition
-    // 0.40: Fairing sep
-    // 0.50 - 0.70: Orbit insertion curve completes
-    // 0.70: Stage 2 cutoff & sep
-    // 0.80 - 0.90: Satellite acquires / panels deploy
-    // 0.90 - 1.00: Orbiting
+    return { posX, posY, posZ, rotZ, rotY, rotX };
+  };
 
-    const pMaxQ = getProgress(offset, 0.2, 0.3);         
-    const getTrajectory = (clampedOffset: number, pOrbitContinuous: number, time: number) => {
-      // 0.0 - 0.2: Vertical climb
-      const pLiftoff = getProgress(clampedOffset, 0.0, 0.2);
-      // 0.2 - 0.7: Perfect circular orbit around Earth's center in X-Y plane
-      const pOrbit = getProgress(clampedOffset, 0.2, 0.7);
-      // 0.1 - 0.2: Pitch over maneuver
-      const pPitch = getProgress(clampedOffset, 0.1, 0.2);
-      
-      const orbitRadius = 25; // Exactly 25 units from Earth center (-20)
-      
-      let orbitAngle = 0;
-      let posX = 0;
-      let posY = -1 + (pLiftoff * 6); // Climbs exactly to Y=5
-      let posZ = 0;
-      
-      let rotX = 0;
-      let rotY = 0;
-      let rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch);
-
-      if (pOrbit > 0) {
-        // Scroll angle up to 90 degrees, plus any continuous accumulated angle
-        orbitAngle = (pOrbit * (Math.PI / 2)) + pOrbitContinuous;
-        posX = Math.sin(orbitAngle) * orbitRadius;
-        posY = -20 + Math.cos(orbitAngle) * orbitRadius; // Centered exactly on Earth (-20)
-        rotZ = THREE.MathUtils.lerp(0, -(Math.PI / 2), pPitch) - orbitAngle;
+  // Expose jumpToStage on window so UI buttons can trigger smooth jump
+  useEffect(() => {
+    const handleJump = (e: CustomEvent<{ offset: number }>) => {
+      if (scroll && scroll.el) {
+        const maxScroll = scroll.el.scrollHeight - scroll.el.clientHeight;
+        scroll.el.scrollTo({ top: e.detail.offset * maxScroll, behavior: 'smooth' });
       }
-
-      // Max-Q vibration applies to all attached components evenly
-      const pMaxQ = getProgress(clampedOffset, 0.15, 0.25);
-      if (pMaxQ > 0 && pMaxQ < 1) {
-        posX += (Math.random() - 0.5) * 0.1;
-      }
-
-      return { posX, posY, posZ, rotZ, rotY, rotX };
     };
+    window.addEventListener('jump-to-stage' as any, handleJump);
+    return () => window.removeEventListener('jump-to-stage' as any, handleJump);
+  }, [scroll]);
 
-    // --- SATELLITE (Main Payload) ---
-    // Pass the accumulated delta angle as the continuous parameter
-    const satTraj = getTrajectory(offset, continuousAngleRef.current, state.clock.elapsedTime);
-    
+  // Frame Loop
+  useFrame((state, delta) => {
+    // Handle Auto-Play
+    if (isAutoPlaying && scroll && scroll.el) {
+      const maxScroll = scroll.el.scrollHeight - scroll.el.clientHeight;
+      scroll.el.scrollTop += delta * maxScroll * 0.055;
+      if (scroll.el.scrollTop >= maxScroll - 2) {
+        setIsAutoPlaying(false);
+      }
+    }
+
+    const offset = scroll.offset;
+
+    // Direct HUD DOM updates (60fps, 0 React re-renders)
+    const tel = computeTelemetry(offset);
+    const elMet = document.getElementById('hud-met');
+    const elAlt = document.getElementById('hud-altitude');
+    const elVel = document.getElementById('hud-velocity');
+    const elStatus = document.getElementById('hud-status');
+    const elBar = document.getElementById('hud-progress-bar');
+    const elPct = document.getElementById('hud-percent');
+
+    if (elMet) elMet.textContent = tel.met;
+    if (elAlt) elAlt.textContent = `${tel.altitude} KM`;
+    if (elVel) elVel.textContent = `${tel.velocity} KM/S`;
+    if (elStatus) elStatus.textContent = tel.stageName;
+    if (elBar) elBar.style.width = `${tel.progress}%`;
+    if (elPct) elPct.textContent = `${tel.progress}%`;
+
+    // Highlight active milestone pill
+    for (let i = 0; i < STAGE_MILESTONES.length; i++) {
+      const pill = document.getElementById(`milestone-pill-${i}`);
+      if (pill) {
+        if (i === tel.activeIndex) {
+          pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-orange-500 text-white font-bold shadow-lg shadow-orange-500/30 transition-all scale-105";
+        } else if (i < tel.activeIndex) {
+          pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-white/10 text-white/80 hover:bg-white/20 transition-all";
+        } else {
+          pill.className = "px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-black/40 text-white/40 hover:text-white/70 transition-all border border-white/5";
+        }
+      }
+    }
+
+    // Orbit accumulation in finale
+    if (offset >= 0.9) {
+      continuousAngleRef.current += delta * 0.18;
+    }
+
+    // Earth & Cloud gentle axial rotation
+    if (earthGroupRef.current) earthGroupRef.current.rotation.y += 0.015 * delta;
+    if (cloudsRef.current) cloudsRef.current.rotation.y += 0.022 * delta;
+
+    // Trajectory coordinates for payload
+    const satTraj = getTrajectory(offset, continuousAngleRef.current);
     if (satelliteWrapperRef.current) {
       satelliteWrapperRef.current.position.set(satTraj.posX, satTraj.posY, satTraj.posZ);
       satelliteWrapperRef.current.rotation.set(satTraj.rotX, satTraj.rotY, satTraj.rotZ, 'YXZ');
     }
 
-    const pSatSep = getProgress(offset, 0.7, 0.75); // separation impulse
-    const pSatAcq = getProgress(offset, 0.8, 0.9);
+    const pSatSep = getProgress(offset, 0.70, 0.76);
+    const pSatAcq = getProgress(offset, 0.80, 0.92);
     
     if (satelliteGroupRef.current) {
-      // Sat separation: it pushes forward slightly from Stage 2.
-      // Since local Y points forward, positive Y is the correct axis.
-      satelliteGroupRef.current.position.y = (pSatSep * 3); 
-      
+      satelliteGroupRef.current.position.y = pSatSep * 3;
       if (pSatSep > 0) {
-        satelliteGroupRef.current.rotation.y += 0.5 * delta; // stabilize spin
+        satelliteGroupRef.current.rotation.y += 0.4 * delta;
         satelliteGroupRef.current.rotation.x = THREE.MathUtils.lerp(0, Math.PI / 4, pSatAcq);
       }
     }
 
     // --- STAGE 1 (Booster) ---
-    // Freeze at 0.30
     const s1Offset = Math.min(offset, 0.30);
-    const s1Traj = getTrajectory(s1Offset, 0, 0);
+    const s1Traj = getTrajectory(s1Offset, 0);
     if (stage1WrapperRef.current) {
       stage1WrapperRef.current.position.set(s1Traj.posX, s1Traj.posY, s1Traj.posZ);
       stage1WrapperRef.current.rotation.set(s1Traj.rotX, s1Traj.rotY, s1Traj.rotZ, 'YXZ');
     }
 
-    const pStage1SepRaw = getProgress(offset, 0.30, 0.60); 
+    const pStage1SepRaw = getProgress(offset, 0.30, 0.58);
     const pStage1Sep = easeOut(pStage1SepRaw);
     if (stage1GroupRef.current) {
-      // Local -Y moves it backwards, but we don't want it to shoot past Earth.
-      stage1GroupRef.current.position.y = -pStage1Sep * 15; 
-      stage1GroupRef.current.position.x = -pStage1Sep * 2; 
-      stage1GroupRef.current.rotation.z = pStage1Sep * 4; // fast tumble
-      // Burn up in atmosphere!
-      const scale = Math.max(0, 1 - (pStage1SepRaw * 1.2));
+      stage1GroupRef.current.position.y = -pStage1Sep * 14;
+      stage1GroupRef.current.position.x = -pStage1Sep * 2.5;
+      stage1GroupRef.current.rotation.z = pStage1Sep * 3.5;
+      const scale = Math.max(0, 1 - (pStage1SepRaw * 1.3));
       stage1GroupRef.current.scale.setScalar(scale);
     }
 
     // --- FAIRINGS ---
-    // Freeze at 0.40
-    const fairingOffset = Math.min(offset, 0.40);
-    const fairingTraj = getTrajectory(fairingOffset, 0, 0);
+    const fairingOffset = Math.min(offset, 0.42);
+    const fairingTraj = getTrajectory(fairingOffset, 0);
     if (fairingLeftWrapperRef.current && fairingRightWrapperRef.current) {
       fairingLeftWrapperRef.current.position.set(fairingTraj.posX, fairingTraj.posY, fairingTraj.posZ);
       fairingLeftWrapperRef.current.rotation.set(fairingTraj.rotX, fairingTraj.rotY, fairingTraj.rotZ, 'YXZ');
@@ -170,16 +296,16 @@ function LaunchAnimation() {
       fairingRightWrapperRef.current.rotation.set(fairingTraj.rotX, fairingTraj.rotY, fairingTraj.rotZ, 'YXZ');
     }
 
-    const pFairingSepRaw = getProgress(offset, 0.40, 0.65);
+    const pFairingSepRaw = getProgress(offset, 0.42, 0.65);
     const pFairingSep = easeOut(pFairingSepRaw);
     if (fairingLeftRef.current && fairingRightRef.current) {
       fairingLeftRef.current.position.x = -pFairingSep * 5;
-      fairingLeftRef.current.position.y = -pFairingSep * 10; 
-      fairingLeftRef.current.rotation.z = pFairingSep * 4;
+      fairingLeftRef.current.position.y = -pFairingSep * 9;
+      fairingLeftRef.current.rotation.z = pFairingSep * 3.5;
 
       fairingRightRef.current.position.x = pFairingSep * 5;
-      fairingRightRef.current.position.y = -pFairingSep * 10;
-      fairingRightRef.current.rotation.z = -pFairingSep * 4;
+      fairingRightRef.current.position.y = -pFairingSep * 9;
+      fairingRightRef.current.rotation.z = -pFairingSep * 3.5;
 
       const fScale = Math.max(0, 1 - (pFairingSepRaw * 1.5));
       fairingLeftRef.current.scale.setScalar(fScale);
@@ -187,291 +313,208 @@ function LaunchAnimation() {
     }
 
     // --- STAGE 2 (Upper Stage) ---
-    // Freeze at 0.70
     const s2Offset = Math.min(offset, 0.70);
-    const s2Traj = getTrajectory(s2Offset, 0, 0);
+    const s2Traj = getTrajectory(s2Offset, 0);
     if (stage2WrapperRef.current) {
       stage2WrapperRef.current.position.set(s2Traj.posX, s2Traj.posY, s2Traj.posZ);
       stage2WrapperRef.current.rotation.set(s2Traj.rotX, s2Traj.rotY, s2Traj.rotZ, 'YXZ');
     }
 
-    const pStage2SepRaw = getProgress(offset, 0.70, 0.90);
+    const pStage2SepRaw = getProgress(offset, 0.70, 0.88);
     const pStage2Sep = easeOut(pStage2SepRaw);
     if (stage2GroupRef.current) {
-      stage2GroupRef.current.position.y = -pStage2Sep * 15; 
-      stage2GroupRef.current.rotation.z = pStage2Sep * 2; 
-      
+      stage2GroupRef.current.position.y = -pStage2Sep * 14;
+      stage2GroupRef.current.rotation.z = pStage2Sep * 2;
       const s2Scale = Math.max(0, 1 - (pStage2SepRaw * 1.5));
       stage2GroupRef.current.scale.setScalar(s2Scale);
     }
 
-    // CAMERA LOGIC
-    let targetCamPos = new THREE.Vector3();
-    let targetLookAt = new THREE.Vector3();
+    // --- CAMERA LOGIC ---
+    const targetCamPos = new THREE.Vector3();
+    const targetLookAt = new THREE.Vector3();
 
     if (satelliteWrapperRef.current && satelliteGroupRef.current) {
       const vPos = new THREE.Vector3();
-      satelliteGroupRef.current.getWorldPosition(vPos); // Always look at the satellite
+      satelliteGroupRef.current.getWorldPosition(vPos);
       
       const aspect = state.size.width / state.size.height;
       const isMobile = aspect < 1;
 
       if (offset < 0.9) {
-        // Follow closely but zoomed out enough to see the whole rocket
-        const launchZoom = isMobile ? 65 : 45;
-        targetCamPos.set(vPos.x, vPos.y + 6, launchZoom);
-        targetLookAt.set(vPos.x, vPos.y + 6, 0);
+        const launchZoom = isMobile ? 60 : 42;
+        targetCamPos.set(vPos.x, vPos.y + 5, launchZoom);
+        targetLookAt.set(vPos.x, vPos.y + 5, 0);
       } else {
-        // Grand finale pull-back (orbit view)
-        // Center perfectly on Earth's core (Y=-20)
-        const finalZoom = isMobile ? 110 : 80; 
-        targetCamPos.set(0, -20, finalZoom); 
+        const finalZoom = isMobile ? 100 : 75;
+        targetCamPos.set(0, -20, finalZoom);
         targetLookAt.set(0, -20, 0);
       }
     }
 
-    // Tighter tracking during the fast launch sequence, slower cinematic drift for the finale
-    const lerpFactor = offset < 0.9 ? 0.2 : 0.04;
+    const lerpFactor = offset < 0.9 ? 0.18 : 0.04;
     state.camera.position.lerp(targetCamPos, lerpFactor);
     currentLookAt.current.lerp(targetLookAt, lerpFactor);
     state.camera.lookAt(currentLookAt.current);
 
-    // EXHAUST 1 (Booster)
-    const pStage1Burnout = getProgress(offset, 0.28, 0.30); 
+    // --- EXHAUST 1 (Booster) ---
+    const pStage1Burnout = getProgress(offset, 0.28, 0.30);
     if (exhaust1Ref.current && light1Ref.current) {
-      if (offset > 0 && pStage1Burnout < 1) {
+      if (offset > 0.01 && pStage1Burnout < 1) {
         exhaust1Ref.current.visible = true;
-        const intensity = pMaxQ > 0 && pMaxQ < 1 ? 1.5 : (1 - pStage1Burnout);
-        exhaust1Ref.current.scale.set(1 + Math.random() * 0.2, (1 + Math.random() * 0.8) * intensity, 1 + Math.random() * 0.2);
-        light1Ref.current.intensity = (15 + Math.random() * 10) * intensity;
-        (exhaust1Ref.current.material as THREE.MeshStandardMaterial).emissiveIntensity = (5 + Math.random() * 5) * intensity;
+        const intensity = 1 - pStage1Burnout;
+        exhaust1Ref.current.scale.set(1 + Math.random() * 0.15, (1 + Math.random() * 0.6) * intensity, 1 + Math.random() * 0.15);
+        light1Ref.current.intensity = (14 + Math.random() * 8) * intensity;
       } else {
         exhaust1Ref.current.visible = false;
         light1Ref.current.intensity = 0;
       }
     }
 
-    // EXHAUST 2 (Upper Stage)
-    const pStage2Ignition = getProgress(offset, 0.35, 0.40); 
-    const pStage2Cutoff = getProgress(offset, 0.65, 0.70); 
+    // --- EXHAUST 2 (Vacuum Engine) ---
+    const pStage2Ignition = getProgress(offset, 0.34, 0.40);
+    const pStage2Cutoff = getProgress(offset, 0.66, 0.70);
     if (exhaust2Ref.current && light2Ref.current) {
       if (pStage2Ignition > 0 && pStage2Cutoff < 1) {
         exhaust2Ref.current.visible = true;
-        // Ignites slowly, cuts off quickly
         const intensity = pStage2Ignition * (1 - pStage2Cutoff);
-        exhaust2Ref.current.scale.set((1.5 + Math.random() * 0.2) * intensity, (0.8 + Math.random() * 0.4) * intensity, (1.5 + Math.random() * 0.2) * intensity);
-        light2Ref.current.intensity = (5 + Math.random() * 5) * intensity;
-        (exhaust2Ref.current.material as THREE.MeshStandardMaterial).emissiveIntensity = (3 + Math.random() * 2) * intensity;
+        exhaust2Ref.current.scale.set((1.3 + Math.random() * 0.2) * intensity, (0.8 + Math.random() * 0.3) * intensity, (1.3 + Math.random() * 0.2) * intensity);
+        light2Ref.current.intensity = (6 + Math.random() * 4) * intensity;
       } else {
         exhaust2Ref.current.visible = false;
         light2Ref.current.intensity = 0;
       }
     }
 
-    // SOLAR PANELS
+    // --- SOLAR ARRAYS ---
     if (leftPanelRef.current && rightPanelRef.current) {
       leftPanelRef.current.position.x = THREE.MathUtils.lerp(0, -1.8, pSatAcq);
-      leftPanelRef.current.rotation.y = THREE.MathUtils.lerp(Math.PI/2, 0, pSatAcq);
+      leftPanelRef.current.rotation.y = THREE.MathUtils.lerp(Math.PI / 2, 0, pSatAcq);
       
       rightPanelRef.current.position.x = THREE.MathUtils.lerp(0, 1.8, pSatAcq);
-      rightPanelRef.current.rotation.y = THREE.MathUtils.lerp(-Math.PI/2, 0, pSatAcq);
+      rightPanelRef.current.rotation.y = THREE.MathUtils.lerp(-Math.PI / 2, 0, pSatAcq);
     }
   });
 
-  // High-Fidelity Physical Materials
-  const rocketMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({ 
-    color: '#eeeeee', 
-    metalness: 0.8, 
-    roughness: 0.1, 
-    clearcoat: 1.0, 
-    clearcoatRoughness: 0.1,
-    envMapIntensity: 2.0 
-  }), []);
-  const darkMetal = useMemo(() => new THREE.MeshPhysicalMaterial({ 
-    color: '#111111', 
-    metalness: 0.9, 
-    roughness: 0.4, 
-    envMapIntensity: 1.5 
-  }), []);
-  const goldFoil = useMemo(() => new THREE.MeshPhysicalMaterial({ 
-    color: '#ffcc00', 
-    metalness: 1.0, 
-    roughness: 0.2,
-    clearcoat: 0.5,
-    envMapIntensity: 2.5 
-  }), []);
-  const engineFlame = useMemo(() => new THREE.MeshStandardMaterial({ 
-    color: '#ffffff', 
-    emissive: '#ffaa00', 
-    emissiveIntensity: 15, // Extremely high for Bloom
-    transparent: true, 
-    opacity: 0.9 
-  }), []);
-  const vacFlame = useMemo(() => new THREE.MeshStandardMaterial({ 
-    color: '#ffffff', 
-    emissive: '#00aaff', 
-    emissiveIntensity: 10, 
-    transparent: true, 
-    opacity: 0.8 
-  }), []);
-
-  // EXACT GEOMETRY ALIGNMENTS
-  // Base of the rocket is at Y = 0.
-  // Stage 1 (Booster): Y = 0 to 6
-  // Stage 2 (Upper): Y = 6 to 9
-  // Satellite (Payload): Y = 9 to 11
-  // Fairings (Shell): Y = 9 to 12.5
-
   return (
     <group>
-      {/* EARTH SYSTEM */}
+      {/* EARTH SYSTEM (Optimized to 48 segments for high performance) */}
       <group ref={earthGroupRef} position={[0, -20, 0]}>
-        {/* Main Earth Sphere */}
         <mesh>
-          <sphereGeometry args={[18, 64, 64]} />
-          <meshStandardMaterial map={earthTexture} roughness={0.9} metalness={0.1} />
+          <sphereGeometry args={[18, 48, 48]} />
+          <meshStandardMaterial map={earthTexture} roughness={0.85} metalness={0.1} />
         </mesh>
-        {/* Clouds Layer */}
         <mesh ref={cloudsRef}>
-          <sphereGeometry args={[18.1, 64, 64]} />
-          <meshStandardMaterial map={cloudsTexture} transparent opacity={0.5} depthWrite={false} blending={THREE.AdditiveBlending} />
+          <sphereGeometry args={[18.08, 48, 48]} />
+          <meshStandardMaterial map={cloudsTexture} transparent opacity={0.45} depthWrite={false} blending={THREE.AdditiveBlending} />
         </mesh>
-        {/* Outer Atmospheric Glow */}
+        {/* Sleek Atmospheric Glow */}
         <mesh>
-          <sphereGeometry args={[18.5, 64, 64]} />
-          <meshBasicMaterial color="#3366ff" transparent opacity={0.1} side={THREE.BackSide} blending={THREE.AdditiveBlending} />
-        </mesh>
-        <mesh>
-          <sphereGeometry args={[18.2, 64, 64]} />
-          <meshBasicMaterial color="#5588ff" transparent opacity={0.2} side={THREE.FrontSide} blending={THREE.AdditiveBlending} />
+          <sphereGeometry args={[18.35, 36, 36]} />
+          <meshBasicMaterial color="#3a86ff" transparent opacity={0.18} side={THREE.BackSide} blending={THREE.AdditiveBlending} />
         </mesh>
       </group>
 
-      {/* SATELLITE WRAPPER */}
+      {/* SATELLITE (Payload) */}
       <group ref={satelliteWrapperRef}>
         <group ref={satelliteGroupRef}>
           <group position={[0, 10, 0]} scale={[0.5, 0.5, 0.5]}>
-            <mesh>
+            <mesh material={goldFoil}>
               <boxGeometry args={[1.2, 2.5, 1.2]} />
-              <primitive object={goldFoil} attach="material" />
             </mesh>
             
             <mesh ref={leftPanelRef} position={[0, 0, 0]}>
               <boxGeometry args={[2, 4, 0.05]} />
-              <meshStandardMaterial color="#0a1b2c" metalness={1} roughness={0.2} envMapIntensity={2} />
-              <gridHelper args={[2, 10, 0x4488ff, 0x4488ff]} rotation={[Math.PI/2, 0, 0]} position={[0, 0, 0.03]} />
+              <meshStandardMaterial color="#0c1b33" metalness={0.9} roughness={0.2} />
+              <gridHelper args={[2, 8, 0x4488ff, 0x3366cc]} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.03]} />
             </mesh>
 
             <mesh ref={rightPanelRef} position={[0, 0, 0]}>
               <boxGeometry args={[2, 4, 0.05]} />
-              <meshStandardMaterial color="#0a1b2c" metalness={1} roughness={0.2} envMapIntensity={2} />
-              <gridHelper args={[2, 10, 0x4488ff, 0x4488ff]} rotation={[Math.PI/2, 0, 0]} position={[0, 0, 0.03]} />
+              <meshStandardMaterial color="#0c1b33" metalness={0.9} roughness={0.2} />
+              <gridHelper args={[2, 8, 0x4488ff, 0x3366cc]} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.03]} />
             </mesh>
 
             <mesh position={[0, 1.5, 0]} rotation={[-0.2, 0, 0]}>
-              <cylinderGeometry args={[0.8, 0.1, 0.4, 32]} />
-              <meshStandardMaterial color="#ffffff" metalness={0.5} roughness={0.5} />
+              <cylinderGeometry args={[0.8, 0.1, 0.4, 24]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.6} roughness={0.4} />
             </mesh>
             
-            <mesh position={[0, 1.9, 0]}>
-              <cylinderGeometry args={[0.05, 0.05, 1, 16]} />
-              <primitive object={darkMetal} attach="material" />
+            <mesh position={[0, 1.9, 0]} material={darkMetal}>
+              <cylinderGeometry args={[0.05, 0.05, 1, 12]} />
             </mesh>
           </group>
         </group>
       </group>
 
-      {/* FAIRING LEFT WRAPPER */}
+      {/* FAIRING LEFT */}
       <group ref={fairingLeftWrapperRef}>
         <group ref={fairingLeftRef}>
-          <mesh position={[0, 10, 0]}> {/* Base of fairing cylinder */}
-            <cylinderGeometry args={[0.62, 0.62, 2, 32, 1, false, Math.PI, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
+          <mesh position={[0, 10, 0]} material={rocketMaterial}>
+            <cylinderGeometry args={[0.62, 0.62, 2, 24, 1, false, Math.PI, Math.PI]} />
           </mesh>
-          <mesh position={[0, 11.75, 0]}> {/* Cone on top */}
-            <coneGeometry args={[0.62, 1.5, 32, 1, false, Math.PI, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
+          <mesh position={[0, 11.75, 0]} material={rocketMaterial}>
+            <coneGeometry args={[0.62, 1.5, 24, 1, false, Math.PI, Math.PI]} />
           </mesh>
         </group>
       </group>
 
-      {/* FAIRING RIGHT WRAPPER */}
+      {/* FAIRING RIGHT */}
       <group ref={fairingRightWrapperRef}>
         <group ref={fairingRightRef}>
-          <mesh position={[0, 10, 0]}>
-            <cylinderGeometry args={[0.62, 0.62, 2, 32, 1, false, 0, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
+          <mesh position={[0, 10, 0]} material={rocketMaterial}>
+            <cylinderGeometry args={[0.62, 0.62, 2, 24, 1, false, 0, Math.PI]} />
           </mesh>
-          <mesh position={[0, 11.75, 0]}>
-            <coneGeometry args={[0.62, 1.5, 32, 1, false, 0, Math.PI]} />
-            <primitive object={rocketMaterial} attach="material" />
+          <mesh position={[0, 11.75, 0]} material={rocketMaterial}>
+            <coneGeometry args={[0.62, 1.5, 24, 1, false, 0, Math.PI]} />
           </mesh>
         </group>
       </group>
 
-      {/* STAGE 2 WRAPPER */}
+      {/* STAGE 2 */}
       <group ref={stage2WrapperRef}>
         <group ref={stage2GroupRef}>
-          <mesh position={[0, 7.5, 0]}> {/* Height 3, center at 7.5 */}
-            <cylinderGeometry args={[0.6, 0.6, 3, 32]} />
-            <primitive object={rocketMaterial} attach="material" />
+          <mesh position={[0, 7.5, 0]} material={rocketMaterial}>
+            <cylinderGeometry args={[0.6, 0.6, 3, 24]} />
           </mesh>
           
-          <mesh position={[0, 6.1, 0]} rotation={[Math.PI/2, 0, 0]}>
-            <torusGeometry args={[0.6, 0.02, 16, 64]} />
-            <primitive object={darkMetal} attach="material" />
-          </mesh>
+          <mesh position={[0, 6.1, 0]} rotation={[Math.PI / 2, 0, 0]} geometry={ringGeo} material={darkMetal} />
 
-          <mesh position={[0, 5.8, 0]}> {/* Engine */}
-            <cylinderGeometry args={[0.2, 0.5, 0.4, 32]} />
-            <primitive object={darkMetal} attach="material" />
+          <mesh position={[0, 5.8, 0]} material={darkMetal}>
+            <cylinderGeometry args={[0.2, 0.5, 0.4, 24]} />
           </mesh>
           
-          <mesh ref={exhaust2Ref} position={[0, 4.8, 0]} visible={false}>
-            <coneGeometry args={[0.8, 2, 32]} />
-            <primitive object={vacFlame} attach="material" />
-            <pointLight ref={light2Ref} color="#00aaff" distance={30} decay={2} intensity={0} />
+          <mesh ref={exhaust2Ref} position={[0, 4.8, 0]} visible={false} material={vacFlame}>
+            <coneGeometry args={[0.8, 2, 24]} />
+            <pointLight ref={light2Ref} color="#00b4d8" distance={25} decay={2} intensity={0} />
           </mesh>
         </group>
       </group>
 
-      {/* STAGE 1 WRAPPER */}
+      {/* STAGE 1 (Core Booster) */}
       <group ref={stage1WrapperRef}>
         <group ref={stage1GroupRef}>
-          <mesh position={[0, 3, 0]}> {/* Height 6, center at 3 */}
-            <cylinderGeometry args={[0.6, 0.6, 6, 64]} />
-            <primitive object={rocketMaterial} attach="material" />
+          <mesh position={[0, 3, 0]} material={rocketMaterial}>
+            <cylinderGeometry args={[0.6, 0.6, 6, 32]} />
           </mesh>
           
-          <mesh position={[0, 5.9, 0]} rotation={[Math.PI/2, 0, 0]}>
-            <torusGeometry args={[0.6, 0.02, 16, 64]} />
-            <primitive object={darkMetal} attach="material" />
-          </mesh>
-          <mesh position={[0, 3, 0]} rotation={[Math.PI/2, 0, 0]}>
-            <torusGeometry args={[0.6, 0.02, 16, 64]} />
-            <primitive object={darkMetal} attach="material" />
-          </mesh>
-          <mesh position={[0, 0.2, 0]} rotation={[Math.PI/2, 0, 0]}>
-            <torusGeometry args={[0.6, 0.04, 16, 64]} />
-            <primitive object={darkMetal} attach="material" />
+          <mesh position={[0, 5.9, 0]} rotation={[Math.PI / 2, 0, 0]} geometry={ringGeo} material={darkMetal} />
+          <mesh position={[0, 3, 0]} rotation={[Math.PI / 2, 0, 0]} geometry={ringGeo} material={darkMetal} />
+          <mesh position={[0, 0.2, 0]} rotation={[Math.PI / 2, 0, 0]} geometry={ringGeo} material={darkMetal} />
+
+          <mesh position={[0, -0.2, 0]} material={darkMetal}>
+            <cylinderGeometry args={[0.4, 0.7, 0.6, 24]} />
           </mesh>
 
-          <mesh position={[0, -0.2, 0]}>
-            <cylinderGeometry args={[0.4, 0.7, 0.6, 32]} />
-            <primitive object={darkMetal} attach="material" />
+          <mesh ref={exhaust1Ref} position={[0, -1.8, 0]} visible={false} material={engineFlame}>
+            <coneGeometry args={[0.6, 3, 24]} />
+            <pointLight ref={light1Ref} color="#ff7700" distance={40} decay={1.8} intensity={0} />
           </mesh>
 
-          <mesh ref={exhaust1Ref} position={[0, -1.8, 0]} visible={false}>
-            <coneGeometry args={[0.6, 3, 32]} />
-            <primitive object={engineFlame} attach="material" />
-            <pointLight ref={light1Ref} color="#ff7700" distance={50} decay={1.5} intensity={0} />
-          </mesh>
-
+          {/* Booster Aerodynamic Fins */}
           <group position={[0, 0.5, 0]}>
-            {[0, Math.PI/2, Math.PI, Math.PI*1.5].map((rot, i) => (
-              <mesh key={i} rotation={[0, rot, 0]} position={[Math.sin(rot)*0.7, 0, Math.cos(rot)*0.7]}>
-                <boxGeometry args={[0.1, 1.2, 0.8]} />
-                <primitive object={rocketMaterial} attach="material" />
+            {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((rot, i) => (
+              <mesh key={i} rotation={[0, rot, 0]} position={[Math.sin(rot) * 0.7, 0, Math.cos(rot) * 0.7]} material={rocketMaterial}>
+                <boxGeometry args={[0.08, 1.2, 0.7]} />
               </mesh>
             ))}
           </group>
@@ -482,35 +525,121 @@ function LaunchAnimation() {
 }
 
 export default function RocketLaunchSequence() {
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+
+  const jumpToStage = (offset: number) => {
+    window.dispatchEvent(new CustomEvent('jump-to-stage', { detail: { offset } }));
+  };
+
   return (
-    <div className="w-full h-screen bg-black relative">
-      <Canvas shadows camera={{ position: [0, 6, 25], fov: 45 }}>
+    <div className="w-full h-full min-h-[100dvh] bg-black relative overflow-hidden select-none font-mono">
+      {/* 3D WEBGL CANVAS */}
+      <Canvas
+        gl={{
+          antialias: false,
+          powerPreference: "high-performance",
+          alpha: false,
+          stencil: false,
+          depth: true
+        }}
+        dpr={[1, 1.5]}
+        performance={{ min: 0.5 }}
+        camera={{ position: [0, 6, 25], fov: 45, near: 0.1, far: 500 }}
+      >
         <Suspense fallback={null}>
-          {/* Robust Realistic Space Studio Lighting */}
           <ambientLight intensity={0.4} />
-          <directionalLight position={[50, 20, 20]} intensity={3.5} color="#fffcf5" castShadow />
-          <directionalLight position={[-30, -20, -10]} intensity={1.0} color="#0088ff" />
-          <pointLight position={[0, 0, 15]} intensity={0.8} color="#ffffff" />
+          <directionalLight position={[50, 20, 20]} intensity={3.0} color="#fffcf5" />
+          <directionalLight position={[-30, -20, -10]} intensity={0.9} color="#0088ff" />
+          <pointLight position={[0, 0, 15]} intensity={0.6} color="#ffffff" />
           
-          <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1.5} />
+          <Stars radius={100} depth={50} count={3500} factor={4} saturation={0} fade speed={1.2} />
           
-          {/* Adjusted pages to 6 for snappy but detailed pacing, increased damping for smoothness */}
-          <ScrollControls pages={6} damping={0.4}>
-            <LaunchAnimation />
+          <ScrollControls pages={5} damping={0.25}>
+            <LaunchController isAutoPlaying={isAutoPlaying} setIsAutoPlaying={setIsAutoPlaying} />
           </ScrollControls>
 
-          {/* Cinematic Post-Processing */}
-          <EffectComposer disableNormalPass>
-            <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1.5} />
-            <Noise opacity={0.02} />
+          <EffectComposer disableNormalPass multisampling={0}>
+            <Bloom luminanceThreshold={0.55} mipmapBlur intensity={1.2} />
+            <Noise opacity={0.015} />
             <Vignette eskil={false} offset={0.1} darkness={1.1} />
           </EffectComposer>
         </Suspense>
       </Canvas>
-      
-      {/* Subtle overlay to guide user */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white/50 text-sm tracking-widest uppercase pointer-events-none animate-pulse">
-        Scroll to Launch
+
+      {/* TOP TELEMETRY HUD BAR (Direct 60fps DOM Sync) */}
+      <div className="absolute top-16 left-0 w-full px-4 sm:px-8 py-2 z-30 pointer-events-none flex flex-wrap items-center justify-between gap-3 bg-gradient-to-b from-black/80 to-transparent">
+        <div className="flex items-center gap-4 text-xs">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-white/40 tracking-wider">MISSION TIME</span>
+            <span id="hud-met" className="text-orange-400 font-bold tracking-widest text-sm">T+ 00:00:00</span>
+          </div>
+          <div className="w-[1px] h-6 bg-white/20" />
+          <div className="flex flex-col">
+            <span className="text-[10px] text-white/40 tracking-wider">ALTITUDE</span>
+            <span id="hud-altitude" className="text-cyan-400 font-bold tracking-widest text-sm">0.0 KM</span>
+          </div>
+          <div className="w-[1px] h-6 bg-white/20" />
+          <div className="flex flex-col">
+            <span className="text-[10px] text-white/40 tracking-wider">VELOCITY</span>
+            <span id="hud-velocity" className="text-emerald-400 font-bold tracking-widest text-sm">0.00 KM/S</span>
+          </div>
+        </div>
+
+        {/* Current Flight Status Badge */}
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span id="hud-status" className="text-[11px] sm:text-xs text-white/90 font-bold tracking-widest bg-white/5 border border-white/10 px-3 py-1 rounded-full uppercase backdrop-blur-md">
+            PAD T-0 // BOOSTER IGNITION &amp; LIFTOFF
+          </span>
+        </div>
+      </div>
+
+      {/* INTERACTIVE MILESTONES & CONTROLS FOOTER */}
+      <div className="absolute bottom-4 sm:bottom-6 left-0 w-full px-4 sm:px-8 z-30 pointer-events-auto flex flex-col gap-2.5">
+        {/* Stage Timeline Navigation Pills */}
+        <div className="w-full flex items-center justify-between gap-2 overflow-x-auto p-1.5 bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {STAGE_MILESTONES.map((stage, i) => (
+              <button
+                key={stage.id}
+                id={`milestone-pill-${i}`}
+                type="button"
+                onClick={() => jumpToStage(stage.offset)}
+                className="px-2.5 py-1 rounded font-mono text-[10px] tracking-wider uppercase bg-black/40 text-white/50 hover:text-white hover:bg-white/10 border border-white/5 transition-all cursor-pointer whitespace-nowrap"
+              >
+                {stage.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Auto Play / Pause Toggle Button */}
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            <button
+              type="button"
+              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+              className={`px-3 py-1 rounded font-mono text-[10px] tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer font-bold ${
+                isAutoPlaying
+                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <span>{isAutoPlaying ? '⏸ PAUSE' : '▶ AUTO PLAY'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Global Progress Bar */}
+        <div className="w-full flex items-center gap-3">
+          <div className="relative flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div id="hud-progress-bar" className="h-full bg-gradient-to-r from-orange-500 via-cyan-400 to-emerald-400 rounded-full w-0 transition-all duration-75" />
+          </div>
+          <span id="hud-percent" className="text-[10px] text-white/50 tracking-wider shrink-0 w-10 text-right">0.0%</span>
+        </div>
+
+        {/* Hint */}
+        <div className="text-center text-[10px] text-white/40 tracking-[0.2em] uppercase pointer-events-none">
+          USE MOUSEWHEEL OR TOUCH TO SCRUB TRAJECTORY • CLICK STAGES TO JUMP
+        </div>
       </div>
     </div>
   );
