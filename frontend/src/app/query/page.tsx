@@ -1209,26 +1209,28 @@ export default function Home() {
               </div>
 
               {/* COMPATIBILITY STATUS BADGE */}
-              <div className="mb-6">
-                <div className="micro-cap text-white/50 mb-1.5">INPUT COMPATIBILITY CHECK</div>
-                {latestResult.compatibility_status === "FAILED" ? (
-                  <div className="bg-[#ff3000]/10 border border-[#ff3000]/50 rounded p-3 flex flex-col gap-1">
-                    <span className="text-[#ff3000] font-semibold text-xs tracking-wider uppercase flex items-center gap-1.5">
-                      <span>⚠</span> COMPATIBILITY REJECTED
-                    </span>
-                    <span className="text-white/70 text-[11px] leading-tight">
-                      Spatial Disparity Detected: Images belong to non-overlapping regions or lack co-registration.
-                    </span>
-                  </div>
-                ) : (
-                  <div className="bg-white/10 border border-white/30 rounded p-2.5 flex items-center gap-2">
-                    <span className="text-white text-xs font-bold">✓</span>
-                    <span className="text-white/80 font-semibold text-xs tracking-wider uppercase">
-                      VERIFIED CO-REGISTERED PAIR
-                    </span>
-                  </div>
-                )}
-              </div>
+              {latestResult.compatibility_status !== "NOT_APPLICABLE" && (
+                <div className="mb-6">
+                  <div className="micro-cap text-white/50 mb-1.5">INPUT COMPATIBILITY CHECK</div>
+                  {latestResult.compatibility_status === "FAILED" ? (
+                    <div className="bg-[#ff3000]/10 border border-[#ff3000]/50 rounded p-3 flex flex-col gap-1">
+                      <span className="text-[#ff3000] font-semibold text-xs tracking-wider uppercase flex items-center gap-1.5">
+                        <span>⚠</span> COMPATIBILITY REJECTED
+                      </span>
+                      <span className="text-white/70 text-[11px] leading-tight">
+                        Spatial Disparity Detected: Images belong to non-overlapping regions or lack co-registration.
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="bg-white/10 border border-white/30 rounded p-2.5 flex items-center gap-2">
+                      <span className="text-white text-xs font-bold">✓</span>
+                      <span className="text-white/80 font-semibold text-xs tracking-wider uppercase">
+                        VERIFIED CO-REGISTERED PAIR
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* CONFIDENCE & COHERENCE METRICS */}
               <div className="mb-6 grid grid-cols-2 gap-3 bg-[#0a0a0a] border border-[#2a2a2f] p-3 rounded-lg">

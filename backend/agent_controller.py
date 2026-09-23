@@ -596,7 +596,7 @@ class QueryRouter:
             "answer": final_text,
             "visual_evidence": visual_evidence,
             "confidence": validation.overall_confidence,
-            "compatibility_status": "PASSED" if validation.passed else "WARNINGS",
+            "compatibility_status": "NOT_APPLICABLE",
             "spatial_coherence_score": 1.0,
             "execution_summary": {
                 "selected_task": qi.intent,
