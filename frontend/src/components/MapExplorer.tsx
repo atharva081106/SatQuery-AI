@@ -860,31 +860,8 @@ export default function MapExplorer({ onAcquire, onCancel }: MapExplorerProps = 
     }
   }, [basemap, L]);
 
-  // Dynamic NASA GIBS Tile Layer Effect
-  useEffect(() => {
-    if (!L || !mapInstanceRef.current) return;
-    
-    // Remove old layer if it exists
-    if (gibsLayerRef.current) {
-      mapInstanceRef.current.removeLayer(gibsLayerRef.current);
-    }
-    
-    // Create new layer with the updated endDate
-    const gibsLayer = L.tileLayer(
-      `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${endDate}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
-      {
-        attribution: 'NASA GIBS',
-        maxZoom: 9,
-        opacity: 0.9,
-        className: 'gibs-layer',
-        bounds: [[-85.0511287776, -180], [85.0511287776, 180]]
-      }
-    );
-    
-    gibsLayer.addTo(mapInstanceRef.current);
-    gibsLayerRef.current = gibsLayer;
-    
-  }, [L, endDate]);
+  // Dynamic NASA GIBS Tile Layer Effect removed for extreme performance optimization.
+  // ESRI World Imagery acts as the sole, ultra-fast CDN-backed satellite basemap.
 
   const handleAcquire = async () => {
     if (!canUseMap) {
