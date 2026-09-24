@@ -48,7 +48,7 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     sensors: "Cartosat-2S / Sentinel-2 Bi-Temporal Pair",
     resolution: "0.65m / 10m Ground Resolution",
     pipeline: "Siamese UNet Change Head + Mask Overlays",
-    query: "Run Change Detection between pre-flood baseline and post-flood event",
+    query: "What changed between these two dates, and where did the change occur?",
     description: "Catastrophic cloudburst and glacial lake outburst flood in Chamoli. Demonstrates bi-temporal difference mapping, swollen silt channel boundary delineation, and affected transport infrastructure isolation.",
     technicalNote: "Directly solves PS 26167 requirement: Bi-temporal satellite pair processing with pixel-level displaced terrain identification.",
     images: [
@@ -67,7 +67,7 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     sensors: "Cartosat-2S Panchromatic + Multispectral",
     resolution: "0.65m Sub-Meter GSD",
     pipeline: "SatSegNet Grounding Head + Bounding Boxes",
-    query: "Highlight industrial storage facilities, maritime docks, and cargo vessels",
+    query: "Describe the land-cover and major objects visible in this image.",
     description: "Deep-water seaport terminal evaluation. Isolates commercial container ships, docking berths, and cylindrical petroleum liquid storage clusters with sub-meter spatial precision.",
     technicalNote: "Validates high-resolution panchromatic spatial grounding with zero false alarms across ocean-land boundaries.",
     images: [
@@ -85,7 +85,7 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     sensors: "Cartosat-3 Optical + RISAT-1 C-Band SAR",
     resolution: "5.4 GHz Microwave + 1.2m SAR Stripmap",
     pipeline: "Cross-Modal Dual-Encoder Attention",
-    query: "Penetrate cloud cover using SAR radar backscatter channels and extract obscured maritime features",
+    query: "Use the optical and SAR images together to identify built-up and water-covered regions.",
     description: "Overcomes 100% thick monsoon cloud cover obscuring optical satellites by fusing synthetic aperture radar backscatter returns to pinpoint maritime vessels and island coastlines.",
     technicalNote: "Demonstrates ISRO RISAT-1 microwave radar capabilities for all-weather 24/7 disaster and strategic surveillance.",
     images: [
@@ -104,7 +104,7 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     sensors: "Resourcesat-2 LISS-4 Multispectral",
     resolution: "5.8m GSD (Green, Red, NIR)",
     pipeline: "Multispectral Water Indices + Vector Contouring",
-    query: "Detect water body boundary and calculate total wetland surface area in km²",
+    query: "Highlight the water body referred to in the query.",
     description: "Ramsar wetland desiccation monitoring. Isolates hypersaline brine lagoons from industrial salt evaporation pans and computes accurate surface area vector polygons in RFC 7946 GeoJSON.",
     technicalNote: "Validates multispectral SWIR/NIR water indices and automatic polygon area calculation in square kilometers.",
     images: [
@@ -122,7 +122,7 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     sensors: "Cartosat-3 High-Resolution Panchromatic",
     resolution: "0.28m State-of-the-Art GSD",
     pipeline: "Multi-Class Semantic Segmentation (Built-Up vs Road)",
-    query: "Detect built-up structures, commercial buildings, and calculate built-up density percentage",
+    query: "Has the built-up area increased, decreased, or remained unchanged?",
     description: "Rapid urban densification analysis isolating tech park footprints, multi-lane arterial roads, and remaining vegetative buffers with built-up ratio percentage.",
     technicalNote: "Evaluates sub-30cm Cartosat-3 high-detail resolving power for smart city planning and tax boundary audits.",
     images: [
