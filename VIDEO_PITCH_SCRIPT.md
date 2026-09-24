@@ -11,9 +11,12 @@
 **Speaker:** "Good morning everyone. Today we are addressing ISRO Problem Statement 26167. 
 Satellite imagery is incredibly powerful, but using AI to analyze this data is extremely difficult for non-experts. If you ask a generic AI chat model to analyze a satellite image, it often hallucinates—it guesses the answer because it wasn't trained on geospatial physics. Furthermore, specialized tools are fragmented. You need one tool for optical images, a completely different tool for radar, and another for change detection."
 
-**[0:30 - 1:15] The Solution: An 'AI Hospital' of Specialists**
+**[0:30 - 1:00] The Solution: An 'AI Hospital' of Specialists**
 **Speaker:** "Our solution is **SatQuery AI**. Instead of building one generic AI model that tries to do everything and fails, we built an **Agentic Orchestrator**. 
 Think of our system like a hospital. The user types their query in plain English—like speaking to a receptionist. Our 'Agentic Controller' understands the request and automatically routes the images to the correct specialist doctor. We have one specialist model for object detection (SatSegNet), another specifically for comparing timelines (Siamese Networks), and another for penetrating clouds using SAR radar."
+
+**[1:00 - 1:15] Benchmarking: Proven Accuracy**
+**Speaker:** "And most importantly, we don't just trust these specialists blindly. To ensure they meet ISRO's standards, they are rigorously trained and tested against prescribed public benchmarks: **BigEarthNet** for understanding terrain, **RSVQA** for answering visual questions, and **CDVQA** for spotting disaster changes. This proves our AI's accuracy is mathematically grounded, not just a guess."
 
 ---
 
