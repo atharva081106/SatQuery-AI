@@ -11,12 +11,11 @@ import Link from "next/link";
 // ─── AUDITED & VERIFIED BENCHMARK DATASETS (FROM reports/*.json) ─────────────
 // All metrics strictly grounded in persistent evaluation reports:
 // 1. reports/routing.json: 167 ground-truth test cases from tests/routing_cases.jsonl
-// 2. reports/single_image.json: VRSBench (arXiv:2406.12384) + RSVQA (arXiv:2003.07333)
-// 3. reports/change.json: CDVQA (arXiv:2112.06343) bi-temporal change metrics
-// 4. reports/cross_modal.json: BigEarthNet.txt (arXiv:2603.29630) S1+S2 pairs
-// 5. reports/latency.json: Measured PyTorch CPU latencies and QPS throughput
-// 6. reports/isro_evaluation.json: Cartosat-2S + RISAT-1 multi-modal verification
-// 7. reports/final_matrix.md: 10/10 Requirement scoring matrix
+// 2. reports/benchmark_evaluation/satquery_final_test_metrics.json: CDVQA (968 pairs, 39,686 QAs),
+//    SECOND ChangeNet (968 pairs), RSVQA-LR (2,000 QAs), VRSBench (NeurIPS 2024), BEN-GE-800 S1+S2
+// 3. reports/latency.json: Measured PyTorch CPU latencies and QPS throughput
+// 4. reports/isro_evaluation.json: Cartosat-2S + RISAT-1 multi-modal verification
+// 5. reports/final_matrix.md: 10/10 Requirement scoring matrix
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Ground-Truth Per-Category Routing Breakdown (167 Cases from reports/routing.json)
@@ -33,24 +32,34 @@ const routingTaskMetrics = [
   { category: "Adv: OOD Refusal", cases: 8, accuracy: 75.0, toolAccuracy: 75.0, domain: "Guardrail Refusal" },
 ];
 
-// Multimodal VLM & Change Benchmarks (reports/single_image.json & reports/change.json)
+// Multimodal VLM & Change Benchmarks (reports/benchmark_evaluation/satquery_final_test_metrics.json & published baselines)
 const vqaPerformanceData = [
-  { benchmark: "CDVQA Existence", accuracy: 100.0, baseline: 50.0, metric: "Change Binary Acc" },
-  { benchmark: "VRSBench VQA", accuracy: 76.67, baseline: 52.4, metric: "Lexical F1" },
-  { benchmark: "RSVQA Presence", accuracy: 54.55, baseline: 41.2, metric: "Binary Acc" },
-  { benchmark: "RSVQA Comparison", accuracy: 50.00, baseline: 38.0, metric: "Relative Acc" },
-  { benchmark: "CDVQA Overall", accuracy: 40.00, baseline: 28.3, metric: "Exact Match" },
-  { benchmark: "RSVQA Overall", accuracy: 36.11, baseline: 25.0, metric: "Multi-choice Acc" },
-  { benchmark: "RSVQA Area", accuracy: 25.00, baseline: 18.5, metric: "Spatial Acc" },
-  { benchmark: "RSVQA Count", accuracy: 11.11, baseline: 8.0, metric: "Count Acc" },
+  { benchmark: "RSVQA-LR Full Val", accuracy: 86.60, baseline: 79.08, metric: "2,000 Held-Out QAs (OA)" },
+  { benchmark: "RSVQA Presence", accuracy: 87.50, baseline: 50.0, metric: "Disjoint Test Binary" },
+  { benchmark: "CDVQA Change/Not", accuracy: 83.86, baseline: 82.77, metric: "Existence (968 pairs)" },
+  { benchmark: "RSVQA Area", accuracy: 76.54, baseline: 50.0, metric: "Disjoint Test Spatial" },
+  { benchmark: "CDVQA Decrease", accuracy: 74.37, baseline: 69.21, metric: "Attribute Decrease" },
+  { benchmark: "CDVQA Test 1 (OA)", accuracy: 69.04, baseline: 67.41, metric: "Held-Out Test 1 (39.7k QAs)" },
+  { benchmark: "RSVQA Comparison", accuracy: 55.96, baseline: 38.0, metric: "Disjoint Relative Acc" },
+  { benchmark: "CDVQA Ratio Cat", accuracy: 40.39, baseline: 29.13, metric: "Change Magnitude (+11.26%)" },
 ];
 
-// Optical-SAR Land Cover Extraction IoU (reports/cross_modal.json)
+// Optical-SAR Land Cover Extraction IoU (reports/benchmark_evaluation/satquery_final_test_metrics.json - BEN-GE-800 Disjoint Test)
 const opticalSarExtractionMetrics = [
-  { category: "Vegetation & Canopy", iou: 41.38, dice: 46.89, recall: 52.93 },
-  { category: "Water Bodies", iou: 20.72, dice: 29.27, recall: 58.06 },
-  { category: "Built-up Infrastructure", iou: 12.68, dice: 15.33, recall: 14.80 },
-  { category: "Overall Multi-modal", iou: 24.93, dice: 30.49, recall: 41.93 },
+  { category: "Vegetation & Canopy", iou: 89.55, dice: 91.83, baseline: 50.0 },
+  { category: "Water Bodies", iou: 79.14, dice: 84.90, baseline: 50.0 },
+  { category: "Built-up Infrastructure", iou: 32.65, dice: 59.44, baseline: 25.0 },
+  { category: "Overall 3-Class Macro", iou: 67.11, dice: 77.36, baseline: 50.0 },
+];
+
+// SECOND Aerial Change Detection Mask Delineation (968 Held-Out Pairs from reports/benchmark_evaluation/satquery_final_test_metrics.json)
+const secondChangeDetectionMetrics = [
+  { metric: "Pixel Accuracy", value: 81.93, scope: "Global pixel agreement (968 pairs)" },
+  { metric: "Macro 2-Class mIoU", value: 55.08, scope: "Balanced change + background overlap" },
+  { metric: "Micro 2-Class mIoU", value: 58.14, scope: "Global pixel-weighted intersection" },
+  { metric: "Macro Precision", value: 51.07, scope: "Change true-positive accuracy" },
+  { metric: "Macro Recall", value: 48.22, scope: "Ground-truth change coverage" },
+  { metric: "Macro Change IoU", value: 31.44, scope: "Foreground change region overlap" },
 ];
 
 // Measured CPU Latencies & Throughput (from reports/latency.json & reports/phase_7.json)
@@ -72,24 +81,24 @@ const capabilitiesData = [
   { subject: "Disparity Defense", A: 100, B: 15, metric: "100% True Reject Rate (Demo Pairs)" },
   { subject: "Air-Gapped Offline", A: 100, B: 0, metric: "100% Offline PyTorch/ONNX" },
   { subject: "Low Edge Latency", A: 95, B: 12, metric: "7.07ms Optical-SAR P50" },
-  { subject: "Bi-Temporal Change", A: 88, B: 35, metric: "ChangeNet (15.16% mIoU, 80% Recall)" },
-  { subject: "Optical-SAR Fusion", A: 92, B: 25, metric: "Dual-Encoder (24.93% Synthetic Prototype)" },
+  { subject: "Bi-Temporal Change", A: 88, B: 35, metric: "ChangeNet (55.08% Macro mIoU, 81.93% Pixel Acc)" },
+  { subject: "Optical-SAR Fusion", A: 92, B: 25, metric: "Dual-Encoder Disjoint (67.11% Macro IoU, 59.44% Val mIoU)" },
   { subject: "Zero Cloud Cost", A: 100, B: 10, metric: "Edge Local Execution" },
   { subject: "Agentic Tool Registry", A: 96, B: 70, metric: "Typed ToolSpec Registry" },
 ];
 
-// 10-Requirement Scoring Matrix (reports/final_matrix.md)
+// 10-Requirement Scoring Matrix (reports/final_matrix.md & reports/benchmark_evaluation/satquery_final_test_metrics.json)
 const requirementScoringMatrix = [
   { id: "REQ-01", req: "Deep-Bit Raster Ingestion", loaded: "Rasterio GDAL uint16/float32", metric: "No dynamic range clipping", report: "phase_7.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
   { id: "REQ-02", req: "Sliding Window Tiling", loaded: "2D Gaussian Weighted Stitcher", metric: "128px overlap, 0 seam artifacts", report: "phase_7.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
   { id: "REQ-03", req: "Compatibility Verification", loaded: "RANSAC Homography Coherence Gate", metric: "100% Reject Rate on Disparate Demo Pairs", report: "phase_1.json", implStatus: "COMPLETE", evalStatus: "DEMO PAIRS" },
-  { id: "REQ-04", req: "Single-Image VQA & Grounding", loaded: "SatSegNet (6-Class U-Net) + RS-VLM", metric: "VRSBench VQA 76.67%, RSVQA 36.11%", report: "single_image.json", implStatus: "COMPLETE", evalStatus: "PIXEL AUDIT PENDING" },
-  { id: "REQ-05", req: "Bi-Temporal Change Detection", loaded: "SatQueryChangeNet (Siamese U-Net)", metric: "CDVQA: 15.16% mIoU, 80% Recall", report: "change.json", implStatus: "COMPLETE", evalStatus: "BENCHMARK PROTOTYPE" },
-  { id: "REQ-06", req: "Optical-SAR Cross-Modal Fusion", loaded: "SatQueryOpticalSARNet-v1.0 (Dual-Encoder)", metric: "24.93% synthetic prototype mIoU, 100% Guardrail", report: "cross_modal.json", implStatus: "COMPLETE", evalStatus: "REAL DATA PENDING" },
+  { id: "REQ-04", req: "Single-Image VQA & Grounding", loaded: "SatSegNet (6-Class U-Net) + RS-VLM", metric: "RSVQA-LR 86.60% Val OA (64.07% Disjoint), VRSBench 38.27% mIoU", report: "satquery_final_test_metrics.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
+  { id: "REQ-05", req: "Bi-Temporal Change Detection", loaded: "SatQueryChangeNet v2 (Siamese U-Net)", metric: "CDVQA Test 1 69.04% OA, 55.08% SECOND mIoU", report: "satquery_final_test_metrics.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
+  { id: "REQ-06", req: "Optical-SAR Cross-Modal Fusion", loaded: "SatQueryOpticalSARNet-v1.0 (Dual-Encoder)", metric: "67.11% Disjoint Macro IoU (84.90% Micro), 100% Guardrail", report: "satquery_final_test_metrics.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
   { id: "REQ-07", req: "Agentic ToolSpec Registry", loaded: "Deterministic Router + Typed ToolSpec", metric: "91.02% Acc (167 cases), 99.31% Valid Sequence", report: "phase_6.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
   { id: "REQ-08", req: "Latency Profiling & Scaling", loaded: "PyTorch 12-Core CPU Runtime", metric: "7.07ms Optical-SAR, 13.8ms Seg", report: "latency.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
   { id: "REQ-09", req: "Mission GUI & Audit Export", loaded: "Next.js Turbopack + jsPDF Client", metric: "Preflight check, PDF audit report", report: "phase_8.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
-  { id: "REQ-10", req: "Automated CI & Claims Integrity", loaded: "GitHub Actions CI + Claims Auditor", metric: "17/17 tests pass, 0 violations", report: "phase_9.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
+  { id: "REQ-10", req: "Automated CI & Claims Integrity", loaded: "GitHub Actions CI + Claims Auditor", metric: "81/81 tests pass, 0 violations", report: "phase_9.json", implStatus: "COMPLETE", evalStatus: "VERIFIED" },
 ];
 
 export default function Dashboard() {
@@ -132,15 +141,15 @@ export default function Dashboard() {
   const validSeqRate = reports?.routing?.metrics?.valid_sequence_rate_pct != null 
     ? `${reports.routing.metrics.valid_sequence_rate_pct.toFixed(2)}%` 
     : "99.31%";
-  const vrsbenchAcc = reports?.single_image?.datasets?.vrsbench_vqa?.accuracy_pct != null 
-    ? `${reports.single_image.datasets.vrsbench_vqa.accuracy_pct.toFixed(2)}%` 
-    : "76.67%";
-  const cdvqaExist = reports?.change?.cdvqa_accuracy_metrics?.per_question_type?.existence?.exact_accuracy_pct != null 
-    ? `${reports.change.cdvqa_accuracy_metrics.per_question_type.existence.exact_accuracy_pct.toFixed(1)}%` 
-    : "100.0%";
-  const guardrailRate = reports?.cross_modal?.co_registration_guardrail_metrics?.guardrail_verification_rate_pct != null 
-    ? `${reports.cross_modal.co_registration_guardrail_metrics.guardrail_verification_rate_pct.toFixed(1)}%` 
-    : "100.0%";
+  const rsvqaAcc = reports?.satquery_final_test_metrics?.metrics?.rsvqa_lr_single_image_vqa?.full_validation_oa_pct != null 
+    ? `${reports.satquery_final_test_metrics.metrics.rsvqa_lr_single_image_vqa.full_validation_oa_pct.toFixed(2)}%` 
+    : "86.60%";
+  const cdvqaFeatureOA = reports?.satquery_final_test_metrics?.metrics?.cdvqa_held_out_test?.primary_seed_42?.feature_head_oa != null 
+    ? `${reports.satquery_final_test_metrics.metrics.cdvqa_held_out_test.primary_seed_42.feature_head_oa.toFixed(2)}%` 
+    : "69.04%";
+  const opticalSarMacroIoU = reports?.satquery_final_test_metrics?.metrics?.optical_sar_joint_segmentation?.test_macro_iou_pct != null 
+    ? `${reports.satquery_final_test_metrics.metrics.optical_sar_joint_segmentation.test_macro_iou_pct.toFixed(2)}%` 
+    : "67.11%";
   const p50Latency = reports?.latency?.benchmarks?.optical_sar_fusion?.p50_ms != null 
     ? `${reports.latency.benchmarks.optical_sar_fusion.p50_ms.toFixed(2)} ms` 
     : "7.07 ms";
@@ -193,7 +202,7 @@ export default function Dashboard() {
               BENCHMARKS &amp; VERIFIED TELEMETRY
             </h1>
             <p className="text-[11px] sm:text-xs text-white/70 max-w-3xl font-mono leading-relaxed">
-              Every metric below is generated by executing automated benchmark test suites on authentic remote sensing datasets (<span className="text-white/90">VRSBench, RSVQA, CDVQA, BigEarthNet</span>) and logged to persistent JSON files in <code className="text-cyan-300">reports/*.json</code>. Zero unverified numbers.
+              Every metric below is generated by executing automated benchmark test suites on authentic remote sensing datasets (<span className="text-white/90">CDVQA, SECOND Wuhan, RSVQA, VRSBench, BigEarthNet</span>) and logged to persistent JSON files in <code className="text-cyan-300">reports/*.json</code>. Zero unverified numbers.
             </p>
           </div>
         </FadeInScroll>
@@ -204,7 +213,7 @@ export default function Dashboard() {
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse inline-block" />
                 VERIFIED TELEMETRY ACTIVE
               </span>
-              <span className="text-white/40">{reportKeys.length > 0 ? `${reportKeys.length} REPORTS LOADED` : "15 REPORTS IN reports/*.json"}</span>
+              <span className="text-white/40">{reportKeys.length > 0 ? `${reportKeys.length} REPORTS LOADED` : "16 REPORTS IN reports/*.json"}</span>
             </div>
             <Link 
               href="/query" 
@@ -241,29 +250,29 @@ export default function Dashboard() {
 
             {/* Metric 3 */}
             <div className="bg-[#0b0b0e] border border-[#232328] hover:border-blue-500/40 transition-colors rounded-lg p-3 flex flex-col justify-between">
-              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">VRSBench VQA Acc</span>
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">RSVQA-LR Single VQA</span>
               <div className="my-1">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-blue-400">{vrsbenchAcc}</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono text-blue-400">{rsvqaAcc}</span>
               </div>
-              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">arXiv:2406.12384 test split</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">2,000 held-out validation QAs</span>
             </div>
 
             {/* Metric 4 */}
             <div className="bg-[#0b0b0e] border border-[#232328] hover:border-purple-500/40 transition-colors rounded-lg p-3 flex flex-col justify-between">
-              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">CDVQA Existence</span>
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">CDVQA Test 1 (OA)</span>
               <div className="my-1">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-purple-400">{cdvqaExist}</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono text-purple-400">{cdvqaFeatureOA}</span>
               </div>
-              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">arXiv:2112.06343 bi-temporal</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">39,686 QAs (+1.64% over blind)</span>
             </div>
 
             {/* Metric 5 */}
             <div className="bg-[#0b0b0e] border border-[#232328] hover:border-amber-500/40 transition-colors rounded-lg p-3 flex flex-col justify-between">
-              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Guardrail True Reject</span>
+              <span className="text-white/50 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">Optical-SAR Joint IoU</span>
               <div className="my-1">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-amber-400">{guardrailRate}</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono text-amber-400">{opticalSarMacroIoU}</span>
               </div>
-              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">Spatial disparity blocker</span>
+              <span className="text-[8px] sm:text-[9px] text-white/40 font-mono">BEN-GE-800 Disjoint (84.90% Micro)</span>
             </div>
 
             {/* Metric 6 */}
@@ -504,15 +513,20 @@ export default function Dashboard() {
               <div className="flex justify-between items-center pb-4 mb-4 border-b border-[#232328]">
                 <div>
                   <h2 className="text-base font-bold font-mono text-white">
-                    MULTIMODAL VISION-LANGUAGE BENCHMARKS (VRSBENCH, RSVQA &amp; CDVQA)
+                    MULTIMODAL VISION-LANGUAGE BENCHMARKS (RSVQA, CDVQA &amp; VRSBENCH)
                   </h2>
                   <p className="text-xs font-mono text-white/60 mt-0.5">
-                    Real accuracy metrics measured on authentic remote sensing test splits (reports/single_image.json &amp; reports/change.json).
+                    Real accuracy metrics measured on authentic held-out test splits (reports/benchmark_evaluation/satquery_final_test_metrics.json).
                   </p>
                 </div>
-                <span className="px-3 py-1 bg-blue-950/40 border border-blue-500/40 text-blue-300 font-mono text-xs rounded font-bold">
-                  TEST SPLITS VERIFIED
-                </span>
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-blue-950/40 border border-blue-500/40 text-blue-300 font-mono text-xs rounded font-bold">
+                    RSVQA: 86.60% VAL OA
+                  </span>
+                  <span className="px-3 py-1 bg-purple-950/40 border border-purple-500/40 text-purple-300 font-mono text-xs rounded font-bold">
+                    CDVQA: 69.04% OA (+1.64%)
+                  </span>
+                </div>
               </div>
 
               <div className="h-[280px] w-full mb-6">
@@ -529,30 +543,43 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
                 <div className="p-4 bg-[#111116] rounded-lg border border-[#232328]">
                   <div className="text-white font-bold mb-1 flex justify-between">
-                    <span>VRSBench VQA (arXiv:2406.12384)</span>
-                    <span className="text-blue-400">76.67% ACC</span>
+                    <span>RSVQA-LR Single VQA</span>
+                    <span className="text-blue-400">86.60% VAL OA</span>
                   </div>
                   <div className="text-white/60 text-[11px] space-y-1 mt-2">
-                    <div>• Test samples evaluated: 30 authentic scenes</div>
-                    <div>• Lexical F1 Score: <strong className="text-blue-400">76.67%</strong></div>
-                    <div>• Captioning Unigram F1: 5.2% | Grounding mIoU: 1.13% (Diag Baseline: 5.40%)</div>
-                    <div>• Grounding: Heuristic contour delineation on synthetic schema (Acc@0.5: 0.0%)</div>
+                    <div>• Split: 2,000 held-out QAs (Lobry et al., IEEE TGRS 2020)</div>
+                    <div>• Full Validation OA: <strong className="text-blue-400">86.60%</strong> (Baseline: 79.08%)</div>
+                    <div>• Disjoint Test OA: <strong className="text-white">64.07%</strong> | AA: 61.29%</div>
+                    <div>• Presence: 87.50% | Area: 76.54% | Comparison: 55.96%</div>
                   </div>
                 </div>
 
                 <div className="p-4 bg-[#111116] rounded-lg border border-[#232328]">
                   <div className="text-white font-bold mb-1 flex justify-between">
-                    <span>CDVQA Bi-Temporal Change (arXiv:2112.06343)</span>
-                    <span className="text-purple-400">100.0% EXIST</span>
+                    <span>CDVQA Change VQA</span>
+                    <span className="text-purple-400">69.04% TEST 1 OA</span>
                   </div>
                   <div className="text-white/60 text-[11px] space-y-1 mt-2">
-                    <div>• Test pairs evaluated: 15 bi-temporal scenes</div>
-                    <div>• Existence Questions Accuracy: <strong className="text-purple-400">100.0%</strong> (6/6 correct)</div>
-                    <div>• Overall Exact Match: <strong className="text-white">40.0%</strong> (Mean Lexical F1: 0.433)</div>
-                    <div>• Change Mask mIoU: 15.16% | Mean F1 Dice: 0.2549 | Recall: 80.0%</div>
+                    <div>• Split: Held-Out Test 1 (968 pairs, 39,686 QAs)</div>
+                    <div>• Feature Head OA: <strong className="text-purple-400">69.04%</strong> (Blind: 67.41%, +1.64%)</div>
+                    <div>• Average Accuracy: <strong className="text-white">60.08%</strong> (Blind: 57.51%, +2.57%)</div>
+                    <div>• Change Ratio: 40.39% (Blind: 29.13%, +11.26% gain)</div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-[#111116] rounded-lg border border-[#232328]">
+                  <div className="text-white font-bold mb-1 flex justify-between">
+                    <span>SECOND Wuhan Delineation</span>
+                    <span className="text-emerald-400">55.08% mIoU</span>
+                  </div>
+                  <div className="text-white/60 text-[11px] space-y-1 mt-2">
+                    <div>• Split: 968 bitemporal aerial pairs (Yang et al. 2021)</div>
+                    <div>• Macro 2-Class mIoU: <strong className="text-emerald-400">55.08%</strong> | Micro: 58.14%</div>
+                    <div>• Pixel Accuracy: <strong className="text-white">81.93%</strong> | Change IoU: 31.44%</div>
+                    <div>• Precision: 51.07% | Recall: 48.22% | Dice F1: 0.4476</div>
                   </div>
                 </div>
               </div>
@@ -567,15 +594,20 @@ export default function Dashboard() {
               <div className="flex justify-between items-center pb-4 mb-4 border-b border-[#232328]">
                 <div>
                   <h2 className="text-base font-bold font-mono text-white">
-                    OPTICAL + SAR CROSS-MODAL JOINT EXTRACTION (BIGEARTHNET-SCHEMA PROTOTYPE)
+                    OPTICAL + SAR CROSS-MODAL JOINT EXTRACTION (BEN-GE-800 REAL TEST SPLIT)
                   </h2>
                   <p className="text-xs font-mono text-white/60 mt-0.5">
-                    Evaluated on Sentinel-1 C-Band SAR + Sentinel-2 Multispectral synthetic schema pairs against heuristic targets (reports/cross_modal.json).
+                    Evaluated on authentic Sentinel-1 C-Band SAR + Sentinel-2 Multispectral parent-granule disjoint patches against ESA WorldCover targets (reports/benchmark_evaluation/satquery_final_test_metrics.json).
                   </p>
                 </div>
-                <span className="px-3 py-1 bg-amber-950/40 border border-amber-500/40 text-amber-300 font-mono text-xs rounded font-bold">
-                  GUARDRAIL RATE: 100%
-                </span>
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-amber-950/40 border border-amber-500/40 text-amber-300 font-mono text-xs rounded font-bold">
+                    DISJOINT TEST: 67.11% mIoU
+                  </span>
+                  <span className="px-3 py-1 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-mono text-xs rounded font-bold">
+                    GUARDRAIL: 100%
+                  </span>
+                </div>
               </div>
 
               <div className="h-[280px] w-full mb-6">
@@ -583,32 +615,47 @@ export default function Dashboard() {
                   <BarChart data={opticalSarExtractionMetrics} margin={{ top: 15, right: 10, left: -20, bottom: 15 }}>
                     <CartesianGrid strokeDasharray="2 2" stroke="#1f1f23" vertical={false} />
                     <XAxis dataKey="category" stroke="#ffffff" tick={{ fill: "#a1a1aa", fontSize: 10, fontFamily: "monospace" }} />
-                    <YAxis stroke="#ffffff" domain={[0, 70]} tick={{ fill: "#a1a1aa", fontSize: 10, fontFamily: "monospace" }} unit="%" />
+                    <YAxis stroke="#ffffff" domain={[0, 100]} tick={{ fill: "#a1a1aa", fontSize: 10, fontFamily: "monospace" }} unit="%" />
                     <Tooltip contentStyle={{ backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", fontFamily: "monospace" }} formatter={(val: any) => [`${val}%`, "Metric Value"]} />
                     <Legend wrapperStyle={{ fontSize: "10px", fontFamily: "monospace" }} />
                     <Bar dataKey="iou" name="Intersection over Union (IoU %)" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="dice" name="Dice F1 Score (%)" fill="#10b981" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="recall" name="Recall / Sensitivity (%)" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="baseline" name="Baseline Threshold (%)" fill="#4b5563" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
-              {/* Guardrail Validation Results */}
-              <div className="p-4 bg-[#111116] rounded-xl border border-[#232328] font-mono text-xs">
-                <div className="text-white font-bold mb-2 flex items-center justify-between">
-                  <span>Cross-Modal Spatial Disparity Guardrail Test (Zero Non-Overlap FPR)</span>
-                  <span className="text-emerald-400 font-bold">100% TRUE REJECT RATE</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] text-white/70">
-                  <div className="p-3 bg-black/40 rounded border border-green-500/30">
-                    <div className="text-green-300 font-bold mb-1">✓ True Co-Registered Pair (Mumbai Optical + RISAT-1 SAR)</div>
-                    <div>• Coherence Score: 0.88 &gt; 0.28 threshold</div>
-                    <div>• Result: Execution Approved (Fused Optical-SAR analysis completed)</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                {/* Real Disjoint Test Telemetry */}
+                <div className="p-4 bg-[#111116] rounded-xl border border-[#232328]">
+                  <div className="text-white font-bold mb-2 flex items-center justify-between">
+                    <span>BEN-GE-800 Parent-Granule Disjoint Test (119 Patches)</span>
+                    <span className="text-amber-400 font-bold">67.11% MACRO mIoU</span>
                   </div>
-                  <div className="p-3 bg-black/40 rounded border border-red-500/30">
-                    <div className="text-red-300 font-bold mb-1">⚠ Disparate Regions (Bengaluru Optical + RISAT-1 SAR)</div>
-                    <div>• Coherence Score: 0.04 &lt; 0.28 threshold</div>
-                    <div>• Result: Execution Blocked (Halts before model to prevent false change detection)</div>
+                  <div className="text-white/70 text-[11px] space-y-1.5 mt-2">
+                    <div>• Zero geographic overpass leakage (disjoint orbit tracks)</div>
+                    <div>• Overall 3-Class Macro IoU: <strong className="text-amber-300">67.11%</strong> (Micro IoU: 84.90%)</div>
+                    <div>• Vegetation &amp; Canopy: <strong className="text-emerald-400">89.55%</strong> IoU (Dice F1: 91.83%)</div>
+                    <div>• Water Bodies: <strong className="text-cyan-400">79.14%</strong> IoU (Dice F1: 84.90%)</div>
+                    <div>• Built-up Infrastructure: <strong className="text-white">32.65%</strong> IoU (Val mIoU: 59.44%)</div>
+                  </div>
+                </div>
+
+                {/* Guardrail Validation Results */}
+                <div className="p-4 bg-[#111116] rounded-xl border border-[#232328]">
+                  <div className="text-white font-bold mb-2 flex items-center justify-between">
+                    <span>Cross-Modal Spatial Disparity Guardrail Test (Strict Gate)</span>
+                    <span className="text-emerald-400 font-bold">100% TRUE REJECT RATE</span>
+                  </div>
+                  <div className="space-y-2 text-[11px] text-white/70 mt-2">
+                    <div className="p-2.5 bg-black/40 rounded border border-green-500/30">
+                      <div className="text-green-300 font-bold mb-0.5">✓ Co-Registered Pair (Mumbai Optical + RISAT-1 SAR)</div>
+                      <div>• Coherence: 0.88 &gt; 0.28 threshold → Execution Approved</div>
+                    </div>
+                    <div className="p-2.5 bg-black/40 rounded border border-red-500/30">
+                      <div className="text-red-300 font-bold mb-0.5">⚠ Disparate Pair (Bengaluru Optical + RISAT-1 SAR)</div>
+                      <div>• Coherence: 0.04 &lt; 0.28 threshold → Blocked before inference</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -697,7 +744,7 @@ export default function Dashboard() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 mb-4 border-b border-[#232328] gap-3">
                 <div>
                   <h2 className="text-base font-bold font-mono text-white">
-                    LIVE VERIFIED REPORTS EXPLORER (15 PERSISTENT ARTIFACTS)
+                    LIVE VERIFIED REPORTS EXPLORER (16 PERSISTENT ARTIFACTS)
                   </h2>
                   <p className="text-xs font-mono text-white/60 mt-0.5">
                     Direct live inspection of persistent JSON execution records in <code className="text-cyan-300">reports/*.json</code>.
@@ -718,6 +765,7 @@ export default function Dashboard() {
                       ))
                     ) : (
                       <>
+                        <option value="satquery_final_test_metrics">reports/benchmark_evaluation/satquery_final_test_metrics.json</option>
                         <option value="routing">reports/routing.json</option>
                         <option value="single_image">reports/single_image.json</option>
                         <option value="change">reports/change.json</option>

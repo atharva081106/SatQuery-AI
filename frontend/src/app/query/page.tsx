@@ -918,7 +918,7 @@ export default function Home() {
         doc.setFontSize(7);
         doc.setTextColor(71, 85, 105);
         doc.text("Telemetry verified against SIH26167 evaluation suite: 167 routing cases, 91.02% routing accuracy, 0 claims violations.", 18, y + 10);
-        doc.text("Models: SatSegNet (6-class), SatQueryChangeNet (15.16% CDVQA mIoU), SatQueryOpticalSARNet-v1.0 (24.93% synthetic prototype mIoU). All reports in reports/.", 18, y + 14);
+        doc.text("Models: SatSegNet (6-class), SatQueryChangeNet v2 (55.08% SECOND mIoU), SatQueryOpticalSARNet-v1.0 (67.11% Disjoint mIoU). Held-out reports in reports/.", 18, y + 14);
         y += 22;
       });
 

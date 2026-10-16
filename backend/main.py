@@ -143,25 +143,32 @@ async def healthcheck():
 @app.get("/api/reports")
 async def get_benchmark_reports():
     """
-    Returns all verified execution reports from reports/*.json.
+    Returns all verified execution reports from reports/*.json and reports/benchmark_evaluation/*.json.
     Ensures the UI only renders numbers that have actually run on real data.
     """
     reports_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "reports"))
     reports = {}
     if os.path.exists(reports_dir):
-        for fname in os.listdir(reports_dir):
-            if fname.endswith(".json"):
-                fpath = os.path.join(reports_dir, fname)
-                try:
-                    with open(fpath, "r", encoding="utf-8") as f:
-                        reports[fname[:-5]] = json.load(f)
-                except Exception as e:
-                    reports[fname[:-5]] = {"error": f"Failed to read report: {e}"}
+        for root, _, files in os.walk(reports_dir):
+            for fname in sorted(files):
+                if fname.endswith(".json"):
+                    fpath = os.path.join(root, fname)
+                    key = fname[:-5]
+                    rel_key = os.path.splitext(os.path.relpath(fpath, reports_dir))[0].replace("\\", "/")
+                    try:
+                        with open(fpath, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                            reports[key] = data
+                            if rel_key != key:
+                                reports[rel_key] = data
+                    except Exception as e:
+                        reports[key] = {"error": f"Failed to read report: {e}"}
     return {
         "status": "success",
         "reports": reports,
         "verified_count": len(reports)
     }
+
 
 @app.post("/api/preflight")
 async def run_preflight_checks(
