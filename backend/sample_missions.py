@@ -124,6 +124,7 @@ def generate_sample_missions():
             "tag": "BI-TEMPORAL CHANGE DETECTION",
             "location": "Rishi Ganga Valley, Uttarakhand (30.41° N, 79.73° E)",
             "sensors": "Cartosat-2S / Sentinel-2 Bi-Temporal Pair",
+            "pipeline": "SatQuery ChangeNet v3 + CDVQA 3-Seed Feature Head",
             "query": "What changed between these two dates, and where did the change occur?",
             "description": "Bi-temporal sequence capturing catastrophic river swelling, debris flow, and structural displacement.",
             "images": [
@@ -142,10 +143,11 @@ def generate_sample_missions():
         {
             "id": "mumbai_port_recon",
             "title": "MUMBAI HARBOR & DOCKS RECON",
-            "tag": "SINGLE-IMAGE VQA & GROUNDING",
+            "tag": "HIGH-RES VQA & VISUAL GROUNDING",
             "location": "Jawaharlal Nehru Port, Navi Mumbai (18.95° N, 72.95° E)",
             "sensors": "Cartosat-2S High-Resolution Optical (0.65m GSD)",
-            "query": "Describe the land-cover and major objects visible in this image.",
+            "pipeline": "VRSBench Visual Grounding Head v3 + RS-VLM Adapter",
+            "query": "Highlight industrial storage facilities, maritime docks, and cargo vessels",
             "description": "Sub-meter optical spatial reconnaissance isolating maritime shipping berths and cylindrical storage infrastructure.",
             "images": [
                 {
@@ -161,6 +163,7 @@ def generate_sample_missions():
             "tag": "OPTICAL–SAR CROSS-MODAL FUSION",
             "location": "Andaman Sea Corridor (12.35° N, 92.78° E)",
             "sensors": "Cartosat Optical + RISAT-1 C-Band SAR Co-Registered",
+            "pipeline": "SatQuery Optical-SAR Net v3 (Dual-Branch Fusion)",
             "query": "Use the optical and SAR images together to identify built-up and water-covered regions.",
             "description": "Cross-modal pair demonstrating 100% cloud penetration via RISAT-1 C-band microwave radar to reveal hidden vessels and coastline.",
             "images": [
@@ -182,7 +185,8 @@ def generate_sample_missions():
             "tag": "WETLAND BOUNDARY DELINEATION",
             "location": "Sambhar Lake, Rajasthan (26.90° N, 75.00° E)",
             "sensors": "Resourcesat-2 LISS-4 Multispectral (5.8m GSD)",
-            "query": "Highlight the water body referred to in the query.",
+            "pipeline": "SatSegNet Multi-Scale U-Net + Vector Contouring",
+            "query": "Detect water body boundary and calculate total wetland surface area in km2",
             "description": "Delineation of hypersaline lake perimeter, salt pans, and arid basin boundaries with RFC 7946 GeoJSON output.",
             "images": [
                 {
@@ -195,10 +199,11 @@ def generate_sample_missions():
         {
             "id": "bengaluru_urban_sprawl",
             "title": "BENGALURU URBAN DEVELOPMENT",
-            "tag": "LAND USE & BUILT-UP EXTRACTION",
+            "tag": "LAND USE & DENSITY ESTIMATION",
             "location": "Whitefield Tech Corridor, Bengaluru (12.97° N, 77.75° E)",
             "sensors": "Cartosat-3 High-Resolution Panchromatic (0.28m GSD)",
-            "query": "Has the built-up area increased, decreased, or remained unchanged?",
+            "pipeline": "RSVQA-LR Head v3 + BigEarthNet RS Domain Adapter",
+            "query": "Describe the land-cover distribution and dominant structures in this area",
             "description": "High-density urban analysis isolating commercial complexes, arterial road networks, and vegetative buffer zones.",
             "images": [
                 {

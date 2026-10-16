@@ -404,33 +404,50 @@ export default function Home() {
 
   const queryCategories = [
     {
-      category: "1. SCENE & OBJECT LOCALIZATION",
+      category: "1. BI-TEMPORAL CHANGE DETECTION (SatQuery ChangeNet v3 & CDVQA Head)",
       queries: [
-        "Describe the land-cover and major objects visible in this image."
+        "What changed between these two dates, and where did the change occur?",
+        "Run Change Detection between pre-flood baseline and post-flood event",
+        "Compare urban sprawl and built-up infrastructure expansion between these two epochs.",
+        "Did the water body expand or contract after the flood event?",
+        "Highlight all flooded sectors, washed out bridges, and debris deposits."
       ]
     },
     {
-      category: "2. WATER BODY HIGHLIGHTING & GROUNDING",
+      category: "2. VISUAL GROUNDING & LOCALIZATION (VRSBench Grounding Head v3)",
       queries: [
-        "Highlight the water body referred to in the query."
+        "Highlight industrial storage facilities, maritime docks, and cargo vessels",
+        "Detect and localize all aircraft, hangars, and runway structures.",
+        "Identify and bound residential complexes and road intersections in this scene.",
+        "Where are the circular storage tanks and logistics warehouses located?"
       ]
     },
     {
-      category: "3. BI-TEMPORAL CHANGE DETECTION",
+      category: "3. OPTICAL & SAR CROSS-MODAL FUSION (Optical-SAR Net v3)",
       queries: [
-        "What changed between these two dates, and where did the change occur?"
+        "Use the optical and SAR images together to identify built-up and water-covered regions.",
+        "Penetrate cloud cover using SAR radar backscatter channels and extract obscured maritime features",
+        "Fuse optical RGB and RISAT-1 C-Band SAR to delineate coastal water-land boundaries.",
+        "Extract high double-bounce radar targets and metallic infrastructure through dense haze."
       ]
     },
     {
-      category: "4. OPTICAL & SAR CROSS-MODAL FUSION",
+      category: "4. RS-VLM SCENE UNDERSTANDING (RSVQA-LR Head v3 + Domain Adapter)",
       queries: [
-        "Use the optical and SAR images together to identify built-up and water-covered regions."
+        "Describe the land-cover and major objects visible in this image.",
+        "Describe the land-cover distribution and dominant structures in this area",
+        "Is there an airport, harbor, or industrial complex present in this satellite tile?",
+        "What is the predominant land use in this high-resolution observation?"
       ]
     },
     {
-      category: "5. BUILT-UP AREA TREND QUANTIFICATION",
+      category: "5. SURFACE AREA QUANTIFICATION & DELINEATION (SatSegNet Multi-Scale U-Net)",
       queries: [
-        "Has the built-up area increased, decreased, or remained unchanged?"
+        "Highlight the water body referred to in the query.",
+        "Detect water body boundary and calculate total wetland surface area in km2",
+        "Has the built-up area increased, decreased, or remained unchanged?",
+        "Quantify total built-up area and calculate the impervious surface ratio.",
+        "Measure vegetative canopy coverage and delineate forest conservation boundaries."
       ]
     }
   ];

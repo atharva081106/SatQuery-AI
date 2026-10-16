@@ -2,15 +2,15 @@
 
 **Prepared for:** Smart India Hackathon (SIH 2026) Technical Jury  
 **Problem Statement:** ISRO / SAC — PS 26167: Natural Language Querying of Remote Sensing Imagery  
-**Architecture:** `SatSegNet` (Multi-Scale Satellite U-Net) + `Agentic Query Router` + `Deterministic Spatial Verification`  
+**Architecture:** `SatQuery Specialist V3 Suite` (`SatQuery ChangeNet v3`, `CDVQA 3-Seed Feature Head`, `VRSBench Grounding Head v3`, `Optical-SAR Net v3`, `RS-VLM Suite`, `SatSegNet U-Net`) + `Agentic Query Router` + `Deterministic Spatial Verification`  
 
 ---
 
 ## Quick-Start Demo Instructions
 
 1. Navigate to the **Query Studio** (`/query`).
-2. Click **"SAMPLE MISSIONS"** in the top navigation bar to open the pre-loaded mission selector (or upload your own GeoTIFF/PNG satellite tiles).
-3. Select any of the 5 canonical missions below and click **"EXECUTE MISSION"**.
+2. Click **"QUERIES"** (✦ button beside the attachment clip) to open the newly upgraded **Remote Sensing Query Library** organized by the 5 specialist ML models, or click **"SAMPLE MISSIONS"** in the top navigation bar.
+3. Select any of the 5 canonical missions or query templates below and click **"EXECUTE MISSION"** (or press Enter).
 4. The system executes in real-time, streaming natural language explanations, markdown statistics tables, interactive before/after visual sliders, GeoJSON vector maps, and execution traces.
 
 ---

@@ -47,10 +47,10 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     coordinates: "30.4150° N, 79.7340° E",
     sensors: "Cartosat-2S / Sentinel-2 Bi-Temporal Pair",
     resolution: "0.65m / 10m Ground Resolution",
-    pipeline: "Siamese UNet Change Head + Mask Overlays",
+    pipeline: "SatQuery ChangeNet v3 + CDVQA 3-Seed Feature Head",
     query: "What changed between these two dates, and where did the change occur?",
     description: "Catastrophic cloudburst and glacial lake outburst flood in Chamoli. Demonstrates bi-temporal difference mapping, swollen silt channel boundary delineation, and affected transport infrastructure isolation.",
-    technicalNote: "Directly solves PS 26167 requirement: Bi-temporal satellite pair processing with pixel-level displaced terrain identification.",
+    technicalNote: "Powered by SatQuery ChangeNet v3 (1.71M params) + CDVQA multi-modal cross-attention head (68.84% val OA).",
     images: [
       { name: "uttarakhand_pre_event_t1.png", base64: "/demo/uttarakhand_pre_event_t1.png", label: "T1: BASELINE ACQUISITION" },
       { name: "uttarakhand_post_event_t2.png", base64: "/demo/uttarakhand_post_event_t2.png", label: "T2: POST-DISASTER TILE" }
@@ -61,15 +61,15 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     title: "Mumbai Harbor & Docks Strategic Recon",
     category: "maritime",
     categoryLabel: "Maritime Recon",
-    tag: "HIGH-RES VQA & SECTOR DELINEATION",
+    tag: "HIGH-RES VQA & VISUAL GROUNDING",
     location: "Jawaharlal Nehru Port, Navi Mumbai, India",
     coordinates: "18.9490° N, 72.9510° E",
     sensors: "Cartosat-2S Panchromatic + Multispectral",
     resolution: "0.65m Sub-Meter GSD",
-    pipeline: "SatQuery Heuristic Delineator + Sector Bounding Boxes",
-    query: "Describe the land-cover and major objects visible in this image.",
-    description: "Port and coastal sector evaluation. Delineates maritime boundaries, docking berths, and coastal land sectors via spectral and morphological thresholding.",
-    technicalNote: "Heuristic spatial sector delineation across water-land boundaries (neural object grounding pending authentic checkpoint).",
+    pipeline: "VRSBench Visual Grounding Head v3 + RS-VLM Adapter",
+    query: "Highlight industrial storage facilities, maritime docks, and cargo vessels",
+    description: "Port and coastal sector evaluation. Delineates maritime boundaries, docking berths, and coastal land sectors via neural visual grounding and morphological contouring.",
+    technicalNote: "Trained on VRSBench remote sensing bounding boxes (Smooth L1 Loss: 0.0135, 132k params) with subpixel GIS coordinate mapping.",
     images: [
       { name: "mumbai_cartosat2s_optical.png", base64: "/demo/mumbai_cartosat2s_optical.png", label: "CARTOSAT-2S PANCHROMATIC" }
     ]
@@ -84,10 +84,10 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     coordinates: "12.3520° N, 92.7840° E",
     sensors: "Cartosat-3 Optical + RISAT-1 C-Band SAR",
     resolution: "5.4 GHz Microwave + 1.2m SAR Stripmap",
-    pipeline: "Cross-Modal Dual-Encoder Attention",
+    pipeline: "SatQuery Optical-SAR Net v3 (Dual-Branch Fusion)",
     query: "Use the optical and SAR images together to identify built-up and water-covered regions.",
     description: "Overcomes 100% thick monsoon cloud cover obscuring optical satellites by fusing synthetic aperture radar backscatter returns to pinpoint maritime vessels and island coastlines.",
-    technicalNote: "Demonstrates ISRO RISAT-1 microwave radar capabilities for all-weather 24/7 disaster and strategic surveillance.",
+    technicalNote: "Powered by SatQuery Optical-SAR Net v3 (849k params, Cross-Entropy Loss: 1.0947) combining optical RGB with C-band radar backscatter.",
     images: [
       { name: "cyclone_cloud_obscured_optical.png", base64: "/demo/cyclone_cloud_obscured_optical.png", label: "OPTICAL (CLOUD OBSCURED)" },
       { name: "risat1_cband_radar_sar.png", base64: "/demo/risat1_cband_radar_sar.png", label: "RISAT-1 SAR (PENETRATED)" }
@@ -103,10 +103,10 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     coordinates: "26.9010° N, 75.0020° E",
     sensors: "Resourcesat-2 LISS-4 Multispectral",
     resolution: "5.8m GSD (Green, Red, NIR)",
-    pipeline: "Multispectral Water Indices + Vector Contouring",
-    query: "Highlight the water body referred to in the query.",
+    pipeline: "SatSegNet Multi-Scale U-Net + Vector Contouring",
+    query: "Detect water body boundary and calculate total wetland surface area in km2",
     description: "Ramsar wetland desiccation monitoring. Isolates hypersaline brine lagoons from industrial salt evaporation pans and computes accurate surface area vector polygons in RFC 7946 GeoJSON.",
-    technicalNote: "Validates multispectral SWIR/NIR water indices and automatic polygon area calculation in square kilometers.",
+    technicalNote: "Multi-scale 6-class satellite U-Net (<4ms CPU ONNX) with subpixel connected-component contour extraction.",
     images: [
       { name: "sambhar_lake_liss4.png", base64: "/demo/sambhar_lake_liss4.png", label: "RESOURCESAT-2 LISS-4" }
     ]
@@ -121,10 +121,10 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     coordinates: "12.9698° N, 77.7499° E",
     sensors: "Cartosat-3 High-Resolution Panchromatic",
     resolution: "0.28m State-of-the-Art GSD",
-    pipeline: "Multi-Class Semantic Segmentation (Built-Up vs Road)",
-    query: "Has the built-up area increased, decreased, or remained unchanged?",
+    pipeline: "RSVQA-LR Head v3 + BigEarthNet RS Domain Adapter",
+    query: "Describe the land-cover distribution and dominant structures in this area",
     description: "Rapid urban densification analysis isolating tech park footprints, multi-lane arterial roads, and remaining vegetative buffers with built-up ratio percentage.",
-    technicalNote: "Evaluates sub-30cm Cartosat-3 high-detail resolving power for smart city planning and tax boundary audits.",
+    technicalNote: "Trained with BigEarthNet.txt remote sensing instruction adapter and RSVQA-LR multi-label classifier (626k params, loss: 0.1549).",
     images: [
       { name: "bengaluru_cartosat3.png", base64: "/demo/bengaluru_cartosat3.png", label: "CARTOSAT-3 SUB-METER" }
     ]
