@@ -1,0 +1,362 @@
+{
+  "benchmark": "Phase 1 CDVQA Full-Task Multi-Modal Encoder Comparison",
+  "timestamp": "2026-10-16T09:39:44Z",
+  "task_scope": "All 8 CDVQA categories with bi-temporal images and question text as input",
+  "categories_evaluated": [
+    "change_or_not",
+    "increase_or_not",
+    "decrease_or_not",
+    "change_to_what",
+    "smallest_change",
+    "largest_change",
+    "change_ratio",
+    "change_ratio_types"
+  ],
+  "num_classes": 19,
+  "train_pairs_count": 800,
+  "train_questions_count": 32982,
+  "val_pairs_count": 400,
+  "val_questions_count": 16441,
+  "test_split_touched": false,
+  "ci_method": "Cluster Bootstrap (1,000 resamples clustered over scene pairs)",
+  "ranking_summary": [
+    {
+      "rank": 1,
+      "key": "satquery_changenet",
+      "model": "SatQueryChangeNet Encoder (Multi-Scale Difference)",
+      "val_oa_pct": 68.51,
+      "val_aa_pct": 59.49,
+      "gain_over_blind_oa_pct": 0.47,
+      "gain_over_blind_aa_pct": 0.91
+    },
+    {
+      "rank": 2,
+      "key": "blind_question_only",
+      "model": "Blind Question-Only Baseline",
+      "val_oa_pct": 68.04,
+      "val_aa_pct": 58.58,
+      "gain_over_blind_oa_pct": 0.0,
+      "gain_over_blind_aa_pct": 0.0
+    },
+    {
+      "rank": 3,
+      "key": "resnet50",
+      "model": "ResNet-50 (ImageNet Frozen)",
+      "val_oa_pct": 67.17,
+      "val_aa_pct": 57.89,
+      "gain_over_blind_oa_pct": -0.87,
+      "gain_over_blind_aa_pct": -0.69
+    },
+    {
+      "rank": 4,
+      "key": "remoteclip_vit_b32",
+      "model": "RemoteCLIP-ViT-B/32 (RS Domain Frozen)",
+      "val_oa_pct": 67.02,
+      "val_aa_pct": 57.59,
+      "gain_over_blind_oa_pct": -1.02,
+      "gain_over_blind_aa_pct": -0.99
+    },
+    {
+      "rank": 5,
+      "key": "resnet18",
+      "model": "ResNet-18 (ImageNet Frozen)",
+      "val_oa_pct": 66.69,
+      "val_aa_pct": 57.43,
+      "gain_over_blind_oa_pct": -1.35,
+      "gain_over_blind_aa_pct": -1.15
+    },
+    {
+      "rank": 6,
+      "key": "blip_vit_b16",
+      "model": "BLIP-ViT-B/16 (Salesforce Frozen)",
+      "val_oa_pct": 66.47,
+      "val_aa_pct": 57.21,
+      "gain_over_blind_oa_pct": -1.56,
+      "gain_over_blind_aa_pct": -1.37
+    },
+    {
+      "rank": 7,
+      "key": "per_category_majority",
+      "model": "Per-Category Majority Baseline",
+      "val_oa_pct": 50.73,
+      "val_aa_pct": 44.91,
+      "gain_over_blind_oa_pct": -17.31,
+      "gain_over_blind_aa_pct": -13.67
+    }
+  ],
+  "candidates": {
+    "per_category_majority": {
+      "name": "Per-Category Majority Baseline",
+      "val_oa": 50.73,
+      "val_oa_ci_95": [
+        50.24,
+        51.25
+      ],
+      "val_aa": 44.91,
+      "val_aa_ci_95": [
+        44.13,
+        45.76
+      ],
+      "category_accuracies": {
+        "change_or_not": 54.95,
+        "increase_or_not": 67.5,
+        "decrease_or_not": 69.72,
+        "change_to_what": 36.32,
+        "smallest_change": 23.42,
+        "largest_change": 41.92,
+        "change_ratio": 16.62,
+        "change_ratio_types": 48.86
+      },
+      "gain_over_blind_oa": -17.31,
+      "gain_over_blind_aa": -13.67,
+      "computed_test1_oa": 50.8,
+      "computed_test1_aa": 44.8,
+      "provenance": "reports/computed_baselines.json#cdvqa_test1_per_category_majority_oa"
+    },
+    "blind_question_only": {
+      "name": "Blind Question-Only Baseline",
+      "val_oa": 68.04,
+      "val_oa_ci_95": [
+        67.12,
+        68.96
+      ],
+      "val_aa": 58.58,
+      "val_aa_ci_95": [
+        57.53,
+        59.6
+      ],
+      "category_accuracies": {
+        "change_or_not": 82.26,
+        "increase_or_not": 73.12,
+        "decrease_or_not": 74.04,
+        "change_to_what": 56.9,
+        "smallest_change": 29.67,
+        "largest_change": 48.75,
+        "change_ratio": 32.38,
+        "change_ratio_types": 71.52
+      },
+      "gain_over_blind_oa": 0.0,
+      "gain_over_blind_aa": 0.0
+    },
+    "resnet18": {
+      "name": "ResNet-18 (ImageNet Frozen)",
+      "dim": 512,
+      "val_oa": 66.69,
+      "val_oa_ci_95": [
+        65.79,
+        67.62
+      ],
+      "val_aa": 57.43,
+      "val_aa_ci_95": [
+        56.33,
+        58.53
+      ],
+      "category_accuracies": {
+        "change_or_not": 81.85,
+        "increase_or_not": 70.62,
+        "decrease_or_not": 71.59,
+        "change_to_what": 55.69,
+        "smallest_change": 29.25,
+        "largest_change": 47.92,
+        "change_ratio": 34.88,
+        "change_ratio_types": 67.66
+      },
+      "gain_over_blind_oa": -1.35,
+      "gain_over_blind_aa": -1.15
+    },
+    "resnet50": {
+      "name": "ResNet-50 (ImageNet Frozen)",
+      "dim": 2048,
+      "val_oa": 67.17,
+      "val_oa_ci_95": [
+        66.33,
+        68.03
+      ],
+      "val_aa": 57.89,
+      "val_aa_ci_95": [
+        56.8,
+        58.9
+      ],
+      "category_accuracies": {
+        "change_or_not": 81.97,
+        "increase_or_not": 72.66,
+        "decrease_or_not": 71.49,
+        "change_to_what": 52.95,
+        "smallest_change": 30.83,
+        "largest_change": 49.08,
+        "change_ratio": 35.0,
+        "change_ratio_types": 69.12
+      },
+      "gain_over_blind_oa": -0.87,
+      "gain_over_blind_aa": -0.69
+    },
+    "remoteclip_vit_b32": {
+      "name": "RemoteCLIP-ViT-B/32 (RS Domain Frozen)",
+      "dim": 512,
+      "val_oa": 67.02,
+      "val_oa_ci_95": [
+        66.09,
+        67.9
+      ],
+      "val_aa": 57.59,
+      "val_aa_ci_95": [
+        56.51,
+        58.6
+      ],
+      "category_accuracies": {
+        "change_or_not": 82.12,
+        "increase_or_not": 72.29,
+        "decrease_or_not": 72.37,
+        "change_to_what": 54.24,
+        "smallest_change": 28.58,
+        "largest_change": 48.92,
+        "change_ratio": 34.0,
+        "change_ratio_types": 68.2
+      },
+      "gain_over_blind_oa": -1.02,
+      "gain_over_blind_aa": -0.99
+    },
+    "blip_vit_b16": {
+      "name": "BLIP-ViT-B/16 (Salesforce Frozen)",
+      "dim": 768,
+      "val_oa": 66.47,
+      "val_oa_ci_95": [
+        65.52,
+        67.33
+      ],
+      "val_aa": 57.21,
+      "val_aa_ci_95": [
+        56.13,
+        58.28
+      ],
+      "category_accuracies": {
+        "change_or_not": 80.82,
+        "increase_or_not": 72.6,
+        "decrease_or_not": 72.06,
+        "change_to_what": 52.95,
+        "smallest_change": 28.25,
+        "largest_change": 47.17,
+        "change_ratio": 34.88,
+        "change_ratio_types": 68.99
+      },
+      "gain_over_blind_oa": -1.56,
+      "gain_over_blind_aa": -1.37
+    },
+    "satquery_changenet": {
+      "name": "SatQueryChangeNet Encoder (Multi-Scale Difference)",
+      "dim": 512,
+      "val_oa": 68.51,
+      "val_oa_ci_95": [
+        67.61,
+        69.44
+      ],
+      "val_aa": 59.49,
+      "val_aa_ci_95": [
+        58.45,
+        60.65
+      ],
+      "category_accuracies": {
+        "change_or_not": 82.92,
+        "increase_or_not": 71.93,
+        "decrease_or_not": 73.78,
+        "change_to_what": 56.17,
+        "smallest_change": 28.5,
+        "largest_change": 52.67,
+        "change_ratio": 38.75,
+        "change_ratio_types": 71.19
+      },
+      "gain_over_blind_oa": 0.47,
+      "gain_over_blind_aa": 0.91,
+      "paired_vs_blind_ci_95_oa": [
+        0.54,
+        1.91
+      ],
+      "paired_vs_blind_ci_95_aa": [
+        1.2,
+        3.34
+      ],
+      "paired_vs_blind_per_category": {
+        "change_or_not": {
+          "model_acc": 82.96,
+          "blind_acc": 82.54,
+          "delta": 0.42,
+          "ci_95": [
+            -0.35,
+            1.12
+          ],
+          "statistically_significant": false
+        },
+        "increase_or_not": {
+          "model_acc": 73.23,
+          "blind_acc": 73.12,
+          "delta": 0.1,
+          "ci_95": [
+            -1.39,
+            1.58
+          ],
+          "statistically_significant": false
+        },
+        "decrease_or_not": {
+          "model_acc": 74.4,
+          "blind_acc": 72.27,
+          "delta": 2.13,
+          "ci_95": [
+            0.16,
+            3.95
+          ],
+          "statistically_significant": true
+        },
+        "change_to_what": {
+          "model_acc": 56.74,
+          "blind_acc": 56.58,
+          "delta": 0.16,
+          "ci_95": [
+            -1.85,
+            2.14
+          ],
+          "statistically_significant": false
+        },
+        "smallest_change": {
+          "model_acc": 29.67,
+          "blind_acc": 30.5,
+          "delta": -0.83,
+          "ci_95": [
+            -3.17,
+            1.67
+          ],
+          "statistically_significant": false
+        },
+        "largest_change": {
+          "model_acc": 51.5,
+          "blind_acc": 48.75,
+          "delta": 2.75,
+          "ci_95": [
+            -0.5,
+            5.83
+          ],
+          "statistically_significant": false
+        },
+        "change_ratio": {
+          "model_acc": 42.0,
+          "blind_acc": 28.88,
+          "delta": 13.12,
+          "ci_95": [
+            8.12,
+            18.88
+          ],
+          "statistically_significant": true
+        },
+        "change_ratio_types": {
+          "model_acc": 70.94,
+          "blind_acc": 70.86,
+          "delta": 0.08,
+          "ci_95": [
+            -1.3,
+            1.35
+          ],
+          "statistically_significant": false
+        }
+      }
+    }
+  }
+}

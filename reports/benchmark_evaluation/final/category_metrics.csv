@@ -1,0 +1,17 @@
+Domain,Subcategory,Evaluated_Count,Primary_Metric,Primary_Value,Secondary_Metric,Secondary_Value,Auxiliary_Metric,Auxiliary_Value
+Change Detection,Change Class,968 pairs,Macro IoU,31.44%,Micro IoU,36.44%,Micro F1 / Dice,0.5342
+Change Detection,No-Change Background,968 pairs,Macro IoU,78.72%,Micro IoU,79.84%,Micro F1 / Dice,0.8879
+Change Detection,2-Class Mean,968 pairs,Macro 2-Class mIoU,55.08%,Micro 2-Class mIoU,58.14%,Pixel Accuracy,81.93%
+Optical-SAR Fusion,Built-up,119 patches,Class IoU,32.65%,Dice F1,49.23%,Precision / Recall,75.55% / 36.51%
+Optical-SAR Fusion,Water,119 patches,Class IoU,79.14%,Dice F1,88.36%,Precision / Recall,96.78% / 81.29%
+Optical-SAR Fusion,Vegetation,119 patches,Class IoU,89.55%,Dice F1,94.49%,Precision / Recall,91.80% / 97.33%
+Optical-SAR Fusion,3-Class Mean,119 patches,Macro mIoU,67.11%,Macro Dice,77.36%,Micro IoU,84.90%
+Change VQA (Constrained),change_or_not,25 questions,Exact Accuracy,44.00%,Binary F1,0.6111,TP / FP / FN / TN,11 / 14 / 0 / 0
+Change VQA (Constrained),decrease_or_not,25 questions,Exact Accuracy,32.00%,Binary F1,0.4848,TP / FP / FN / TN,8 / 17 / 0 / 0
+Change VQA (Constrained),increase_or_not,25 questions,Exact Accuracy,32.00%,Binary F1,0.4138,TP / FP / FN / TN,6 / 16 / 1 / 2
+Change VQA (Constrained),change_to_what,25 questions,Exact Accuracy,24.00%,Top-1 Precision,24.00%,Closed Vocab Class,6 Semantic Classes
+Change VQA (Constrained),smallest_change,25 questions,Exact Accuracy,12.00%,Top-1 Precision,12.00%,Closed Vocab Class,6 Semantic Classes
+Change VQA (Constrained),change_ratio_types,25 questions,Exact Accuracy,12.00%,MAE,30.00,RMSE,43.54
+Change VQA (Constrained),change_ratio,25 questions,Exact Accuracy,4.00%,MAE,57.20,RMSE,65.19
+Change VQA (Constrained),largest_change,25 questions,Exact Accuracy,0.00%,Top-1 Precision,0.00%,Closed Vocab Class,6 Semantic Classes
+Change VQA (Constrained),8-Category Aggregate,200 questions,Overall Exact (OA),20.00%,Average Per-Type (AA),20.00%,Vocabulary Size,19 Tokens

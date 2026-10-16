@@ -1,0 +1,81 @@
+{
+  "benchmark": "CDVQA / SECOND",
+  "provenance": "Yuan et al. 2022 IEEE TGRS (arXiv:2112.06343)",
+  "date_computed": "2026-10-16",
+  "categories": {
+    "change_or_not": {
+      "train": {"count": 23048, "majority_answer": "yes", "majority_pct": 56.99},
+      "val": {"count": 5751, "majority_answer": "yes", "majority_pct": 54.95},
+      "test1": {"count": 13882, "majority_answer": "yes", "majority_pct": 56.17},
+      "test2": {"count": 5126, "majority_answer": "yes", "majority_pct": 55.48}
+    },
+    "change_ratio": {
+      "train": {"count": 3200, "majority_answer": "10_to_20", "majority_pct": 16.50},
+      "val": {"count": 800, "majority_answer": "10_to_20", "majority_pct": 16.62},
+      "test1": {"count": 1936, "majority_answer": "10_to_20", "majority_pct": 15.29},
+      "test2": {"count": 1936, "majority_answer": "10_to_20", "majority_pct": 15.29}
+    },
+    "change_ratio_types": {
+      "train": {"count": 9740, "majority_answer": "0", "majority_pct": 47.25},
+      "val": {"count": 2409, "majority_answer": "0", "majority_pct": 48.86},
+      "test1": {"count": 5811, "majority_answer": "0", "majority_pct": 47.70},
+      "test2": {"count": 11616, "majority_answer": "0", "majority_pct": 47.74}
+    },
+    "change_to_what": {
+      "train": {"count": 5012, "majority_answer": "nvg_surface", "majority_pct": 37.43},
+      "val": {"count": 1239, "majority_answer": "buildings", "majority_pct": 39.87},
+      "test1": {"count": 2991, "majority_answer": "nvg_surface", "majority_pct": 38.05},
+      "test2": {"count": 2991, "majority_answer": "nvg_surface", "majority_pct": 38.05}
+    },
+    "decrease_or_not": {
+      "train": {"count": 7652, "majority_answer": "no", "majority_pct": 69.68},
+      "val": {"count": 1922, "majority_answer": "no", "majority_pct": 69.72},
+      "test1": {"count": 4658, "majority_answer": "no", "majority_pct": 69.00},
+      "test2": {"count": 1754, "majority_answer": "no", "majority_pct": 68.93}
+    },
+    "increase_or_not": {
+      "train": {"count": 7715, "majority_answer": "no", "majority_pct": 66.61},
+      "val": {"count": 1920, "majority_answer": "no", "majority_pct": 67.50},
+      "test1": {"count": 4600, "majority_answer": "no", "majority_pct": 66.63},
+      "test2": {"count": 1805, "majority_answer": "no", "majority_pct": 67.92}
+    },
+    "largest_change": {
+      "train": {"count": 4800, "majority_answer": "nvg_surface", "majority_pct": 41.62},
+      "val": {"count": 1200, "majority_answer": "nvg_surface", "majority_pct": 41.92},
+      "test1": {"count": 2904, "majority_answer": "nvg_surface", "majority_pct": 42.91},
+      "test2": {"count": 2904, "majority_answer": "nvg_surface", "majority_pct": 42.91}
+    },
+    "smallest_change": {
+      "train": {"count": 4800, "majority_answer": "buildings", "majority_pct": 23.96},
+      "val": {"count": 1200, "majority_answer": "buildings", "majority_pct": 23.42},
+      "test1": {"count": 2904, "majority_answer": "buildings", "majority_pct": 22.31},
+      "test2": {"count": 2904, "majority_answer": "buildings", "majority_pct": 22.31}
+    }
+  },
+  "overall_splits": {
+    "train": {
+      "total_questions": 65967,
+      "majority_answer": "no",
+      "majority_count": 20385,
+      "majority_pct": 30.90
+    },
+    "val": {
+      "total_questions": 16441,
+      "majority_answer": "no",
+      "majority_count": 5227,
+      "majority_pct": 31.79
+    },
+    "test1": {
+      "total_questions": 39686,
+      "majority_answer": "no",
+      "majority_count": 12364,
+      "majority_pct": 31.15
+    },
+    "test2": {
+      "total_questions": 31036,
+      "majority_answer": "0",
+      "majority_count": 5547,
+      "majority_pct": 17.87
+    }
+  }
+}

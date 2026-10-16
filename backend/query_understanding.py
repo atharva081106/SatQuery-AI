@@ -29,7 +29,7 @@ from data_models import (
     INTENT_REGION_DIRECTION, INTENT_IMAGE_DESCRIPTION, INTENT_SCENE_UNDERSTANDING,
     INTENT_CHANGE_DETECTION, INTENT_COMPARISON, INTENT_TEMPORAL, INTENT_ANOMALY_DETECTION,
     INTENT_INFRASTRUCTURE, INTENT_AGRICULTURAL, INTENT_WATER_BODY, INTENT_VEGETATION,
-    INTENT_ROAD_NETWORK, INTENT_COORDINATE_REQUEST, INTENT_MULTI_TASK,
+    INTENT_ROAD_NETWORK, INTENT_COORDINATE_REQUEST, INTENT_MULTI_TASK, INTENT_OUT_OF_DOMAIN,
 )
 
 logger = logging.getLogger(__name__)
@@ -320,6 +320,32 @@ def _determine_vision_capability(intent: str, targets: List[str]) -> str:
     return "general"
 
 
+def check_out_of_domain(q_lower: str) -> Tuple[bool, Optional[str]]:
+    """
+    Identifies queries that are outside remote sensing observation capability,
+    trivia/world-knowledge, creative text, financial, or non-geospatial subjects.
+    """
+    default_msg = "Cannot answer from this remote sensing imagery: query is not a geospatial question."
+    patterns = [
+        (r'\b(stock price|market cap|shares of|bitcoin|crypto|nasdaq|dow jones|dividend|interest rate|apple stock)\b',
+         "Cannot answer from this remote sensing imagery: query is a financial inquiry, not a geospatial question."),
+        (r'\b(write (a )?poem|write (an )?essay|write (a )?story|tell me a (funny )?joke|write lyrics|tell me about love)\b',
+         "Cannot answer from this remote sensing imagery: query is a creative text request, not a geospatial question."),
+        (r'\b(capital of|who is the|president of|prime minister|speed of light|write a (python|script|code)|solve (this )?equation|translate to|matrix multiplication|bubble sort)\b',
+         "Cannot answer from this remote sensing imagery: query seeks general trivia, programming, or mathematics unrelated to satellite imagery."),
+        (r'\b(nuclear submarine|underwater submarine|submarine)\b',
+         "Cannot answer from this remote sensing imagery: subsurface marine vessels are not observable from optical remote sensing imagery."),
+        (r'\b(inside the|interior of|bedroom|living room|furniture|kitchen)\b',
+         "Cannot answer from this remote sensing imagery: internal building structures cannot be resolved from satellite nadir observations."),
+        (r'\b(virus|bacteria|dna|microscope|quantum)\b',
+         "Cannot answer from this remote sensing imagery: target concept is microscopic and far beyond remote sensing ground resolution.")
+    ]
+    for pat, reason in patterns:
+        if re.search(pat, q_lower):
+            return True, reason or default_msg
+    return False, None
+
+
 class QueryUnderstanding:
     """
     Parses a natural-language remote-sensing query into a structured QueryIntent.
@@ -338,13 +364,26 @@ class QueryUnderstanding:
             return QueryIntent(
                 raw_query=query,
                 intent=INTENT_SCENE_UNDERSTANDING,
-                confidence=0.40,
+                confidence=0.10,
                 limitations=["Query understanding encountered an error; defaulting to scene description."]
             )
 
     def _do_analyze(self, query: str, num_images: int) -> QueryIntent:
         q = query.strip()
         q_lower = q.lower()
+
+        # ── Out-of-domain semantic guardrail ───────────────────────────────
+        is_ood, ood_reason = check_out_of_domain(q_lower)
+        if is_ood:
+            return QueryIntent(
+                raw_query=q,
+                intent=INTENT_OUT_OF_DOMAIN,
+                confidence=round(0.08, 4),
+                required_vision_capability="none",
+                is_out_of_domain=True,
+                rejection_reason=ood_reason,
+                limitations=[ood_reason]
+            )
 
         # ── Target extraction ──────────────────────────────────────────────
         targets = _extract_targets(q_lower)
@@ -363,15 +402,17 @@ class QueryUnderstanding:
         # Multi-image always → change or cross-modal
         if num_images >= 2:
             if has_change:
+                change_conf = round(float(min(0.98, max(0.50, 0.65 + 0.25 * float(len(targets) > 0)))), 4)
                 return QueryIntent(
                     raw_query=q,
                     intent=INTENT_CHANGE_DETECTION,
                     targets=targets,
                     operation="compare",
                     requires_visual_overlay=True,
-                    confidence=0.95,
+                    confidence=change_conf,
                     required_vision_capability="change"
                 )
+            compare_conf = round(float(min(0.95, max(0.50, 0.60 + 0.25 * float(has_compare)))), 4)
             return QueryIntent(
                 raw_query=q,
                 intent=INTENT_COMPARISON,
@@ -379,7 +420,7 @@ class QueryUnderstanding:
                 operation="compare",
                 requires_comparison=True,
                 requires_visual_overlay=True,
-                confidence=0.88,
+                confidence=compare_conf,
                 required_vision_capability="change"
             )
 

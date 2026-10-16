@@ -12,8 +12,10 @@ __pycache__/
 checkpoints/
 !ml_pipeline/checkpoints/
 ml_pipeline/checkpoints/*
+!ml_pipeline/checkpoints/*/
+ml_pipeline/checkpoints/**/*.pth
 !ml_pipeline/checkpoints/best_satsegnet.pth
-!ml_pipeline/checkpoints/training_metrics.json
+!ml_pipeline/checkpoints/**/*.json
 !ml_pipeline/checkpoints/*.onnx
 ml_pipeline/satquery_finetuned_model/
 ml_pipeline/dummy_dataset/
@@ -26,6 +28,11 @@ graphify-out/
 *.db
 backend/storage/*.db
 
+# Large Datasets & Caches (Do not push to git)
+ml_pipeline/authentic_data/
+ml_pipeline/dataset_cache/
+scratch/
+antigravity_prompt_satquery.md
 
 # Node & Next.js
 node_modules/

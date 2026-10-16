@@ -1,0 +1,259 @@
+{
+  "experiment": "siamese_resnet18_vs_changenet_v2_validation",
+  "timestamp": "2026-10-16T06:20:19Z",
+  "dataset": "CDVQA / SECOND (Authentic Aerial Pairs)",
+  "train_pairs_evaluated": 800,
+  "val_pairs_evaluated": 400,
+  "test_pairs_touched": false,
+  "note": "Per strict benchmark rules, test set is reserved exclusively for the final chosen model.",
+  "changenet_v2_curves": {
+    "architecture": "SatQueryChangeNet (1.7M params)",
+    "checkpoint": "ml_pipeline\\checkpoints\\satquery_change_net_finetune\\v2\\best_change_net_finetuned.pth",
+    "checkpoint_sha256": "95fb4ceb93f9e40b3c778b2faf384e12d3278c8961892fd8b4a287836207f6b9",
+    "baseline_val_metrics": {
+      "val_loss": 1.1358,
+      "macro_change_iou_pct": 31.15,
+      "macro_dice_f1": 0.4448,
+      "macro_precision": 0.4951,
+      "macro_recall": 0.4844,
+      "micro_change_iou_pct": 34.82,
+      "micro_dice_f1": 0.5165,
+      "micro_precision": 0.4988,
+      "micro_recall": 0.5356,
+      "confusion_matrix": {
+        "tp": 2518012,
+        "fp": 2530280,
+        "fn": 2183475,
+        "tn": 18982633
+      }
+    },
+    "best_epoch": 4,
+    "best_val_metrics": {
+      "val_loss": 1.0374,
+      "macro_change_iou_pct": 34.6,
+      "macro_dice_f1": 0.4871,
+      "macro_precision": 0.4435,
+      "macro_recall": 0.6492,
+      "micro_change_iou_pct": 37.64,
+      "micro_dice_f1": 0.547,
+      "micro_precision": 0.4419,
+      "micro_recall": 0.7177,
+      "confusion_matrix": {
+        "tp": 3374288,
+        "fp": 4262089,
+        "fn": 1327199,
+        "tn": 17250824
+      }
+    },
+    "epoch_history": [
+      {
+        "epoch": 1,
+        "train_loss": 1.1363,
+        "val_loss": 1.0872,
+        "val_macro_change_iou_pct": 33.09,
+        "val_macro_dice_f1": 0.4686,
+        "val_macro_precision": 0.4491,
+        "val_macro_recall": 0.5901,
+        "val_micro_change_iou_pct": 36.14,
+        "val_micro_dice_f1": 0.531,
+        "is_best": true,
+        "duration_seconds": 739.26
+      },
+      {
+        "epoch": 2,
+        "train_loss": 1.087,
+        "val_loss": 1.076,
+        "val_macro_change_iou_pct": 33.45,
+        "val_macro_dice_f1": 0.4744,
+        "val_macro_precision": 0.4105,
+        "val_macro_recall": 0.6832,
+        "val_micro_change_iou_pct": 35.58,
+        "val_micro_dice_f1": 0.5248,
+        "is_best": true,
+        "duration_seconds": 968.1
+      },
+      {
+        "epoch": 3,
+        "train_loss": 1.0625,
+        "val_loss": 1.0519,
+        "val_macro_change_iou_pct": 34.23,
+        "val_macro_dice_f1": 0.4836,
+        "val_macro_precision": 0.423,
+        "val_macro_recall": 0.6822,
+        "val_micro_change_iou_pct": 36.47,
+        "val_micro_dice_f1": 0.5345,
+        "is_best": true,
+        "duration_seconds": 663.29
+      },
+      {
+        "epoch": 4,
+        "train_loss": 1.049,
+        "val_loss": 1.0374,
+        "val_macro_change_iou_pct": 34.6,
+        "val_macro_dice_f1": 0.4871,
+        "val_macro_precision": 0.4435,
+        "val_macro_recall": 0.6492,
+        "val_micro_change_iou_pct": 37.64,
+        "val_micro_dice_f1": 0.547,
+        "is_best": true,
+        "duration_seconds": 892.65
+      }
+    ]
+  },
+  "siamese_resnet18_pretrained": {
+    "model_name": "Siamese-ResNet18-ImageNet-Pretrained",
+    "pretrained": true,
+    "param_count": 12656577,
+    "best_macro_change_iou_pct": 35.08,
+    "best_metrics": {
+      "val_loss": 1.0682,
+      "macro_change_iou_pct": 35.08,
+      "micro_change_iou_pct": 38.53,
+      "macro_dice_f1": 0.4967,
+      "macro_precision": 0.4063,
+      "macro_recall": 0.7523,
+      "confusion_matrix": {
+        "tp": 3889061,
+        "fp": 5391913,
+        "fn": 812426,
+        "tn": 16121000
+      }
+    },
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss": null,
+        "val_loss": 1.455,
+        "macro_change_iou_pct": 17.93,
+        "micro_change_iou_pct": 17.93,
+        "macro_dice_f1": 0.2844,
+        "macro_precision": 0.1793,
+        "macro_recall": 0.995,
+        "confusion_matrix": {
+          "tp": 4701487,
+          "fp": 21512913,
+          "fn": 0,
+          "tn": 0
+        }
+      },
+      {
+        "epoch": 1,
+        "train_loss": 1.382,
+        "duration_sec": 185.0,
+        "is_best": true,
+        "val_loss": 1.2286,
+        "macro_change_iou_pct": 28.28,
+        "micro_change_iou_pct": 29.33,
+        "macro_dice_f1": 0.4204,
+        "macro_precision": 0.2986,
+        "macro_recall": 0.8818,
+        "confusion_matrix": {
+          "tp": 4313344,
+          "fp": 10004148,
+          "fn": 388143,
+          "tn": 11508765
+        }
+      },
+      {
+        "epoch": 2,
+        "train_loss": 1.184,
+        "duration_sec": 161.8,
+        "is_best": true,
+        "val_loss": 1.0682,
+        "macro_change_iou_pct": 35.08,
+        "micro_change_iou_pct": 38.53,
+        "macro_dice_f1": 0.4967,
+        "macro_precision": 0.4063,
+        "macro_recall": 0.7523,
+        "confusion_matrix": {
+          "tp": 3889061,
+          "fp": 5391913,
+          "fn": 812426,
+          "tn": 16121000
+        }
+      }
+    ]
+  },
+  "siamese_resnet18_from_scratch": {
+    "model_name": "Siamese-ResNet18-From-Scratch",
+    "pretrained": false,
+    "param_count": 12656577,
+    "best_macro_change_iou_pct": 29.18,
+    "best_metrics": {
+      "val_loss": 1.2283,
+      "macro_change_iou_pct": 29.18,
+      "micro_change_iou_pct": 30.21,
+      "macro_dice_f1": 0.426,
+      "macro_precision": 0.3517,
+      "macro_recall": 0.7191,
+      "confusion_matrix": {
+        "tp": 3612145,
+        "fp": 7254514,
+        "fn": 1089342,
+        "tn": 14258399
+      }
+    },
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss": null,
+        "val_loss": 1.435,
+        "macro_change_iou_pct": 3.81,
+        "micro_change_iou_pct": 4.58,
+        "macro_dice_f1": 0.0714,
+        "macro_precision": 0.3433,
+        "macro_recall": 0.0434,
+        "confusion_matrix": {
+          "tp": 233352,
+          "fp": 390879,
+          "fn": 4468135,
+          "tn": 21122034
+        }
+      },
+      {
+        "epoch": 1,
+        "train_loss": 1.3869,
+        "duration_sec": 162.6,
+        "is_best": true,
+        "val_loss": 1.2872,
+        "macro_change_iou_pct": 27.71,
+        "micro_change_iou_pct": 28.74,
+        "macro_dice_f1": 0.408,
+        "macro_precision": 0.3184,
+        "macro_recall": 0.7286,
+        "confusion_matrix": {
+          "tp": 3694510,
+          "fp": 8151958,
+          "fn": 1006977,
+          "tn": 13360955
+        }
+      },
+      {
+        "epoch": 2,
+        "train_loss": 1.2493,
+        "duration_sec": 161.1,
+        "is_best": true,
+        "val_loss": 1.2283,
+        "macro_change_iou_pct": 29.18,
+        "micro_change_iou_pct": 30.21,
+        "macro_dice_f1": 0.426,
+        "macro_precision": 0.3517,
+        "macro_recall": 0.7191,
+        "confusion_matrix": {
+          "tp": 3612145,
+          "fp": 7254514,
+          "fn": 1089342,
+          "tn": 14258399
+        }
+      }
+    ]
+  },
+  "validation_comparison_summary": {
+    "changenet_v2_best_val_macro_iou_pct": 34.6,
+    "changenet_v2_best_val_loss": 1.0374,
+    "resnet18_pretrained_best_val_macro_iou_pct": 35.08,
+    "resnet18_pretrained_best_val_loss": 1.0682,
+    "resnet18_from_scratch_best_val_macro_iou_pct": 29.18,
+    "resnet18_from_scratch_best_val_loss": 1.2283
+  }
+}

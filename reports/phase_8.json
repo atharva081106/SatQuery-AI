@@ -1,0 +1,71 @@
+{
+  "phase": 8,
+  "phase_name": "Frontend: GUI, Evidence & Verification",
+  "status": "COMPLETED",
+  "timestamp": "2026-10-14T18:17:00Z",
+  "metrics": {
+    "preflight_telemetry": {
+      "endpoint": "/api/preflight",
+      "features": [
+        "Raster format detection (GeoTIFF, TIFF, PNG, JPEG, JP2)",
+        "Sensor modality detection (Optical, SAR, Multispectral)",
+        "CRS & coordinate bounds extraction (EPSG vs Local grid)",
+        "Pairwise spatial co-registration verification",
+        "Spatial mismatch warning banner before execution"
+      ],
+      "status": "VERIFIED"
+    },
+    "benchmark_mode_toggle": {
+      "default_state": true,
+      "payload_field": "benchmark_mode",
+      "effects": [
+        "Enables verified telemetry logging in reports/",
+        "Enforces audit checks across model routing pipelines"
+      ],
+      "status": "VERIFIED"
+    },
+    "confidence_score_derivation": {
+      "ui_element": "Formula Explainer Tooltip / Popover",
+      "derivation_source": "execution_trace.confidence_derivation",
+      "factors_displayed": [
+        "Query Intent Confidence",
+        "Spatial Coherence Score",
+        "Specialist Model Softmax Probability",
+        "Execution Mode (Specialist Neural Pipeline vs Fallback Heuristic)"
+      ],
+      "status": "VERIFIED"
+    },
+    "tool_invocation_trace": {
+      "drawer_section": "PIPELINE TOOL INVOCATIONS",
+      "fields_displayed": [
+        "Trace Audit UUID",
+        "Tool Name & Task ID",
+        "Tool Version",
+        "Per-tool Latency (ms)",
+        "Execution Status Chip (SUCCESS, FALLBACK_HEURISTIC, REJECTED)",
+        "Operational Summary"
+      ],
+      "status": "VERIFIED"
+    },
+    "pdf_audit_export": {
+      "engine": "jsPDF (Client-side Vector & Raster Export)",
+      "contents": [
+        "Trace Audit Identifier",
+        "Total Pipeline Latency (ms)",
+        "Mission Overview & Task Routing",
+        "Input Compatibility & Spatial Coherence Verification",
+        "Agentic Controller Reasoning Trace",
+        "Pipeline Tool Invocation Records with per-tool latencies",
+        "System Synthesis & Analytical Inference",
+        "Visual Evidence Canvas / Swipe Comparator",
+        "Verified Benchmark & Claims Audit Provenance (reports/)"
+      ],
+      "status": "VERIFIED"
+    },
+    "frontend_build_verification": {
+      "framework": "Next.js 16.3.4 (Turbopack)",
+      "build_status": "SUCCESS",
+      "exit_code": 0
+    }
+  }
+}

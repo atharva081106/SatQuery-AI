@@ -1,4 +1,5 @@
 import os
+import json
 
 # Only set local windows cache if on windows and not provided by environment
 if os.name == "nt" and "HF_HOME" not in os.environ:
@@ -13,11 +14,13 @@ from starlette.concurrency import run_in_threadpool
 from typing import List, Optional
 import uvicorn
 import time
+import torch
 from collections import defaultdict
 from agent_controller import agent_controller
 import storage_manager
 from cache_manager import cache_manager
 from storage_r2 import r2_storage
+from ml_models import ml_manager
 
 app = FastAPI(
     title="SatQuery AI Backend",
@@ -69,30 +72,67 @@ START_TIME = time.time()
 @app.get("/health")
 async def healthcheck():
     """
-    Comprehensive healthcheck endpoint for Render / Hugging Face Spaces / cloud detection.
-    Reflects ISRO PS 26167 multi-model architecture specifications and free scaling status.
+    Comprehensive, honest healthcheck endpoint reporting real loaded models,
+    exact checkpoints, runtime hardware devices, and benchmark provenance.
     """
+    _, vqa_model, vqa_dev, vqa_name = ml_manager.get_vqa_pipeline()
+    _, seg_miou, seg_name = ml_manager.get_segmentation_pipeline()
+
+    checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints"))
+    ckpt_path = os.path.join(checkpoints_dir, "best_satsegnet.pth")
+    rs_vlm_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "satquery_finetuned_model"))
+    vlm_finetuned_path = rs_vlm_path if os.path.exists(rs_vlm_path) else rs_vlm_path
+    change_model, change_iou, change_name = ml_manager.get_change_pipeline()
+    change_ckpt = os.path.join(checkpoints_dir, "satquery_change_net", "change_net.pth")
+    cross_model, cross_iou, cross_name = ml_manager.get_cross_modal_pipeline()
+    cross_ckpt = os.path.join(checkpoints_dir, "satquery_optical_sar_net", "optical_sar_net.pth")
+
     return {
         "status": "online",
         "service": "SatQuery AI Backend",
         "problem_statement": "ISRO / SAC — PS 26167",
         "version": "1.0.0",
         "uptime_seconds": round(time.time() - START_TIME, 1),
-        "scaling": {
-            "tier": "100% Free Production Stack ($0/month)",
+        "runtime": {
+            "device": "cuda" if torch.cuda.is_available() else "cpu",
+            "transformers_offline": os.environ.get("TRANSFORMERS_OFFLINE") == "1",
+            "enable_ml_models": os.environ.get("ENABLE_ML_MODELS") == "true",
             "cache_backend": cache_manager.get_backend_name(),
-            "cache_diagnostics": cache_manager.get_status(),
             "storage_backend": storage_manager.get_storage_type(),
-            "object_storage": "cloudflare_r2" if r2_storage.is_configured() else "inline_base64_fallback",
-            "onnx_acceleration": "SatSegNet INT8 Quantized (<4ms CPU)"
+            "object_storage": "cloudflare_r2" if r2_storage.is_configured() else "inline_base64_fallback"
         },
         "models": {
-            "vlm_foundation": "Florence-2-base (Fine-tuned for Earth Observation / Remote Sensing)",
-            "segmentation": "SatSegNet (ResNet-18 Backbone, 6 Land-Cover Classes, ONNX INT8)",
-            "classes": ["Background", "Water", "Forest/Vegetation", "Bare Soil", "Urban/Built-up", "Agriculture"],
-            "change_detection": "Bi-Temporal Residual Engine with Spatial Coherence Kernel",
-            "sar_fusion": "RISAT-1 / Sentinel-1 C-Band Cloud-Penetrating Synthesis",
-            "spatial_grounding": "Connected-component subpixel contour delineation (RFC 7946 GeoJSON)"
+            "vlm_foundation": {
+                "loaded_name": vqa_name,
+                "model_class": vqa_model.__class__.__name__ if vqa_model else "None (Rule/Heuristic Fallback)",
+                "checkpoint_path": vlm_finetuned_path if os.path.exists(vlm_finetuned_path) else "Salesforce/blip-vqa-base (HF Local Cache)",
+                "status": "ready" if vqa_model else "fallback_active"
+            },
+            "segmentation": {
+                "loaded_name": seg_name,
+                "architecture": "SatSegNet (From-scratch 6-class Multi-Scale U-Net, 482,822 parameters)",
+                "checkpoint_path": ckpt_path if os.path.exists(ckpt_path) else "None",
+                "classes": ["Background", "Water", "Forest/Vegetation", "Bare Soil", "Urban/Built-up", "Cloud/Haze"],
+                "status": "ready" if os.path.exists(ckpt_path) else "fallback_active"
+            },
+            "change_detection": {
+                "loaded_name": change_name,
+                "architecture": "SatQueryChangeNet (Siamese Feature Difference Network, 1,709,873 parameters)",
+                "checkpoint_path": change_ckpt if os.path.exists(change_ckpt) else "None",
+                "val_iou": change_iou,
+                "status": "ready" if change_model else "fallback_active"
+            },
+            "sar_fusion": {
+                "loaded_name": cross_name,
+                "architecture": "SatQueryOpticalSARNet (Optical-SAR Dual-Encoder Feature Fusion, 849,603 parameters)",
+                "checkpoint_path": cross_ckpt if os.path.exists(cross_ckpt) else "None",
+                "val_iou": cross_iou,
+                "status": "ready" if cross_model else "fallback_active"
+            },
+            "spatial_grounding": {
+                "algorithm": "Connected-component subpixel contour delineation (RFC 7946 GeoJSON)",
+                "status": "ready"
+            }
         },
         "gis_integration": {
             "bhuvan_wms": "enabled (bhuvan-vec2.nrsc.gov.in)",
@@ -100,11 +140,129 @@ async def healthcheck():
         }
     }
 
+@app.get("/api/reports")
+async def get_benchmark_reports():
+    """
+    Returns all verified execution reports from reports/*.json.
+    Ensures the UI only renders numbers that have actually run on real data.
+    """
+    reports_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "reports"))
+    reports = {}
+    if os.path.exists(reports_dir):
+        for fname in os.listdir(reports_dir):
+            if fname.endswith(".json"):
+                fpath = os.path.join(reports_dir, fname)
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        reports[fname[:-5]] = json.load(f)
+                except Exception as e:
+                    reports[fname[:-5]] = {"error": f"Failed to read report: {e}"}
+    return {
+        "status": "success",
+        "reports": reports,
+        "verified_count": len(reports)
+    }
+
+@app.post("/api/preflight")
+async def run_preflight_checks(
+    images: List[UploadFile] = File(...),
+    benchmark_mode: bool = Form(True)
+):
+    """
+    Pre-flight inspection for uploaded remote sensing rasters before query submission:
+    - Identifies raster formats (GEOTIFF/TIFF/PNG/JPEG)
+    - Detects sensor modalities (OPTICAL vs SAR vs MULTISPECTRAL)
+    - Extracts geospatial CRS, resolution, and bounding coordinates
+    - Runs spatial compatibility verification for multi-image uploads
+    - Recommends optimal tasks and validates benchmark mode compliance
+    """
+    from model_interfaces import (
+        detect_image_format,
+        detect_image_modality,
+        check_spatial_compatibility,
+        decode_satellite_image
+    )
+
+    if not images:
+        return {"status": "error", "message": "No images provided for pre-flight check."}
+
+    contents = []
+    file_infos = []
+    for img in images:
+        b = await img.read()
+        contents.append(b)
+        fmt = detect_image_format(b, img.filename)
+        mod_info = detect_image_modality(b, img.filename)
+        _, _, geo_meta = decode_satellite_image(b)
+
+        file_infos.append({
+            "filename": img.filename,
+            "format": fmt,
+            "modality": mod_info.get("modality", "OPTICAL"),
+            "sensor_family": mod_info.get("sensor_family", "Satellite Raster"),
+            "modality_confidence": mod_info.get("confidence", 0.90),
+            "has_georeference": geo_meta is not None and "west" in geo_meta,
+            "crs": geo_meta.get("crs") if geo_meta else None,
+            "bounds": {
+                "west": geo_meta["west"],
+                "south": geo_meta["south"],
+                "east": geo_meta["east"],
+                "north": geo_meta["north"]
+            } if geo_meta and "west" in geo_meta else None,
+            "pixel_size": [geo_meta.get("pixel_size_x"), geo_meta.get("pixel_size_y")] if geo_meta else None,
+            "dtype": geo_meta.get("dtype") if geo_meta else "uint8",
+            "band_count": geo_meta.get("band_count") if geo_meta else 3
+        })
+
+    # Pairwise compatibility check if >= 2 images
+    pairwise_info = None
+    overall_status = "READY"
+    if len(contents) >= 2:
+        is_cross_modal = any(f["modality"] == "SAR" for f in file_infos) and any(f["modality"] in ("OPTICAL", "MULTISPECTRAL") for f in file_infos)
+        is_compat, score, msg, diag = check_spatial_compatibility(contents[0], contents[1], cross_modal=is_cross_modal)
+        pairwise_info = {
+            "is_compatible": is_compat,
+            "coherence_score": score,
+            "status": "PASSED" if is_compat else "REJECTED",
+            "message": msg,
+            "diagnostics": diag
+        }
+        if not is_compat:
+            overall_status = "INCOMPATIBLE_PAIR"
+
+    # Format compliance check
+    if not benchmark_mode:
+        unsupported = [f for f in file_infos if f["format"] in ("PNG", "JPEG")]
+        if unsupported:
+            overall_status = "UNSUPPORTED_FORMAT"
+
+    # Suggested tasks based on inputs
+    suggested_tasks = []
+    if len(contents) == 1:
+        suggested_tasks = ["SINGLE_IMAGE_VQA", "SINGLE_IMAGE_CAPTIONING", "SINGLE_IMAGE_GROUNDING", "LAND_COVER_SEGMENTATION"]
+    elif len(contents) == 2:
+        if any(f["modality"] == "SAR" for f in file_infos):
+            suggested_tasks = ["CROSS_MODAL_EXTRACTION"]
+        else:
+            suggested_tasks = ["CHANGE_ANALYSIS"]
+
+    return {
+        "status": "success",
+        "preflight_status": overall_status,
+        "num_images": len(contents),
+        "files": file_infos,
+        "pairwise_compatibility": pairwise_info,
+        "suggested_tasks": suggested_tasks,
+        "benchmark_mode": benchmark_mode
+    }
+
+
 @app.post("/api/query")
 async def process_query(
     query: str = Form(...),
     history: str = Form(None),
     images: List[UploadFile] = File(...),
+    benchmark_mode: bool = Form(True),
     x_api_key: Optional[str] = Header(None)
 ):
     """
@@ -124,9 +282,11 @@ async def process_query(
 
     # Read image contents
     image_bytes_list = []
+    filenames_list = []
     for image in images:
         content = await image.read()
         image_bytes_list.append(content)
+        filenames_list.append(image.filename or "")
 
     # 1. Check Deterministic Hash Cache (0ms response, 0 RAM/CPU cost)
     cache_key = cache_manager.compute_query_hash(query, image_bytes_list)
@@ -146,7 +306,15 @@ async def process_query(
             pass
             
     # Execute query in a threadpool so CPU-heavy CV/NumPy operations do not block the event loop
-    result = await run_in_threadpool(agent_controller.execute_query, query, image_bytes_list, history_list)
+    result = await run_in_threadpool(
+        agent_controller.execute_query,
+        query,
+        image_bytes_list,
+        history_list,
+        None,
+        benchmark_mode,
+        filenames_list
+    )
     
     # Save to persistent database (Supabase PostgreSQL or SQLite)
     if result.get("status") == "success":

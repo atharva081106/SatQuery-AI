@@ -1,0 +1,305 @@
+{
+  "benchmark": "SatQuery-Agentic-Routing-v1.0 (tests/routing_cases.jsonl)",
+  "timestamp": "2026-10-14T17:46:13+05:30",
+  "total_cases_evaluated": 167,
+  "valid_cases_count": 145,
+  "adversarial_cases_count": 22,
+  "metrics": {
+    "task_classification_accuracy_pct": 91.02,
+    "tool_selection_accuracy_pct": 91.02,
+    "valid_sequence_rate_pct": 99.31,
+    "invalid_call_rejection_rate_pct": 90.91,
+    "structured_error_code_match_rate_pct": 86.36,
+    "overall_accuracy_pct": 90.42
+  },
+  "per_category_metrics": {
+    "single_image_vqa": {
+      "total": 30,
+      "accuracy_pct": 93.33,
+      "task_acc_pct": 93.33,
+      "tool_acc_pct": 93.33
+    },
+    "single_image_captioning": {
+      "total": 20,
+      "accuracy_pct": 70.0,
+      "task_acc_pct": 70.0,
+      "tool_acc_pct": 70.0
+    },
+    "single_image_grounding": {
+      "total": 25,
+      "accuracy_pct": 88.0,
+      "task_acc_pct": 88.0,
+      "tool_acc_pct": 88.0
+    },
+    "land_cover": {
+      "total": 25,
+      "accuracy_pct": 96.0,
+      "task_acc_pct": 96.0,
+      "tool_acc_pct": 96.0
+    },
+    "change": {
+      "total": 25,
+      "accuracy_pct": 100.0,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0
+    },
+    "cross_modal": {
+      "total": 20,
+      "accuracy_pct": 100.0,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0
+    },
+    "adversarial_ood": {
+      "total": 8,
+      "accuracy_pct": 75.0,
+      "task_acc_pct": 75.0,
+      "tool_acc_pct": 75.0
+    },
+    "adversarial_count": {
+      "total": 6,
+      "accuracy_pct": 83.33,
+      "task_acc_pct": 83.33,
+      "tool_acc_pct": 83.33
+    },
+    "adversarial_modality": {
+      "total": 4,
+      "accuracy_pct": 100.0,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0
+    },
+    "adversarial_format": {
+      "total": 1,
+      "accuracy_pct": 100.0,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0
+    },
+    "adversarial_param": {
+      "total": 3,
+      "accuracy_pct": 66.67,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0
+    }
+  },
+  "latency_by_task": {
+    "SINGLE_IMAGE_VQA": {
+      "count": 40,
+      "mean_ms": 436.9,
+      "p50_ms": 407.59,
+      "p95_ms": 606.27
+    },
+    "SINGLE_IMAGE_GROUNDING": {
+      "count": 24,
+      "mean_ms": 339.43,
+      "p50_ms": 357.44,
+      "p95_ms": 497.8
+    },
+    "CHANGE_ANALYSIS": {
+      "count": 34,
+      "mean_ms": 1159.65,
+      "p50_ms": 1513.85,
+      "p95_ms": 1658.41
+    },
+    "SINGLE_IMAGE_CAPTIONING": {
+      "count": 14,
+      "mean_ms": 445.45,
+      "p50_ms": 405.78,
+      "p95_ms": 600.62
+    },
+    "LAND_COVER_SEGMENTATION": {
+      "count": 24,
+      "mean_ms": 424.8,
+      "p50_ms": 414.91,
+      "p95_ms": 575.42
+    },
+    "CROSS_MODAL_EXTRACTION": {
+      "count": 23,
+      "mean_ms": 144.55,
+      "p50_ms": 153.46,
+      "p95_ms": 171.72
+    },
+    "OUT_OF_DOMAIN_REJECTION": {
+      "count": 6,
+      "mean_ms": 1.82,
+      "p50_ms": 1.73,
+      "p95_ms": 2.07
+    },
+    "MODALITY_GUARDRAIL": {
+      "count": 2,
+      "mean_ms": 28.71,
+      "p50_ms": 28.71,
+      "p95_ms": 31.19
+    }
+  },
+  "sample_evaluations": [
+    {
+      "id": "vqa_001",
+      "category": "single_image_vqa",
+      "query": "Is there an airport runway visible in this scene?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 515.26,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_002",
+      "category": "single_image_vqa",
+      "query": "Are there any water bodies present in this image?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 437.02,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_003",
+      "category": "single_image_vqa",
+      "query": "How many storage tanks can be identified in this industrial area?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 327.96,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_004",
+      "category": "single_image_vqa",
+      "query": "Is there a bridge crossing the river?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 446.52,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_005",
+      "category": "single_image_vqa",
+      "query": "How many aircraft are stationed on the tarmac?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 438.16,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_006",
+      "category": "single_image_vqa",
+      "query": "Does the image contain residential buildings?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 541.12,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_007",
+      "category": "single_image_vqa",
+      "query": "What is the predominant land cover in the southern quadrant?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 393.43,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_008",
+      "category": "single_image_vqa",
+      "query": "Are there commercial vessels docked at the harbor?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 364.23,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_009",
+      "category": "single_image_vqa",
+      "query": "Is any railway infrastructure visible?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 379.56,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    },
+    {
+      "id": "vqa_010",
+      "category": "single_image_vqa",
+      "query": "Are there solar photovoltaic panels installed in this area?",
+      "expected_task": "SINGLE_IMAGE_VQA",
+      "predicted_task": "SINGLE_IMAGE_VQA",
+      "expected_tool": "single_image_vqa",
+      "predicted_tool": "single_image_vqa",
+      "expected_validity": "VALID",
+      "actual_validity": "VALID",
+      "expected_error_code": null,
+      "actual_error_code": null,
+      "latency_ms": 360.32,
+      "task_match": true,
+      "tool_match": true,
+      "overall_correct": true
+    }
+  ]
+}

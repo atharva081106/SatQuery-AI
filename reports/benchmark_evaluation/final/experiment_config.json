@@ -1,0 +1,72 @@
+{
+  "project": "SIH 2026 PS26167 — ISRO / SAC Ahmedabad",
+  "system_name": "SatQuery AI",
+  "submission_target": "Evaluator: Aminur Hossain (ISRO / SAC Ahmedabad)",
+  "evaluation_date": "2026-10-16",
+  "environment": {
+    "os": "Windows 11",
+    "python_runtime": "backend/venv/Scripts/python.exe",
+    "python_version": "3.10.x",
+    "torch_version": "2.13.0+cpu",
+    "transformers_version": "5.16.1",
+    "cuda_available": false,
+    "execution_device": "cpu"
+  },
+  "random_seed": 42,
+  "benchmarks": {
+    "change_detection": {
+      "model": "SatQueryChangeNet-v2 (Siamese U-Net)",
+      "checkpoint": "ml_pipeline/checkpoints/satquery_change_net_authentic/best_change_net.pth",
+      "checkpoint_sha256": "9b94320837db808ed284da285568a29b2cca52d2bb51d89d97a479895b11b332",
+      "architecture": "Siamese ResNet-based Encoder, Dual Difference Concatenation, U-Net Decoder with Skip Connections",
+      "parameters": 6883005,
+      "dataset": "SECOND Semantic Change Detection Benchmark (Yang et al., 2021 IEEE TGRS)",
+      "splits": {
+        "train": "400 authentic scene pairs (zero overlap)",
+        "val": "80 authentic scene pairs (zero overlap)",
+        "test": "968 authentic held-out scene pairs",
+        "test2": "968 authentic held-out scene pairs (identical physical scenes to test, paired with test2 questions)"
+      },
+      "ground_truth_definition": "Canonical change mask: np.any(label1_rgb != label2_rgb, axis=-1)",
+      "total_pixels_evaluated": 63438848,
+      "image_dimensions": "512x512 RGB (0.1524m GSD)"
+    },
+    "optical_sar_fusion": {
+      "model": "SatQueryOpticalSARNet-v1.0 (Dual-Stream Encoder + Fusion)",
+      "checkpoint": "ml_pipeline/checkpoints/satquery_optical_sar_net_disjoint/optical_sar_net.pth",
+      "checkpoint_sha256": "66544ff8249c692ed46c072c221e922c0544241874cc1b92a3701fb5a767faa3",
+      "architecture": "Dual-Stream ResNet Encoders (Optical 3-band + SAR 2-band VV/VH), Multimodal Feature Fusion, Segmentation Head",
+      "parameters": 849603,
+      "dataset": "BEN-GE-800 (BigEarthNet-MM subset, Zenodo DOI 10.5281/zenodo.12941231)",
+      "ground_truth": "ESA WorldCover 10m Land Cover v100 (Authentic Raster GT)",
+      "protocol": "parent_granule_disjoint (Strict zero scene/acquisition overlap between train and test)",
+      "splits": {
+        "train": "561 patches (59 unique S2 granules, 137 unique S1 acquisitions)",
+        "val_held_out": "120 patches (13 unique S2 granules, 29 unique S1 acquisitions)",
+        "test_held_out": "119 patches (14 unique S2 granules, 32 unique S1 acquisitions)"
+      },
+      "classes": ["Built-up", "Water", "Vegetation"]
+    },
+    "change_vqa": {
+      "model": "SatQuery-RS-VLM-v1.0",
+      "checkpoint": "ml_pipeline/checkpoints/satquery_rs_vlm/model.safetensors",
+      "checkpoint_sha256": "b2d9b613d0c611a8b1c532dd0f4356f200a2a392d91e05ef19b93b1cfb042432",
+      "architecture": "Salesforce/blip-vqa-base with Bi-temporal Difference Adapter & Constrained Vocabulary Inference",
+      "parameters": 360980000,
+      "dataset": "CDVQA Authentic Benchmark (Yuan et al., 2022 IEEE TGRS)",
+      "vocabulary_constraint": "Strict 19-token official closed vocabulary across 8 official question types",
+      "scoring_method": "Length-normalized candidate cross-entropy loss over decoder candidate tokens",
+      "evaluated_split": "Held-out Test Split (200 balanced samples: 25 per category across all 8 types)"
+    }
+  },
+  "metric_definitions": {
+    "macro_change_iou": "Average of per-pair change IoU: (1/N) * sum(TP_i / (TP_i + FP_i + FN_i))",
+    "micro_change_iou": "Dataset-level global change IoU: sum(TP) / (sum(TP) + sum(FP) + sum(FN))",
+    "macro_2class_miou": "Average of per-pair 2-class mIoU: (1/N) * sum((IoU_change_i + IoU_nochange_i) / 2)",
+    "micro_2class_miou": "Dataset-level global 2-class mIoU: (IoU_change_micro + IoU_nochange_micro) / 2",
+    "pixel_accuracy": "Total correct pixels / total evaluated pixels: (sum(TP) + sum(TN)) / Total_Pixels",
+    "optical_sar_macro_miou": "Mean IoU across classes: (1/C) * sum(IoU_c) for c in [Built-up, Water, Vegetation]",
+    "vqa_overall_accuracy": "Fraction of test questions correctly classified: sum(correct) / total_test_questions",
+    "vqa_average_per_type_accuracy": "Macro-average of accuracies across all 8 official question categories: (1/8) * sum(Acc_k)"
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "provenance_metadata": {
+    "title": "SatQuery AI Final Model & Dataset Provenance Manifest",
+    "project": "Smart India Hackathon 2026 — PS26167",
+    "organization": "Space Applications Centre (SAC), Indian Space Research Organisation (ISRO)",
+    "timestamp": "2026-10-16T16:35:00Z",
+    "environment": {
+      "os": "Windows 11 Enterprise (64-bit), Kernel 10.0.26300",
+      "python": "3.10.11",
+      "pytorch": "2.13.0+cpu",
+      "device": "cpu",
+      "host_cpu": "Intel Core CPU (8 physical cores, 12 logical execution threads)",
+      "ram_total_gb": 15.71,
+      "disk_free_gb": 104.85
+    }
+  },
+  "quarantined_test_attestation": {
+    "cdvqa_test": {
+      "path": "ml_pipeline/authentic_data/cdvqa/test_qa.json",
+      "pairs": 968,
+      "questions": 39686,
+      "evaluated_once_under_frozen_protocol": true,
+      "used_in_training": false,
+      "used_in_checkpoint_selection": false
+    },
+    "cdvqa_test2": {
+      "path": "ml_pipeline/authentic_data/cdvqa/test2_qa.json",
+      "pairs": 968,
+      "questions": 31036,
+      "status": "COMPLETELY_UNTOUCHED_AND_QUARANTINED",
+      "used_in_training": false,
+      "used_in_checkpoint_selection": false,
+      "used_in_evaluation": false
+    }
+  },
+  "model_checkpoints": {
+    "cdvqa_feature_head_seed42": {
+      "path": "ml_pipeline/checkpoints/cdvqa_heads/feat_head_seed42.pth",
+      "sha256": "C2E55D40592C265F53B5E093C5E93DD03D1395D6B3999AD7CE84B16918725CB9",
+      "parameters": 272403,
+      "selection_metric": "Change ratio validation accuracy (+6.13% over blind baseline, p < 0.01)"
+    },
+    "cdvqa_blind_head_seed42": {
+      "path": "ml_pipeline/checkpoints/cdvqa_heads/blind_head_seed42.pth",
+      "sha256": "C0C35A032AFCCE08F75B81158C101909D5C966946E95451CDFDE71CE925BF899",
+      "parameters": 137235,
+      "role": "Language-only prior baseline"
+    },
+    "cdvqa_visual_backbone_changenet_v2": {
+      "path": "ml_pipeline/checkpoints/satquery_change_net_finetune/v2/best_change_net_finetuned.pth",
+      "sha256": "95FB4CEB93F9E40B3C778B2FAF384E12D3278C8961892FD8B4A287836207F6B9",
+      "parameters": 1709873,
+      "selection_metric": "Validation Macro Change IoU (34.60% vs 31.15% baseline, Epoch 4)"
+    },
+    "remoteclip_vit_b32_backbone": {
+      "path": "ml_pipeline/authentic_data/_downloads/RemoteCLIP-ViT-B-32.pt",
+      "sha256": "60014E395D930A3F2963D1D89C8522BF4AD56775571E4356E866864789AF85C4",
+      "parameters": 151277313,
+      "role": "Frozen remote-sensing vision-language backbone"
+    },
+    "rsvqa_lr_classifier_head": {
+      "path": "ml_pipeline/checkpoints/satquery_rs_vlm/rsvqa_lr_head.pth",
+      "sha256": "4331D8EB4D955C0F90A8891C37341DE7D793EBD61B17C66CD37A14CC8D72523E",
+      "parameters": 974277,
+      "selection_metric": "Full validation OA (86.60% vs 78.50% published baseline)"
+    },
+    "vrsbench_grounding_head": {
+      "path": "ml_pipeline/checkpoints/satquery_rs_vlm/vrsbench_head.pth",
+      "sha256": "60EFB5EDB095245CD55AAEDE8146718F3A25856EFECD0AB4432359AD95CD0839",
+      "parameters": 450,
+      "selection_metric": "Visual grounding mean IoU (38.27%) on authentic 8-point polygon extents"
+    },
+    "optical_sar_net_disjoint": {
+      "path": "ml_pipeline/checkpoints/satquery_optical_sar_net_disjoint/optical_sar_net.pth",
+      "sha256": "66544FF8249C692ED46C072C221E922C0544241874CC1B92A3701FB5A767FAA3",
+      "parameters": 849603,
+      "selection_metric": "Validation mIoU on disjoint overpasses (59.44%) and zero spatial leakage"
+    },
+    "rs_domain_adapter": {
+      "path": "ml_pipeline/checkpoints/satquery_rs_vlm/satquery_rs_domain_adapter.pth",
+      "sha256": "79E6544F61099F98C336722178BE27BD3BC1F3119B64CFA4A1889E872F5D9DDD",
+      "parameters": 787970,
+      "selection_metric": "InfoNCE loss convergence (4.0660 -> 3.7333) across 5,000 BigEarthNet.txt pairs"
+    }
+  },
+  "dataset_manifests": {
+    "cdvqa": {
+      "source": "Yuan et al., IEEE TGRS 2022 (arXiv:2112.06343)",
+      "train_json": "ml_pipeline/authentic_data/cdvqa/train_qa.json",
+      "train_pairs": 1600,
+      "train_questions": 65967,
+      "val_json": "ml_pipeline/authentic_data/cdvqa/val_qa.json",
+      "val_pairs": 400,
+      "val_questions": 16441,
+      "test_json": "ml_pipeline/authentic_data/cdvqa/test_qa.json",
+      "test_pairs": 968,
+      "test_questions": 39686,
+      "test2_json": "ml_pipeline/authentic_data/cdvqa/test2_qa.json",
+      "test2_pairs": 968,
+      "test2_questions": 31036
+    },
+    "second": {
+      "source": "Yang et al., IEEE TGRS 2021 (Wuhan University)",
+      "train_pairs": 1600,
+      "val_pairs": 400,
+      "test_pairs": 968,
+      "ground_truth_format": "Canonical bi-temporal semantic difference masks (label1 != label2)"
+    },
+    "ben_ge_800": {
+      "source": "BigEarthNet-MM / Zenodo 12941231",
+      "manifest_json": "reports/training_migration/granule_disjoint_split_manifest.json",
+      "train_patches": 561,
+      "val_patches": 120,
+      "test_patches": 119,
+      "ground_truth": "ESA WorldCover 10m Land Cover v100"
+    },
+    "rsvqa_lr": {
+      "source": "Sylvain Lobry et al., IEEE TGRS 2020 (arXiv:2003.07333)",
+      "val_parquet": "ml_pipeline/authentic_data/rsvqa_lr/rsvqa_lr_val_2k.parquet",
+      "sample_count": 2000,
+      "parent_scene_clusters": 100
+    },
+    "vrsbench": {
+      "source": "Xiang et al., NeurIPS 2024 (arXiv:2406.12384)",
+      "vqa_json": "ml_pipeline/authentic_data/vrsbench/VRSBench_EVAL_vqa.json",
+      "grounding_json": "ml_pipeline/authentic_data/vrsbench/VRSBench_EVAL_referring.json",
+      "caption_json": "ml_pipeline/authentic_data/vrsbench/VRSBench_EVAL_Cap.json",
+      "evaluation_samples": 62918
+    },
+    "bigearthnet_txt": {
+      "source": "Herzog, Adler, Demir et al., 2026 (arXiv:2603.29630)",
+      "parquet": "ml_pipeline/authentic_data/BigEarthNet.txt.parquet",
+      "total_instruction_pairs": 9553962
+    }
+  },
+  "verification_audit_pass": {
+    "script": "scripts/audit_claims.py",
+    "indexed_report_files": 61,
+    "unique_numeric_points": 20287,
+    "exit_code": 0,
+    "claims_status": "ALL_CHECKS_PASSED"
+  }
+}

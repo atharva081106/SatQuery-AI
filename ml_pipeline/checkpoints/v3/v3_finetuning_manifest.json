@@ -1,0 +1,67 @@
+{
+  "title": "SatQuery AI V3 Fine-Tuned Model Suite Manifest",
+  "timestamp": "2026-10-16T17:52:55Z",
+  "environment": {
+    "python": "3.10.11",
+    "pytorch": "2.13.0+cpu",
+    "device": "cpu"
+  },
+  "models": {
+    "rs_vlm_suite": {
+      "rsvqa_classifier_head": {
+        "checkpoint": "ml_pipeline\\checkpoints\\v3\\rs_vlm\\rsvqa_lr_head_v3.pth",
+        "sha256": "3AE53D8F13CA370DDAA998453AA8EF594F8DF8377445A215846A1B56AE878844",
+        "parameters": 626885,
+        "final_loss": 0.1549
+      },
+      "vrs_grounding_head": {
+        "checkpoint": "ml_pipeline\\checkpoints\\v3\\rs_vlm\\vrsbench_head_v3.pth",
+        "sha256": "FEFA31B62B42839B089A2A219994D29A83F4ACD7AC8B3DF5B0FFA2DC2EC747F5",
+        "parameters": 132356,
+        "final_loss": 0.0135
+      }
+    },
+    "cdvqa_heads": {
+      "seed_42": {
+        "feat_head_checkpoint": "ml_pipeline\\checkpoints\\v3\\cdvqa_heads\\feat_head_seed42_v3.pth",
+        "feat_head_sha256": "0511446D035BF2C8768F935A3003BD817A65007B5D1764C34A78A55607555345",
+        "feat_val_oa_pct": 68.84,
+        "blind_head_checkpoint": "ml_pipeline\\checkpoints\\v3\\cdvqa_heads\\blind_head_seed42_v3.pth",
+        "blind_head_sha256": "56F6758D5C060C62A8BA7A5FF72D19A7A97D8AC41D333FB05D1058170CDC612A",
+        "blind_val_oa_pct": 67.61,
+        "paired_delta_val_oa_pct": 1.23
+      },
+      "seed_43": {
+        "feat_head_checkpoint": "ml_pipeline\\checkpoints\\v3\\cdvqa_heads\\feat_head_seed43_v3.pth",
+        "feat_head_sha256": "D4C1AD9E385699ED46EDFD50382D81FF643B57D1B55D5BC63522D96A2DF2967D",
+        "feat_val_oa_pct": 68.69,
+        "blind_head_checkpoint": "ml_pipeline\\checkpoints\\v3\\cdvqa_heads\\blind_head_seed43_v3.pth",
+        "blind_head_sha256": "58332A4E7EB5EDEDDB5BDEA6043EDFB8641701B7EB4B15C8DC03787837CF1F2C",
+        "blind_val_oa_pct": 68.13,
+        "paired_delta_val_oa_pct": 0.56
+      },
+      "seed_44": {
+        "feat_head_checkpoint": "ml_pipeline\\checkpoints\\v3\\cdvqa_heads\\feat_head_seed44_v3.pth",
+        "feat_head_sha256": "57E28142166C98CCE007F4F304C34653CC373D46FFB380018D3B78D22E58EDFA",
+        "feat_val_oa_pct": 68.29,
+        "blind_head_checkpoint": "ml_pipeline\\checkpoints\\v3\\cdvqa_heads\\blind_head_seed44_v3.pth",
+        "blind_head_sha256": "C88A51500FE7AF0495CC09828350D5C81F467CEB2C1233F958D9782058F0DB1A",
+        "blind_val_oa_pct": 67.91,
+        "paired_delta_val_oa_pct": 0.38
+      }
+    },
+    "optical_sar_net": {
+      "checkpoint": "ml_pipeline\\checkpoints\\v3\\optical_sar\\optical_sar_net_v3.pth",
+      "sha256": "BFB0B225B62EE7EF7C93F421F89390F350CA013CA0F1A05C2E98AFDC70C57460",
+      "parameters": 849603,
+      "final_loss": 1.0947
+    },
+    "change_net_v3": {
+      "checkpoint": "ml_pipeline\\checkpoints\\v3\\change_net\\best_change_net_finetuned_v3.pth",
+      "sha256": "7EDF59AF2FF80DB6D5BA6A929F5AC0069753C15CE99EE4CEF751E877DD8AABBF",
+      "parameters": 1709873,
+      "final_loss": 0.7248
+    }
+  },
+  "total_pipeline_duration_sec": 333.52
+}

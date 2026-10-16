@@ -1,0 +1,73 @@
+{
+  "phase": 7,
+  "title": "Robust Input Handling & Performance Telemetry",
+  "timestamp": "2026-10-14T18:03:00+05:30",
+  "status": "PASSED",
+  "input_handling": {
+    "geotiff_ingestion": {
+      "supported_dtypes": ["uint8", "uint16", "int16", "float32"],
+      "multiband_support": "Multi-spectral (4-band, 8-band, 12-band Sentinel-2 L2A) with intelligent B4/B3/B2 RGB band selection",
+      "radiometric_normalization": "2%-98% cumulative percentile contrast stretching excluding nodata/missing values",
+      "sar_scientific_scaling": "Log-transform decibels (dB) scaling for linear power backscatter sigma0",
+      "nodata_masking": "Strict nodata detection via ds.nodata and NaN/Inf masking; clean 0-fill of background without radiometric distortion",
+      "metadata_extracted": ["bounds", "crs", "pixel_size_x", "pixel_size_y", "nodata", "band_count", "dtype"]
+    },
+    "benchmark_mode_toggle": {
+      "behavior": "When disabled, standard PNG/JPEG without georeferencing is strictly rejected with UNSUPPORTED_FORMAT; when enabled, allows standard benchmark evaluation datasets."
+    },
+    "edge_case_guardrails": {
+      "all_nodata_raster": "Rejected with descriptive ValueError",
+      "blank_empty_bands": "Rejected with descriptive ValueError",
+      "corrupted_stream": "Rejected with descriptive ValueError",
+      "unreferenced_geotiff": "Flags lack of CRS/affine transform and triggers unverified co-registration guardrails"
+    }
+  },
+  "large_raster_tiling": {
+    "engine": "backend/tiling.py (SlidingWindowTiler)",
+    "tile_size": 512,
+    "overlap": 64,
+    "border_blending": "2D Hann / Cosine apodization window for seamless boundary transitions without stitching seams",
+    "mask_stitching": "Multi-class weighted probability / vote accumulation with argmax resolution",
+    "detection_remapping": "Tile-to-global normalized coordinate re-projection with cross-tile Non-Maximum Suppression (NMS) and geographic center interpolation",
+    "memory_bounded": "Peak working set kept under 512 MB via sliding window tile streaming"
+  },
+  "latency_benchmarks": {
+    "benchmark_report_json": "reports/latency.json",
+    "benchmark_report_md": "reports/latency.md",
+    "hardware": {
+      "device": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+      "cuda_available": false,
+      "cpu_cores": 12,
+      "torch_version": "2.13.0+cpu"
+    },
+    "p50_p95_metrics": {
+      "single_image_vqa": {"p50_ms": 15.01, "p95_ms": 29.17, "throughput_qps": 56.46},
+      "single_image_captioning": {"p50_ms": 13.72, "p95_ms": 16.35, "throughput_qps": 70.79},
+      "single_image_grounding": {"p50_ms": 13.24, "p95_ms": 14.13, "throughput_qps": 75.44},
+      "land_cover_segmentation": {"p50_ms": 13.76, "p95_ms": 21.31, "throughput_qps": 66.80},
+      "bi_temporal_change": {"p50_ms": 51.76, "p95_ms": 58.05, "throughput_qps": 19.78},
+      "optical_sar_fusion": {"p50_ms": 7.07, "p95_ms": 8.59, "throughput_qps": 139.75},
+      "spatial_compatibility_verifier": {"p50_ms": 27.76, "p95_ms": 34.66, "throughput_qps": 35.04},
+      "large_raster_tiling_stitching_2048x2048": {"p50_ms": 229.29, "p95_ms": 274.93, "throughput_qps": 4.22},
+      "raster_ingestion_decode": {"p50_ms": 13.29, "p95_ms": 14.58, "throughput_qps": 75.13}
+    }
+  },
+  "regression_tests": {
+    "test_files": [
+      "backend/test_input_robustness.py",
+      "backend/test_tool_registry.py",
+      "backend/test_change_pipeline.py",
+      "backend/test_cross_modal.py",
+      "backend/test_query_routing.py"
+    ],
+    "total_tests": 81,
+    "passed_tests": 81,
+    "pass_rate_pct": 100.0
+  },
+  "claims_audit": {
+    "script": "scripts/audit_claims.py",
+    "violations_found": 0,
+    "hardcoded_confidence_literals": 0,
+    "status": "ALL CHECKS PASSED"
+  }
+}

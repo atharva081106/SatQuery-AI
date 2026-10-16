@@ -1,0 +1,114 @@
+{
+  "benchmark": "Phase 1 CDVQA Head Retrained on All 1,600 Pairs with Visual Dropout & Blanking",
+  "timestamp": "2026-10-16T12:11:07Z",
+  "regularization": {
+    "visual_branch_dropout": 0.4,
+    "random_visual_blanking_p": 0.2,
+    "train_pairs_count": 1600,
+    "train_questions_count": 65967,
+    "val_pairs_count": 400,
+    "val_questions_count": 16441,
+    "epochs": 15,
+    "batch_size": 256
+  },
+  "results": {
+    "model_oa": 68.49,
+    "blind_oa": 67.98,
+    "delta_oa": 0.5,
+    "paired_delta_oa_ci_95": [
+      -0.06,
+      1.06
+    ],
+    "delta_oa_significant": false,
+    "model_aa": 59.26,
+    "blind_aa": 58.45,
+    "delta_aa": 0.81,
+    "paired_delta_aa_ci_95": [
+      -0.01,
+      1.59
+    ],
+    "delta_aa_significant": false,
+    "per_category": {
+      "change_or_not": {
+        "model_acc": 83.22,
+        "blind_acc": 82.26,
+        "delta": 0.96,
+        "ci_95": [
+          0.35,
+          1.54
+        ],
+        "significant": true
+      },
+      "increase_or_not": {
+        "model_acc": 73.02,
+        "blind_acc": 74.74,
+        "delta": -1.72,
+        "ci_95": [
+          -2.73,
+          -0.68
+        ],
+        "significant": true
+      },
+      "decrease_or_not": {
+        "model_acc": 73.47,
+        "blind_acc": 74.04,
+        "delta": -0.57,
+        "ci_95": [
+          -2.2,
+          1.05
+        ],
+        "significant": false
+      },
+      "change_to_what": {
+        "model_acc": 56.9,
+        "blind_acc": 55.21,
+        "delta": 1.69,
+        "ci_95": [
+          -0.08,
+          3.41
+        ],
+        "significant": false
+      },
+      "smallest_change": {
+        "model_acc": 29.58,
+        "blind_acc": 30.0,
+        "delta": -0.42,
+        "ci_95": [
+          -2.59,
+          1.75
+        ],
+        "significant": false
+      },
+      "largest_change": {
+        "model_acc": 48.92,
+        "blind_acc": 48.75,
+        "delta": 0.17,
+        "ci_95": [
+          -2.67,
+          3.17
+        ],
+        "significant": false
+      },
+      "change_ratio": {
+        "model_acc": 38.0,
+        "blind_acc": 31.87,
+        "delta": 6.13,
+        "ci_95": [
+          2.5,
+          10.12
+        ],
+        "significant": true
+      },
+      "change_ratio_types": {
+        "model_acc": 70.94,
+        "blind_acc": 70.73,
+        "delta": 0.21,
+        "ci_95": [
+          -0.98,
+          1.32
+        ],
+        "significant": false
+      }
+    }
+  }
+}

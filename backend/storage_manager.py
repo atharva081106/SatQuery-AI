@@ -221,7 +221,7 @@ def list_recent_queries(limit: int = 20) -> List[Dict[str, Any]]:
             "timestamp": ts,
             "status": "success",
             "task": "UNKNOWN",
-            "confidence": 0.0,
+            "confidence": None,
             "has_geojson": False
         }
         if resp_json:

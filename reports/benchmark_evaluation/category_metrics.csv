@@ -1,0 +1,10 @@
+Category,Evaluated_Samples,Exact_Accuracy_Pct,Normalized_Accuracy_Pct,Classification_Precision,Classification_Recall,Classification_F1,Regression_MAE,Regression_RMSE,Confusion_Matrix,Primary_Failure_Mode
+change_or_not,25,44.00%,44.00%,0.4400,1.0000,0.6111,N/A,N/A,"TP=11, FP=14, FN=0, TN=0",Affirmative bias: model predicted 'yes' on 100% of samples (14 false positives on 'no' ground truth)
+increase_or_not,25,36.00%,36.00%,0.2857,0.8571,0.4286,N/A,N/A,"TP=6, FP=15, FN=1, TN=3",Temporal direction loss: unsigned |T2 - T1| cannot determine whether vegetation expanded or cleared
+decrease_or_not,25,32.00%,32.00%,0.3200,1.0000,0.4848,N/A,N/A,"TP=8, FP=17, FN=0, TN=0",Temporal direction loss: affirmative confirmation bias results in 17 false positives
+smallest_change,25,0.00%,4.00%,0.0000,0.0000,0.0000,N/A,N/A,N/A,Vocabulary mismatch: model outputs generic English nouns ('oil' 'coin') instead of 6 SECOND land-cover classes
+largest_change,25,0.00%,0.00%,0.0000,0.0000,0.0000,N/A,N/A,N/A,Vocabulary mismatch: model outputs descriptive phrases ('water' 'bank') failing strict token equality against 'NVG_surface'
+change_to_what,25,0.00%,0.00%,0.0000,0.0000,0.0000,N/A,N/A,N/A,Synonym penalty: model generates semantic synonyms ('city' vs 'buildings' 'industrial' vs 'NVG_surface')
+change_ratio,25,0.00%,0.00%,N/A,N/A,0.0000,52.52%,59.13%,N/A,Syntax mismatch: model outputs scalar estimates ('100' '50') instead of underscore interval strings ('0_to_10')
+change_ratio_types,25,0.00%,8.00%,N/A,N/A,0.0000,12.40%,20.50%,N/A,Format mismatch: partial matches triggered spuriously by token '1' matching substring in '0_to_10'
+OVERALL_BENCHMARK,200,14.00%,15.50%,0.3486,0.9524,0.1433,32.46%,39.82%,"TP=25, FP=46, FN=1, TN=3",Generative VLM evaluated without closed 19-class prompt constraints on unsigned difference imagery

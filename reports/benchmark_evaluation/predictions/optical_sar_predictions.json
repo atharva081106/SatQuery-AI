@@ -1,0 +1,306 @@
+{
+  "benchmark": "BigEarthNet.txt (arXiv:2603.29630) / Optical-SAR Dual-Encoder",
+  "provenance": "SYNTHETIC_SCHEMA_PROTOTYPE (15 test pairs, synthetic heuristic pseudo-mask targets)",
+  "split": "test",
+  "sample_count": 15,
+  "overall_mean_iou_pct": 21.22,
+  "overall_mean_f1_dice": 0.2524,
+  "per_target_class": {
+    "built_up": {
+      "mean_iou_pct": 6.98,
+      "dice_f1": 0.1034,
+      "precision": 0.0698,
+      "recall": 0.1995
+    },
+    "water": {
+      "mean_iou_pct": 20.22,
+      "dice_f1": 0.2534,
+      "precision": 0.3215,
+      "recall": 0.2446
+    },
+    "vegetation": {
+      "mean_iou_pct": 36.48,
+      "dice_f1": 0.4004,
+      "precision": 0.4601,
+      "recall": 0.3973
+    }
+  },
+  "co_registration_guardrails": {
+    "true_pair_mumbai": {
+      "compatible": true,
+      "coherence_score": 0.88,
+      "message": "Unverified Optical-SAR Co-Registration (Radiometric NMI: 0.0191, Gradient Coherence: 0.017)"
+    },
+    "disparate_pair_bengaluru": {
+      "compatible": false,
+      "coherence_score": 0.04,
+      "message": "Cross-Modal Disparity Detected: Optical and SAR images appear to be from distinct geographic scenes (NMI: 0.0010, Gradient Corr: -0.011)."
+    }
+  },
+  "isro_authentic_data_status": {
+    "evaluation_status": "BLOCKED",
+    "reason": "No official ground-truth reference masks or verified QA pairs exist locally for Cartosat-2S or RISAT-1. Procedural demo images in frontend/public/demo/ are UI demonstration mockups without reference ground truth.",
+    "reference_masks_evaluated": false,
+    "qa_answers_evaluated": false
+  },
+  "predictions": [
+    {
+      "sample_index": 0,
+      "patch_id": "S2A_MSIL2A_2018_test_0000",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Arable land",
+        "Broad-leaved forest"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0,
+      "water_f1": 0.0,
+      "vegetation_iou": 0.0224,
+      "vegetation_f1": 0.0439,
+      "latency_ms": 67.25
+    },
+    {
+      "sample_index": 1,
+      "patch_id": "S2A_MSIL2A_2018_test_0001",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Inland waters"
+      ],
+      "built_up_iou": 0.3498,
+      "built_up_f1": 0.5183,
+      "water_iou": 0.1104,
+      "water_f1": 0.1988,
+      "vegetation_iou": 0.0,
+      "vegetation_f1": 0.0,
+      "latency_ms": 35.83
+    },
+    {
+      "sample_index": 2,
+      "patch_id": "S2A_MSIL2A_2018_test_0002",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Marine waters",
+        "Beaches, dunes, sands",
+        "Inland wetlands",
+        "Natural grassland and sparsely vegetated areas"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0694,
+      "water_f1": 0.1298,
+      "vegetation_iou": 0.8288,
+      "vegetation_f1": 0.9064,
+      "latency_ms": 36.76
+    },
+    {
+      "sample_index": 3,
+      "patch_id": "S2A_MSIL2A_2018_test_0003",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Coniferous forest",
+        "Natural grassland and sparsely vegetated areas",
+        "Transitional woodland, shrub"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0,
+      "water_f1": 0.0,
+      "vegetation_iou": 0.0084,
+      "vegetation_f1": 0.0166,
+      "latency_ms": 38.1
+    },
+    {
+      "sample_index": 4,
+      "patch_id": "S2A_MSIL2A_2018_test_0004",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Inland waters",
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.1651,
+      "water_f1": 0.2835,
+      "vegetation_iou": 0.2777,
+      "vegetation_f1": 0.4347,
+      "latency_ms": 36.25
+    },
+    {
+      "sample_index": 5,
+      "patch_id": "S2A_MSIL2A_2018_test_0005",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Arable land",
+        "Broad-leaved forest"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 1.0,
+      "water_f1": 1.0,
+      "vegetation_iou": 1.0,
+      "vegetation_f1": 1.0,
+      "latency_ms": 42.28
+    },
+    {
+      "sample_index": 6,
+      "patch_id": "S2A_MSIL2A_2018_test_0006",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Inland waters"
+      ],
+      "built_up_iou": 0.3473,
+      "built_up_f1": 0.5155,
+      "water_iou": 0.2061,
+      "water_f1": 0.3417,
+      "vegetation_iou": 0.0,
+      "vegetation_f1": 0.0,
+      "latency_ms": 38.02
+    },
+    {
+      "sample_index": 7,
+      "patch_id": "S2A_MSIL2A_2018_test_0007",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Marine waters",
+        "Beaches, dunes, sands",
+        "Inland wetlands",
+        "Natural grassland and sparsely vegetated areas"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.1387,
+      "water_f1": 0.2436,
+      "vegetation_iou": 0.4157,
+      "vegetation_f1": 0.5872,
+      "latency_ms": 42.18
+    },
+    {
+      "sample_index": 8,
+      "patch_id": "S2A_MSIL2A_2018_test_0008",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Coniferous forest",
+        "Natural grassland and sparsely vegetated areas",
+        "Transitional woodland, shrub"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0,
+      "water_f1": 0.0,
+      "vegetation_iou": 0.9814,
+      "vegetation_f1": 0.9906,
+      "latency_ms": 41.38
+    },
+    {
+      "sample_index": 9,
+      "patch_id": "S2A_MSIL2A_2018_test_0009",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Inland waters",
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.1442,
+      "water_f1": 0.252,
+      "vegetation_iou": 0.9896,
+      "vegetation_f1": 0.9948,
+      "latency_ms": 39.88
+    },
+    {
+      "sample_index": 10,
+      "patch_id": "S2A_MSIL2A_2018_test_0010",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Arable land",
+        "Broad-leaved forest"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 1.0,
+      "water_f1": 1.0,
+      "vegetation_iou": 0.0,
+      "vegetation_f1": 0.0,
+      "latency_ms": 39.55
+    },
+    {
+      "sample_index": 11,
+      "patch_id": "S2A_MSIL2A_2018_test_0011",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Inland waters"
+      ],
+      "built_up_iou": 0.3492,
+      "built_up_f1": 0.5177,
+      "water_iou": 0.1602,
+      "water_f1": 0.2761,
+      "vegetation_iou": 0.0,
+      "vegetation_f1": 0.0,
+      "latency_ms": 33.97
+    },
+    {
+      "sample_index": 12,
+      "patch_id": "S2A_MSIL2A_2018_test_0012",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Marine waters",
+        "Beaches, dunes, sands",
+        "Inland wetlands",
+        "Natural grassland and sparsely vegetated areas"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0,
+      "water_f1": 0.0,
+      "vegetation_iou": 0.0,
+      "vegetation_f1": 0.0,
+      "latency_ms": 35.14
+    },
+    {
+      "sample_index": 13,
+      "patch_id": "S2A_MSIL2A_2018_test_0013",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Coniferous forest",
+        "Natural grassland and sparsely vegetated areas",
+        "Transitional woodland, shrub"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0,
+      "water_f1": 0.0,
+      "vegetation_iou": 0.0429,
+      "vegetation_f1": 0.0823,
+      "latency_ms": 45.59
+    },
+    {
+      "sample_index": 14,
+      "patch_id": "S2A_MSIL2A_2018_test_0014",
+      "s1_patch_id": "",
+      "clc_labels": [
+        "Inland waters",
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "built_up_iou": 0.0,
+      "built_up_f1": 0.0,
+      "water_iou": 0.0395,
+      "water_f1": 0.0761,
+      "vegetation_iou": 0.9043,
+      "vegetation_f1": 0.9497,
+      "latency_ms": 37.48
+    }
+  ]
+}

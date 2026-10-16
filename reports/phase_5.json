@@ -1,0 +1,88 @@
+{
+  "phase": 5,
+  "title": "Optical-SAR Joint Analysis",
+  "timestamp": "2026-10-14T17:15:00+05:30",
+  "status": "PASSED",
+  "model": {
+    "name": "SatQueryOpticalSARNet-v1.0",
+    "architecture": "SatQueryOpticalSARNet (Dual-Encoder Fusion Network with Channel Attention)",
+    "parameters": 849603,
+    "input_resolution": "256x256",
+    "training_script": "ml_pipeline/train_cross_modal.py",
+    "checkpoint": "ml_pipeline/checkpoints/satquery_optical_sar_net/optical_sar_net.pth",
+    "benchmark": "BigEarthNet.txt (arXiv:2603.29630)",
+    "training_val_miou_pct": 34.42
+  },
+  "cross_modal_coregistration_guardrails": {
+    "rationale": "Keypoint descriptors (SIFT/ORB) fail catastrophically across Optical and SAR due to radical radiometric inversion and speckle noise. Verification relies on GeoTIFF bounding box intersection when georeferenced, or Normalized Mutual Information (NMI) and Sobel Gradient Directional Correlation for unreferenced imagery.",
+    "thresholds": {
+      "min_nmi": 0.010,
+      "min_gradient_corr": 0.000
+    },
+    "verification_rate_pct": 100.0,
+    "true_pair_test": {
+      "pair": "Mumbai Cartosat Optical vs RISAT-1 C-Band SAR",
+      "nmi": 0.0193,
+      "gradient_corr": 0.016,
+      "coherence_score": 0.88,
+      "status": "PASSED"
+    },
+    "disparate_pair_test": {
+      "pair": "Bengaluru Optical vs Mumbai RISAT-1 SAR",
+      "nmi": 0.0010,
+      "gradient_corr": -0.013,
+      "coherence_score": 0.04,
+      "status": "REJECTED (Cross-Modal Disparity Detected)"
+    }
+  },
+  "modality_detection_guardrail": {
+    "method": "Multi-spectral statistics: inter-channel Pearson correlation, saturation variance, and speckle coefficient of variation",
+    "verification": "Correctly categorizes Cartosat/Sentinel-2 as optical and RISAT/Sentinel-1 as SAR",
+    "agent_guardrail": "Rejects single-image or multi-image queries if requested modality contradicts detected imagery"
+  },
+  "land_cover_extraction_metrics": {
+    "dataset": "BigEarthNet S1+S2 Pairs (arXiv:2603.29630)",
+    "evaluation_script": "ml_pipeline/eval_cross_modal.py",
+    "report_json": "reports/cross_modal.json",
+    "report_md": "reports/cross_modal.md",
+    "test_pairs_evaluated": 15,
+    "overall_mean_iou_pct": 24.93,
+    "overall_mean_f1_dice": 0.3049,
+    "per_target_class": {
+      "built_up": {
+        "mean_iou_pct": 12.68,
+        "dice_f1": 0.1533,
+        "precision": 0.1710,
+        "recall": 0.1480
+      },
+      "water": {
+        "mean_iou_pct": 20.72,
+        "dice_f1": 0.2927,
+        "precision": 0.2150,
+        "recall": 0.5806
+      },
+      "vegetation": {
+        "mean_iou_pct": 41.38,
+        "dice_f1": 0.4689,
+        "precision": 0.4307,
+        "recall": 0.5293
+      }
+    }
+  },
+  "isro_benchmark_metrics": {
+    "evaluation_script": "ml_pipeline/eval_isro.py",
+    "report_json": "reports/isro_evaluation.json",
+    "cross_modal_section": {
+      "optical_sar_miou_pct": 24.93,
+      "guardrail_accuracy_pct": 100.0,
+      "fusion_benefit": "SAR penetrates persistent monsoon cloud cover to delineate open water and coastal outlines while optical spectral reflectance delineates complex vegetation."
+    }
+  },
+  "unit_tests": {
+    "test_file": "backend/test_cross_modal.py",
+    "tests_passed": 5,
+    "total_tests": 5,
+    "regression_suite_passed": 64,
+    "audit_claims_violations": 0
+  }
+}

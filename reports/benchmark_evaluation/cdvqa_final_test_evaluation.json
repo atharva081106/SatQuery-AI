@@ -1,0 +1,407 @@
+{
+  "benchmark": "SatQuery AI CDVQA Final Held-Out Test Evaluation",
+  "timestamp": "2026-10-16T14:23:52Z",
+  "test_partition": "authentic_data/cdvqa_prepared/test/cdvqa_annotations.json",
+  "dataset_scope": {
+    "train_pairs": 1600,
+    "train_questions": 65967,
+    "val_pairs": 400,
+    "val_questions": 16441,
+    "test_pairs": 968,
+    "test_questions": 39686,
+    "geographic_coverage": "968 aerial scene pairs from SECOND Wuhan University benchmark; unseen spatial tiles within benchmark distribution."
+  },
+  "model_checkpoints": {
+    "visual_backbone": {
+      "name": "SatQueryChangeNet v2",
+      "checkpoint": "ml_pipeline/checkpoints/satquery_change_net_finetune/v2/best_change_net_finetuned.pth",
+      "sha256": "95FB4CEB93F9E40B3C778B2FAF384E12D3278C8961892FD8B4A287836207F6B9"
+    },
+    "text_encoder": {
+      "name": "RemoteCLIP ViT-B/32",
+      "checkpoint": "ml_pipeline/authentic_data/_downloads/RemoteCLIP-ViT-B-32.pt",
+      "sha256": "60014E395D930A3F2963D1D89C8522BF4AD56775571E4356E866864789AF85C4"
+    },
+    "evaluated_heads": {
+      "blind_head_seed42": {
+        "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\cdvqa_heads\\blind_head_seed42.pth",
+        "sha256": "C0C35A032AFCCE08F75B81158C101909D5C966946E95451CDFDE71CE925BF899"
+      },
+      "feat_head_seed42": {
+        "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\cdvqa_heads\\feat_head_seed42.pth",
+        "sha256": "C2E55D40592C265F53B5E093C5E93DD03D1395D6B3999AD7CE84B16918725CB9"
+      },
+      "blind_head_seed43": {
+        "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\cdvqa_heads\\blind_head_seed43.pth",
+        "sha256": "8B1B1E05996B0DC21BBE27FF829B871F5D9C4C70DF3922244BC6760832C233D0"
+      },
+      "feat_head_seed43": {
+        "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\cdvqa_heads\\feat_head_seed43.pth",
+        "sha256": "EE1419E8D8C9C31358FFAE77F7409E2CAD870ABC6B76D1B3223619A461EABFAE"
+      },
+      "blind_head_seed44": {
+        "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\cdvqa_heads\\blind_head_seed44.pth",
+        "sha256": "B1DFBAE3E832A47B28ED0166F6DBDAC0A096C2F56C2ED8F27E4D75F9D30FF2AC"
+      },
+      "feat_head_seed44": {
+        "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\cdvqa_heads\\feat_head_seed44.pth",
+        "sha256": "9FDFC35A7F63397032B6C45244EE749F438588BB2F7125EF3BBE567863FE7498"
+      }
+    }
+  },
+  "primary_evaluation_seed_42": {
+    "blind_test_oa": 67.41,
+    "blind_test_aa": 57.51,
+    "feat_test_oa": 69.04,
+    "feat_test_aa": 60.08,
+    "delta_oa": 1.64,
+    "delta_aa": 2.57,
+    "blind_categories": {
+      "change_or_not": 82.77,
+      "increase_or_not": 73.72,
+      "decrease_or_not": 69.21,
+      "change_to_what": 55.43,
+      "smallest_change": 29.79,
+      "largest_change": 48.62,
+      "change_ratio": 29.13,
+      "change_ratio_types": 71.38
+    },
+    "feat_categories": {
+      "change_or_not": 83.86,
+      "increase_or_not": 71.04,
+      "decrease_or_not": 74.37,
+      "change_to_what": 57.1,
+      "smallest_change": 31.16,
+      "largest_change": 51.48,
+      "change_ratio": 40.39,
+      "change_ratio_types": 71.19
+    },
+    "delta_categories": {
+      "change_or_not": 1.09,
+      "increase_or_not": -2.67,
+      "decrease_or_not": 5.15,
+      "change_to_what": 1.67,
+      "smallest_change": 1.38,
+      "largest_change": 2.86,
+      "change_ratio": 11.26,
+      "change_ratio_types": -0.19
+    },
+    "scene_pair_clustered_bootstrap": {
+      "n_bootstrap": 1000,
+      "cluster_level": "scene_pair (968 unique test scene pairs)",
+      "p_value_resolution_note": "With B=1,000 bootstrap resamples, the minimum empirical discrete resolution is 1/B = 0.001. A zero count of non-positive differences (k=0) establishes an empirical upper bound of p < 0.001.",
+      "delta_oa_ci_95": [
+        1.21,
+        2.08
+      ],
+      "delta_oa_empirical_p": "< 0.001",
+      "delta_oa_statistically_significant": true,
+      "delta_aa_ci_95": [
+        1.98,
+        3.19
+      ],
+      "delta_aa_empirical_p": "< 0.001",
+      "delta_aa_statistically_significant": true,
+      "per_category": {
+        "change_or_not": {
+          "uncorrected_ci_95": [
+            0.65,
+            1.58
+          ],
+          "bonferroni_ci_99_375": [
+            0.42,
+            1.83
+          ],
+          "empirical_bootstrap_p_value": "< 0.001",
+          "statistically_significant_nominal": true,
+          "survives_bonferroni": true
+        },
+        "increase_or_not": {
+          "uncorrected_ci_95": [
+            -3.75,
+            -1.61
+          ],
+          "bonferroni_ci_99_375": [
+            -4.15,
+            -1.15
+          ],
+          "empirical_bootstrap_p_value": "< 0.001",
+          "statistically_significant_nominal": true,
+          "survives_bonferroni": true
+        },
+        "decrease_or_not": {
+          "uncorrected_ci_95": [
+            3.99,
+            6.53
+          ],
+          "bonferroni_ci_99_375": [
+            3.21,
+            6.87
+          ],
+          "empirical_bootstrap_p_value": "< 0.001",
+          "statistically_significant_nominal": true,
+          "survives_bonferroni": true
+        },
+        "change_to_what": {
+          "uncorrected_ci_95": [
+            0.2,
+            3.21
+          ],
+          "bonferroni_ci_99_375": [
+            -0.43,
+            3.76
+          ],
+          "empirical_bootstrap_p_value": 0.024,
+          "statistically_significant_nominal": true,
+          "survives_bonferroni": false
+        },
+        "smallest_change": {
+          "uncorrected_ci_95": [
+            -0.14,
+            2.86
+          ],
+          "bonferroni_ci_99_375": [
+            -0.59,
+            3.44
+          ],
+          "empirical_bootstrap_p_value": 0.072,
+          "statistically_significant_nominal": false,
+          "survives_bonferroni": false
+        },
+        "largest_change": {
+          "uncorrected_ci_95": [
+            0.76,
+            4.82
+          ],
+          "bonferroni_ci_99_375": [
+            -0.03,
+            5.6
+          ],
+          "empirical_bootstrap_p_value": 0.014,
+          "statistically_significant_nominal": true,
+          "survives_bonferroni": false
+        },
+        "change_ratio": {
+          "uncorrected_ci_95": [
+            8.21,
+            14.1
+          ],
+          "bonferroni_ci_99_375": [
+            7.54,
+            14.86
+          ],
+          "empirical_bootstrap_p_value": "< 0.001",
+          "statistically_significant_nominal": true,
+          "survives_bonferroni": true
+        },
+        "change_ratio_types": {
+          "uncorrected_ci_95": [
+            -1.04,
+            0.62
+          ],
+          "bonferroni_ci_99_375": [
+            -1.38,
+            0.88
+          ],
+          "empirical_bootstrap_p_value": 0.626,
+          "statistically_significant_nominal": false,
+          "survives_bonferroni": false
+        }
+      }
+    }
+  },
+  "three_seed_test_aggregate": {
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "blind_test_oa_values": [
+      67.41,
+      67.82,
+      67.68
+    ],
+    "blind_test_oa_mean": 67.64,
+    "blind_test_oa_std": 0.17,
+    "blind_test_aa_values": [
+      57.51,
+      58.14,
+      57.85
+    ],
+    "blind_test_aa_mean": 57.83,
+    "blind_test_aa_std": 0.26,
+    "feat_test_oa_values": [
+      69.04,
+      68.69,
+      68.76
+    ],
+    "feat_test_oa_mean": 68.83,
+    "feat_test_oa_std": 0.15,
+    "feat_test_aa_values": [
+      60.08,
+      59.58,
+      59.73
+    ],
+    "feat_test_aa_mean": 59.8,
+    "feat_test_aa_std": 0.21,
+    "delta_oa_values": [
+      1.64,
+      0.87,
+      1.08
+    ],
+    "delta_oa_mean": 1.2,
+    "delta_oa_std": 0.32,
+    "delta_aa_values": [
+      2.57,
+      1.44,
+      1.89
+    ],
+    "delta_aa_mean": 1.97,
+    "delta_aa_std": 0.46,
+    "paired_t_tests": {
+      "overall_accuracy": {
+        "mean_delta_oa": 1.1927,
+        "sample_std_oa": 0.3973,
+        "standard_error_oa": 0.2294,
+        "t_statistic": 5.199,
+        "df": 2,
+        "p_value": 0.0351,
+        "ci_95": [0.21, 2.18]
+      },
+      "average_accuracy": {
+        "mean_delta_aa": 1.9634,
+        "sample_std_aa": 0.5706,
+        "standard_error_aa": 0.3294,
+        "t_statistic": 5.96,
+        "df": 2,
+        "p_value": 0.027,
+        "ci_95": [0.55, 3.38]
+      }
+    },
+    "per_category_analysis": {
+      "change_or_not": {
+        "blind_test_mean": 82.61,
+        "blind_test_std": 0.18,
+        "feat_test_mean": 83.77,
+        "feat_test_std": 0.12,
+        "delta_mean": 1.15,
+        "delta_std": 0.24,
+        "individual_deltas": [
+          1.09,
+          1.48,
+          0.89
+        ]
+      },
+      "increase_or_not": {
+        "blind_test_mean": 73.72,
+        "blind_test_std": 0.0,
+        "feat_test_mean": 71.89,
+        "feat_test_std": 0.62,
+        "delta_mean": -1.83,
+        "delta_std": 0.61,
+        "individual_deltas": [
+          -2.67,
+          -1.57,
+          -1.24
+        ]
+      },
+      "decrease_or_not": {
+        "blind_test_mean": 71.78,
+        "blind_test_std": 2.0,
+        "feat_test_mean": 73.3,
+        "feat_test_std": 0.76,
+        "delta_mean": 1.52,
+        "delta_std": 2.74,
+        "individual_deltas": [
+          5.15,
+          -1.46,
+          0.88
+        ]
+      },
+      "change_to_what": {
+        "blind_test_mean": 56.31,
+        "blind_test_std": 0.64,
+        "feat_test_mean": 55.24,
+        "feat_test_std": 1.49,
+        "delta_mean": -1.07,
+        "delta_std": 2.12,
+        "individual_deltas": [
+          1.67,
+          -3.48,
+          -1.4
+        ]
+      },
+      "smallest_change": {
+        "blind_test_mean": 28.9,
+        "blind_test_std": 0.8,
+        "feat_test_mean": 30.14,
+        "feat_test_std": 0.74,
+        "delta_mean": 1.24,
+        "delta_std": 0.65,
+        "individual_deltas": [
+          1.38,
+          1.96,
+          0.38
+        ]
+      },
+      "largest_change": {
+        "blind_test_mean": 48.62,
+        "blind_test_std": 0.0,
+        "feat_test_mean": 51.61,
+        "feat_test_std": 0.31,
+        "delta_mean": 2.99,
+        "delta_std": 0.31,
+        "individual_deltas": [
+          2.86,
+          3.41,
+          2.69
+        ]
+      },
+      "change_ratio": {
+        "blind_test_mean": 29.63,
+        "blind_test_std": 0.67,
+        "feat_test_mean": 41.1,
+        "feat_test_std": 0.5,
+        "delta_mean": 11.47,
+        "delta_std": 0.61,
+        "individual_deltas": [
+          11.26,
+          10.85,
+          12.29
+        ]
+      },
+      "change_ratio_types": {
+        "blind_test_mean": 71.08,
+        "blind_test_std": 0.21,
+        "feat_test_mean": 71.32,
+        "feat_test_std": 0.13,
+        "delta_mean": 0.23,
+        "delta_std": 0.32,
+        "individual_deltas": [
+          -0.19,
+          0.29,
+          0.6
+        ]
+      }
+    }
+  },
+  "comparison_vs_validation_audit": {
+    "notes": "Validation and test sets represent distinct non-overlapping geographic partitions. Comparing validation to test reflects generalization across disjoint tile sets within SECOND.",
+    "validation_point_estimates": {
+      "blind_oa_mean": 67.97,
+      "feat_oa_mean": 68.56,
+      "delta_oa_mean": 0.59,
+      "blind_aa_mean": 58.39,
+      "feat_aa_mean": 59.67,
+      "delta_aa_mean": 1.28
+    },
+    "test_point_estimates": {
+      "blind_oa_mean": 67.64,
+      "feat_oa_mean": 68.83,
+      "delta_oa_mean": 1.2,
+      "blind_aa_mean": 57.83,
+      "feat_test_aa_mean": 59.8,
+      "delta_aa_mean": 1.97
+    }
+  }
+}

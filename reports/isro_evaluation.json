@@ -1,0 +1,38 @@
+{
+  "mission": "ISRO / SAC Cartosat-2S + RISAT-1 Multi-Modal Analysis Stub",
+  "timestamp": "2026-10-14 18:00:44 UTC",
+  "evaluation_scope": "SYNTHETIC_DEMO_STUB",
+  "reference_masks_evaluated": false,
+  "qa_answers_evaluated": false,
+  "integrity_notice": "Default evaluation utilizes procedural synthetic demo images (mumbai_cartosat2s_optical.png, risat1_cband_radar_sar.png) from frontend/public/demo/. No authentic ISRO Cartosat-2S or RISAT-1 imagery was evaluated, and no ground-truth reference masks or QA pairs were scored.",
+  "sensor_inputs": {
+    "optical": {
+      "file": "mumbai_cartosat2s_optical.png",
+      "detected_modality": "OPTICAL",
+      "sensor_family": "Cartosat / High-Resolution Optical RGB",
+      "is_synthetic_demo": true
+    },
+    "sar": {
+      "file": "risat1_cband_radar_sar.png",
+      "detected_modality": "SAR",
+      "sensor_family": "RISAT-1 / Sentinel-1 C-Band SAR",
+      "is_synthetic_demo": true
+    }
+  },
+  "spatial_co_registration": {
+    "compatible": true,
+    "coherence_score": 0.88,
+    "message": "Unverified Optical-SAR Co-Registration (Radiometric NMI: 0.0191, Gradient Coherence: 0.017)"
+  },
+  "resampling_and_grid": {
+    "crs": "EPSG:4326 (Normalized Visual Stub)",
+    "target_resolution_meters": 2.5,
+    "resampling_method": "Spatial Bicubic / Area Normalization (Benchmark Mode)"
+  },
+  "model_provenance": "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)",
+  "extracted_land_cover_coverage_pct": {
+    "built_up_infrastructure": 99.99,
+    "hydrological_water_bodies": 23.27,
+    "vegetation_and_canopy": 63.64
+  }
+}

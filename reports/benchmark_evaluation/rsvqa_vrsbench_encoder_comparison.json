@@ -1,0 +1,143 @@
+{
+  "benchmark": "Phase 1 Cross-Dataset Encoder Comparison (RSVQA-LR and VRSBench)",
+  "timestamp": "2026-10-16T12:15:59Z",
+  "description": "Evaluates candidate multi-modal vision encoders alongside blind question-only baselines on RSVQA-LR and VRSBench validation sets.",
+  "datasets": {
+    "rsvqa_lr": {
+      "name": "RSVQA-LR (Sentinel-2 Low Resolution)",
+      "train_samples": 168,
+      "val_samples": 36,
+      "vocab_size": 13,
+      "candidates": {
+        "blind_question_only": {
+          "model": "Blind Question-Only Baseline",
+          "oa_pct": 41.67,
+          "aa_pct": 40.72,
+          "gain_over_blind_oa_pct": 0.0,
+          "gain_over_blind_aa_pct": 0.0,
+          "per_category": {
+            "area": 25.0,
+            "comparison": 50.0,
+            "count": 33.33,
+            "presence": 54.55
+          }
+        },
+        "resnet18": {
+          "model": "ResNet-18 (ImageNet frozen)",
+          "oa_pct": 83.33,
+          "aa_pct": 82.8,
+          "gain_over_blind_oa_pct": 41.66,
+          "gain_over_blind_aa_pct": 42.08,
+          "per_category": {
+            "area": 75.0,
+            "comparison": 87.5,
+            "count": 77.78,
+            "presence": 90.91
+          }
+        },
+        "resnet50": {
+          "model": "ResNet-50 (ImageNet frozen)",
+          "oa_pct": 91.67,
+          "aa_pct": 91.32,
+          "gain_over_blind_oa_pct": 50.0,
+          "gain_over_blind_aa_pct": 50.6,
+          "per_category": {
+            "area": 87.5,
+            "comparison": 100.0,
+            "count": 77.78,
+            "presence": 100.0
+          }
+        },
+        "remoteclip_vit_b32": {
+          "model": "RemoteCLIP-ViT-B/32 (RS Domain frozen)",
+          "oa_pct": 91.67,
+          "aa_pct": 91.32,
+          "gain_over_blind_oa_pct": 50.0,
+          "gain_over_blind_aa_pct": 50.6,
+          "per_category": {
+            "area": 87.5,
+            "comparison": 100.0,
+            "count": 77.78,
+            "presence": 100.0
+          }
+        },
+        "blip_vit_b16": {
+          "model": "BLIP-ViT-B/16 (Salesforce frozen)",
+          "oa_pct": 83.33,
+          "aa_pct": 82.8,
+          "gain_over_blind_oa_pct": 41.66,
+          "gain_over_blind_aa_pct": 42.08,
+          "per_category": {
+            "area": 87.5,
+            "comparison": 75.0,
+            "count": 77.78,
+            "presence": 90.91
+          }
+        }
+      }
+    },
+    "vrsbench": {
+      "name": "VRSBench (VHR Aerial VQA)",
+      "train_samples": 140,
+      "val_samples": 30,
+      "vocab_size": 3,
+      "candidates": {
+        "blind_question_only": {
+          "model": "Blind Question-Only Baseline",
+          "oa_pct": 76.67,
+          "aa_pct": 76.67,
+          "gain_over_blind_oa_pct": 0.0,
+          "gain_over_blind_aa_pct": 0.0,
+          "per_category": {
+            "attribute": 100.0,
+            "existence": 53.33
+          }
+        },
+        "resnet18": {
+          "model": "ResNet-18 (ImageNet frozen)",
+          "oa_pct": 86.67,
+          "aa_pct": 86.67,
+          "gain_over_blind_oa_pct": 10.0,
+          "gain_over_blind_aa_pct": 10.0,
+          "per_category": {
+            "attribute": 100.0,
+            "existence": 73.33
+          }
+        },
+        "resnet50": {
+          "model": "ResNet-50 (ImageNet frozen)",
+          "oa_pct": 73.33,
+          "aa_pct": 73.33,
+          "gain_over_blind_oa_pct": -3.34,
+          "gain_over_blind_aa_pct": -3.34,
+          "per_category": {
+            "attribute": 100.0,
+            "existence": 46.67
+          }
+        },
+        "remoteclip_vit_b32": {
+          "model": "RemoteCLIP-ViT-B/32 (RS Domain frozen)",
+          "oa_pct": 83.33,
+          "aa_pct": 83.33,
+          "gain_over_blind_oa_pct": 6.66,
+          "gain_over_blind_aa_pct": 6.66,
+          "per_category": {
+            "attribute": 100.0,
+            "existence": 66.67
+          }
+        },
+        "blip_vit_b16": {
+          "model": "BLIP-ViT-B/16 (Salesforce frozen)",
+          "oa_pct": 76.67,
+          "aa_pct": 76.67,
+          "gain_over_blind_oa_pct": 0.0,
+          "gain_over_blind_aa_pct": 0.0,
+          "per_category": {
+            "attribute": 100.0,
+            "existence": 53.33
+          }
+        }
+      }
+    }
+  }
+}

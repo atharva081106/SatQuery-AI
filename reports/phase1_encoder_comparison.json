@@ -1,0 +1,69 @@
+{
+  "dataset": "CDVQA / SECOND (Yuan et al. 2022)",
+  "task": "Semantic Change Multi-Class Probe Classification (change_to_what, 6 classes)",
+  "split": "val",
+  "n_samples": 250,
+  "seed": 42,
+  "date": "2026-10-16",
+  "exact_command": "python ml_pipeline/phase1_encoder_comparison.py",
+  "objective": "Phase 1: Compare frozen vision backbones by head accuracy on authentic validation subset on CPU",
+  "remoteclip_checkpoint_sha256": "60014e395d930a3f2963d1d89c8522bf4ad56775571e4356e866864789af85c4",
+  "results": {
+    "resnet18": {
+      "encoder": "ResNet-18",
+      "feature_dim": 512,
+      "fused_dim": 2048,
+      "encoder_params": 11176512,
+      "probe_head_params": 263302,
+      "license": "BSD-3-Clause",
+      "val_subset_samples": 100,
+      "train_subset_samples": 150,
+      "val_accuracy_pct": 48.0,
+      "val_macro_f1": 0.225,
+      "avg_cpu_latency_ms": 45.47,
+      "total_extraction_sec": 16.73
+    },
+    "resnet50": {
+      "encoder": "ResNet-50",
+      "feature_dim": 2048,
+      "fused_dim": 8192,
+      "encoder_params": 23508032,
+      "probe_head_params": 1049734,
+      "license": "BSD-3-Clause",
+      "val_subset_samples": 100,
+      "train_subset_samples": 150,
+      "val_accuracy_pct": 43.0,
+      "val_macro_f1": 0.262,
+      "avg_cpu_latency_ms": 108.73,
+      "total_extraction_sec": 31.81
+    },
+    "blip_vit_b16": {
+      "encoder": "BLIP-ViT-B/16",
+      "feature_dim": 768,
+      "fused_dim": 3072,
+      "encoder_params": 86090496,
+      "probe_head_params": 394374,
+      "license": "BSD-3-Clause",
+      "val_subset_samples": 100,
+      "train_subset_samples": 150,
+      "val_accuracy_pct": 39.0,
+      "val_macro_f1": 0.2135,
+      "avg_cpu_latency_ms": 954.86,
+      "total_extraction_sec": 243.24
+    },
+    "remoteclip_vit_b32": {
+      "encoder": "RemoteCLIP-ViT-B/32",
+      "feature_dim": 512,
+      "fused_dim": 2048,
+      "encoder_params": 151277313,
+      "probe_head_params": 263302,
+      "license": "CC-BY-4.0",
+      "val_subset_samples": 100,
+      "train_subset_samples": 150,
+      "val_accuracy_pct": 40.0,
+      "val_macro_f1": 0.2175,
+      "avg_cpu_latency_ms": 90.07,
+      "total_extraction_sec": 27.27
+    }
+  }
+}

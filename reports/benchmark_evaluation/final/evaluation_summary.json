@@ -1,0 +1,80 @@
+{
+  "project": "SIH 2026 PS26167 \u2014 ISRO / SAC Ahmedabad",
+  "system": "SatQuery AI",
+  "submission_package": "Final Benchmark Evidence Reconciliation",
+  "evaluator": "Aminur Hossain (ISRO / SAC Ahmedabad)",
+  "generation_timestamp": "2026-10-16T02:09:00Z",
+  "verification_verdict": {
+    "track1_change_detection": "PASS",
+    "track2_optical_sar_fusion": "PASS",
+    "track3_change_vqa": "PASS",
+    "track4_landcover_segmentation": "PASS",
+    "track5_isro_custom_data": "BLOCKED"
+  },
+  "verified_metrics": {
+    "change_detection": {
+      "checkpoint": "ml_pipeline/checkpoints/satquery_change_net_authentic/best_change_net.pth",
+      "checkpoint_sha256": "9b94320837db808ed284da285568a29b2cca52d2bb51d89d97a479895b11b332",
+      "dataset": "SECOND / CDVQA (Yang et al. 2021)",
+      "split": "Official Test & Test2 (968 scene pairs each)",
+      "evaluated_pairs": 968,
+      "evaluated_pixels": 63438848,
+      "macro_change_iou_pct": 31.44,
+      "macro_2class_miou_pct": 55.08,
+      "micro_change_iou_pct": 36.44,
+      "micro_2class_miou_pct": 58.14,
+      "global_pixel_accuracy_pct": 81.93,
+      "confusion_matrix": {
+        "TP": 6571310,
+        "FP": 6006609,
+        "FN": 5456510,
+        "TN": 45404419
+      },
+      "discrepancy_resolution": "The previous reported 81.76% macro mIoU / 0.8932 Dice was an artifact of a luminance-thresholding defect that generated 74-98% false change masks. Retraining with canonical pixel difference np.any(label1_rgb != label2_rgb, axis=-1) on 400 train pairs yielded verified 31.44% Change IoU. Test and Test2 have identical change detection metrics because they share the identical 968 physical image pairs. The 32.05% logged earlier on Test2 was an intermediate progressive running average at pair 600/968."
+    },
+    "optical_sar_fusion": {
+      "checkpoint": "ml_pipeline/checkpoints/satquery_optical_sar_net_disjoint/optical_sar_net.pth",
+      "checkpoint_sha256": "66544ff8249c692ed46c072c221e922c0544241874cc1b92a3701fb5a767faa3",
+      "dataset": "BEN-GE-800 (Zenodo DOI 10.5281/zenodo.12941231)",
+      "ground_truth": "ESA WorldCover 10m Land Cover v100",
+      "protocol": "parent_granule_disjoint (zero scene/acquisition overlap)",
+      "evaluated_test_patches": 119,
+      "macro_miou_pct": 67.11,
+      "macro_dice_pct": 77.36,
+      "micro_iou_pct": 84.9,
+      "per_class_iou": {
+        "built_up_pct": 32.65,
+        "water_pct": 79.14,
+        "vegetation_pct": 89.55
+      }
+    },
+    "change_vqa": {
+      "checkpoint": "ml_pipeline/checkpoints/satquery_rs_vlm/model.safetensors",
+      "checkpoint_sha256": "b2d9b613d0c611a8b1c532dd0f4356f200a2a392d91e05ef19b93b1cfb042432",
+      "dataset": "CDVQA Authentic Benchmark (Yuan et al. 2022 IEEE TGRS)",
+      "split": "Official Test Split (Held-Out)",
+      "evaluated_questions": 200,
+      "inference_adapter": "Candidate Cross-Entropy Scoring with Sequence-Length Normalization",
+      "vocabulary_size": 19,
+      "constrained_results": {
+        "overall_exact_accuracy_pct": 20.0,
+        "average_per_type_accuracy_pct": 20.0,
+        "category_accuracies": {
+          "change_or_not": 44.0,
+          "decrease_or_not": 32.0,
+          "increase_or_not": 32.0,
+          "change_to_what": 24.0,
+          "smallest_change": 12.0,
+          "change_ratio_types": 12.0,
+          "change_ratio": 4.0,
+          "largest_change": 0.0
+        }
+      },
+      "unconstrained_baseline": {
+        "overall_exact_accuracy_pct": 14.0,
+        "average_per_type_accuracy_pct": 15.5
+      },
+      "relative_improvement_pct": 42.86
+    }
+  }
+}

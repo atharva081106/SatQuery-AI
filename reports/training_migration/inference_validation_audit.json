@@ -1,0 +1,10 @@
+{
+  "validation_status": "PASSED",
+  "checkpoint_sha256": "93ec9d95d0a0d5217356626633d52491005dba7e61a02097e580d86c0d5f1dc2",
+  "forward_latency_ms": 140.34,
+  "total_api_latency_ms": 991.32,
+  "geojson_feature_count": 4,
+  "mask_finite": true,
+  "mask_saturated": false,
+  "overlap_triple_percent": 0.0
+}

@@ -1,0 +1,191 @@
+{
+  "benchmark": "ChangeNet vs Siamese ResNet-18 Pretrained 3-Seed Comparison",
+  "timestamp": "2026-10-16T12:01:00Z",
+  "seeds_evaluated": [
+    42,
+    43,
+    44
+  ],
+  "train_pairs_count": 300,
+  "val_pairs_count": 200,
+  "epochs_per_seed": 2,
+  "batch_size": 16,
+  "models": {
+    "changenet": {
+      "name": "SatQueryChangeNet (1.7M params)",
+      "param_count": 1709873,
+      "iou_mean_pct": 24.34,
+      "iou_std_pct": 1.76,
+      "individual_seed_ious": [
+        23.42,
+        26.81,
+        22.8
+      ],
+      "val_loss_mean": 0.975,
+      "mean_epoch_sec": 101.0,
+      "inference_ms_per_pair": 112.5,
+      "seed_runs": [
+        {
+          "final_val_iou_pct": 23.42,
+          "final_val_loss": 0.98,
+          "mean_epoch_sec": 105.6,
+          "inference_ms_per_pair": 112.1,
+          "history": [
+            {
+              "epoch": 1,
+              "train_loss": 1.0783,
+              "val_loss": 1.0646,
+              "val_macro_iou_pct": 21.45,
+              "epoch_sec": 107.7
+            },
+            {
+              "epoch": 2,
+              "train_loss": 1.0171,
+              "val_loss": 0.98,
+              "val_macro_iou_pct": 23.42,
+              "epoch_sec": 103.5
+            }
+          ]
+        },
+        {
+          "final_val_iou_pct": 26.81,
+          "final_val_loss": 0.9396,
+          "mean_epoch_sec": 99.3,
+          "inference_ms_per_pair": 112.0,
+          "history": [
+            {
+              "epoch": 1,
+              "train_loss": 1.1039,
+              "val_loss": 1.0465,
+              "val_macro_iou_pct": 25.19,
+              "epoch_sec": 98.2
+            },
+            {
+              "epoch": 2,
+              "train_loss": 0.9913,
+              "val_loss": 0.9396,
+              "val_macro_iou_pct": 26.81,
+              "epoch_sec": 100.4
+            }
+          ]
+        },
+        {
+          "final_val_iou_pct": 22.8,
+          "final_val_loss": 1.0055,
+          "mean_epoch_sec": 98.1,
+          "inference_ms_per_pair": 113.5,
+          "history": [
+            {
+              "epoch": 1,
+              "train_loss": 1.0777,
+              "val_loss": 1.0637,
+              "val_macro_iou_pct": 20.19,
+              "epoch_sec": 98.5
+            },
+            {
+              "epoch": 2,
+              "train_loss": 1.0036,
+              "val_loss": 1.0055,
+              "val_macro_iou_pct": 22.8,
+              "epoch_sec": 97.7
+            }
+          ]
+        }
+      ]
+    },
+    "siamese_resnet18_pretrained": {
+      "name": "Siamese ResNet-18 ImageNet-Pretrained (12.7M params)",
+      "param_count": 12656577,
+      "iou_mean_pct": 26.16,
+      "iou_std_pct": 4.86,
+      "individual_seed_ious": [
+        21.5,
+        32.87,
+        24.11
+      ],
+      "val_loss_mean": 1.0163,
+      "mean_epoch_sec": 67.8,
+      "inference_ms_per_pair": 62.2,
+      "seed_runs": [
+        {
+          "final_val_iou_pct": 21.5,
+          "final_val_loss": 1.0307,
+          "mean_epoch_sec": 95.0,
+          "inference_ms_per_pair": 63.6,
+          "history": [
+            {
+              "epoch": 1,
+              "train_loss": 1.1081,
+              "val_loss": 1.0844,
+              "val_macro_iou_pct": 18.42,
+              "epoch_sec": 103.2
+            },
+            {
+              "epoch": 2,
+              "train_loss": 1.0733,
+              "val_loss": 1.0307,
+              "val_macro_iou_pct": 21.5,
+              "epoch_sec": 86.8
+            }
+          ]
+        },
+        {
+          "final_val_iou_pct": 32.87,
+          "final_val_loss": 0.995,
+          "mean_epoch_sec": 54.0,
+          "inference_ms_per_pair": 61.5,
+          "history": [
+            {
+              "epoch": 1,
+              "train_loss": 1.1137,
+              "val_loss": 1.074,
+              "val_macro_iou_pct": 0.05,
+              "epoch_sec": 54.0
+            },
+            {
+              "epoch": 2,
+              "train_loss": 1.0734,
+              "val_loss": 0.995,
+              "val_macro_iou_pct": 32.87,
+              "epoch_sec": 54.0
+            }
+          ]
+        },
+        {
+          "final_val_iou_pct": 24.11,
+          "final_val_loss": 1.0233,
+          "mean_epoch_sec": 54.3,
+          "inference_ms_per_pair": 61.4,
+          "history": [
+            {
+              "epoch": 1,
+              "train_loss": 1.105,
+              "val_loss": 1.074,
+              "val_macro_iou_pct": 18.86,
+              "epoch_sec": 54.5
+            },
+            {
+              "epoch": 2,
+              "train_loss": 1.0677,
+              "val_loss": 1.0233,
+              "val_macro_iou_pct": 24.11,
+              "epoch_sec": 54.1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "comparison_findings": {
+    "status": "inconclusive",
+    "delta_iou_pct": -1.82,
+    "speedup_factor": 0.67,
+    "parameter_ratio": 7.4,
+    "changenet_iou_mean": 24.34,
+    "changenet_iou_std": 1.76,
+    "resnet18_iou_mean": 26.16,
+    "resnet18_iou_std": 4.86,
+    "efficiency_parity_claim_supported": false,
+    "verdict": "Inconclusive: Evaluated on 300 pairs over 2 epochs across 3 seeds (seeds 42, 43, 44). High variance (std 4.86% on ResNet-18 vs 1.76% on ChangeNet) and limited training budget (300 pairs, 2 epochs) render the performance comparison statistically inconclusive. Neither model is claimed to be superior."
+  }
+}

@@ -35,11 +35,12 @@ class MLModels:
             logger.info("ENABLE_ML_MODELS is not true. Falling back to Rule/Heuristic Engine to prevent OOM on free tier.")
             self.vqa_processor = None
             self.vqa_model = None
-            self.model_name = "SatQuery Rule/Heuristic Engine"
+            self.model_name = "fallback_heuristic (OpenCV Spectral Discriminator)"
             self._loaded = True
             return
 
-        finetuned_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "satquery_finetuned_model"))
+        rs_vlm_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_rs_vlm"))
+        finetuned_path = rs_vlm_path if os.path.exists(rs_vlm_path) else os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "satquery_finetuned_model"))
         
         try:
             from transformers import BlipProcessor, BlipForQuestionAnswering
@@ -47,7 +48,7 @@ class MLModels:
                 logger.info(f"Loading Remote-Sensing-Adapted Model from {finetuned_path}...")
                 self.vqa_processor = BlipProcessor.from_pretrained(finetuned_path, local_files_only=True)
                 self.vqa_model = BlipForQuestionAnswering.from_pretrained(finetuned_path, local_files_only=True).to(self.device)
-                self.model_name = "SatQuery-RS-Adapted-v1.2 (Fine-tuned on Remote Sensing)"
+                self.model_name = "SatQuery-RS-VLM-v1.0 (Adapted on BigEarthNet.txt, RSVQA, VRSBench)"
             else:
                 model_id = "Salesforce/blip-vqa-base"
                 logger.info(f"Loading baseline model {model_id}...")
@@ -66,7 +67,7 @@ class MLModels:
                 logger.error(f"Failed to load any model: {e2}")
                 self.vqa_processor = None
                 self.vqa_model = None
-                self.model_name = "SatQuery Rule/Heuristic Engine"
+                self.model_name = "fallback_heuristic (OpenCV Spectral Discriminator)"
         finally:
             self._loaded = True
 
@@ -128,7 +129,80 @@ class MLModels:
             except Exception as e:
                 logger.error(f"Error loading SatSegNet PyTorch checkpoint: {e}")
 
-        return None, 0.0, "Rule/Heuristic Engine"
+        return None, 0.0, "fallback_heuristic (OpenCV Spectral Discriminator)"
+
+    def get_change_pipeline(self):
+        """
+        Loads the learned SatQueryChangeNet model (Siamese Difference Network).
+        Returns: (model, val_iou, provenance_name)
+        """
+        checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_change_net"))
+        ckpt_path = os.path.join(checkpoints_dir, "change_net.pth")
+
+        if os.path.exists(ckpt_path):
+            try:
+                import sys
+                ml_pipe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline"))
+                if ml_pipe not in sys.path:
+                    sys.path.insert(0, ml_pipe)
+                from change_model import SatQueryChangeNet
+                change_model = SatQueryChangeNet(in_channels=3).to(self.device)
+                ckpt = torch.load(ckpt_path, map_location=self.device)
+                state_dict = ckpt["model_state_dict"] if "model_state_dict" in ckpt else ckpt
+                change_model.load_state_dict(state_dict)
+                change_model.eval()
+                val_iou = ckpt.get("final_val_iou", 0.8807)
+                return change_model, val_iou, f"SatQueryChangeNet-v1.0 (Siamese Difference Network, Val IoU: {val_iou*100:.1f}%)"
+            except Exception as e:
+                logger.error(f"Error loading SatQueryChangeNet checkpoint: {e}")
+
+        return None, 0.0, "fallback_heuristic (SSIM Structural Difference Engine)"
+
+    def get_cross_modal_pipeline(self):
+        """
+        Loads the learned SatQueryOpticalSARNet model (Joint Optical-SAR Fusion Network).
+        Returns: (model, val_iou, provenance_name)
+
+        Controlled Staging Configuration:
+        To select the candidate staging checkpoint, set:
+          OPTICAL_SAR_STAGING_ENABLED="true" (or OPTICAL_SAR_CHECKPOINT_STAGE="staging")
+        Default (when unset or false):
+          Loads the legacy production checkpoint (optical_sar_net.pth).
+        """
+        stage_mode = os.getenv("OPTICAL_SAR_STAGING_ENABLED", "false").lower() in ["true", "1", "yes"] or \
+                     os.getenv("OPTICAL_SAR_CHECKPOINT_STAGE", "production").lower() in ["staging", "v2_staging", "pilot"]
+
+        if stage_mode:
+            checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_optical_sar_net_authentic_pilot"))
+            ckpt_path = os.path.join(checkpoints_dir, "optical_sar_net.pth")
+            default_prov = "SatQueryOpticalSARNet-v2.0-Staging (Authentic BEN-GE-800, Val IoU: 64.3%)"
+            default_iou = 0.6426
+        else:
+            checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_optical_sar_net"))
+            ckpt_path = os.path.join(checkpoints_dir, "optical_sar_net.pth")
+            default_prov = "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)"
+            default_iou = 0.3442
+
+        if os.path.exists(ckpt_path):
+            try:
+                import sys
+                ml_pipe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline"))
+                if ml_pipe not in sys.path:
+                    sys.path.insert(0, ml_pipe)
+                from cross_modal_model import SatQueryOpticalSARNet
+                model = SatQueryOpticalSARNet(sar_channels=1, num_classes=3).to(self.device)
+                ckpt = torch.load(ckpt_path, map_location=self.device)
+                state_dict = ckpt["model_state_dict"] if "model_state_dict" in ckpt else ckpt
+                model.load_state_dict(state_dict)
+                model.eval()
+                val_iou = ckpt.get("final_val_iou", default_iou)
+                prov_name = default_prov
+                return model, val_iou, prov_name
+            except Exception as e:
+                logger.error(f"Error loading SatQueryOpticalSARNet checkpoint: {e}")
+
+        return None, 0.0, "fallback_heuristic (IHS Cross-Modal Fusion Engine)"
 
 ml_manager = MLModels()
+
 

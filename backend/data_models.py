@@ -35,6 +35,7 @@ INTENT_VEGETATION                = "VEGETATION_ANALYSIS"
 INTENT_ROAD_NETWORK              = "ROAD_NETWORK_ANALYSIS"
 INTENT_COORDINATE_REQUEST        = "COORDINATE_REQUEST"
 INTENT_MULTI_TASK                = "MULTI_TASK_QUERY"
+INTENT_OUT_OF_DOMAIN             = "OUT_OF_DOMAIN"
 
 
 @dataclass
@@ -55,6 +56,9 @@ class QueryIntent:
     requires_comparison: bool = False
     confidence: float = 0.8
     required_vision_capability: str = "general"  # general|detection|segmentation|vlm|change
+    is_out_of_domain: bool = False
+    rejection_reason: Optional[str] = None
+    limitations: List[str] = field(default_factory=list)
 
 
 @dataclass

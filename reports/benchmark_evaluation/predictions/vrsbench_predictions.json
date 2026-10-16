@@ -1,0 +1,893 @@
+{
+  "benchmark": "VRSBench (arXiv:2406.12384 / NeurIPS 2024)",
+  "provenance": "SYNTHETIC_SCHEMA_PROTOTYPE (15 images, 30 VQA, 15 Captions, 15 Grounding)",
+  "split": "test",
+  "vqa_accuracy_pct": 76.67,
+  "vqa_mean_token_f1": 76.67,
+  "captioning_unigram_f1": 5.2,
+  "grounding_heuristic_acc_0_5": 0.0,
+  "grounding_heuristic_miou": 0.0113,
+  "grounding_owlvit_acc_0_5": 0.0,
+  "grounding_owlvit_miou": 0.0,
+  "vqa_predictions": [
+    {
+      "sample_index": 0,
+      "question_id": 0,
+      "image_id": "vrs_test_0000",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1381.57
+    },
+    {
+      "sample_index": 1,
+      "question_id": 1,
+      "image_id": "vrs_test_0000",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1055.54
+    },
+    {
+      "sample_index": 2,
+      "question_id": 2,
+      "image_id": "vrs_test_0001",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 943.45
+    },
+    {
+      "sample_index": 3,
+      "question_id": 3,
+      "image_id": "vrs_test_0001",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1015.93
+    },
+    {
+      "sample_index": 4,
+      "question_id": 4,
+      "image_id": "vrs_test_0002",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 957.08
+    },
+    {
+      "sample_index": 5,
+      "question_id": 5,
+      "image_id": "vrs_test_0002",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1014.06
+    },
+    {
+      "sample_index": 6,
+      "question_id": 6,
+      "image_id": "vrs_test_0003",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 962.58
+    },
+    {
+      "sample_index": 7,
+      "question_id": 7,
+      "image_id": "vrs_test_0003",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1066.41
+    },
+    {
+      "sample_index": 8,
+      "question_id": 8,
+      "image_id": "vrs_test_0004",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 967.03
+    },
+    {
+      "sample_index": 9,
+      "question_id": 9,
+      "image_id": "vrs_test_0004",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1015.51
+    },
+    {
+      "sample_index": 10,
+      "question_id": 10,
+      "image_id": "vrs_test_0005",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 1018.25
+    },
+    {
+      "sample_index": 11,
+      "question_id": 11,
+      "image_id": "vrs_test_0005",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1028.05
+    },
+    {
+      "sample_index": 12,
+      "question_id": 12,
+      "image_id": "vrs_test_0006",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 954.75
+    },
+    {
+      "sample_index": 13,
+      "question_id": 13,
+      "image_id": "vrs_test_0006",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1018.43
+    },
+    {
+      "sample_index": 14,
+      "question_id": 14,
+      "image_id": "vrs_test_0007",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 956.26
+    },
+    {
+      "sample_index": 15,
+      "question_id": 15,
+      "image_id": "vrs_test_0007",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1092.05
+    },
+    {
+      "sample_index": 16,
+      "question_id": 16,
+      "image_id": "vrs_test_0008",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 952.36
+    },
+    {
+      "sample_index": 17,
+      "question_id": 17,
+      "image_id": "vrs_test_0008",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1167.95
+    },
+    {
+      "sample_index": 18,
+      "question_id": 18,
+      "image_id": "vrs_test_0009",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 1011.2
+    },
+    {
+      "sample_index": 19,
+      "question_id": 19,
+      "image_id": "vrs_test_0009",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 997.94
+    },
+    {
+      "sample_index": 20,
+      "question_id": 20,
+      "image_id": "vrs_test_0010",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 983.76
+    },
+    {
+      "sample_index": 21,
+      "question_id": 21,
+      "image_id": "vrs_test_0010",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1068.05
+    },
+    {
+      "sample_index": 22,
+      "question_id": 22,
+      "image_id": "vrs_test_0011",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 1024.68
+    },
+    {
+      "sample_index": 23,
+      "question_id": 23,
+      "image_id": "vrs_test_0011",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1082.5
+    },
+    {
+      "sample_index": 24,
+      "question_id": 24,
+      "image_id": "vrs_test_0012",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 940.3
+    },
+    {
+      "sample_index": 25,
+      "question_id": 25,
+      "image_id": "vrs_test_0012",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1031.71
+    },
+    {
+      "sample_index": 26,
+      "question_id": 26,
+      "image_id": "vrs_test_0013",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "no"
+      ],
+      "predicted": "yes",
+      "normalized_match": false,
+      "token_f1": 0.0,
+      "latency_ms": 1041.08
+    },
+    {
+      "sample_index": 27,
+      "question_id": 27,
+      "image_id": "vrs_test_0013",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1020.41
+    },
+    {
+      "sample_index": 28,
+      "question_id": 28,
+      "image_id": "vrs_test_0014",
+      "question": "Are there any maritime vessels or cargo ships docked at the facility?",
+      "ground_truth_answers": [
+        "yes"
+      ],
+      "predicted": "yes",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 952.5
+    },
+    {
+      "sample_index": 29,
+      "question_id": 29,
+      "image_id": "vrs_test_0014",
+      "question": "What is the primary function of the large circular structures?",
+      "ground_truth_answers": [
+        "oil storage tanks",
+        "chemical storage"
+      ],
+      "predicted": "oil storage tanks",
+      "normalized_match": true,
+      "token_f1": 1.0,
+      "latency_ms": 1012.72
+    }
+  ],
+  "captioning_predictions": [
+    {
+      "sample_index": 0,
+      "image_id": "vrs_test_0000",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #0.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial",
+      "unigram_precision": 0.0435,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0571,
+      "latency_ms": 1803.22
+    },
+    {
+      "sample_index": 1,
+      "image_id": "vrs_test_0001",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #1.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1723.91
+    },
+    {
+      "sample_index": 2,
+      "image_id": "vrs_test_0002",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #2.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1687.57
+    },
+    {
+      "sample_index": 3,
+      "image_id": "vrs_test_0003",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #3.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1652.12
+    },
+    {
+      "sample_index": 4,
+      "image_id": "vrs_test_0004",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #4.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1663.11
+    },
+    {
+      "sample_index": 5,
+      "image_id": "vrs_test_0005",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #5.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1693.3
+    },
+    {
+      "sample_index": 6,
+      "image_id": "vrs_test_0006",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #6.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1903.84
+    },
+    {
+      "sample_index": 7,
+      "image_id": "vrs_test_0007",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #7.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1699.41
+    },
+    {
+      "sample_index": 8,
+      "image_id": "vrs_test_0008",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #8.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1628.28
+    },
+    {
+      "sample_index": 9,
+      "image_id": "vrs_test_0009",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #9.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1738.71
+    },
+    {
+      "sample_index": 10,
+      "image_id": "vrs_test_0010",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #10.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial industrial",
+      "unigram_precision": 0.0,
+      "unigram_recall": 0.0,
+      "unigram_f1": 0.0,
+      "latency_ms": 2129.25
+    },
+    {
+      "sample_index": 11,
+      "image_id": "vrs_test_0011",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #11.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1695.15
+    },
+    {
+      "sample_index": 12,
+      "image_id": "vrs_test_0012",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #12.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1686.79
+    },
+    {
+      "sample_index": 13,
+      "image_id": "vrs_test_0013",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #13.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1701.84
+    },
+    {
+      "sample_index": 14,
+      "image_id": "vrs_test_0014",
+      "ground_truth_caption": "A high-resolution satellite scene showing developed maritime facilities and storage infrastructure #14.",
+      "predicted_caption": "industrial industrial industrial industrial industrial industrial industrial industrial industrial and commercial industrial industrial industrial and commercial industrial industrial industrial industrial and commercial commercial commercial",
+      "unigram_precision": 0.0417,
+      "unigram_recall": 0.0833,
+      "unigram_f1": 0.0556,
+      "latency_ms": 1661.07
+    }
+  ],
+  "grounding_predictions": [
+    {
+      "sample_index": 0,
+      "grounding_id": 0,
+      "image_id": "vrs_test_0000",
+      "target_expression": "the large airplane located near the central sector",
+      "category": "airplane",
+      "ground_truth_bbox": [
+        20,
+        30,
+        80,
+        80
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 1,
+      "grounding_id": 1,
+      "image_id": "vrs_test_0001",
+      "target_expression": "the large ship located near the central sector",
+      "category": "ship",
+      "ground_truth_bbox": [
+        37,
+        53,
+        97,
+        103
+      ],
+      "heuristic_predicted_bbox": [
+        47,
+        28,
+        161,
+        153
+      ],
+      "heuristic_iou": 0.1695,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 2,
+      "grounding_id": 2,
+      "image_id": "vrs_test_0002",
+      "target_expression": "the large storage_tank located near the central sector",
+      "category": "storage_tank",
+      "ground_truth_bbox": [
+        54,
+        76,
+        114,
+        126
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 3,
+      "grounding_id": 3,
+      "image_id": "vrs_test_0003",
+      "target_expression": "the large bridge located near the central sector",
+      "category": "bridge",
+      "ground_truth_bbox": [
+        71,
+        99,
+        131,
+        149
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 4,
+      "grounding_id": 4,
+      "image_id": "vrs_test_0004",
+      "target_expression": "the large harbor located near the central sector",
+      "category": "harbor",
+      "ground_truth_bbox": [
+        88,
+        122,
+        148,
+        172
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 5,
+      "grounding_id": 5,
+      "image_id": "vrs_test_0005",
+      "target_expression": "the large stadium located near the central sector",
+      "category": "stadium",
+      "ground_truth_bbox": [
+        105,
+        45,
+        165,
+        95
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 6,
+      "grounding_id": 6,
+      "image_id": "vrs_test_0006",
+      "target_expression": "the large vehicle located near the central sector",
+      "category": "vehicle",
+      "ground_truth_bbox": [
+        22,
+        68,
+        82,
+        118
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 7,
+      "grounding_id": 7,
+      "image_id": "vrs_test_0007",
+      "target_expression": "the large airplane located near the central sector",
+      "category": "airplane",
+      "ground_truth_bbox": [
+        39,
+        91,
+        99,
+        141
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 8,
+      "grounding_id": 8,
+      "image_id": "vrs_test_0008",
+      "target_expression": "the large ship located near the central sector",
+      "category": "ship",
+      "ground_truth_bbox": [
+        56,
+        114,
+        116,
+        164
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 9,
+      "grounding_id": 9,
+      "image_id": "vrs_test_0009",
+      "target_expression": "the large storage_tank located near the central sector",
+      "category": "storage_tank",
+      "ground_truth_bbox": [
+        73,
+        37,
+        133,
+        87
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 10,
+      "grounding_id": 10,
+      "image_id": "vrs_test_0010",
+      "target_expression": "the large bridge located near the central sector",
+      "category": "bridge",
+      "ground_truth_bbox": [
+        90,
+        60,
+        150,
+        110
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 11,
+      "grounding_id": 11,
+      "image_id": "vrs_test_0011",
+      "target_expression": "the large harbor located near the central sector",
+      "category": "harbor",
+      "ground_truth_bbox": [
+        107,
+        83,
+        167,
+        133
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 12,
+      "grounding_id": 12,
+      "image_id": "vrs_test_0012",
+      "target_expression": "the large stadium located near the central sector",
+      "category": "stadium",
+      "ground_truth_bbox": [
+        24,
+        106,
+        84,
+        156
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 13,
+      "grounding_id": 13,
+      "image_id": "vrs_test_0013",
+      "target_expression": "the large vehicle located near the central sector",
+      "category": "vehicle",
+      "ground_truth_bbox": [
+        41,
+        129,
+        101,
+        179
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    },
+    {
+      "sample_index": 14,
+      "grounding_id": 14,
+      "image_id": "vrs_test_0014",
+      "target_expression": "the large airplane located near the central sector",
+      "category": "airplane",
+      "ground_truth_bbox": [
+        58,
+        52,
+        118,
+        102
+      ],
+      "heuristic_predicted_bbox": null,
+      "heuristic_iou": 0.0,
+      "heuristic_hit_50": false,
+      "owlvit_predicted_bbox": null,
+      "owlvit_iou": 0.0,
+      "owlvit_hit_50": false,
+      "owlvit_confidence": null,
+      "owlvit_latency_ms": 0.0
+    }
+  ]
+}

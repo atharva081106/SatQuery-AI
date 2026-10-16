@@ -11,8 +11,8 @@ def main(args):
     model = BlipForQuestionAnswering.from_pretrained(model_id)
     
     print(f"Loading datasets from {args.data_dir}")
-    train_dataset = RSVQADataset(data_dir=args.data_dir, processor=processor, split="train")
-    eval_dataset = RSVQADataset(data_dir=args.data_dir, processor=processor, split="val")
+    train_dataset = RSVQADataset(data_dir=args.data_dir, processor=processor, split="train", max_samples=args.max_samples)
+    eval_dataset = RSVQADataset(data_dir=args.data_dir, processor=processor, split="val", max_samples=args.max_samples)
     
     # Configure HuggingFace Trainer
     training_args = TrainingArguments(
@@ -52,5 +52,6 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size per device")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=5e-5, help="Learning rate")
+    parser.add_argument("--max_samples", type=int, default=None, help="Cap dataset sample count for quick training on free GPUs")
     args = parser.parse_args()
     main(args)

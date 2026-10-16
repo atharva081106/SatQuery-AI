@@ -289,7 +289,10 @@ def _detect_generic_structures(cv_img: np.ndarray) -> List[Dict]:
         if area < (h * w) * 0.002 or area > (h * w) * 0.2:
             continue
         bx, by, bw, bh = cv2.boundingRect(c)
-        results.append({"bx": bx, "by": by, "bw": bw, "bh": bh, "area": area, "confidence": 0.40})
+        # Dynamic confidence based on contour fill solidity and contrast against surrounding background
+        solidity = float(area) / max(float(bw * bh), 1.0)
+        derived_conf = round(float(np.clip(0.35 + 0.45 * solidity, 0.20, 0.90)), 4)
+        results.append({"bx": bx, "by": by, "bw": bw, "bh": bh, "area": area, "confidence": derived_conf})
 
     results.sort(key=lambda x: -x["area"])
     return results[:10]

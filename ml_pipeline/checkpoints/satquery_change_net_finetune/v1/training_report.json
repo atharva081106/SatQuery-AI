@@ -1,0 +1,57 @@
+{
+  "experiment": "satquery_change_net_finetune_v1",
+  "timestamp": "2026-10-15T22:05:52Z",
+  "base_checkpoint": "ml_pipeline\\checkpoints\\satquery_change_net_authentic\\best_change_net.pth",
+  "base_checkpoint_sha256": "9b94320837db808ed284da285568a29b2cca52d2bb51d89d97a479895b11b332",
+  "finetuned_checkpoint": "ml_pipeline\\checkpoints\\satquery_change_net_finetune\\v1\\best_change_net_finetuned.pth",
+  "finetuned_checkpoint_sha256": "5d3a8c80eb4c1fa53c6505ce91955a521f3e43c6a8745e28e9bfb2442f9f2c55",
+  "dataset": "SECOND / CDVQA (Yang et al. 2021)",
+  "train_pairs_count": 1600,
+  "val_pairs_count": 400,
+  "test_pairs_count": 968,
+  "test_set_touched": false,
+  "baseline_val_change_iou_pct": 31.15,
+  "best_epoch": 1,
+  "best_val_change_iou_pct": 31.13,
+  "relative_val_improvement_pct": -0.05,
+  "total_duration_seconds": 4356.87,
+  "hardware_device": "cpu",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.707,
+      "val_loss": 0.6989,
+      "val_mean_foreground_iou_pct": 31.13,
+      "val_mean_dice_f1": 0.4413,
+      "is_best": true,
+      "duration_seconds": 734.04
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.683,
+      "val_loss": 0.6797,
+      "val_mean_foreground_iou_pct": 29.78,
+      "val_mean_dice_f1": 0.4221,
+      "is_best": false,
+      "duration_seconds": 662.35
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.67,
+      "val_loss": 0.673,
+      "val_mean_foreground_iou_pct": 30.64,
+      "val_mean_dice_f1": 0.4334,
+      "is_best": false,
+      "duration_seconds": 631.68
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.6598,
+      "val_loss": 0.6559,
+      "val_mean_foreground_iou_pct": 30.85,
+      "val_mean_dice_f1": 0.4346,
+      "is_best": false,
+      "duration_seconds": 2328.74
+    }
+  ]
+}

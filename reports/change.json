@@ -1,0 +1,149 @@
+{
+  "benchmark": "CDVQA (arXiv:2112.06343)",
+  "models": {
+    "change_segmentation": "SatQueryChangeNet-v1.0 (Siamese U-Net, CDVQA trained)",
+    "change_vqa": "SatQuery-RS-VLM-v1.0 (Adapted Checkpoint)"
+  },
+  "hardware": {
+    "device": "cpu",
+    "platform": "win32"
+  },
+  "dataset_statistics": {
+    "test_pairs": 100,
+    "question_types_evaluated": [
+      "change_or_not",
+      "increase_or_not",
+      "decrease_or_not",
+      "smallest_change",
+      "largest_change",
+      "change_to_what",
+      "change_ratio",
+      "change_ratio_types"
+    ]
+  },
+  "change_detection_mask_metrics": {
+    "mean_iou_pct": 84.65,
+    "mean_f1_dice": 0.9137,
+    "precision": 0.8549,
+    "recall": 0.9893
+  },
+  "cdvqa_accuracy_metrics": {
+    "overall_exact_accuracy_pct": 27.0,
+    "overall_normalized_accuracy_pct": 29.0,
+    "average_per_type_accuracy_pct": 14.93,
+    "overall_lexical_f1": 0.27,
+    "per_question_type": {
+      "change_or_not": {
+        "count": 41,
+        "exact_accuracy_pct": 51.22,
+        "normalized_accuracy_pct": 51.22,
+        "lexical_f1": 0.5122
+      },
+      "increase_or_not": {
+        "count": 12,
+        "exact_accuracy_pct": 16.67,
+        "normalized_accuracy_pct": 16.67,
+        "lexical_f1": 0.1667
+      },
+      "decrease_or_not": {
+        "count": 12,
+        "exact_accuracy_pct": 33.33,
+        "normalized_accuracy_pct": 33.33,
+        "lexical_f1": 0.3333
+      },
+      "smallest_change": {
+        "count": 7,
+        "exact_accuracy_pct": 0.0,
+        "normalized_accuracy_pct": 0.0,
+        "lexical_f1": 0.0
+      },
+      "largest_change": {
+        "count": 7,
+        "exact_accuracy_pct": 0.0,
+        "normalized_accuracy_pct": 0.0,
+        "lexical_f1": 0.0
+      },
+      "change_to_what": {
+        "count": 6,
+        "exact_accuracy_pct": 0.0,
+        "normalized_accuracy_pct": 0.0,
+        "lexical_f1": 0.0
+      },
+      "change_ratio": {
+        "count": 4,
+        "exact_accuracy_pct": 0.0,
+        "normalized_accuracy_pct": 0.0,
+        "lexical_f1": 0.0
+      },
+      "change_ratio_types": {
+        "count": 11,
+        "exact_accuracy_pct": 0.0,
+        "normalized_accuracy_pct": 18.18,
+        "lexical_f1": 0.0
+      }
+    }
+  },
+  "runtime_seconds": 316.5,
+  "sample_evaluations": [
+    {
+      "pair_id": "07308",
+      "question": "Did the areas of non-vegetated ground surface change?",
+      "ground_truth": "yes",
+      "predicted": "yes",
+      "question_type": "change_or_not",
+      "exact_match": true,
+      "partial_match": true,
+      "f1": 1.0,
+      "mask_iou": 0.9677693769025948,
+      "mask_f1": 0.9836207314354396
+    },
+    {
+      "pair_id": "07308",
+      "question": "Did the regions of trees change?",
+      "ground_truth": "no",
+      "predicted": "yes",
+      "question_type": "change_or_not",
+      "exact_match": false,
+      "partial_match": false,
+      "f1": 0.0,
+      "mask_iou": 0.9677693769025948,
+      "mask_f1": 0.9836207314354396
+    },
+    {
+      "pair_id": "07308",
+      "question": "Have the areas of low vegetation changed?",
+      "ground_truth": "no",
+      "predicted": "yes",
+      "question_type": "change_or_not",
+      "exact_match": false,
+      "partial_match": false,
+      "f1": 0.0,
+      "mask_iou": 0.9677693769025948,
+      "mask_f1": 0.9836207314354396
+    },
+    {
+      "pair_id": "07308",
+      "question": "Have the regions of water changed?",
+      "ground_truth": "no",
+      "predicted": "yes",
+      "question_type": "change_or_not",
+      "exact_match": false,
+      "partial_match": false,
+      "f1": 0.0,
+      "mask_iou": 0.9677693769025948,
+      "mask_f1": 0.9836207314354396
+    },
+    {
+      "pair_id": "07308",
+      "question": "Have the regions of playgrounds changed?",
+      "ground_truth": "no",
+      "predicted": "yes",
+      "question_type": "change_or_not",
+      "exact_match": false,
+      "partial_match": false,
+      "f1": 0.0,
+      "mask_iou": 0.9677693769025948,
+      "mask_f1": 0.9836207314354396
+    }
+  ]
+}

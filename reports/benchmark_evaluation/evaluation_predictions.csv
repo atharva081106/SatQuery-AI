@@ -1,0 +1,201 @@
+Index,Pair_ID,Category,Question,Ground_Truth,Predicted,Exact_Match,Normalized_Match,Token_F1,GT_Numeric,Pred_Numeric
+0,07308,change_or_not,Did the areas of non-vegetated ground surface change?,yes,yes,True,True,1.0,,
+1,07308,change_or_not,Did the regions of trees change?,no,yes,False,False,0.0,,
+2,07308,change_or_not,Have the areas of low vegetation changed?,no,yes,False,False,0.0,,
+3,07308,change_or_not,Have the regions of water changed?,no,yes,False,False,0.0,,
+4,07308,change_or_not,Have the regions of playgrounds changed?,no,yes,False,False,0.0,,
+5,07308,change_or_not,Did the regions of non-vegetated ground surface change in the pre-event image?,yes,yes,True,True,1.0,,
+6,07308,change_or_not,Did the areas of trees change in the pre-change image?,no,yes,False,False,0.0,,
+7,07308,change_or_not,Have the areas of low vegetation changed in the first image?,no,yes,False,False,0.0,,
+8,07308,change_or_not,Did the areas of water change in the pre-change image?,no,yes,False,False,0.0,,
+9,07308,change_or_not,Have the regions of buildings changed in the first image?,yes,yes,True,True,1.0,,
+10,07308,change_or_not,Have the areas of non-vegetated ground surface changed in the second image?,yes,yes,True,True,1.0,,
+11,07308,change_or_not,Have the regions of trees changed in the second image?,no,yes,False,False,0.0,,
+12,07308,change_or_not,Did the areas of low vegetation change in the post-change image?,no,yes,False,False,0.0,,
+13,07308,change_or_not,Did the regions of water change in the post-event image?,no,yes,False,False,0.0,,
+14,07308,change_or_not,Did the areas of buildings change in the post-change image?,yes,yes,True,True,1.0,,
+15,07308,change_or_not,Have the regions of playgrounds changed in the second image?,no,yes,False,False,0.0,,
+16,08311,change_or_not,Have the areas of non-vegetated ground surface changed?,yes,yes,True,True,1.0,,
+17,08311,change_or_not,Have the regions of buildings changed?,yes,yes,True,True,1.0,,
+18,08311,change_or_not,Have the areas of playgrounds changed?,no,yes,False,False,0.0,,
+19,08311,change_or_not,Did the areas of non-vegetated ground surface change in the pre-change image?,yes,yes,True,True,1.0,,
+20,08311,change_or_not,Did the regions of trees change in the pre-event image?,no,yes,False,False,0.0,,
+21,08311,change_or_not,Did the regions of low vegetation change in the pre-event image?,yes,yes,True,True,1.0,,
+22,08311,change_or_not,Did the areas of water change in the pre-change image?,yes,yes,True,True,1.0,,
+23,08311,change_or_not,Have the regions of buildings changed in the first image?,yes,yes,True,True,1.0,,
+24,08311,change_or_not,Have the areas of playgrounds changed in the first image?,no,yes,False,False,0.0,,
+25,07308,change_ratio,What is the percentage of changed regions?,0_to_10,100,False,False,0.0,5.0,100.0
+26,07308,change_ratio,What is the percentage of unchanged areas?,90_to_100,50,False,False,0.0,95.0,50.0
+27,08311,change_ratio,What is the percentage of changed regions?,20_to_30,100,False,False,0.0,25.0,100.0
+28,08311,change_ratio,What is the non-change ratio of the imagery?,70_to_80,1 to 1,False,False,0.0,75.0,1.0
+29,07197,change_ratio,How much of the area has changed?,10_to_20,lot,False,False,0.0,15.0,0.0
+30,07197,change_ratio,What is the percentage of non-change regions?,80_to_90,50,False,False,0.0,85.0,50.0
+31,04221,change_ratio,What is the percentage of changed areas?,20_to_30,100,False,False,0.0,25.0,100.0
+32,04221,change_ratio,What is the percentage of unchanged areas?,70_to_80,50,False,False,0.0,75.0,50.0
+33,02765,change_ratio,What is the percentage of changed regions?,0_to_10,100,False,False,0.0,5.0,100.0
+34,02765,change_ratio,What is the percentage of unchanged areas?,90_to_100,50,False,False,0.0,95.0,50.0
+35,04580,change_ratio,What is the percentage of changed areas?,0_to_10,50,False,False,0.0,5.0,50.0
+36,04580,change_ratio,How much of the area has not changed?,90_to_100,lot,False,False,0.0,95.0,0.0
+37,02814,change_ratio,What is the percentage of changed regions?,10_to_20,100,False,False,0.0,15.0,100.0
+38,02814,change_ratio,What is the non-change ratio of the imagery?,80_to_90,50 50,False,False,0.0,85.0,50.0
+39,01661,change_ratio,What is the percentage of changed areas?,0_to_10,50,False,False,0.0,5.0,50.0
+40,01661,change_ratio,What is the percentage of non-change regions?,90_to_100,50,False,False,0.0,95.0,50.0
+41,00751,change_ratio,What is the percentage of changed regions?,10_to_20,100,False,False,0.0,15.0,100.0
+42,00751,change_ratio,How much of the area has not changed?,80_to_90,lot,False,False,0.0,85.0,0.0
+43,00374,change_ratio,What is the percentage of changed areas?,10_to_20,50,False,False,0.0,15.0,50.0
+44,00374,change_ratio,What is the non-change ratio of the imagery?,80_to_90,50 50,False,False,0.0,85.0,50.0
+45,03691,change_ratio,What is the percentage of changed regions?,30_to_40,100,False,False,0.0,35.0,100.0
+46,03691,change_ratio,What is the percentage of unchanged areas?,60_to_70,50,False,False,0.0,65.0,50.0
+47,01527,change_ratio,What is the percentage of changed areas?,30_to_40,50,False,False,0.0,35.0,50.0
+48,01527,change_ratio,What is the percentage of unchanged areas?,60_to_70,50,False,False,0.0,65.0,50.0
+49,02193,change_ratio,What is the change ratio of the imagery?,30_to_40,1 : 1,False,False,0.0,35.0,1.0
+50,07308,change_ratio_types,How much area of trees has changed in the first image?,0,1,False,False,0.0,0.0,1.0
+51,07308,change_ratio_types,How much area of low vegetation has changed in the pre-change image?,0,1 mile,False,False,0.0,0.0,1.0
+52,07308,change_ratio_types,What is the change proportion of water in the post-event image?,0,30 feet,False,True,0.0,0.0,30.0
+53,07308,change_ratio_types,What is the change proportion of buildings in the second image?,0_to_10,1,False,False,0.0,5.0,1.0
+54,08311,change_ratio_types,What is the change ratio of trees in the first image?,0,1 to 1,False,False,0.0,0.0,1.0
+55,08311,change_ratio_types,What is the change ratio of water in the first image?,0_to_10,1 : 1,False,False,0.0,5.0,1.0
+56,08311,change_ratio_types,What is the change ratio of non-vegetated ground surface in the second image?,20_to_30,1 : 1,False,False,0.0,25.0,1.0
+57,08311,change_ratio_types,How much area of trees has changed in the post-change image?,0,1,False,False,0.0,0.0,1.0
+58,08311,change_ratio_types,How much area of low vegetation has changed in the second image?,0_to_10,1 mile,False,False,0.0,5.0,1.0
+59,08311,change_ratio_types,What is the change proportion of water in the second image?,0_to_10,20 feet,False,False,0.0,5.0,20.0
+60,08311,change_ratio_types,What is the change percentage of buildings in the post-change image?,0,50,False,True,0.0,0.0,50.0
+61,07197,change_ratio_types,What is the change percentage of non-vegetated ground surface in the pre-change image?,0_to_10,50,False,False,0.0,5.0,50.0
+62,07197,change_ratio_types,What is the change ratio of trees in the pre-event image?,0,1 : 1,False,False,0.0,0.0,1.0
+63,07197,change_ratio_types,What is the change proportion of low vegetation in the pre-event image?,0_to_10,large,False,False,0.0,5.0,0.0
+64,07197,change_ratio_types,What is the change ratio of water in the pre-event image?,0,1 : 1,False,False,0.0,0.0,1.0
+65,07197,change_ratio_types,What is the change ratio of playgrounds in the pre-change image?,0_to_10,10 to 10,False,False,0.0,5.0,10.0
+66,07197,change_ratio_types,What is the change percentage of non-vegetated ground surface in the second image?,0_to_10,50,False,False,0.0,5.0,50.0
+67,07197,change_ratio_types,What is the change percentage of trees in the second image?,0_to_10,50,False,False,0.0,5.0,50.0
+68,04221,change_ratio_types,What is the change proportion of water in the pre-event image?,0_to_10,1 mile,False,False,0.0,5.0,1.0
+69,04221,change_ratio_types,How much area of buildings has changed in the first image?,0_to_10,lot,False,False,0.0,5.0,0.0
+70,04221,change_ratio_types,How much area of non-vegetated ground surface has changed in the post-change image?,0_to_10,lot,False,False,0.0,5.0,0.0
+71,04221,change_ratio_types,What is the change ratio of trees in the post-change image?,0,1 to 1,False,False,0.0,0.0,1.0
+72,04221,change_ratio_types,What is the change proportion of buildings in the post-event image?,0_to_10,large,False,False,0.0,5.0,0.0
+73,02765,change_ratio_types,What is the change ratio of non-vegetated ground surface in the pre-change image?,0_to_10,1 : 1,False,False,0.0,5.0,1.0
+74,02765,change_ratio_types,What is the change ratio of low vegetation in the pre-event image?,0_to_10,1 : 1,False,False,0.0,5.0,1.0
+75,07308,change_to_what,What have the regions of non-vegetated ground surface in the pre-change image mainly changed to?,buildings,city,False,False,0.0,,
+76,07308,change_to_what,What have the areas of buildings in the pre-event image mainly changed to?,NVG_surface,industrial,False,False,0.0,,
+77,08311,change_to_what,What have the regions of non-vegetated ground surface in the first image mainly changed to?,low_vegetation,industrial,False,False,0.0,,
+78,08311,change_to_what,What have the regions of low vegetation in the pre-event image mainly changed to?,NVG_surface,city,False,False,0.0,,
+79,08311,change_to_what,What have the regions of water in the pre-event image mainly changed to?,NVG_surface,ocean,False,False,0.0,,
+80,08311,change_to_what,What have the regions of buildings in the first image mainly changed to?,NVG_surface,industrial,False,False,0.0,,
+81,07197,change_to_what,What have the regions of non-vegetated ground surface in the pre-event image mainly changed to?,buildings,city,False,False,0.0,,
+82,07197,change_to_what,What have the areas of low vegetation in the pre-change image mainly changed to?,NVG_surface,city,False,False,0.0,,
+83,07197,change_to_what,What have the areas of buildings in the first image mainly changed to?,NVG_surface,industrial,False,False,0.0,,
+84,07197,change_to_what,What have the regions of playgrounds in the first image mainly changed to?,NVG_surface,city,False,False,0.0,,
+85,04221,change_to_what,What have the areas of low vegetation in the pre-change image mainly changed to?,buildings,city,False,False,0.0,,
+86,04221,change_to_what,What have the regions of water in the first image mainly changed to?,low_vegetation,water,False,False,0.0,,
+87,04221,change_to_what,What have the regions of buildings in the pre-change image mainly changed to?,NVG_surface,city,False,False,0.0,,
+88,02765,change_to_what,What have the areas of non-vegetated ground surface in the pre-event image mainly changed to?,buildings,city,False,False,0.0,,
+89,02765,change_to_what,What have the regions of trees in the pre-event image mainly changed to?,buildings,city,False,False,0.0,,
+90,02765,change_to_what,What have the areas of low vegetation in the pre-change image mainly changed to?,buildings,city,False,False,0.0,,
+91,04580,change_to_what,What have the areas of non-vegetated ground surface in the pre-change image mainly changed to?,low_vegetation,buildings,False,False,0.0,,
+92,04580,change_to_what,What have the regions of low vegetation in the pre-change image mainly changed to?,NVG_surface,city,False,False,0.0,,
+93,02814,change_to_what,What have the areas of non-vegetated ground surface in the pre-change image mainly changed to?,buildings,city,False,False,0.0,,
+94,02814,change_to_what,What have the regions of trees in the pre-event image mainly changed to?,low_vegetation,city,False,False,0.0,,
+95,02814,change_to_what,What have the areas of low vegetation in the pre-event image mainly changed to?,NVG_surface,city,False,False,0.0,,
+96,02814,change_to_what,What have the regions of buildings in the pre-event image mainly changed to?,NVG_surface,industrial industrial industrial industrial industrial and commercial,False,False,0.0,,
+97,01661,change_to_what,What have the regions of non-vegetated ground surface in the pre-event image mainly changed to?,trees,industrial industrial industrial industrial and commercial,False,False,0.0,,
+98,01661,change_to_what,What have the regions of buildings in the pre-change image mainly changed to?,NVG_surface,industrial,False,False,0.0,,
+99,00751,change_to_what,What have the areas of non-vegetated ground surface in the pre-change image mainly changed to?,buildings,parking lot,False,False,0.0,,
+100,07308,decrease_or_not,Did the regions of trees decrease?,no,yes,False,False,0.0,,
+101,07308,decrease_or_not,Did the areas of low vegetation decrease?,no,yes,False,False,0.0,,
+102,07308,decrease_or_not,Have the areas of water decreased?,no,yes,False,False,0.0,,
+103,07308,decrease_or_not,Have the regions of buildings decreased?,yes,yes,True,True,1.0,,
+104,08311,decrease_or_not,Have the regions of non-vegetated ground surface decreased?,no,yes,False,False,0.0,,
+105,08311,decrease_or_not,Did the regions of trees decrease?,no,yes,False,False,0.0,,
+106,08311,decrease_or_not,Have the areas of low vegetation decreased?,yes,yes,True,True,1.0,,
+107,08311,decrease_or_not,Have the regions of water decreased?,yes,yes,True,True,1.0,,
+108,08311,decrease_or_not,Have the areas of playgrounds decreased?,no,yes,False,False,0.0,,
+109,07197,decrease_or_not,Have the regions of non-vegetated ground surface decreased?,no,yes,False,False,0.0,,
+110,07197,decrease_or_not,Have the regions of water decreased?,no,yes,False,False,0.0,,
+111,07197,decrease_or_not,Did the areas of playgrounds decrease?,yes,yes,True,True,1.0,,
+112,04221,decrease_or_not,Did the areas of non-vegetated ground surface decrease?,no,yes,False,False,0.0,,
+113,04221,decrease_or_not,Have the regions of trees decreased?,no,yes,False,False,0.0,,
+114,04221,decrease_or_not,Have the regions of low vegetation decreased?,yes,yes,True,True,1.0,,
+115,04221,decrease_or_not,Did the areas of water decrease?,no,yes,False,False,0.0,,
+116,04221,decrease_or_not,Have the regions of buildings decreased?,no,yes,False,False,0.0,,
+117,04221,decrease_or_not,Have the areas of playgrounds decreased?,no,yes,False,False,0.0,,
+118,02765,decrease_or_not,Did the areas of non-vegetated ground surface decrease?,no,yes,False,False,0.0,,
+119,02765,decrease_or_not,Have the areas of trees decreased?,yes,yes,True,True,1.0,,
+120,02765,decrease_or_not,Have the areas of low vegetation decreased?,yes,yes,True,True,1.0,,
+121,02765,decrease_or_not,Did the regions of water decrease?,no,yes,False,False,0.0,,
+122,02765,decrease_or_not,Did the regions of buildings decrease?,no,yes,False,False,0.0,,
+123,02765,decrease_or_not,Did the areas of playgrounds decrease?,no,yes,False,False,0.0,,
+124,04580,decrease_or_not,Did the regions of non-vegetated ground surface decrease?,yes,yes,True,True,1.0,,
+125,07308,increase_or_not,Did the areas of low vegetation increase?,no,yes,False,False,0.0,,
+126,07308,increase_or_not,Have the regions of water increased?,no,yes,False,False,0.0,,
+127,07308,increase_or_not,Did the regions of playgrounds increase?,no,yes,False,False,0.0,,
+128,08311,increase_or_not,Have the areas of trees increased?,no,yes,False,False,0.0,,
+129,08311,increase_or_not,Did the regions of low vegetation increase?,no,yes,False,False,0.0,,
+130,08311,increase_or_not,Have the areas of water increased?,no,yes,False,False,0.0,,
+131,08311,increase_or_not,Have the areas of buildings increased?,no,yes,False,False,0.0,,
+132,07197,increase_or_not,Have the regions of non-vegetated ground surface increased?,yes,yes,True,True,1.0,,
+133,07197,increase_or_not,Did the regions of trees increase?,yes,yes,True,True,1.0,,
+134,07197,increase_or_not,Have the areas of low vegetation increased?,no,yes,False,False,0.0,,
+135,07197,increase_or_not,Have the regions of water increased?,no,yes,False,False,0.0,,
+136,07197,increase_or_not,Did the areas of buildings increase?,no,yes,False,False,0.0,,
+137,04221,increase_or_not,Have the regions of low vegetation increased?,no,yes,False,False,0.0,,
+138,04221,increase_or_not,Did the regions of buildings increase?,yes,yes,True,True,1.0,,
+139,04221,increase_or_not,Did the regions of playgrounds increase?,no,yes,False,False,0.0,,
+140,02765,increase_or_not,Did the areas of non-vegetated ground surface increase?,yes,yes,True,True,1.0,,
+141,02765,increase_or_not,Have the areas of trees increased?,no,no,True,True,1.0,,
+142,02765,increase_or_not,Did the regions of low vegetation increase?,no,yes,False,False,0.0,,
+143,02765,increase_or_not,Have the areas of buildings increased?,yes,yes,True,True,1.0,,
+144,02765,increase_or_not,Did the regions of playgrounds increase?,no,no,True,True,1.0,,
+145,04580,increase_or_not,Did the areas of non-vegetated ground surface increase?,no,yes,False,False,0.0,,
+146,04580,increase_or_not,Did the regions of trees increase?,no,yes,False,False,0.0,,
+147,04580,increase_or_not,Did the areas of low vegetation increase?,yes,yes,True,True,1.0,,
+148,04580,increase_or_not,Did the areas of water increase?,no,no,True,True,1.0,,
+149,04580,increase_or_not,Did the areas of buildings increase?,yes,no,False,False,0.0,,
+150,07308,largest_change,What is the largest change?,NVG_surface,bank,False,False,0.0,,
+151,07308,largest_change,What is the largest change in the pre-change image?,buildings,water,False,False,0.0,,
+152,07308,largest_change,What is the largest change in the second image?,NVG_surface,water,False,False,0.0,,
+153,08311,largest_change,What is the largest change?,NVG_surface,1. 5,False,False,0.0,,
+154,08311,largest_change,What type of change is the largest in the first image?,low_vegetation,oil storage,False,False,0.0,,
+155,08311,largest_change,What is the largest change in the post-event image?,NVG_surface,1,False,False,0.0,,
+156,07197,largest_change,What is the largest change?,buildings,city,False,False,0.0,,
+157,07197,largest_change,What is the largest change in the first image?,buildings,oil storage,False,False,0.0,,
+158,07197,largest_change,What type of change is the largest in the second image?,NVG_surface,oil storage,False,False,0.0,,
+159,04221,largest_change,What is the largest change?,low_vegetation,city,False,False,0.0,,
+160,04221,largest_change,What is the largest change in the first image?,low_vegetation,city,False,False,0.0,,
+161,04221,largest_change,What is the largest change in the post-change image?,NVG_surface,city,False,False,0.0,,
+162,02765,largest_change,What type of change is the largest?,buildings,oil storage,False,False,0.0,,
+163,02765,largest_change,What is the largest change in the pre-change image?,low_vegetation,water,False,False,0.0,,
+164,02765,largest_change,What is the largest change in the post-event image?,buildings,oil storage,False,False,0.0,,
+165,04580,largest_change,What is the largest change?,low_vegetation,1,False,False,0.0,,
+166,04580,largest_change,What type of change is the largest in the first image?,NVG_surface,oil,False,False,0.0,,
+167,04580,largest_change,What type of change is the largest in the post-change image?,low_vegetation,oil,False,False,0.0,,
+168,02814,largest_change,What is the largest change?,buildings,city,False,False,0.0,,
+169,02814,largest_change,What is the largest change in the pre-change image?,buildings,city,False,False,0.0,,
+170,02814,largest_change,What is the largest change in the second image?,NVG_surface,city,False,False,0.0,,
+171,01661,largest_change,What is the largest change?,NVG_surface,oil storage,False,False,0.0,,
+172,01661,largest_change,What type of change is the largest in the pre-change image?,buildings,oil,False,False,0.0,,
+173,01661,largest_change,What is the largest change in the post-event image?,NVG_surface,oil storage,False,False,0.0,,
+174,00751,largest_change,What is the largest change?,NVG_surface,parking,False,False,0.0,,
+175,07308,smallest_change,What type of change is the smallest?,NVG_surface,oil,False,False,0.0,,
+176,07308,smallest_change,What is the smallest change in the first image?,NVG_surface,1,False,False,0.0,,
+177,07308,smallest_change,What type of change is the smallest in the post-change image?,buildings,oil,False,False,0.0,,
+178,08311,smallest_change,What is the smallest change?,water,coin,False,False,0.0,,
+179,08311,smallest_change,What type of change is the smallest in the pre-event image?,NVG_surface,oil,False,False,0.0,,
+180,08311,smallest_change,What type of change is the smallest in the second image?,low_vegetation,oil,False,False,0.0,,
+181,07197,smallest_change,What type of change is the smallest?,playgrounds,oil,False,False,0.0,,
+182,07197,smallest_change,What is the smallest change in the first image?,playgrounds,second,False,False,0.0,,
+183,07197,smallest_change,What is the smallest change in the post-event image?,trees,second,False,False,0.0,,
+184,04221,smallest_change,What type of change is the smallest?,water,city,False,False,0.0,,
+185,04221,smallest_change,What is the smallest change in the pre-change image?,water,water level,False,True,0.6666666666666666,,
+186,04221,smallest_change,What is the smallest change in the second image?,low_vegetation,water,False,False,0.0,,
+187,02765,smallest_change,What type of change is the smallest?,NVG_surface,oil,False,False,0.0,,
+188,02765,smallest_change,What is the smallest change in the pre-event image?,NVG_surface,5,False,False,0.0,,
+189,02765,smallest_change,What type of change is the smallest in the post-change image?,low_vegetation,oil,False,False,0.0,,
+190,04580,smallest_change,What is the smallest change?,buildings,coin,False,False,0.0,,
+191,04580,smallest_change,What type of change is the smallest in the pre-event image?,low_vegetation,train,False,False,0.0,,
+192,04580,smallest_change,What type of change is the smallest in the post-event image?,NVG_surface,time,False,False,0.0,,
+193,02814,smallest_change,What is the smallest change?,trees,quarter,False,False,0.0,,
+194,02814,smallest_change,What type of change is the smallest in the pre-change image?,low_vegetation,oil storage,False,False,0.0,,
+195,02814,smallest_change,What is the smallest change in the post-event image?,low_vegetation,time,False,False,0.0,,
+196,01661,smallest_change,What type of change is the smallest?,low_vegetation,oil,False,False,0.0,,
+197,01661,smallest_change,What type of change is the smallest in the pre-event image?,NVG_surface,oil,False,False,0.0,,
+198,01661,smallest_change,What type of change is the smallest in the post-change image?,low_vegetation,oil,False,False,0.0,,
+199,00751,smallest_change,What is the smallest change?,trees,coin,False,False,0.0,,

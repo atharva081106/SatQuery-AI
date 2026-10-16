@@ -1,0 +1,45 @@
+================================================================================
+SATQUERY AI — SIH PS26167 OFFICIAL ACCEPTANCE TEST SUITE
+Timestamp: 2026-10-14T21:27:20Z
+================================================================================
+
+--- [PHASE 1] Preflight & Environment Verification ---
+Backend Health: online (enable_ml_models=True)
+Frontend HTTP Availability: 200 OK
+
+--- [CATEGORY A] Agentic Routing and Tool Orchestration (Weight: 20%) ---
+Test A1 (Captioning): code=200, lat=567.2ms, task=SINGLE_IMAGE_CAPTIONING, tool=single_image_captioning
+Test A2 (Highlight/Grounding): code=200, lat=552.6ms, task=SINGLE_IMAGE_VQA, tool=single_image_vqa
+Test A3 (Change Routing): code=200, lat=990.2ms, task=CHANGE_ANALYSIS, tool=bi_temporal_change
+Test A4 (Cross-Modal Routing): code=200, lat=742.2ms, task=CROSS_MODAL_EXTRACTION, tool=optical_sar_fusion
+Test A5 (Trend Analysis): code=200, lat=796.1ms, task=CHANGE_ANALYSIS, has_trend=True
+Test A6 (Single image for pairwise): status=rejected, err_code=INVALID_INPUT_COUNT, is_rejected=True
+Test A7 (Duplicate images): compat=REJECTED_IDENTICAL_IMAGES, is_rejected=True
+Test A8 (Modality contradiction): err_code=MODALITY_MISMATCH, is_rejected=True
+
+--- [CATEGORY B] Single-Image Remote-Sensing VLM (Weight: 20%) ---
+Test B1 (BLIP VQA Specialist): lat=8554.7ms, prov=SatQuery-RS-VLM-v1.0 (Adapted on BigEarthNet.txt, RSVQA, VRSBench), answer=**VLM Direct Prediction (SatQuery-RS-VLM-v1.0 (Adapted on BigEarthNet.txt, RSVQA, VRSBench)):** **land and water**
+Test B2 (OWL-ViT Grounding Detection): boxes=13, conf=0.0228, exec=NEURAL_OWLVIT
+Test B3 (OWL-ViT No-Detection): status=NO_DETECTION, boxes=0, conf=0.0
+Test B4 (GeoJSON Validation): has_geojson=True, valid=True
+
+--- [CATEGORY C] Multitemporal Change Understanding (Weight: 25%) ---
+Test C1 (Uttarakhand T1/T2 Change): compat=PASSED, score=0.59, prov=SatQueryChangeNet-v1.0 (Siamese Difference Network, Val IoU: 88.1%), visual=True
+Test C2 (Disparate regions rejection): compat=FAILED, score=0.07
+
+--- [CATEGORY D] Optical-SAR Paired Analysis (Weight: 25%) ---
+Test D1 (Optical-SAR Fusion API): compat=PASSED, score=0.88, exec=NEURAL, prov=SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)
+Test D2 (Mask Inspection): Built-up coverage=99.97% (1048229/1048576 px)
+
+--- [CATEGORY E] Robustness, Usability and Reporting (Weight: 10%) ---
+Test E1 (Preflight API): status=success, preflight=READY, pairwise=PASSED
+Running pytest test suite...
+Test E2 (Automated Tests): exit_code=0, 103 passed=True
+Checking Next.js production build...
+Test E3 (Frontend Production Build): BUILD_ID exists=True
+
+Structured results saved: D:\sih26167\reports\sih_acceptance_test\test_results.json
+Markdown report saved: D:\sih26167\reports\sih_acceptance_test\acceptance_test_report.md
+
+>>> ALL ACCEPTANCE TESTS COMPLETE.
+================================================================================

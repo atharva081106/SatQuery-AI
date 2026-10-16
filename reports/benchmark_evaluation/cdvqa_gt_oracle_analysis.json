@@ -1,0 +1,56 @@
+{
+  "benchmark": "CDVQA Ground-Truth Semantic Oracle Evaluation (Yuan et al. 2022 Section II)",
+  "is_oracle": true,
+  "timestamp": "2026-10-16T13:16:51Z",
+  "provenance": "SECOND semantic labels (label1, label2) directly queried via algorithmic formulas in Section II",
+  "description": "Tests whether CDVQA ground-truth answers can be derived directly from the SECOND semantic masks without any visual perception model.",
+  "results": {
+    "is_oracle": true,
+    "total_questions_evaluated": 16441,
+    "total_correct": 16431,
+    "overall_accuracy_pct": 99.94,
+    "average_accuracy_pct": 99.89,
+    "category_accuracies_pct": {
+      "change_or_not": 100.0,
+      "increase_or_not": 100.0,
+      "decrease_or_not": 100.0,
+      "change_to_what": 100.0,
+      "smallest_change": 99.25,
+      "largest_change": 100.0,
+      "change_ratio": 99.88,
+      "change_ratio_types": 100.0
+    },
+    "can_answers_be_derived_from_second_labels": true,
+    "oracle_derivation_summary": "Yes. Section II of Yuan et al. (2022) details deterministic template-based rules applied to SECOND semantic change maps (s_t1, s_t2 in {0..6}). When these exact formulas are evaluated directly on the ground-truth masks, the Oracle achieves 99.94% Overall Accuracy and 99.89% Average Accuracy. Residual minor discrepancies occur due to edge-case template phrasings and bin boundary conventions.",
+    "sample_discrepancies": {
+      "smallest_change": [
+        {
+          "pair_id": "03647",
+          "question": "What is the smallest change in the pre-change image?",
+          "gt_answer": "trees",
+          "oracle_prediction": "nvg_surface"
+        },
+        {
+          "pair_id": "05330",
+          "question": "What is the smallest change?",
+          "gt_answer": "nvg_surface",
+          "oracle_prediction": "buildings"
+        },
+        {
+          "pair_id": "05330",
+          "question": "What is the smallest change in the pre-event image?",
+          "gt_answer": "nvg_surface",
+          "oracle_prediction": "buildings"
+        }
+      ],
+      "change_ratio": [
+        {
+          "pair_id": "05330",
+          "question": "How much of the area has changed?",
+          "gt_answer": "0",
+          "oracle_prediction": "0_to_10"
+        }
+      ]
+    }
+  }
+}

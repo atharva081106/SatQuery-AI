@@ -1,0 +1,29 @@
+{
+  "experiment_name": "satquery_change_net_finetune_v1",
+  "description": "Controlled fine-tuning of SatQueryChangeNet on 100% authentic SECOND/CDVQA train pairs with spatial augmentations",
+  "seed": 42,
+  "base_checkpoint": "ml_pipeline\\checkpoints\\satquery_change_net_authentic\\best_change_net.pth",
+  "base_checkpoint_sha256": "9b94320837db808ed284da285568a29b2cca52d2bb51d89d97a479895b11b332",
+  "baseline_val_foreground_iou_pct": 31.15,
+  "train_samples": 1600,
+  "val_samples": 400,
+  "held_out_test_samples": 968,
+  "image_resolution": [
+    256,
+    256
+  ],
+  "batch_size": 16,
+  "epochs": 4,
+  "learning_rate": 0.0002,
+  "weight_decay": 0.0001,
+  "optimizer": "AdamW",
+  "scheduler": "CosineAnnealingLR (eta_min=1e-6)",
+  "loss_formulation": "BCEWithLogitsLoss() + 0.5 * DiceLoss()",
+  "augmentations": [
+    "RandomHorizontalFlip(p=0.5)",
+    "RandomVerticalFlip(p=0.5)",
+    "Random90Rotation(p=0.5)"
+  ],
+  "selection_metric": "val_mean_foreground_change_iou",
+  "device": "cpu"
+}

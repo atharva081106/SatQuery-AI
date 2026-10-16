@@ -1,0 +1,60 @@
+{
+  "phase": 2,
+  "title": "Data pipeline (real datasets only)",
+  "timestamp": "2026-10-14T15:40:15+05:30",
+  "status": "PASSED",
+  "script": "ml_pipeline/data_sanity.py",
+  "acceptance_criteria": {
+    "authentic_loaders_implemented": {
+      "status": "PASSED",
+      "datasets": [
+        {
+          "name": "BigEarthNet.txt",
+          "reference": "arXiv:2603.29630",
+          "license": "CDLA-Permissive-1.0",
+          "loader_file": "ml_pipeline/data/bigearthnet_loader.py"
+        },
+        {
+          "name": "RSVQA",
+          "reference": "arXiv:2003.07333",
+          "license": "CC BY 4.0",
+          "loader_file": "ml_pipeline/data/rsvqa_loader.py"
+        },
+        {
+          "name": "VRSBench",
+          "reference": "arXiv:2406.12384",
+          "license": "CC BY-NC-SA 4.0",
+          "loader_file": "ml_pipeline/data/vrsbench_loader.py"
+        },
+        {
+          "name": "CDVQA",
+          "reference": "arXiv:2112.06343",
+          "license": "CC BY 4.0",
+          "loader_file": "ml_pipeline/data/cdvqa_loader.py"
+        }
+      ]
+    },
+    "dummy_data_elimination": {
+      "status": "PASSED",
+      "deleted_files": [
+        "ml_pipeline/generate_dummy_data.py",
+        "ml_pipeline/dummy_dataset"
+      ],
+      "synthetic_random_noise_in_training_or_eval": false
+    },
+    "max_samples_support": {
+      "status": "PASSED",
+      "description": "All 4 loaders and train_vqa.py support --max_samples flag for free Colab/Kaggle GPU execution."
+    },
+    "documentation_and_resource_needs": {
+      "status": "PASSED",
+      "doc_file": "ml_pipeline/README.md",
+      "details": "Documents disk, RAM, and VRAM needs per dataset, Colab execution commands, and licenses."
+    },
+    "data_sanity_report": {
+      "status": "PASSED",
+      "report_file": "reports/data_sanity.md",
+      "samples_per_split_audited": 5
+    }
+  }
+}

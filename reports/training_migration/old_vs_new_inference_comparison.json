@@ -1,0 +1,254 @@
+[
+  {
+    "case_id": "CASE_1_MUMBAI_DEMO",
+    "description": "Mumbai Cartosat-2S Optical + RISAT-1 C-band SAR",
+    "old_production": {
+      "provenance": "SatQueryOpticalSARNet-v1.0 (Production, Val IoU: 34.4%)",
+      "execution_path": "NEURAL",
+      "confidence": 0.828,
+      "forward_latency_ms": 139.38,
+      "total_latency_ms": 904.36,
+      "geojson_feature_count": 16,
+      "geojson_features": [
+        {
+          "id": "cross_modal_built_1",
+          "class": "Urban / Built-up",
+          "area_ha": 81.0
+        },
+        {
+          "id": "cross_modal_built_2",
+          "class": "Urban / Built-up",
+          "area_ha": 52.0
+        },
+        {
+          "id": "cross_modal_built_3",
+          "class": "Urban / Built-up",
+          "area_ha": 46.0
+        },
+        {
+          "id": "cross_modal_built_4",
+          "class": "Urban / Built-up",
+          "area_ha": 41.0
+        },
+        {
+          "id": "cross_modal_built_5",
+          "class": "Urban / Built-up",
+          "area_ha": 29.0
+        },
+        {
+          "id": "cross_modal_built_6",
+          "class": "Urban / Built-up",
+          "area_ha": 28.0
+        },
+        {
+          "id": "cross_modal_built_7",
+          "class": "Urban / Built-up",
+          "area_ha": 25.0
+        },
+        {
+          "id": "cross_modal_built_8",
+          "class": "Urban / Built-up",
+          "area_ha": 21.0
+        },
+        {
+          "id": "cross_modal_water_9",
+          "class": "Water Bodies",
+          "area_ha": 3987.0
+        },
+        {
+          "id": "cross_modal_water_10",
+          "class": "Water Bodies",
+          "area_ha": 1354.0
+        },
+        {
+          "id": "cross_modal_water_11",
+          "class": "Water Bodies",
+          "area_ha": 246.0
+        },
+        {
+          "id": "cross_modal_water_12",
+          "class": "Water Bodies",
+          "area_ha": 74.0
+        },
+        {
+          "id": "cross_modal_water_13",
+          "class": "Water Bodies",
+          "area_ha": 55.0
+        },
+        {
+          "id": "cross_modal_water_14",
+          "class": "Water Bodies",
+          "area_ha": 53.0
+        },
+        {
+          "id": "cross_modal_water_15",
+          "class": "Water Bodies",
+          "area_ha": 37.0
+        },
+        {
+          "id": "cross_modal_water_16",
+          "class": "Water Bodies",
+          "area_ha": 36.0
+        }
+      ]
+    },
+    "new_staging_candidate": {
+      "provenance": "SatQueryOpticalSARNet-v2.0-Staging (Authentic BEN-GE-800, Val IoU: 64.3%)",
+      "execution_path": "NEURAL",
+      "confidence": 0.828,
+      "forward_latency_ms": 122.95,
+      "total_latency_ms": 690.52,
+      "geojson_feature_count": 4,
+      "geojson_features": [
+        {
+          "id": "cross_modal_water_1",
+          "class": "Water Bodies",
+          "area_ha": 224.0
+        },
+        {
+          "id": "cross_modal_water_2",
+          "class": "Water Bodies",
+          "area_ha": 36.0
+        },
+        {
+          "id": "cross_modal_water_3",
+          "class": "Water Bodies",
+          "area_ha": 30.0
+        },
+        {
+          "id": "cross_modal_water_4",
+          "class": "Water Bodies",
+          "area_ha": 25.0
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_2_BEN_GE_TEST_0",
+    "description": "Authentic BigEarthNet Patch S2A_MSIL2A_20170613T101031_52_57 (Urban fabric, Industrial or commercial units, Arable land, Complex cultivation patterns, Coniferous forest)",
+    "old_production": {
+      "provenance": "SatQueryOpticalSARNet-v1.0 (Production, Val IoU: 34.4%)",
+      "execution_path": "NEURAL",
+      "confidence": 0.828,
+      "forward_latency_ms": 44.05,
+      "total_latency_ms": 125.41,
+      "geojson_feature_count": 8,
+      "geojson_features": [
+        {
+          "id": "cross_modal_built_1",
+          "class": "Urban / Built-up",
+          "area_ha": 4.0
+        },
+        {
+          "id": "cross_modal_built_2",
+          "class": "Urban / Built-up",
+          "area_ha": 3.0
+        },
+        {
+          "id": "cross_modal_built_3",
+          "class": "Urban / Built-up",
+          "area_ha": 2.0
+        },
+        {
+          "id": "cross_modal_built_4",
+          "class": "Urban / Built-up",
+          "area_ha": 2.0
+        },
+        {
+          "id": "cross_modal_built_5",
+          "class": "Urban / Built-up",
+          "area_ha": 2.0
+        },
+        {
+          "id": "cross_modal_built_6",
+          "class": "Urban / Built-up",
+          "area_ha": 1.0
+        },
+        {
+          "id": "cross_modal_built_7",
+          "class": "Urban / Built-up",
+          "area_ha": 1.0
+        },
+        {
+          "id": "cross_modal_built_8",
+          "class": "Urban / Built-up",
+          "area_ha": 1.0
+        }
+      ]
+    },
+    "new_staging_candidate": {
+      "provenance": "SatQueryOpticalSARNet-v2.0-Staging (Authentic BEN-GE-800, Val IoU: 64.3%)",
+      "execution_path": "NEURAL",
+      "confidence": 0.828,
+      "forward_latency_ms": 30.8,
+      "total_latency_ms": 119.54,
+      "geojson_feature_count": 3,
+      "geojson_features": [
+        {
+          "id": "cross_modal_built_1",
+          "class": "Urban / Built-up",
+          "area_ha": 93.0
+        },
+        {
+          "id": "cross_modal_built_2",
+          "class": "Urban / Built-up",
+          "area_ha": 1.0
+        },
+        {
+          "id": "cross_modal_built_3",
+          "class": "Urban / Built-up",
+          "area_ha": 1.0
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_3_BEN_GE_TEST_1",
+    "description": "Authentic BigEarthNet Patch S2A_MSIL2A_20170613T101032_43_77 (Arable land, Land principally occupied by agriculture, with significant areas of natural vegetation, Mixed forest, Transitional woodland, shrub)",
+    "old_production": {
+      "provenance": "SatQueryOpticalSARNet-v1.0 (Production, Val IoU: 34.4%)",
+      "execution_path": "NEURAL",
+      "confidence": 0.828,
+      "forward_latency_ms": 29.76,
+      "total_latency_ms": 119.48,
+      "geojson_feature_count": 4,
+      "geojson_features": [
+        {
+          "id": "cross_modal_built_1",
+          "class": "Urban / Built-up",
+          "area_ha": 81.0
+        },
+        {
+          "id": "cross_modal_built_2",
+          "class": "Urban / Built-up",
+          "area_ha": 1.0
+        },
+        {
+          "id": "cross_modal_built_3",
+          "class": "Urban / Built-up",
+          "area_ha": 0.0
+        },
+        {
+          "id": "cross_modal_built_4",
+          "class": "Urban / Built-up",
+          "area_ha": 0.0
+        }
+      ]
+    },
+    "new_staging_candidate": {
+      "provenance": "SatQueryOpticalSARNet-v2.0-Staging (Authentic BEN-GE-800, Val IoU: 64.3%)",
+      "execution_path": "NEURAL",
+      "confidence": 0.828,
+      "forward_latency_ms": 29.92,
+      "total_latency_ms": 125.23,
+      "geojson_feature_count": 1,
+      "geojson_features": [
+        {
+          "id": "cross_modal_built_1",
+          "class": "Urban / Built-up",
+          "area_ha": 3.0
+        }
+      ]
+    }
+  }
+]

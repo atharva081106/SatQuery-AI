@@ -1,0 +1,69 @@
+{
+  "experiment_name": "SatQueryOpticalSARNet Parent-Granule-Disjoint Evaluation",
+  "protocol": "parent_granule_disjoint",
+  "checkpoint_path": "ml_pipeline\\checkpoints\\satquery_optical_sar_net_disjoint\\optical_sar_net.pth",
+  "checkpoint_sha256": "66544ff8249c692ed46c072c221e922c0544241874cc1b92a3701fb5a767faa3",
+  "dataset_name": "BEN-GE-800 (BigEarthNet-MM subset)",
+  "ground_truth_source": "ESA WorldCover 10m Land Cover v100 (Authentic Raster GT)",
+  "provenance": "Zenodo DOI 10.5281/zenodo.12941231",
+  "classes": [
+    "Built-up",
+    "Water",
+    "Vegetation"
+  ],
+  "random_seed": 42,
+  "sample_counts": {
+    "train": 561,
+    "val_held_out": 120,
+    "test_held_out": 119,
+    "total_patches": 800
+  },
+  "hardware": "cpu",
+  "total_runtime_seconds": 215.65,
+  "epochs": 3,
+  "batch_size": 8,
+  "learning_rate": 0.001,
+  "final_validation_metrics": {
+    "val_loss": 0.555,
+    "val_mean_iou": 0.5944,
+    "val_mean_dice": 0.7049,
+    "val_iou_built_up": 0.229,
+    "val_iou_water": 0.6777,
+    "val_iou_vegetation": 0.8764
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.8264,
+      "val_loss": 0.674,
+      "val_mean_iou": 0.5478,
+      "val_mean_dice": 0.6641,
+      "val_iou_built_up": 0.1867,
+      "val_iou_water": 0.6265,
+      "val_iou_vegetation": 0.8301,
+      "duration_seconds": 70.02
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.6697,
+      "val_loss": 0.6073,
+      "val_mean_iou": 0.5583,
+      "val_mean_dice": 0.685,
+      "val_iou_built_up": 0.2665,
+      "val_iou_water": 0.5526,
+      "val_iou_vegetation": 0.8557,
+      "duration_seconds": 65.24
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.6261,
+      "val_loss": 0.555,
+      "val_mean_iou": 0.5944,
+      "val_mean_dice": 0.7049,
+      "val_iou_built_up": 0.229,
+      "val_iou_water": 0.6777,
+      "val_iou_vegetation": 0.8764,
+      "duration_seconds": 65.17
+    }
+  ]
+}

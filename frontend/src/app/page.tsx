@@ -303,8 +303,8 @@ export default function LandingPage() {
                 Interact with complex remote sensing data using everyday language. Our advanced agentic pipeline interprets your intent and extracts precise insights from vast geographical areas.
               </p>
               <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10 font-mono text-[10px]">
-                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">⚡ &lt;10ms ONNX INT8</span>
-                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🎯 90.2% Accuracy</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">⚡ Verified Telemetry</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🎯 Benchmarks: reports/*.json</span>
                 <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🛰️ Agentic VQA</span>
               </div>
             </div>
@@ -332,11 +332,11 @@ export default function LandingPage() {
                 SPATIAL<br/>LOCALIZATION
               </h2>
               <p className="body-md opacity-80 mb-4 sm:mb-6 text-xs sm:text-base leading-relaxed">
-                Identify and bound critical infrastructure, environmental changes, and specific geographical features directly onto the image canvas with millimeter precision.
+                Identify and bound critical infrastructure, environmental changes, and specific geographical features directly onto the image canvas with subpixel contour delineation.
               </p>
               <div className="flex flex-wrap gap-2 mb-4 pt-2 border-t border-white/10 font-mono text-[10px]">
-                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">📐 Millimeter Precision</span>
-                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🛡️ Zero FPR Gate</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">📐 GeoJSON Contours</span>
+                <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🛡️ Calibrated Verification</span>
                 <span className="px-2.5 py-1 rounded-md bg-white/10 text-white/90 font-semibold">🇮🇳 Bhuvan &amp; Sentinel</span>
               </div>
               <Link href="/query" className="button-ghost-on-dark inline-block hover:bg-white hover:text-black text-xs sm:text-sm py-2.5 px-6">

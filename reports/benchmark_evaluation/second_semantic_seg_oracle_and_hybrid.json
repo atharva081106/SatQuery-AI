@@ -1,0 +1,81 @@
+{
+  "benchmark": "Phase 1 SECOND Semantic Segmentation Model, Predicted Map Oracle, and Hybrid Head",
+  "timestamp": "2026-10-16T13:46:51Z",
+  "budget": {
+    "architecture": "Lightweight 4-stage UNet (1.2M parameters)",
+    "input_resolution": "256x256 RGB (3 channels)",
+    "output_classes": 7,
+    "hardware": "8-thread CPU (AVX2 optimized)",
+    "train_pairs_budget": 300,
+    "epochs": 3,
+    "batch_size": 16,
+    "estimated_flops_per_image": "4.2 GFLOPs",
+    "estimated_wall_clock_sec": 30.0
+  },
+  "segmentation_training": {
+    "wall_clock_sec": 495.01,
+    "train_pairs": 300,
+    "epochs": 3,
+    "parameters": 1205639
+  },
+  "predicted_map_oracle_results": {
+    "description": "Deterministic oracle rules applied directly to the predicted semantic maps from the trained 6-class segmentation model.",
+    "val_oa": 52.99,
+    "val_aa": 47.84,
+    "oa_ci_95": [
+      51.82,
+      54.13
+    ],
+    "aa_ci_95": [
+      46.66,
+      49.03
+    ],
+    "category_accuracies": {
+      "change_or_not": 55.97,
+      "increase_or_not": 69.01,
+      "decrease_or_not": 73.36,
+      "change_to_what": 36.32,
+      "smallest_change": 19.75,
+      "largest_change": 41.92,
+      "change_ratio": 31.87,
+      "change_ratio_types": 54.5
+    },
+    "delta_vs_blind_oa": -14.98,
+    "delta_vs_feat_oa": -15.57
+  },
+  "hybrid_model_results": {
+    "description": "VQA head fed with 19 map-derived features (class counts per date, change fractions, total changed fraction) + question embeddings.",
+    "val_oa": 68.04,
+    "val_aa": 58.73,
+    "oa_ci_95": [
+      67.1,
+      68.92
+    ],
+    "aa_ci_95": [
+      57.66,
+      59.81
+    ],
+    "category_accuracies": {
+      "change_or_not": 81.99,
+      "increase_or_not": 74.58,
+      "decrease_or_not": 73.99,
+      "change_to_what": 56.9,
+      "smallest_change": 32.08,
+      "largest_change": 46.92,
+      "change_ratio": 32.62,
+      "change_ratio_types": 70.73
+    },
+    "delta_vs_blind_oa": 0.07,
+    "delta_vs_feat_oa": -0.52
+  },
+  "comparison_summary": {
+    "blind_baseline_oa": 67.97,
+    "blind_baseline_aa": 58.39,
+    "feature_head_oa": 68.56,
+    "feature_head_aa": 59.67,
+    "predicted_map_oracle_oa": 52.99,
+    "predicted_map_oracle_aa": 47.84,
+    "hybrid_oa": 68.04,
+    "hybrid_aa": 58.73
+  }
+}

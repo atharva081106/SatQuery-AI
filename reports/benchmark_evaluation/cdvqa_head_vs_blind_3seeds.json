@@ -1,0 +1,282 @@
+{
+  "benchmark": "Phase 1 CDVQA Feature-Head vs Blind Baseline (3 Seeds)",
+  "timestamp": "2026-10-16T13:28:40Z",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "dataset_scope": {
+    "train_pairs": 1600,
+    "train_questions": 65967,
+    "val_pairs": 400,
+    "val_questions": 16441
+  },
+  "blind_variance_analysis": {
+    "blind_oa_mean": 67.97,
+    "blind_oa_std": 0.13,
+    "blind_oa_variance": 0.018,
+    "blind_oa_values": [
+      67.7817650994465,
+      68.03114165805,
+      68.0919652089289
+    ],
+    "blind_aa_mean": 58.39,
+    "blind_aa_std": 0.3,
+    "blind_aa_variance": 0.089,
+    "blind_aa_values": [
+      57.99454072600463,
+      58.71805457114952,
+      58.44441246287616
+    ]
+  },
+  "feature_head_analysis": {
+    "feat_oa_mean": 68.56,
+    "feat_oa_std": 0.15,
+    "feat_oa_variance": 0.0222,
+    "feat_oa_values": [
+      68.74885955842102,
+      68.38391825314763,
+      68.55422419560854
+    ],
+    "feat_aa_mean": 59.67,
+    "feat_aa_std": 0.27,
+    "feat_aa_variance": 0.0733,
+    "feat_aa_values": [
+      60.00518026894991,
+      59.342040171340685,
+      59.6603047037307
+    ]
+  },
+  "paired_deltas": {
+    "delta_oa_mean": 0.59,
+    "delta_oa_std": 0.27,
+    "delta_oa_values": [
+      0.97,
+      0.35,
+      0.46
+    ],
+    "delta_aa_mean": 1.28,
+    "delta_aa_std": 0.57,
+    "delta_aa_values": [
+      2.01,
+      0.62,
+      1.22
+    ]
+  },
+  "per_category_analysis": {
+    "change_or_not": {
+      "blind_mean": 82.43,
+      "blind_std": 0.38,
+      "blind_var": 0.143,
+      "feat_mean": 82.81,
+      "feat_std": 0.16,
+      "feat_var": 0.0243,
+      "delta_mean": 0.39,
+      "delta_std": 0.44,
+      "individual_deltas": [
+        0.1,
+        1.01,
+        0.05
+      ]
+    },
+    "increase_or_not": {
+      "blind_mean": 74.74,
+      "blind_std": 0.0,
+      "blind_var": 0.0,
+      "feat_mean": 72.69,
+      "feat_std": 0.49,
+      "feat_var": 0.2429,
+      "delta_mean": -2.05,
+      "delta_std": 0.49,
+      "individual_deltas": [
+        -2.6,
+        -1.41,
+        -2.14
+      ]
+    },
+    "decrease_or_not": {
+      "blind_mean": 72.3,
+      "blind_std": 1.59,
+      "blind_var": 2.5434,
+      "feat_mean": 73.79,
+      "feat_std": 0.6,
+      "feat_var": 0.3615,
+      "delta_mean": 1.49,
+      "delta_std": 2.08,
+      "individual_deltas": [
+        4.01,
+        -1.09,
+        1.56
+      ]
+    },
+    "change_to_what": {
+      "blind_mean": 56.58,
+      "blind_std": 0.51,
+      "blind_var": 0.2649,
+      "feat_mean": 54.24,
+      "feat_std": 1.52,
+      "feat_var": 2.3103,
+      "delta_mean": -2.34,
+      "delta_std": 1.95,
+      "individual_deltas": [
+        0.16,
+        -4.6,
+        -2.58
+      ]
+    },
+    "smallest_change": {
+      "blind_mean": 29.86,
+      "blind_std": 0.55,
+      "blind_var": 0.2978,
+      "feat_mean": 30.08,
+      "feat_std": 0.65,
+      "feat_var": 0.4213,
+      "delta_mean": 0.22,
+      "delta_std": 0.1,
+      "individual_deltas": [
+        0.25,
+        0.08,
+        0.33
+      ]
+    },
+    "largest_change": {
+      "blind_mean": 48.75,
+      "blind_std": 0.0,
+      "blind_var": 0.0,
+      "feat_mean": 51.33,
+      "feat_std": 0.61,
+      "feat_var": 0.375,
+      "delta_mean": 2.58,
+      "delta_std": 0.61,
+      "individual_deltas": [
+        2.58,
+        3.33,
+        1.83
+      ]
+    },
+    "change_ratio": {
+      "blind_mean": 31.21,
+      "blind_std": 1.45,
+      "blind_var": 2.1076,
+      "feat_mean": 41.08,
+      "feat_std": 0.75,
+      "feat_var": 0.566,
+      "delta_mean": 9.88,
+      "delta_std": 1.77,
+      "individual_deltas": [
+        11.75,
+        7.5,
+        10.38
+      ]
+    },
+    "change_ratio_types": {
+      "blind_mean": 71.22,
+      "blind_std": 0.17,
+      "blind_var": 0.028,
+      "feat_mean": 71.32,
+      "feat_std": 0.23,
+      "feat_var": 0.0551,
+      "delta_mean": 0.1,
+      "delta_std": 0.19,
+      "individual_deltas": [
+        -0.17,
+        0.17,
+        0.29
+      ]
+    }
+  },
+  "multiple_comparison_control": {
+    "correction_method": "Bonferroni (FWER control across 8 categories)",
+    "num_categories": 8,
+    "nominal_alpha": 0.05,
+    "bonferroni_adjusted_alpha": 0.00625,
+    "statistical_testing_framework": {
+      "test_type": "Two-tailed paired Student's t-test across 3 seeds (df=2)",
+      "uncertainty_measured": "Training/optimization variance across random weight initializations and data shuffling batches",
+      "notes": "Degrees of freedom are small (N=3, df=2). Critical value for alpha=0.05 is t=4.303; for Bonferroni alpha=0.00625 is t=12.651. Single-seed clustered bootstrap (in cdvqa_paired_bootstrap_ci.json) measures a distinct dimension: finite-sample evaluation uncertainty across the 400 geographic scene pairs."
+    },
+    "three_seed_category_tests": {
+      "change_ratio": {
+        "delta_mean": 9.88,
+        "delta_std": 1.77,
+        "sample_std": 2.17,
+        "t_statistic": 7.886,
+        "p_value": 0.0157,
+        "survives_nominal_alpha_0_05": true,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Statistically significant at nominal alpha=0.05 (p=0.0157), but does NOT survive strict Bonferroni correction (p > 0.00625) under the 3-seed Student's t-test due to small degrees of freedom (df=2). In the separate single-seed clustered bootstrap on 400 scene pairs (finite-sample evaluation uncertainty), uncorrected 95% CI is [+8.12%, +18.88%]."
+      },
+      "largest_change": {
+        "delta_mean": 2.58,
+        "delta_std": 0.61,
+        "sample_std": 0.75,
+        "t_statistic": 5.959,
+        "p_value": 0.027,
+        "survives_nominal_alpha_0_05": true,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Statistically significant at nominal alpha=0.05 (p=0.0270), does NOT survive strict Bonferroni correction (p > 0.00625)."
+      },
+      "decrease_or_not": {
+        "delta_mean": 1.49,
+        "delta_std": 2.08,
+        "sample_std": 2.55,
+        "t_statistic": 1.013,
+        "p_value": 0.4173,
+        "survives_nominal_alpha_0_05": false,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Not statistically significant (p=0.4173); individual deltas span zero across seeds (+4.01% in seed 42 to -1.09% in seed 43)."
+      },
+      "change_or_not": {
+        "delta_mean": 0.39,
+        "delta_std": 0.44,
+        "sample_std": 0.54,
+        "t_statistic": 1.242,
+        "p_value": 0.3399,
+        "survives_nominal_alpha_0_05": false,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Not statistically significant under 3-seed t-test (p=0.3399), though point estimates remain weakly positive across all three seeds (+0.10%, +1.01%, +0.05%)."
+      },
+      "smallest_change": {
+        "delta_mean": 0.22,
+        "delta_std": 0.1,
+        "sample_std": 0.13,
+        "t_statistic": 2.965,
+        "p_value": 0.0974,
+        "survives_nominal_alpha_0_05": false,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Not statistically significant (p=0.0974 > 0.05)."
+      },
+      "change_ratio_types": {
+        "delta_mean": 0.1,
+        "delta_std": 0.19,
+        "sample_std": 0.24,
+        "t_statistic": 0.704,
+        "p_value": 0.5543,
+        "survives_nominal_alpha_0_05": false,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Not statistically significant (p=0.5543); deltas span zero (-0.17% to +0.29%). Language prior dominates."
+      },
+      "change_to_what": {
+        "delta_mean": -2.34,
+        "delta_std": 1.95,
+        "sample_std": 2.39,
+        "t_statistic": -1.696,
+        "p_value": 0.2323,
+        "survives_nominal_alpha_0_05": false,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Negative mean delta (-2.34%); not statistically significant (p=0.2323)."
+      },
+      "increase_or_not": {
+        "delta_mean": -2.05,
+        "delta_std": 0.49,
+        "sample_std": 0.6,
+        "t_statistic": -5.908,
+        "p_value": 0.0275,
+        "survives_nominal_alpha_0_05": true,
+        "survives_bonferroni_0_00625": false,
+        "verdict": "Statistically significant negative shift at nominal alpha=0.05 (p=0.0275); does not survive Bonferroni. Visual feature head underperforms blind baseline across all three seeds."
+      }
+    }
+  }
+}

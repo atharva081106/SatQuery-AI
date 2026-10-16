@@ -1,0 +1,1643 @@
+{
+  "a": {
+    "probe": "a",
+    "query": "What is the capital of France?",
+    "images": [
+      "bengaluru_cartosat3.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 666.78,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Request Validation Error (NON_GEOSPATIAL_QUERY)**\n\nCannot answer from this remote sensing imagery: query seeks general trivia, programming, or mathematics unrelated to satellite imagery.\n\n\u2022 **Reason:** Query was classified as a non-geospatial question outside remote sensing observation capability.\n\u2022 **Action Required:** Ask questions pertaining to Earth observation, land cover, spatial infrastructure, or change over time.",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_NON_GEOSPATIAL_QUERY",
+      "spatial_coherence_score": 0.0,
+      "execution_summary": {
+        "selected_task": "OUT_OF_DOMAIN_REJECTION",
+        "tool_used": "semantic_guardrail",
+        "input_scope": "1 image(s)",
+        "num_images_processed": 1,
+        "agent_reasoning": "Validation failed at Stage 2/3: Query was classified as a non-geospatial question outside remote sensing observation capability."
+      },
+      "execution_trace": {
+        "trace_id": "d9601def-c81e-490d-952b-a5a19de92b0c",
+        "timestamp": "2026-10-14T19:55:29.264291",
+        "query": "What is the capital of France?",
+        "selected_task": "OUT_OF_DOMAIN_REJECTION",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 1,
+          "is_out_of_domain": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "semantic_guardrail",
+            "task_name": "OUT_OF_DOMAIN_REJECTION",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 16.2,
+            "parameters_used": {},
+            "summary": "Cannot answer from this remote sensing imagery: query seeks general trivia, programming, or mathematics unrelated to satellite imagery."
+          }
+        ],
+        "per_step_latency_ms": {
+          "input_validation": 16.2
+        },
+        "total_latency_ms": 16.2,
+        "outputs_summary": {
+          "status": "rejected",
+          "error_code": "NON_GEOSPATIAL_QUERY",
+          "visual_evidence_count": 0,
+          "geojson_features": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Calibrated rejection uncertainty: 0.04 derived from guardrail constraint NON_GEOSPATIAL_QUERY.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": {
+          "status": "error",
+          "error_code": "NON_GEOSPATIAL_QUERY",
+          "error_type": "OutOfDomainQueryError",
+          "message": "Cannot answer from this remote sensing imagery: query seeks general trivia, programming, or mathematics unrelated to satellite imagery.",
+          "reason": "Query was classified as a non-geospatial question outside remote sensing observation capability.",
+          "suggested_fix": "Ask questions pertaining to Earth observation, land cover, spatial infrastructure, or change over time.",
+          "invalid_parameter": null,
+          "details": {
+            "raw_query": "What is the capital of France?"
+          }
+        }
+      },
+      "structured_error": {
+        "status": "error",
+        "error_code": "NON_GEOSPATIAL_QUERY",
+        "error_type": "OutOfDomainQueryError",
+        "message": "Cannot answer from this remote sensing imagery: query seeks general trivia, programming, or mathematics unrelated to satellite imagery.",
+        "reason": "Query was classified as a non-geospatial question outside remote sensing observation capability.",
+        "suggested_fix": "Ask questions pertaining to Earth observation, land cover, spatial infrastructure, or change over time.",
+        "invalid_parameter": null,
+        "details": {
+          "raw_query": "What is the capital of France?"
+        }
+      },
+      "geo_metadata": null,
+      "geojson_data": null
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  },
+  "b": {
+    "probe": "b",
+    "query": "Is there a nuclear submarine in this image?",
+    "images": [
+      "mumbai_cartosat2s_optical.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 536.42,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Request Validation Error (NON_GEOSPATIAL_QUERY)**\n\nCannot answer from this remote sensing imagery: subsurface marine vessels are not observable from optical remote sensing imagery.\n\n\u2022 **Reason:** Query was classified as a non-geospatial question outside remote sensing observation capability.\n\u2022 **Action Required:** Ask questions pertaining to Earth observation, land cover, spatial infrastructure, or change over time.",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_NON_GEOSPATIAL_QUERY",
+      "spatial_coherence_score": 0.0,
+      "execution_summary": {
+        "selected_task": "OUT_OF_DOMAIN_REJECTION",
+        "tool_used": "semantic_guardrail",
+        "input_scope": "1 image(s)",
+        "num_images_processed": 1,
+        "agent_reasoning": "Validation failed at Stage 2/3: Query was classified as a non-geospatial question outside remote sensing observation capability."
+      },
+      "execution_trace": {
+        "trace_id": "8df25d4e-6846-4079-bdc0-ed1a44b9f652",
+        "timestamp": "2026-10-14T19:55:29.813275",
+        "query": "Is there a nuclear submarine in this image?",
+        "selected_task": "OUT_OF_DOMAIN_REJECTION",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 1,
+          "is_out_of_domain": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "semantic_guardrail",
+            "task_name": "OUT_OF_DOMAIN_REJECTION",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 0.23,
+            "parameters_used": {},
+            "summary": "Cannot answer from this remote sensing imagery: subsurface marine vessels are not observable from optical remote sensing imagery."
+          }
+        ],
+        "per_step_latency_ms": {
+          "input_validation": 0.23
+        },
+        "total_latency_ms": 0.23,
+        "outputs_summary": {
+          "status": "rejected",
+          "error_code": "NON_GEOSPATIAL_QUERY",
+          "visual_evidence_count": 0,
+          "geojson_features": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Calibrated rejection uncertainty: 0.04 derived from guardrail constraint NON_GEOSPATIAL_QUERY.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": {
+          "status": "error",
+          "error_code": "NON_GEOSPATIAL_QUERY",
+          "error_type": "OutOfDomainQueryError",
+          "message": "Cannot answer from this remote sensing imagery: subsurface marine vessels are not observable from optical remote sensing imagery.",
+          "reason": "Query was classified as a non-geospatial question outside remote sensing observation capability.",
+          "suggested_fix": "Ask questions pertaining to Earth observation, land cover, spatial infrastructure, or change over time.",
+          "invalid_parameter": null,
+          "details": {
+            "raw_query": "Is there a nuclear submarine in this image?"
+          }
+        }
+      },
+      "structured_error": {
+        "status": "error",
+        "error_code": "NON_GEOSPATIAL_QUERY",
+        "error_type": "OutOfDomainQueryError",
+        "message": "Cannot answer from this remote sensing imagery: subsurface marine vessels are not observable from optical remote sensing imagery.",
+        "reason": "Query was classified as a non-geospatial question outside remote sensing observation capability.",
+        "suggested_fix": "Ask questions pertaining to Earth observation, land cover, spatial infrastructure, or change over time.",
+        "invalid_parameter": null,
+        "details": {
+          "raw_query": "Is there a nuclear submarine in this image?"
+        }
+      },
+      "geo_metadata": null,
+      "geojson_data": null
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  },
+  "c": {
+    "probe": "c",
+    "query": "Is there a water body visible in this image?",
+    "images": [
+      "sambhar_lake_liss4.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 3213.9,
+    "response_json": {
+      "status": "success",
+      "answer": "\ud83d\udca7 **Water Body Delineation & Spatial Highlighting**\n\n### 1. Direct Grounding & Localization\n\u2022 **Visual Highlighting:** The water body has been delineated and **highlighted in luminous cyan-blue** with golden boundary vectors in the visual evidence canvas on the right.\n\u2022 **Surface Coverage:** Water bodies encompass approximately **~6.2%** (6.48 km\u00b2 / 648 hectares) of the observed scene.\n\n\n---\n\n### 2. Surface Distribution Balance\n  \u2022 **Built-Up Area**: **53.8%** (56.42 km\u00b2) / 5,642 ha\n  \u2022 **Cropland**: **19.1%** (20.02 km\u00b2) / 2,002 ha\n  \u2022 **Forest**: **18.6%** (19.49 km\u00b2) / 1,949 ha\n  \u2022 **Water Bodies**: **6.2%** (6.48 km\u00b2) / 648 ha\n  \u2022 **Cloud / Haze**: **2.3%** (2.44 km\u00b2) / 244 ha\n\n\n---\n\n### 3. Tactical GIS Interoperability\n\u2022 Vectorized boundary contours are ready for direct projection and export to **RFC 7946 WGS84 GeoJSON** (compatible with QGIS, ArcGIS, and ISRO Bhuvan).\n\n---\n\n**\u26a0 Limitations & Uncertainty**\n  \u2022 Requested target 'water_body' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_2725482_CHARS>",
+          "description": "Delineated Water Bodies (~6.2%) & Terrestrial Landmass (~91.5%)"
+        }
+      ],
+      "confidence": 0.82,
+      "compatibility_status": "NOT_APPLICABLE",
+      "spatial_coherence_score": 1.0,
+      "execution_summary": {
+        "selected_task": "SINGLE_IMAGE_VQA",
+        "input_scope": "Single Image",
+        "num_images_processed": 1,
+        "agent_reasoning": "Query intent: WATER_BODY_ANALYSIS (confidence 90%). Targets: ['water_body']. Methods: ['land_cover_segmentation'].",
+        "compatibility_status": "PASSED",
+        "spatial_coherence_score": 1.0,
+        "model_provenance": "SatQuery CV Engine (OpenCV + ML Segmentation)"
+      },
+      "execution_trace": {
+        "trace_id": "6e5c815b-151a-4b8b-a2c9-b0b8ebe931a9",
+        "timestamp": "2026-10-14T19:55:30.976996",
+        "query": "Is there a water body visible in this image?",
+        "selected_task": "SINGLE_IMAGE_VQA",
+        "task_confidence": 0.82,
+        "input_checks": {
+          "num_images": 1,
+          "detected_modalities": [
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 123.93,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Raster metadata & georeferencing inspection completed."
+          },
+          {
+            "tool_id": "single_image_vqa",
+            "task_name": "SINGLE_IMAGE_VQA",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 477.07,
+            "parameters_used": {},
+            "summary": "Executed analysis pipeline using SatQuery CV Engine (OpenCV + ML Segmentation)."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 1.4,
+          "stage2_input_verification": 123.93,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 477.07
+        },
+        "total_latency_ms": 603.38,
+        "outputs_summary": {
+          "text_answer_length": 1173,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 0,
+          "measurements_count": 0,
+          "detections_count": 0
+        },
+        "confidence": 0.82,
+        "confidence_derivation": "Dynamically derived from model softmax probabilities, land-cover pixel coverage, and spatial validation agreement.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": null,
+      "pair_comparison": null,
+      "query_understanding": {
+        "intent": "WATER_BODY_ANALYSIS",
+        "sub_intents": [],
+        "targets": [
+          "water_body"
+        ],
+        "operation": "analyze",
+        "spatial_constraint": null,
+        "requires_count": false,
+        "requires_area": false,
+        "confidence": 0.9
+      },
+      "interpreted_task": "Water Body Detection",
+      "detections": [],
+      "detection_count": 0,
+      "measurements": [],
+      "limitations": [],
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "warnings": [
+          "Requested target 'water_body' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration."
+        ]
+      },
+      "id": "3d2ff3aa-76b0-4b83-858c-4aebbebc3e43"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.82
+  },
+  "d": {
+    "probe": "d",
+    "query": "Describe the land-cover and major objects visible in this image.",
+    "images": [
+      "mumbai_cartosat2s_optical.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 7088.71,
+    "response_json": {
+      "status": "success",
+      "answer": "\ud83d\udef0\ufe0f **Executive Scene & Land-Cover Assessment**\n\n### 1. Overview & Dominant Landscape\nThe scene shows a mix of **forest and vegetation** (70.0%), **agricultural land** (43.9%), **built-up area and settlements** (23.3%), **water bodies** (6.5%).\n\n---\n\n### 2. \ud83d\udcca Quantitative Land-Cover & Surface Breakdown\n\n| Surface Feature / Land Class | Surface Coverage | Estimated Area (km\u00b2) | Area (Hectares) | Status / Character |\n| :--- | :--- | :--- | :--- | :--- |\n| **Cropland** | **43.9%** | **46.00 km\u00b2** | **4,600 ha** | Delineated surface layer |\n| **Forest** | **26.1%** | **27.37 km\u00b2** | **2,737 ha** | Delineated surface layer |\n| **Built-Up Area** | **23.3%** | **24.47 km\u00b2** | **2,447 ha** | Delineated surface layer |\n| **Water Bodies** | **6.5%** | **6.80 km\u00b2** | **680 ha** | Delineated surface layer |\n| **Cloud / Haze** | **0.2%** | **0.22 km\u00b2** | **22 ha** | Delineated surface layer |\n\n---\n\n### 3. \ud83d\udccd Major Detected Objects & Infrastructure\n\u2022 Structural and linear features were integrated into the primary land-cover segmentation.\n\n---\n\n### 4. \ud83d\uddfa\ufe0f Tactical Evidence & GIS Readiness\n\u2022 All detected structures and surface boundaries are highlighted in the visual evidence canvas.\n\u2022 Full vector polygons are prepared for RFC 7946 GeoJSON export.\n\n---\n\n**\u26a0 Limitations & Uncertainty**\n  \u2022 Requested target class 'land' is abstract or unsupported by the active weights. System safely declined to hallucinate bounding boxes.\n  \u2022 Query requested spatial object localization, but no deterministic detections breached the confidence threshold. The scene may lack the specified structural signatures, or atmospheric interference compromised the feature extraction layer.\n  \u2022 Requested target 'land' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_2726274_CHARS>",
+          "description": "AI Feature Salience & Focus Heatmap"
+        }
+      ],
+      "confidence": 0.72,
+      "compatibility_status": "NOT_APPLICABLE",
+      "spatial_coherence_score": 1.0,
+      "execution_summary": {
+        "selected_task": "SINGLE_IMAGE_CAPTIONING",
+        "input_scope": "Single Image",
+        "num_images_processed": 1,
+        "agent_reasoning": "Query intent: MULTI_TASK_QUERY (confidence 88%). Targets: ['land']. Methods: ['scene_description', 'object_detection', 'land_cover_segmentation'].",
+        "compatibility_status": "PASSED",
+        "spatial_coherence_score": 1.0,
+        "model_provenance": "SatQuery CV Engine (OpenCV + ML Segmentation)"
+      },
+      "execution_trace": {
+        "trace_id": "fddf96de-0ee5-490e-9961-7e0d94fec6a3",
+        "timestamp": "2026-10-14T19:55:37.973229",
+        "query": "Describe the land-cover and major objects visible in this image.",
+        "selected_task": "SINGLE_IMAGE_CAPTIONING",
+        "task_confidence": 0.72,
+        "input_checks": {
+          "num_images": 1,
+          "detected_modalities": [
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 48.93,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Raster metadata & georeferencing inspection completed."
+          },
+          {
+            "tool_id": "single_image_captioning",
+            "task_name": "SINGLE_IMAGE_CAPTIONING",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 4318.94,
+            "parameters_used": {},
+            "summary": "Executed analysis pipeline using SatQuery CV Engine (OpenCV + ML Segmentation)."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.51,
+          "stage2_input_verification": 48.93,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 4318.94
+        },
+        "total_latency_ms": 4368.65,
+        "outputs_summary": {
+          "text_answer_length": 1909,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 0,
+          "measurements_count": 0,
+          "detections_count": 0
+        },
+        "confidence": 0.72,
+        "confidence_derivation": "Dynamically derived from model softmax probabilities, land-cover pixel coverage, and spatial validation agreement.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": null,
+      "pair_comparison": null,
+      "query_understanding": {
+        "intent": "MULTI_TASK_QUERY",
+        "sub_intents": [
+          "MULTI_TASK_QUERY",
+          "SCENE_UNDERSTANDING",
+          "LAND_COVER_CLASSIFICATION",
+          "OBJECT_LOCALIZATION"
+        ],
+        "targets": [
+          "land"
+        ],
+        "operation": "describe",
+        "spatial_constraint": null,
+        "requires_count": false,
+        "requires_area": false,
+        "confidence": 0.88
+      },
+      "interpreted_task": "Multi-Task Analysis",
+      "detections": [],
+      "detection_count": 0,
+      "measurements": [],
+      "limitations": [
+        "Requested target class 'land' is abstract or unsupported by the active weights. System safely declined to hallucinate bounding boxes."
+      ],
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "warnings": [
+          "Query requested spatial object localization, but no deterministic detections breached the confidence threshold. The scene may lack the specified structural signatures, or atmospheric interference compromised the feature extraction layer.",
+          "Requested target 'land' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration."
+        ]
+      },
+      "id": "a1868e11-2fc0-4a1d-b6d7-a8885fd86081"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.72
+  },
+  "e": {
+    "probe": "e",
+    "query": "How many buildings are in this image?",
+    "images": [
+      "bengaluru_cartosat3.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 2815.29,
+    "response_json": {
+      "status": "success",
+      "answer": "**DETECTION COUNT: Building**\n\n  Total detected: **0**\n\n\n\n---\n\n**\u26a0 Limitations & Uncertainty**\n  \u2022 Query requested spatial object localization, but no deterministic detections breached the confidence threshold. The scene may lack the specified structural signatures, or atmospheric interference compromised the feature extraction layer.\n  \u2022 Requested target 'building' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration.\n  \u2022 Count query detected but no count metric was produced.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_3364842_CHARS>",
+          "description": "AI Feature Salience & Focus Heatmap"
+        }
+      ],
+      "confidence": 0.71,
+      "compatibility_status": "NOT_APPLICABLE",
+      "spatial_coherence_score": 1.0,
+      "execution_summary": {
+        "selected_task": "SINGLE_IMAGE_VQA",
+        "input_scope": "Single Image",
+        "num_images_processed": 1,
+        "agent_reasoning": "Query intent: OBJECT_COUNTING (confidence 95%). Targets: ['building']. Methods: ['object_detection', 'count_objects'].",
+        "compatibility_status": "PASSED",
+        "spatial_coherence_score": 1.0,
+        "model_provenance": "SatQuery CV Engine (OpenCV + ML Segmentation)"
+      },
+      "execution_trace": {
+        "trace_id": "9ee387c0-4d02-4525-bf97-2e667af5e3aa",
+        "timestamp": "2026-10-14T19:55:40.876526",
+        "query": "How many buildings are in this image?",
+        "selected_task": "SINGLE_IMAGE_VQA",
+        "task_confidence": 0.71,
+        "input_checks": {
+          "num_images": 1,
+          "detected_modalities": [
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 47.01,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Raster metadata & georeferencing inspection completed."
+          },
+          {
+            "tool_id": "single_image_vqa",
+            "task_name": "SINGLE_IMAGE_VQA",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 362.48,
+            "parameters_used": {},
+            "summary": "Executed analysis pipeline using SatQuery CV Engine (OpenCV + ML Segmentation)."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.41,
+          "stage2_input_verification": 47.01,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 362.48
+        },
+        "total_latency_ms": 410.05,
+        "outputs_summary": {
+          "text_answer_length": 642,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 0,
+          "measurements_count": 0,
+          "detections_count": 0
+        },
+        "confidence": 0.71,
+        "confidence_derivation": "Dynamically derived from model softmax probabilities, land-cover pixel coverage, and spatial validation agreement.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": null,
+      "pair_comparison": null,
+      "query_understanding": {
+        "intent": "OBJECT_COUNTING",
+        "sub_intents": [],
+        "targets": [
+          "building"
+        ],
+        "operation": "count",
+        "spatial_constraint": null,
+        "requires_count": true,
+        "requires_area": false,
+        "confidence": 0.95
+      },
+      "interpreted_task": "Object Counting",
+      "detections": [],
+      "detection_count": 0,
+      "measurements": [],
+      "limitations": [],
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "warnings": [
+          "Query requested spatial object localization, but no deterministic detections breached the confidence threshold. The scene may lack the specified structural signatures, or atmospheric interference compromised the feature extraction layer.",
+          "Requested target 'building' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration.",
+          "Count query detected but no count metric was produced."
+        ]
+      },
+      "id": "06c9af70-81c2-4b15-a2f2-43cf2a40eb6a"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.71
+  },
+  "f": {
+    "probe": "f",
+    "query": "What changed between these two dates, and where did the change occur?",
+    "images": [
+      "uttarakhand_pre_event_t1.png",
+      "uttarakhand_post_event_t2.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 5866.55,
+    "response_json": {
+      "status": "success",
+      "answer": "\ud83e\udd16 **VLM Change Analysis (SatQuery-RS-VLM-v1.0 (Adapted on BigEarthNet.txt, RSVQA, VRSBench)):** **water source**\n\n\ud83d\udd0d **Bi-Temporal Change Detection & Spatial Localization Assessment**\n\n### 1. Direct Answer: WHAT Changed Between the Two Dates\n\u2022 **Overall Change Extent:** Approximately **99.8%** (104.65 km\u00b2 / 10,465 hectares) of the scene experienced measurable surface transformation.\n\u2022 **Key Feature Shifts:**\n  \u2022 **Built-up Development:** Expanded by +20.6% (+21.64 km\u00b2)\n  \u2022 **Vegetation Cover:** Decreased by -14.3% (-14.95 km\u00b2)\n  \u2022 **Water Bodies:** Expanded by +4.4% (+4.64 km\u00b2)\n\n---\n\n### 2. Direct Answer: WHERE the Changes Occurred\n\u2022 **Change Cluster #1 (Central Core):** Urban Expansion / Structural Development \u2014 Spans **104.65 km\u00b2** (10,465 ha) | Position: `x:[0.00\u20131.00], y:[0.00\u20131.00]`\n\n---\n\n### \ud83d\udcca Quantitative Bi-Temporal Surface Transition Matrix\n\n| Surface Feature / Land Class | T1: Baseline Epoch | T2: Post-Event Epoch | Net Surface Shift (\u0394) | Estimated Area Shift (km\u00b2) | Transition Trajectory |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| \ud83c\udfd8\ufe0f **Urban Built-up & Infrastructure** | **46.5%** (48.79 km\u00b2) | **67.2%** (70.43 km\u00b2) | **+20.6%** | **+21.64 km\u00b2** (+2,164 ha) | \ud83d\udd3a Expansion |\n| \ud83c\udf33 **Vegetation & Tree Canopy** | **35.9%** (37.67 km\u00b2) | **21.7%** (22.72 km\u00b2) | **-14.3%** | **-14.95 km\u00b2** | \ud83d\udd3b Clearing |\n| \ud83d\udca7 **Water Bodies & Drainage** | **5.0%** (5.21 km\u00b2) | **9.4%** (9.85 km\u00b2) | **+4.4%** | **+4.64 km\u00b2** | \ud83d\udd3a Inundation |\n| \ud83e\udea8 **Bare Ground & Open Soil** | **0.0%** (0.01 km\u00b2) | **0.0%** (0.01 km\u00b2) | **+0.0%** | **+0.01 km\u00b2** | \u2696\ufe0f Stable |\n| \ud83d\udd0d **TOTAL DETECTED CHANGE EXTENT** | **Baseline (0.0%)** | **Active (99.8%)** | **99.8%** | **104.65 km\u00b2** (10,465 ha) | **SSIM Structural Deviation** |\n\n---\n\n### 3. Visual Evidence & Trace Verification\n\u2022 In the visual evidence canvas on the right, all change zones are demarcated with **red tactical bounding boxes** and sector IDs.\n\u2022 Use the **interactive before/after swipe slider** in the Trace panel to compare baseline and post-event satellite imagery side by side.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_2682182_CHARS>",
+          "description": "Bi-Temporal Change Map (99.8% Changed Area Demarcated in Red Bounding Boxes)"
+        }
+      ],
+      "confidence": 0.5605,
+      "compatibility_status": "PASSED",
+      "spatial_coherence_score": 0.59,
+      "execution_summary": {
+        "selected_task": "CHANGE_ANALYSIS",
+        "tool_used": "BiTemporalChangeAnalysis",
+        "input_scope": "Multi-image (2 images)",
+        "num_images_processed": 2,
+        "agent_reasoning": "Multi-image query (2 images). Routed to CHANGE_ANALYSIS."
+      },
+      "execution_trace": {
+        "trace_id": "2279bd19-9271-48eb-875b-0d8fa7422c17",
+        "timestamp": "2026-10-14T19:55:46.276218",
+        "query": "What changed between these two dates, and where did the change occur?",
+        "selected_task": "CHANGE_ANALYSIS",
+        "task_confidence": 0.5605,
+        "input_checks": {
+          "num_images": 2,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 713.05,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Spatial verification: PASSED (coherence: 0.59)"
+          },
+          {
+            "tool_id": "bi_temporal_change",
+            "task_name": "CHANGE_ANALYSIS",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 2139.16,
+            "parameters_used": {},
+            "summary": "Executed BiTemporalChangeAnalysis generating answers, masks, and polygons."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.32,
+          "stage2_input_verification": 62.8,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 2852.22
+        },
+        "total_latency_ms": 2915.52,
+        "outputs_summary": {
+          "answer_length": 2045,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 1
+        },
+        "confidence": 0.5605,
+        "confidence_derivation": "Dynamically derived from spatial coherence score and model segmentation logit overlap.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": {
+        "type": "FeatureCollection",
+        "metadata": {
+          "mission": "SatQuery AI Bi-Temporal Change Detection & Spatial Localization",
+          "coherence_score": 0.59,
+          "change_percentage": 99.8,
+          "total_change_km2": 104.65,
+          "crs": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "id": "change_polygon_1",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    79.71,
+                    30.43
+                  ],
+                  [
+                    79.75,
+                    30.43
+                  ],
+                  [
+                    79.75,
+                    30.39
+                  ],
+                  [
+                    79.71,
+                    30.39
+                  ],
+                  [
+                    79.71,
+                    30.43
+                  ]
+                ]
+              ]
+            },
+            "properties": {
+              "change_id": 1,
+              "quadrant": "Central Core",
+              "change_type": "Urban Expansion / Structural Development",
+              "area_km2": 104.65,
+              "area_ha": 10465.0,
+              "pixel_bbox": [
+                0,
+                0,
+                1024,
+                1024
+              ]
+            }
+          }
+        ]
+      },
+      "pair_comparison": {
+        "type": "BI_TEMPORAL",
+        "before_image": "<BASE64_IMAGE_STRIPPED_2673862_CHARS>",
+        "after_image": "<BASE64_IMAGE_STRIPPED_2682182_CHARS>",
+        "before_label": "T1: BASELINE OBSERVATION",
+        "after_label": "T2: POST-EVENT / DETECTED CHANGES"
+      },
+      "query_understanding": {
+        "intent": "CHANGE_DETECTION",
+        "targets": [],
+        "confidence": 0.65
+      },
+      "id": "7f1d4c09-600c-4161-908f-d639dd231d85"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.5605
+  },
+  "g": {
+    "probe": "g",
+    "query": "Has the built-up area increased, decreased, or remained unchanged?",
+    "images": [
+      "uttarakhand_pre_event_t1.png",
+      "uttarakhand_pre_event_t1.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 860.98,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Identical Images Provided**\n\nIdentical images provided; cannot detect change. Bi-temporal change analysis requires two distinct observations captured at different temporal epochs (T1 baseline vs T2 post-event).",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_IDENTICAL_IMAGES",
+      "spatial_coherence_score": 1.0,
+      "execution_summary": {
+        "selected_task": "CHANGE_ANALYSIS",
+        "tool_used": "BiTemporalChangeAnalysis",
+        "input_scope": "Multi-image (2 images)",
+        "num_images_processed": 2,
+        "agent_reasoning": "Multi-image query (2 images). Routed to CHANGE_ANALYSIS."
+      },
+      "execution_trace": {
+        "trace_id": "5f71a353-4f86-4739-a4cd-54de1ed0a5f1",
+        "timestamp": "2026-10-14T19:55:49.715645",
+        "query": "Has the built-up area increased, decreased, or remained unchanged?",
+        "selected_task": "CHANGE_ANALYSIS",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 2,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 1.35,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Spatial verification: REJECTED_IDENTICAL_IMAGES (coherence: 1.0)"
+          },
+          {
+            "tool_id": "bi_temporal_change",
+            "task_name": "CHANGE_ANALYSIS",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 4.04,
+            "parameters_used": {},
+            "summary": "Executed BiTemporalChangeAnalysis generating answers, masks, and polygons."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.38,
+          "stage2_input_verification": 74.25,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 5.39
+        },
+        "total_latency_ms": 80.16,
+        "outputs_summary": {
+          "answer_length": 215,
+          "visual_evidence_count": 0,
+          "geojson_features_count": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Dynamically derived from spatial coherence score and model segmentation logit overlap.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": null,
+      "pair_comparison": null,
+      "query_understanding": {
+        "intent": "CHANGE_DETECTION",
+        "targets": [
+          "urban_area"
+        ],
+        "confidence": 0.9
+      }
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  },
+  "h": {
+    "probe": "h",
+    "query": "What changed between these two dates?",
+    "images": [
+      "bengaluru_cartosat3.png",
+      "sambhar_lake_liss4.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 2458.93,
+    "response_json": {
+      "status": "success",
+      "answer": "\u26a0\ufe0f **Spatial Incompatibility: Images Show Different Geographic Locations**\n\nThe two uploaded images failed co-registration verification (Spatial coherence match score: **5%**).\n\n\u2022 **Co-registration Requirement:** Bi-temporal change detection requires two images capturing the exact same spatial bounding box.\n\u2022 **Action Required:** Please upload paired observations covering the same geospatial target at different acquisition epochs.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_752174_CHARS>",
+          "description": "Location Comparison (Mismatch)"
+        }
+      ],
+      "confidence": 0.05,
+      "compatibility_status": "FAILED",
+      "spatial_coherence_score": 0.05,
+      "execution_summary": {
+        "selected_task": "CHANGE_ANALYSIS",
+        "tool_used": "BiTemporalChangeAnalysis",
+        "input_scope": "Multi-image (2 images)",
+        "num_images_processed": 2,
+        "agent_reasoning": "Multi-image query (2 images). Routed to CHANGE_ANALYSIS."
+      },
+      "execution_trace": {
+        "trace_id": "57668e25-8875-4218-9cd8-71ba63b2b8b8",
+        "timestamp": "2026-10-14T19:55:50.405812",
+        "query": "What changed between these two dates?",
+        "selected_task": "CHANGE_ANALYSIS",
+        "task_confidence": 0.05,
+        "input_checks": {
+          "num_images": 2,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 94.66,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Spatial verification: FAILED (coherence: 0.05)"
+          },
+          {
+            "tool_id": "bi_temporal_change",
+            "task_name": "CHANGE_ANALYSIS",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 283.99,
+            "parameters_used": {},
+            "summary": "Executed BiTemporalChangeAnalysis generating answers, masks, and polygons."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.24,
+          "stage2_input_verification": 59.5,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 378.65
+        },
+        "total_latency_ms": 438.5,
+        "outputs_summary": {
+          "answer_length": 434,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 0
+        },
+        "confidence": 0.05,
+        "confidence_derivation": "Dynamically derived from spatial coherence score and model segmentation logit overlap.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": null,
+      "pair_comparison": null,
+      "query_understanding": {
+        "intent": "CHANGE_DETECTION",
+        "targets": [],
+        "confidence": 0.65
+      },
+      "id": "cd2adc88-74a5-4ce0-9ba1-622e182f9165"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.05
+  },
+  "i": {
+    "probe": "i",
+    "query": "Use the optical and SAR images together to identify built-up and water-covered regions.",
+    "images": [
+      "mumbai_cartosat2s_optical.png",
+      "risat1_cband_radar_sar.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 366.64,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Request Validation Error (MODALITY_MISMATCH)**\n\nCross-modal analysis requires complementary Optical and SAR microwave imagery.\n\n\u2022 **Reason:** Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs.\n\u2022 **Action Required:** Upload one Optical multispectral image and one Synthetic Aperture Radar (SAR) tile (e.g. RISAT-1 or Sentinel-1).",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_MODALITY_MISMATCH",
+      "spatial_coherence_score": 0.0,
+      "execution_summary": {
+        "selected_task": "CROSS_MODAL_EXTRACTION",
+        "tool_used": "optical_sar_fusion",
+        "input_scope": "2 image(s)",
+        "num_images_processed": 2,
+        "agent_reasoning": "Validation failed at Stage 2/3: Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs."
+      },
+      "execution_trace": {
+        "trace_id": "9937ba7e-8515-4008-9d1c-60bf62329c58",
+        "timestamp": "2026-10-14T19:55:52.545004",
+        "query": "Use the optical and SAR images together to identify built-up and water-covered regions.",
+        "selected_task": "CROSS_MODAL_EXTRACTION",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 2,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "optical_sar_fusion",
+            "task_name": "CROSS_MODAL_EXTRACTION",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 59.93,
+            "parameters_used": {},
+            "summary": "Cross-modal analysis requires complementary Optical and SAR microwave imagery."
+          }
+        ],
+        "per_step_latency_ms": {
+          "input_validation": 59.93
+        },
+        "total_latency_ms": 59.93,
+        "outputs_summary": {
+          "status": "rejected",
+          "error_code": "MODALITY_MISMATCH",
+          "visual_evidence_count": 0,
+          "geojson_features": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Calibrated rejection uncertainty: 0.04 derived from guardrail constraint MODALITY_MISMATCH.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": {
+          "status": "error",
+          "error_code": "MODALITY_MISMATCH",
+          "error_type": "CrossModalMismatchError",
+          "message": "Cross-modal analysis requires complementary Optical and SAR microwave imagery.",
+          "reason": "Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs.",
+          "suggested_fix": "Upload one Optical multispectral image and one Synthetic Aperture Radar (SAR) tile (e.g. RISAT-1 or Sentinel-1).",
+          "invalid_parameter": null,
+          "details": {
+            "detected_modalities": [
+              "OPTICAL",
+              "OPTICAL"
+            ]
+          }
+        }
+      },
+      "structured_error": {
+        "status": "error",
+        "error_code": "MODALITY_MISMATCH",
+        "error_type": "CrossModalMismatchError",
+        "message": "Cross-modal analysis requires complementary Optical and SAR microwave imagery.",
+        "reason": "Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs.",
+        "suggested_fix": "Upload one Optical multispectral image and one Synthetic Aperture Radar (SAR) tile (e.g. RISAT-1 or Sentinel-1).",
+        "invalid_parameter": null,
+        "details": {
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ]
+        }
+      },
+      "geo_metadata": null,
+      "geojson_data": null
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  },
+  "j": {
+    "probe": "j",
+    "query": "Use the optical and SAR images together to identify built-up and water-covered regions.",
+    "images": [
+      "bengaluru_cartosat3.png",
+      "risat1_cband_radar_sar.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 268.65,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Request Validation Error (MODALITY_MISMATCH)**\n\nCross-modal analysis requires complementary Optical and SAR microwave imagery.\n\n\u2022 **Reason:** Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs.\n\u2022 **Action Required:** Upload one Optical multispectral image and one Synthetic Aperture Radar (SAR) tile (e.g. RISAT-1 or Sentinel-1).",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_MODALITY_MISMATCH",
+      "spatial_coherence_score": 0.0,
+      "execution_summary": {
+        "selected_task": "CROSS_MODAL_EXTRACTION",
+        "tool_used": "optical_sar_fusion",
+        "input_scope": "2 image(s)",
+        "num_images_processed": 2,
+        "agent_reasoning": "Validation failed at Stage 2/3: Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs."
+      },
+      "execution_trace": {
+        "trace_id": "e51f71b0-0a87-4202-975e-65f035cfbfe8",
+        "timestamp": "2026-10-14T19:55:52.814836",
+        "query": "Use the optical and SAR images together to identify built-up and water-covered regions.",
+        "selected_task": "CROSS_MODAL_EXTRACTION",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 2,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "optical_sar_fusion",
+            "task_name": "CROSS_MODAL_EXTRACTION",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 67.61,
+            "parameters_used": {},
+            "summary": "Cross-modal analysis requires complementary Optical and SAR microwave imagery."
+          }
+        ],
+        "per_step_latency_ms": {
+          "input_validation": 67.61
+        },
+        "total_latency_ms": 67.61,
+        "outputs_summary": {
+          "status": "rejected",
+          "error_code": "MODALITY_MISMATCH",
+          "visual_evidence_count": 0,
+          "geojson_features": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Calibrated rejection uncertainty: 0.04 derived from guardrail constraint MODALITY_MISMATCH.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": {
+          "status": "error",
+          "error_code": "MODALITY_MISMATCH",
+          "error_type": "CrossModalMismatchError",
+          "message": "Cross-modal analysis requires complementary Optical and SAR microwave imagery.",
+          "reason": "Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs.",
+          "suggested_fix": "Upload one Optical multispectral image and one Synthetic Aperture Radar (SAR) tile (e.g. RISAT-1 or Sentinel-1).",
+          "invalid_parameter": null,
+          "details": {
+            "detected_modalities": [
+              "OPTICAL",
+              "OPTICAL"
+            ]
+          }
+        }
+      },
+      "structured_error": {
+        "status": "error",
+        "error_code": "MODALITY_MISMATCH",
+        "error_type": "CrossModalMismatchError",
+        "message": "Cross-modal analysis requires complementary Optical and SAR microwave imagery.",
+        "reason": "Detected modalities ['OPTICAL', 'OPTICAL'] do not contain both Optical and SAR inputs.",
+        "suggested_fix": "Upload one Optical multispectral image and one Synthetic Aperture Radar (SAR) tile (e.g. RISAT-1 or Sentinel-1).",
+        "invalid_parameter": null,
+        "details": {
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ]
+        }
+      },
+      "geo_metadata": null,
+      "geojson_data": null
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  },
+  "k": {
+    "probe": "k",
+    "query": "What changed between these two dates?",
+    "images": [
+      "bengaluru_cartosat3.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 276.55,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Request Validation Error (INVALID_INPUT_COUNT)**\n\nBi-temporal change detection requires exactly 2 images (T1 pre-event and T2 post-event), but only 1 image was supplied.\n\n\u2022 **Reason:** Change detection computes pixel-level and semantic surface transitions between two distinct temporal observations.\n\u2022 **Action Required:** Please upload two co-registered satellite images: a baseline (T1) and a subsequent observation (T2).",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_INVALID_INPUT_COUNT",
+      "spatial_coherence_score": 0.0,
+      "execution_summary": {
+        "selected_task": "CHANGE_ANALYSIS",
+        "tool_used": "bi_temporal_change",
+        "input_scope": "1 image(s)",
+        "num_images_processed": 1,
+        "agent_reasoning": "Validation failed at Stage 2/3: Change detection computes pixel-level and semantic surface transitions between two distinct temporal observations."
+      },
+      "execution_trace": {
+        "trace_id": "aa541d17-978e-48a3-83ad-ce08f59d9f89",
+        "timestamp": "2026-10-14T19:55:53.092044",
+        "query": "What changed between these two dates?",
+        "selected_task": "CHANGE_ANALYSIS",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 1,
+          "detected_modalities": [
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "bi_temporal_change",
+            "task_name": "CHANGE_ANALYSIS",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 46.2,
+            "parameters_used": {},
+            "summary": "Bi-temporal change detection requires exactly 2 images (T1 pre-event and T2 post-event), but only 1 image was supplied."
+          }
+        ],
+        "per_step_latency_ms": {
+          "input_validation": 46.2
+        },
+        "total_latency_ms": 46.2,
+        "outputs_summary": {
+          "status": "rejected",
+          "error_code": "INVALID_INPUT_COUNT",
+          "visual_evidence_count": 0,
+          "geojson_features": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Calibrated rejection uncertainty: 0.04 derived from guardrail constraint INVALID_INPUT_COUNT.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": {
+          "status": "error",
+          "error_code": "INVALID_INPUT_COUNT",
+          "error_type": "InputCountError",
+          "message": "Bi-temporal change detection requires exactly 2 images (T1 pre-event and T2 post-event), but only 1 image was supplied.",
+          "reason": "Change detection computes pixel-level and semantic surface transitions between two distinct temporal observations.",
+          "suggested_fix": "Please upload two co-registered satellite images: a baseline (T1) and a subsequent observation (T2).",
+          "invalid_parameter": null,
+          "details": {
+            "received_images": 1,
+            "required_images": 2
+          }
+        }
+      },
+      "structured_error": {
+        "status": "error",
+        "error_code": "INVALID_INPUT_COUNT",
+        "error_type": "InputCountError",
+        "message": "Bi-temporal change detection requires exactly 2 images (T1 pre-event and T2 post-event), but only 1 image was supplied.",
+        "reason": "Change detection computes pixel-level and semantic surface transitions between two distinct temporal observations.",
+        "suggested_fix": "Please upload two co-registered satellite images: a baseline (T1) and a subsequent observation (T2).",
+        "invalid_parameter": null,
+        "details": {
+          "received_images": 1,
+          "required_images": 2
+        }
+      },
+      "geo_metadata": null,
+      "geojson_data": null
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  },
+  "l": {
+    "probe": "l",
+    "query": "Is there a water body visible?",
+    "images": [
+      "uttarakhand_pre_event_t1.png",
+      "uttarakhand_post_event_t2.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 5245.08,
+    "response_json": {
+      "status": "success",
+      "answer": "\ud83e\udd16 **VLM Change Analysis (SatQuery-RS-VLM-v1.0 (Adapted on BigEarthNet.txt, RSVQA, VRSBench)):** **yes**\n\n\ud83d\udd0d **Bi-Temporal Change Detection & Spatial Localization Assessment**\n\n### 1. Direct Answer: WHAT Changed Between the Two Dates\n\u2022 **Overall Change Extent:** Approximately **99.8%** (104.65 km\u00b2 / 10,465 hectares) of the scene experienced measurable surface transformation.\n\u2022 **Key Feature Shifts:**\n  \u2022 **Built-up Development:** Expanded by +20.6% (+21.64 km\u00b2)\n  \u2022 **Vegetation Cover:** Decreased by -14.3% (-14.95 km\u00b2)\n  \u2022 **Water Bodies:** Expanded by +4.4% (+4.64 km\u00b2)\n\n---\n\n### 2. Direct Answer: WHERE the Changes Occurred\n\u2022 **Change Cluster #1 (Central Core):** Urban Expansion / Structural Development \u2014 Spans **104.65 km\u00b2** (10,465 ha) | Position: `x:[0.00\u20131.00], y:[0.00\u20131.00]`\n\n---\n\n### \ud83d\udcca Quantitative Bi-Temporal Surface Transition Matrix\n\n| Surface Feature / Land Class | T1: Baseline Epoch | T2: Post-Event Epoch | Net Surface Shift (\u0394) | Estimated Area Shift (km\u00b2) | Transition Trajectory |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| \ud83c\udfd8\ufe0f **Urban Built-up & Infrastructure** | **46.5%** (48.79 km\u00b2) | **67.2%** (70.43 km\u00b2) | **+20.6%** | **+21.64 km\u00b2** (+2,164 ha) | \ud83d\udd3a Expansion |\n| \ud83c\udf33 **Vegetation & Tree Canopy** | **35.9%** (37.67 km\u00b2) | **21.7%** (22.72 km\u00b2) | **-14.3%** | **-14.95 km\u00b2** | \ud83d\udd3b Clearing |\n| \ud83d\udca7 **Water Bodies & Drainage** | **5.0%** (5.21 km\u00b2) | **9.4%** (9.85 km\u00b2) | **+4.4%** | **+4.64 km\u00b2** | \ud83d\udd3a Inundation |\n| \ud83e\udea8 **Bare Ground & Open Soil** | **0.0%** (0.01 km\u00b2) | **0.0%** (0.01 km\u00b2) | **+0.0%** | **+0.01 km\u00b2** | \u2696\ufe0f Stable |\n| \ud83d\udd0d **TOTAL DETECTED CHANGE EXTENT** | **Baseline (0.0%)** | **Active (99.8%)** | **99.8%** | **104.65 km\u00b2** (10,465 ha) | **SSIM Structural Deviation** |\n\n---\n\n### 3. Visual Evidence & Trace Verification\n\u2022 In the visual evidence canvas on the right, all change zones are demarcated with **red tactical bounding boxes** and sector IDs.\n\u2022 Use the **interactive before/after swipe slider** in the Trace panel to compare baseline and post-event satellite imagery side by side.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_2682182_CHARS>",
+          "description": "Bi-Temporal Change Map (99.8% Changed Area Demarcated in Red Bounding Boxes)"
+        }
+      ],
+      "confidence": 0.5605,
+      "compatibility_status": "PASSED",
+      "spatial_coherence_score": 0.59,
+      "execution_summary": {
+        "selected_task": "CHANGE_ANALYSIS",
+        "tool_used": "BiTemporalChangeAnalysis",
+        "input_scope": "Multi-image (2 images)",
+        "num_images_processed": 2,
+        "agent_reasoning": "Multi-image query (2 images). Routed to CHANGE_ANALYSIS."
+      },
+      "execution_trace": {
+        "trace_id": "2fe917de-4b23-4dc0-9ff7-bfc354a4ec07",
+        "timestamp": "2026-10-14T19:55:55.861672",
+        "query": "Is there a water body visible?",
+        "selected_task": "CHANGE_ANALYSIS",
+        "task_confidence": 0.5605,
+        "input_checks": {
+          "num_images": 2,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 578.36,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Spatial verification: PASSED (coherence: 0.59)"
+          },
+          {
+            "tool_id": "bi_temporal_change",
+            "task_name": "CHANGE_ANALYSIS",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 1735.08,
+            "parameters_used": {},
+            "summary": "Executed BiTemporalChangeAnalysis generating answers, masks, and polygons."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.32,
+          "stage2_input_verification": 73.45,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 2313.44
+        },
+        "total_latency_ms": 2387.35,
+        "outputs_summary": {
+          "answer_length": 2036,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 1
+        },
+        "confidence": 0.5605,
+        "confidence_derivation": "Dynamically derived from spatial coherence score and model segmentation logit overlap.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": {
+        "type": "FeatureCollection",
+        "metadata": {
+          "mission": "SatQuery AI Bi-Temporal Change Detection & Spatial Localization",
+          "coherence_score": 0.59,
+          "change_percentage": 99.8,
+          "total_change_km2": 104.65,
+          "crs": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "id": "change_polygon_1",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    79.71,
+                    30.43
+                  ],
+                  [
+                    79.75,
+                    30.43
+                  ],
+                  [
+                    79.75,
+                    30.39
+                  ],
+                  [
+                    79.71,
+                    30.39
+                  ],
+                  [
+                    79.71,
+                    30.43
+                  ]
+                ]
+              ]
+            },
+            "properties": {
+              "change_id": 1,
+              "quadrant": "Central Core",
+              "change_type": "Urban Expansion / Structural Development",
+              "area_km2": 104.65,
+              "area_ha": 10465.0,
+              "pixel_bbox": [
+                0,
+                0,
+                1024,
+                1024
+              ]
+            }
+          }
+        ]
+      },
+      "pair_comparison": {
+        "type": "BI_TEMPORAL",
+        "before_image": "<BASE64_IMAGE_STRIPPED_2673862_CHARS>",
+        "after_image": "<BASE64_IMAGE_STRIPPED_2682182_CHARS>",
+        "before_label": "T1: BASELINE OBSERVATION",
+        "after_label": "T2: POST-EVENT / DETECTED CHANGES"
+      },
+      "query_understanding": {
+        "intent": "COMPARISON",
+        "targets": [
+          "water_body"
+        ],
+        "confidence": 0.6
+      },
+      "id": "319e5146-44c6-4296-b8f0-08bfa3cf630e"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.5605
+  },
+  "m1_geotiff": {
+    "probe": "m1_geotiff",
+    "query": "Is there a water body visible in this scene?",
+    "images": [
+      "2k_earth_normal_map.tif"
+    ],
+    "http_status": 200,
+    "response_time_ms": 2754.68,
+    "response_json": {
+      "status": "success",
+      "answer": "\ud83d\udca7 **Water Body Delineation & Spatial Highlighting**\n\n### 1. Direct Grounding & Localization\n\u2022 **Visual Highlighting:** The water body has been delineated and **highlighted in luminous cyan-blue** with golden boundary vectors in the visual evidence canvas on the right.\n\u2022 **Surface Coverage:** Water bodies encompass approximately **~100.0%** (52.43 km\u00b2 / 5,243 hectares) of the observed scene.\n\n\n---\n\n### 2. Surface Distribution Balance\n  \u2022 **Water Bodies**: **100.0%** (52.43 km\u00b2) / 5,243 ha\n\n\n---\n\n### 3. Tactical GIS Interoperability\n\u2022 Vectorized boundary contours are ready for direct projection and export to **RFC 7946 WGS84 GeoJSON** (compatible with QGIS, ArcGIS, and ISRO Bhuvan).\n\n---\n\n**\u26a0 Limitations & Uncertainty**\n  \u2022 Requested target 'water_body' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration.",
+      "visual_evidence": [
+        {
+          "image_base64": "<BASE64_IMAGE_STRIPPED_126598_CHARS>",
+          "description": "Delineated Water Bodies (~100.0%) & Terrestrial Landmass (~0.0%)"
+        }
+      ],
+      "confidence": 0.82,
+      "compatibility_status": "NOT_APPLICABLE",
+      "spatial_coherence_score": 1.0,
+      "execution_summary": {
+        "selected_task": "SINGLE_IMAGE_VQA",
+        "input_scope": "Single Image",
+        "num_images_processed": 1,
+        "agent_reasoning": "Query intent: WATER_BODY_ANALYSIS (confidence 90%). Targets: ['water_body']. Methods: ['land_cover_segmentation'].",
+        "compatibility_status": "PASSED",
+        "spatial_coherence_score": 1.0,
+        "model_provenance": "SatQuery CV Engine (OpenCV + ML Segmentation)"
+      },
+      "execution_trace": {
+        "trace_id": "3b219cc7-457d-4a82-8b86-adf4fbf11852",
+        "timestamp": "2026-10-14T19:55:59.107251",
+        "query": "Is there a water body visible in this scene?",
+        "selected_task": "SINGLE_IMAGE_VQA",
+        "task_confidence": 0.82,
+        "input_checks": {
+          "num_images": 1,
+          "detected_modalities": [
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "GEOTIFF"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "spatial_compatibility_verifier",
+            "task_name": "COMPATIBILITY_CHECK",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 269.33,
+            "parameters_used": {
+              "mode": "auto"
+            },
+            "summary": "Raster metadata & georeferencing inspection completed."
+          },
+          {
+            "tool_id": "single_image_vqa",
+            "task_name": "SINGLE_IMAGE_VQA",
+            "version": "1.0.0",
+            "status": "SUCCESS",
+            "latency_ms": 218.25,
+            "parameters_used": {},
+            "summary": "Executed analysis pipeline using SatQuery CV Engine (OpenCV + ML Segmentation)."
+          }
+        ],
+        "per_step_latency_ms": {
+          "stage1_classification": 0.22,
+          "stage2_input_verification": 269.33,
+          "stage3_parameter_validation": 0.0,
+          "stage4_tool_execution": 218.25
+        },
+        "total_latency_ms": 487.88,
+        "outputs_summary": {
+          "text_answer_length": 976,
+          "visual_evidence_count": 1,
+          "geojson_features_count": 0,
+          "measurements_count": 0,
+          "detections_count": 0
+        },
+        "confidence": 0.82,
+        "confidence_derivation": "Dynamically derived from model softmax probabilities, land-cover pixel coverage, and spatial validation agreement.",
+        "valid_sequence": true,
+        "is_invalid_call": false,
+        "structured_error": null
+      },
+      "geo_metadata": null,
+      "geojson_data": null,
+      "pair_comparison": null,
+      "query_understanding": {
+        "intent": "WATER_BODY_ANALYSIS",
+        "sub_intents": [],
+        "targets": [
+          "water_body"
+        ],
+        "operation": "describe",
+        "spatial_constraint": null,
+        "requires_count": false,
+        "requires_area": false,
+        "confidence": 0.9
+      },
+      "interpreted_task": "Water Body Detection",
+      "detections": [],
+      "detection_count": 0,
+      "measurements": [],
+      "limitations": [],
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "warnings": [
+          "Requested target 'water_body' yielded null spatial distribution. The entity is either absent from the geographic bounding box, falls below the optical resolution limit, or lacks a dedicated neural extraction weight in the current configuration."
+        ]
+      },
+      "id": "f7e2cd41-419a-4fbc-b8b0-e42c2fc5785c"
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.82
+  },
+  "m2_corrupt": {
+    "probe": "m2_corrupt",
+    "query": "Is there a water body visible in this image?",
+    "images": [
+      "corrupt_image.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 694.0,
+    "response_json": {
+      "status": "error",
+      "message": "Unsupported or corrupted image format. Please ensure the file is a valid satellite or visual image (GeoTIFF, TIFF, JP2, PNG, JPEG, WebP, AVIF, BMP)."
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": null
+  },
+  "m3_three_images": {
+    "probe": "m3_three_images",
+    "query": "Analyze these three images.",
+    "images": [
+      "bengaluru_cartosat3.png",
+      "mumbai_cartosat2s_optical.png",
+      "sambhar_lake_liss4.png"
+    ],
+    "http_status": 200,
+    "response_time_ms": 616.41,
+    "response_json": {
+      "status": "rejected",
+      "answer": "\u26a0\ufe0f **Request Validation Error (INVALID_INPUT_COUNT)**\n\nInvalid image count for CHANGE_ANALYSIS: received 3, expected 2-2.\n\n\u2022 **Reason:** Tool 'CHANGE_ANALYSIS' requires between 2 and 2 images, but 3 image(s) were supplied.\n\u2022 **Action Required:** Provide exactly 2 image(s) for CHANGE_ANALYSIS.",
+      "visual_evidence": [],
+      "confidence": 0.04,
+      "compatibility_status": "REJECTED_INVALID_INPUT_COUNT",
+      "spatial_coherence_score": 0.0,
+      "execution_summary": {
+        "selected_task": "CHANGE_ANALYSIS",
+        "tool_used": "bi_temporal_change",
+        "input_scope": "3 image(s)",
+        "num_images_processed": 3,
+        "agent_reasoning": "Validation failed at Stage 2/3: Tool 'CHANGE_ANALYSIS' requires between 2 and 2 images, but 3 image(s) were supplied."
+      },
+      "execution_trace": {
+        "trace_id": "38b4f622-641c-47db-8f72-c57a12cdf496",
+        "timestamp": "2026-10-14T19:56:02.489928",
+        "query": "Analyze these three images.",
+        "selected_task": "CHANGE_ANALYSIS",
+        "task_confidence": 0.04,
+        "input_checks": {
+          "num_images": 3,
+          "detected_modalities": [
+            "OPTICAL",
+            "OPTICAL",
+            "OPTICAL"
+          ],
+          "detected_formats": [
+            "PNG",
+            "PNG",
+            "PNG"
+          ],
+          "has_georeferencing": false,
+          "benchmark_mode": true
+        },
+        "tools_called": [
+          {
+            "tool_id": "bi_temporal_change",
+            "task_name": "CHANGE_ANALYSIS",
+            "version": "1.0.0",
+            "status": "REJECTED",
+            "latency_ms": 99.64,
+            "parameters_used": {},
+            "summary": "Invalid image count for CHANGE_ANALYSIS: received 3, expected 2-2."
+          }
+        ],
+        "per_step_latency_ms": {
+          "input_validation": 99.64
+        },
+        "total_latency_ms": 99.64,
+        "outputs_summary": {
+          "status": "rejected",
+          "error_code": "INVALID_INPUT_COUNT",
+          "visual_evidence_count": 0,
+          "geojson_features": 0
+        },
+        "confidence": 0.04,
+        "confidence_derivation": "Calibrated rejection uncertainty: 0.04 derived from guardrail constraint INVALID_INPUT_COUNT.",
+        "valid_sequence": false,
+        "is_invalid_call": true,
+        "structured_error": {
+          "status": "error",
+          "error_code": "INVALID_INPUT_COUNT",
+          "error_type": "InputCountError",
+          "message": "Invalid image count for CHANGE_ANALYSIS: received 3, expected 2-2.",
+          "reason": "Tool 'CHANGE_ANALYSIS' requires between 2 and 2 images, but 3 image(s) were supplied.",
+          "suggested_fix": "Provide exactly 2 image(s) for CHANGE_ANALYSIS.",
+          "invalid_parameter": null,
+          "details": {
+            "received_count": 3,
+            "expected_min": 2,
+            "expected_max": 2
+          }
+        }
+      },
+      "structured_error": {
+        "status": "error",
+        "error_code": "INVALID_INPUT_COUNT",
+        "error_type": "InputCountError",
+        "message": "Invalid image count for CHANGE_ANALYSIS: received 3, expected 2-2.",
+        "reason": "Tool 'CHANGE_ANALYSIS' requires between 2 and 2 images, but 3 image(s) were supplied.",
+        "suggested_fix": "Provide exactly 2 image(s) for CHANGE_ANALYSIS.",
+        "invalid_parameter": null,
+        "details": {
+          "received_count": 3,
+          "expected_min": 2,
+          "expected_max": 2
+        }
+      },
+      "geo_metadata": null,
+      "geojson_data": null
+    },
+    "tools_invoked": [],
+    "models_invoked": [],
+    "fallback_heuristic_used": false,
+    "confidence": 0.04
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "model_name": "SatQuery-RS-VLM-v1.0",
+  "architecture": "BLIP-VQA RS-Adapted (ViT-B/16 + 12-layer Cross-Attention Decoder)",
+  "base_model": "Salesforce/blip-vqa-base",
+  "total_parameters": 361230140,
+  "trainable_parameters": 361230140,
+  "training_stages": [
+    {
+      "stage": 1,
+      "name": "Image-Text Alignment & Captioning",
+      "dataset": "BigEarthNet.txt (arXiv:2603.29630)",
+      "samples": 3
+    },
+    {
+      "stage": 2,
+      "name": "RS Visual Question Answering",
+      "dataset": "RSVQA (arXiv:2003.07333) + VRSBench VQA",
+      "samples": 6
+    },
+    {
+      "stage": 3,
+      "name": "Text-Guided Grounding",
+      "dataset": "VRSBench Grounding (arXiv:2406.12384)",
+      "samples": 3
+    }
+  ],
+  "random_seed": 42,
+  "learning_rate": 2e-05,
+  "epochs_per_stage": 1,
+  "hardware": {
+    "device": "cpu",
+    "device_name": "CPU (Host)"
+  },
+  "wall_time_seconds": 67.05,
+  "loss_trajectory": [
+    {
+      "stage": 1,
+      "epoch": 1,
+      "dataset": "BigEarthNet.txt",
+      "loss": 9.2166
+    },
+    {
+      "stage": 2,
+      "epoch": 1,
+      "dataset": "RSVQA + VRSBench VQA",
+      "loss": 1.5982
+    },
+    {
+      "stage": 3,
+      "epoch": 1,
+      "dataset": "VRSBench Grounding",
+      "loss": 8.752
+    }
+  ],
+  "date_executed": "2026-10-14 15:48:37"
+}

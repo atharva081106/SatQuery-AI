@@ -1,0 +1,30 @@
+{
+  "model_name": "SatQueryChangeNet-v1.0",
+  "reference": "arXiv:2112.06343",
+  "parameters": 1709873,
+  "device": "cpu",
+  "epochs": 3,
+  "total_time_seconds": 162.03,
+  "final_val_loss": 0.9449,
+  "final_val_iou": 0.8807,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.064,
+      "val_loss": 1.1238,
+      "val_iou": 0.9212
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.9891,
+      "val_loss": 1.0228,
+      "val_iou": 0.8824
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.9397,
+      "val_loss": 0.9449,
+      "val_iou": 0.8807
+    }
+  ]
+}

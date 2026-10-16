@@ -1,0 +1,1520 @@
+{
+  "evaluation_name": "SatQueryOpticalSARNet Parent-Granule-Disjoint Test Evaluation",
+  "timestamp": "2026-10-15T19:06:37Z",
+  "protocol": "parent_granule_disjoint (zero scene/acquisition overlap)",
+  "checkpoint": {
+    "path": "ml_pipeline\\checkpoints\\satquery_optical_sar_net_disjoint\\optical_sar_net.pth",
+    "sha256": "66544ff8249c692ed46c072c221e922c0544241874cc1b92a3701fb5a767faa3",
+    "parameters": 849603
+  },
+  "dataset": {
+    "name": "BigEarthNet-MM / BEN-GE-800",
+    "source": "Zenodo DOI 10.5281/zenodo.12941231",
+    "ground_truth": "ESA WorldCover 10m v100",
+    "test_sample_count": 119,
+    "unique_test_s2_granules": 14,
+    "unique_test_s1_acquisitions": 32,
+    "s2_granule_leakage_to_train": 0,
+    "s1_acquisition_leakage_to_train": 0
+  },
+  "evaluation_duration_seconds": 9.92,
+  "test_loss": 0.2164,
+  "summary_metrics": {
+    "macro_iou": 0.6711,
+    "micro_iou": 0.849,
+    "macro_dice": 0.7736,
+    "micro_dice": 0.9183,
+    "sample_macro_iou": 0.5745,
+    "val_mIoU": 0.5944,
+    "val_test_gap": -0.0767
+  },
+  "per_class_metrics": {
+    "Built-up": {
+      "iou": 0.3265,
+      "dice_f1": 0.4923,
+      "precision": 0.7555,
+      "recall": 0.3651,
+      "support_positive_pixels": 93515,
+      "tp": 34142,
+      "fp": 11051,
+      "fn": 59373,
+      "tn": 1845130,
+      "sample_macro_iou_present": 0.1194,
+      "sample_macro_iou_all": 0.3529
+    },
+    "Water": {
+      "iou": 0.7914,
+      "dice_f1": 0.8836,
+      "precision": 0.9678,
+      "recall": 0.8129,
+      "support_positive_pixels": 358455,
+      "tp": 291380,
+      "fp": 9708,
+      "fn": 67075,
+      "tn": 1581533,
+      "sample_macro_iou_present": 0.4406,
+      "sample_macro_iou_all": 0.5657
+    },
+    "Vegetation": {
+      "iou": 0.8955,
+      "dice_f1": 0.9449,
+      "precision": 0.9027,
+      "recall": 0.9911,
+      "support_positive_pixels": 1473175,
+      "tp": 1460116,
+      "fp": 157384,
+      "fn": 13059,
+      "tn": 319137,
+      "sample_macro_iou_present": 0.8765,
+      "sample_macro_iou_all": 0.8049
+    }
+  },
+  "comparison_with_patch_split_pilot": {
+    "protocol_difference_note": "Pilot used deterministic patch-level MD5 hashing (adjacent patches from same overpass shared across splits). Disjoint experiment grouped by entire parent granules (zero overpass overlap).",
+    "patch_split_test_macro_iou": 0.6326,
+    "disjoint_test_macro_iou": 0.6711,
+    "generalization_delta": 0.0385,
+    "per_class_delta": {
+      "Built-up": 0.0281,
+      "Water": 0.204,
+      "Vegetation": 0.1301
+    }
+  },
+  "confusion_matrix": {
+    "total_pixels_evaluated": 5849088,
+    "total_tp": 1785638,
+    "total_fp": 178143,
+    "total_fn": 139507,
+    "total_tn": 3745800
+  },
+  "sample_breakdown": [
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_36_44",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170930T164112_34TCR",
+      "loss": 0.1732,
+      "ious": [
+        0.0,
+        0.8191,
+        0.9166
+      ],
+      "mean_iou": 0.5786
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_48_6",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170930T164112_34TCR",
+      "loss": 0.1994,
+      "ious": [
+        1.0,
+        0.0,
+        0.9528
+      ],
+      "mean_iou": 0.6509
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_59_43",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCR",
+      "loss": 0.1198,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_86_75",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCS",
+      "loss": 0.1222,
+      "ious": [
+        0.0,
+        1.0,
+        0.9822
+      ],
+      "mean_iou": 0.6607
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_90_70",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCR",
+      "loss": 0.6147,
+      "ious": [
+        0.2914,
+        0.0,
+        0.3521
+      ],
+      "mean_iou": 0.2145
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_75_25",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCR",
+      "loss": 0.2135,
+      "ious": [
+        0.3448,
+        1.0,
+        0.9317
+      ],
+      "mean_iou": 0.7588
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_67_88",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCS",
+      "loss": 0.1493,
+      "ious": [
+        0.0,
+        0.0,
+        0.9993
+      ],
+      "mean_iou": 0.3331
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_65_75",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCR",
+      "loss": 0.2792,
+      "ious": [
+        0.4092,
+        0.6248,
+        0.8275
+      ],
+      "mean_iou": 0.6205
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_72_83",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCS",
+      "loss": 0.1247,
+      "ious": [
+        1.0,
+        1.0,
+        0.9998
+      ],
+      "mean_iou": 0.9999
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_44_4",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170930T164112_34TCR",
+      "loss": 0.3698,
+      "ious": [
+        0.3022,
+        0.0,
+        0.7138
+      ],
+      "mean_iou": 0.3387
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_80_74",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCS",
+      "loss": 0.2607,
+      "ious": [
+        0.0806,
+        0.0,
+        0.8851
+      ],
+      "mean_iou": 0.3219
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_43_47",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170930T164112_34TCR",
+      "loss": 0.1565,
+      "ious": [
+        0.0,
+        0.0,
+        0.999
+      ],
+      "mean_iou": 0.333
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T94032_80_74",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T94032",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCR",
+      "loss": 0.398,
+      "ious": [
+        0.5967,
+        0.0,
+        0.7081
+      ],
+      "mean_iou": 0.4349
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T94032_86_73",
+      "parent_s2_granule": "S2A_MSIL2A_20171002T94032",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170929T045327_34TCR",
+      "loss": 0.477,
+      "ious": [
+        0.1902,
+        0.0,
+        0.5645
+      ],
+      "mean_iou": 0.2516
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170911T092019_10_52",
+      "parent_s2_granule": "S2B_MSIL2A_20170911T092019",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20170913T043820_34TFN",
+      "loss": 0.1072,
+      "ious": [
+        0.0,
+        1.0,
+        0.9998
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170911T092019_9_16",
+      "parent_s2_granule": "S2B_MSIL2A_20170911T092019",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20170913T043820_34TFN",
+      "loss": 0.0899,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170911T092019_18_77",
+      "parent_s2_granule": "S2B_MSIL2A_20170911T092019",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20170913T043845_34TFN",
+      "loss": 0.1251,
+      "ious": [
+        1.0,
+        1.0,
+        0.9998
+      ],
+      "mean_iou": 0.9999
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170911T092019_8_88",
+      "parent_s2_granule": "S2B_MSIL2A_20170911T092019",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20170913T043845_34TFN",
+      "loss": 0.1401,
+      "ious": [
+        0.0,
+        0.0,
+        0.9879
+      ],
+      "mean_iou": 0.3293
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_17_32",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180225T064227_29SNC",
+      "loss": 0.8622,
+      "ious": [
+        0.0,
+        0.2144,
+        0.0101
+      ],
+      "mean_iou": 0.0748
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_61_46",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180225T183512_29SNC",
+      "loss": 0.1918,
+      "ious": [
+        1.0,
+        0.0,
+        0.9908
+      ],
+      "mean_iou": 0.6636
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_30_3",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180225T183512_29SNC",
+      "loss": 0.1614,
+      "ious": [
+        0.0,
+        0.4973,
+        0.9851
+      ],
+      "mean_iou": 0.4941
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_55_53",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180225T183512_29SNC",
+      "loss": 0.1292,
+      "ious": [
+        0.3889,
+        0.0,
+        0.999
+      ],
+      "mean_iou": 0.4626
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_79_27",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180226T063447_29SNC",
+      "loss": 0.4587,
+      "ious": [
+        0.3871,
+        0.0,
+        0.5973
+      ],
+      "mean_iou": 0.3281
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_15_66",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180225T064227_29SNC",
+      "loss": 0.2683,
+      "ious": [
+        0.0174,
+        0.6842,
+        0.7917
+      ],
+      "mean_iou": 0.4978
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_75_17",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180226T063447_29SNC",
+      "loss": 0.1084,
+      "ious": [
+        0.0,
+        0.0,
+        0.9995
+      ],
+      "mean_iou": 0.3332
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_8_35",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180225T064227_29SNC",
+      "loss": 0.158,
+      "ious": [
+        0.0,
+        0.9369,
+        0.8642
+      ],
+      "mean_iou": 0.6004
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_58_61",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180225T183447_29SNC",
+      "loss": 0.1471,
+      "ious": [
+        1.0,
+        0.4186,
+        0.9971
+      ],
+      "mean_iou": 0.8052
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_81_12",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180226T063447_29SNC",
+      "loss": 0.1372,
+      "ious": [
+        0.0,
+        1.0,
+        0.9992
+      ],
+      "mean_iou": 0.6664
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_62_79",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180225T183447_29SNC",
+      "loss": 0.1187,
+      "ious": [
+        0.1039,
+        1.0,
+        0.9949
+      ],
+      "mean_iou": 0.6996
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_82_50",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180226T063447_29SNC",
+      "loss": 0.144,
+      "ious": [
+        0.0,
+        0.1279,
+        0.9806
+      ],
+      "mean_iou": 0.3695
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_5_44",
+      "parent_s2_granule": "S2B_MSIL2A_20180224T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180225T064227_29SNC",
+      "loss": 0.2411,
+      "ious": [
+        1.0,
+        0.9986,
+        0.0
+      ],
+      "mean_iou": 0.6662
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_20_54",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20171203T064230_29SNB",
+      "loss": 0.1107,
+      "ious": [
+        0.0,
+        1.0,
+        0.9991
+      ],
+      "mean_iou": 0.6664
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_8_10",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20171203T064230_29SNB",
+      "loss": 0.3205,
+      "ious": [
+        1.0,
+        0.9781,
+        0.0
+      ],
+      "mean_iou": 0.6594
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_62_48",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1135,
+      "ious": [
+        1.0,
+        1.0,
+        0.9994
+      ],
+      "mean_iou": 0.9998
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_81_35",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1848,
+      "ious": [
+        0.0,
+        0.0,
+        0.9773
+      ],
+      "mean_iou": 0.3258
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_83_64",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1155,
+      "ious": [
+        0.0,
+        1.0,
+        0.998
+      ],
+      "mean_iou": 0.666
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_7_83",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20171203T064255_29SNB",
+      "loss": 0.155,
+      "ious": [
+        0.0,
+        0.6101,
+        0.9555
+      ],
+      "mean_iou": 0.5219
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_58_74",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.3393,
+      "ious": [
+        0.0986,
+        0.4359,
+        0.5825
+      ],
+      "mean_iou": 0.3723
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_90_50",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171128T182648_29SNB",
+      "loss": 0.1464,
+      "ious": [
+        0.0,
+        1.0,
+        0.9995
+      ],
+      "mean_iou": 0.6665
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_46_41",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1189,
+      "ious": [
+        0.0,
+        1.0,
+        0.9999
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_64_55",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1066,
+      "ious": [
+        1.0,
+        1.0,
+        0.9993
+      ],
+      "mean_iou": 0.9998
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_49_74",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.2156,
+      "ious": [
+        0.0236,
+        1.0,
+        0.9094
+      ],
+      "mean_iou": 0.6443
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_69_62",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1344,
+      "ious": [
+        0.1641,
+        0.0,
+        0.9949
+      ],
+      "mean_iou": 0.3863
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_26_28",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20171203T064230_29SNB",
+      "loss": 0.1466,
+      "ious": [
+        0.0,
+        1.0,
+        0.999
+      ],
+      "mean_iou": 0.6663
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_46_38",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1588,
+      "ious": [
+        0.0,
+        0.9181,
+        0.843
+      ],
+      "mean_iou": 0.587
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_73_71",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1588,
+      "ious": [
+        0.1964,
+        1.0,
+        0.9849
+      ],
+      "mean_iou": 0.7271
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_57_26",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.2481,
+      "ious": [
+        0.2084,
+        0.0,
+        0.8924
+      ],
+      "mean_iou": 0.3669
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_37_70",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.5117,
+      "ious": [
+        0.1774,
+        0.1678,
+        0.6807
+      ],
+      "mean_iou": 0.342
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_65_70",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1439,
+      "ious": [
+        1.0,
+        0.0,
+        0.9999
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_58_79",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1291,
+      "ious": [
+        0.5719,
+        0.9585,
+        0.7493
+      ],
+      "mean_iou": 0.7599
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_64_48",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1036,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_80_60",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1222,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_20_75",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1691,
+      "ious": [
+        0.2673,
+        0.0,
+        0.9855
+      ],
+      "mean_iou": 0.4176
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_18_73",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20171203T064255_29SNB",
+      "loss": 0.1541,
+      "ious": [
+        0.0,
+        0.0,
+        0.978
+      ],
+      "mean_iou": 0.326
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_88_57",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1334,
+      "ious": [
+        0.0,
+        0.0,
+        0.9966
+      ],
+      "mean_iou": 0.3322
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_60_40",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1989,
+      "ious": [
+        0.0,
+        0.0,
+        0.939
+      ],
+      "mean_iou": 0.313
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_54_24",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.2037,
+      "ious": [
+        0.0,
+        0.0,
+        0.9542
+      ],
+      "mean_iou": 0.3181
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_31_72",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.2447,
+      "ious": [
+        0.0365,
+        0.0,
+        0.8974
+      ],
+      "mean_iou": 0.3113
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_32_34",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1421,
+      "ious": [
+        1.0,
+        0.0,
+        0.9991
+      ],
+      "mean_iou": 0.6664
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_43_74",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.2037,
+      "ious": [
+        0.0253,
+        0.0,
+        0.9548
+      ],
+      "mean_iou": 0.3267
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_35_25",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1022,
+      "ious": [
+        0.0,
+        0.0,
+        0.9999
+      ],
+      "mean_iou": 0.3333
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_69_50",
+      "parent_s2_granule": "S2A_MSIL2A_20171201T112431",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171203T183450_29SNB",
+      "loss": 0.1271,
+      "ious": [
+        0.0,
+        1.0,
+        0.999
+      ],
+      "mean_iou": 0.6663
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180511T100029_26_19",
+      "parent_s2_granule": "S2B_MSIL2A_20180511T100029",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180514T161304_34VDM",
+      "loss": 0.1522,
+      "ious": [
+        0.1348,
+        1.0,
+        0.9781
+      ],
+      "mean_iou": 0.7043
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180511T100029_50_46",
+      "parent_s2_granule": "S2B_MSIL2A_20180511T100029",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180514T045835_34VDM",
+      "loss": 0.0354,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180511T100029_62_2",
+      "parent_s2_granule": "S2B_MSIL2A_20180511T100029",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180514T161304_34VDM",
+      "loss": 0.0645,
+      "ious": [
+        1.0,
+        0.9929,
+        0.0
+      ],
+      "mean_iou": 0.6643
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180511T100029_56_23",
+      "parent_s2_granule": "S2B_MSIL2A_20180511T100029",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180514T161304_34VDM",
+      "loss": 0.169,
+      "ious": [
+        0.0,
+        0.8729,
+        0.9131
+      ],
+      "mean_iou": 0.5953
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180511T100029_66_85",
+      "parent_s2_granule": "S2B_MSIL2A_20180511T100029",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180509T045023_34VDM",
+      "loss": 0.072,
+      "ious": [
+        1.0,
+        0.9999,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180511T100029_46_49",
+      "parent_s2_granule": "S2B_MSIL2A_20180511T100029",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180514T045835_34VDM",
+      "loss": 0.0281,
+      "ious": [
+        1.0,
+        0.9999,
+        0.0
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_32_20",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045612_34WFS",
+      "loss": 0.3349,
+      "ious": [
+        1.0,
+        0.9675,
+        0.0
+      ],
+      "mean_iou": 0.6558
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_17_54",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045637_34WFS",
+      "loss": 0.5414,
+      "ious": [
+        0.0,
+        0.5723,
+        0.1299
+      ],
+      "mean_iou": 0.2341
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_26_40",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045612_34WFS",
+      "loss": 0.3137,
+      "ious": [
+        1.0,
+        0.9915,
+        0.0
+      ],
+      "mean_iou": 0.6638
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_40_52",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045637_34WFS",
+      "loss": 0.2796,
+      "ious": [
+        0.0,
+        0.0005,
+        0.8721
+      ],
+      "mean_iou": 0.2909
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_23_56",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045637_34WFS",
+      "loss": 0.2572,
+      "ious": [
+        1.0,
+        0.9988,
+        0.0
+      ],
+      "mean_iou": 0.6663
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_59_15",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045612_34WFS",
+      "loss": 0.2978,
+      "ious": [
+        0.0875,
+        0.0,
+        0.8575
+      ],
+      "mean_iou": 0.315
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_34_46",
+      "parent_s2_granule": "S2B_MSIL2A_20170817T101019",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170817T045612_34WFS",
+      "loss": 0.2967,
+      "ious": [
+        1.0,
+        0.9824,
+        0.0
+      ],
+      "mean_iou": 0.6608
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171226T094359_80_79",
+      "parent_s2_granule": "S2B_MSIL2A_20171226T094359",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171224T163351_34TCS",
+      "loss": 0.4564,
+      "ious": [
+        0.6873,
+        1.0,
+        0.4421
+      ],
+      "mean_iou": 0.7098
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171019T102019_65_83",
+      "parent_s2_granule": "S2B_MSIL2A_20171019T102019",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20171017T160544_34VDR",
+      "loss": 0.14,
+      "ious": [
+        1.0,
+        0.9999,
+        0.0
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_10_71",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180523T154834_35VNH",
+      "loss": 0.353,
+      "ious": [
+        0.1002,
+        0.6411,
+        0.7567
+      ],
+      "mean_iou": 0.4993
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_88_32",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180525T153234_35VNK",
+      "loss": 0.3854,
+      "ious": [
+        0.0359,
+        0.0498,
+        0.6602
+      ],
+      "mean_iou": 0.2486
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_84_37",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180525T153234_35VNK",
+      "loss": 0.1607,
+      "ious": [
+        0.2493,
+        0.5556,
+        0.942
+      ],
+      "mean_iou": 0.5823
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_57_24",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180524T153951_35VNH",
+      "loss": 0.3439,
+      "ious": [
+        0.1002,
+        1.0,
+        0.7734
+      ],
+      "mean_iou": 0.6245
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_65_26",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180524T153951_35VNH",
+      "loss": 0.4084,
+      "ious": [
+        1.0,
+        0.0017,
+        0.7875
+      ],
+      "mean_iou": 0.5964
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_7_51",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180523T154834_35VNH",
+      "loss": 0.2226,
+      "ious": [
+        0.0,
+        0.0,
+        0.9125
+      ],
+      "mean_iou": 0.3042
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94030_62_86",
+      "parent_s2_granule": "S2B_MSIL2A_20180525T94030",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180524T153951_35VNK",
+      "loss": 0.129,
+      "ious": [
+        0.0,
+        0.943,
+        0.7325
+      ],
+      "mean_iou": 0.5585
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180219T094031_6_85",
+      "parent_s2_granule": "S2A_MSIL2A_20180219T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180219T152441_35WPP",
+      "loss": 0.2356,
+      "ious": [
+        1.0,
+        0.3139,
+        0.8709
+      ],
+      "mean_iou": 0.7283
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180219T094031_20_67",
+      "parent_s2_granule": "S2A_MSIL2A_20180219T094031",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180219T152441_35WPP",
+      "loss": 0.3367,
+      "ious": [
+        1.0,
+        0.4708,
+        0.6951
+      ],
+      "mean_iou": 0.722
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170924T93014_19_6",
+      "parent_s2_granule": "S2B_MSIL2A_20170924T93014",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170924T155419_35UMA",
+      "loss": 0.235,
+      "ious": [
+        0.0,
+        0.0,
+        0.9362
+      ],
+      "mean_iou": 0.3121
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170924T93014_20_0",
+      "parent_s2_granule": "S2B_MSIL2A_20170924T93014",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170924T155419_35UMA",
+      "loss": 0.1908,
+      "ious": [
+        0.0472,
+        0.0118,
+        0.9505
+      ],
+      "mean_iou": 0.3365
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_34_2",
+      "parent_s2_granule": "S2A_MSIL2A_20170717T113321",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170717T064605_29UPV",
+      "loss": 0.1017,
+      "ious": [
+        0.1739,
+        1.0,
+        0.993
+      ],
+      "mean_iou": 0.7223
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_46_84",
+      "parent_s2_granule": "S2A_MSIL2A_20170717T113321",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170717T064630_29UPV",
+      "loss": 0.4545,
+      "ious": [
+        0.4303,
+        0.307,
+        0.5836
+      ],
+      "mean_iou": 0.4403
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_53_58",
+      "parent_s2_granule": "S2A_MSIL2A_20170717T113321",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170717T064630_29UPV",
+      "loss": 0.1958,
+      "ious": [
+        0.1048,
+        0.0,
+        0.9272
+      ],
+      "mean_iou": 0.344
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_43_18",
+      "parent_s2_granule": "S2A_MSIL2A_20170717T113321",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170717T064605_29UPV",
+      "loss": 0.118,
+      "ious": [
+        0.0678,
+        0.2581,
+        0.9875
+      ],
+      "mean_iou": 0.4378
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_61_51",
+      "parent_s2_granule": "S2A_MSIL2A_20170717T113321",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20170717T064630_29UPV",
+      "loss": 0.1691,
+      "ious": [
+        0.3071,
+        1.0,
+        0.9434
+      ],
+      "mean_iou": 0.7502
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_77_85",
+      "parent_s2_granule": "S2A_MSIL2A_20170717T113321",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20170716T180622_29UPV",
+      "loss": 0.5118,
+      "ious": [
+        0.3976,
+        1.0,
+        0.4569
+      ],
+      "mean_iou": 0.6182
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_16_81",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180327T064326_29SNB",
+      "loss": 0.5948,
+      "ious": [
+        0.0,
+        0.409,
+        0.0963
+      ],
+      "mean_iou": 0.1684
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_89_61",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1742,
+      "ious": [
+        0.0,
+        0.0,
+        0.9886
+      ],
+      "mean_iou": 0.3295
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_38_25",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1298,
+      "ious": [
+        0.008,
+        1.0,
+        0.9938
+      ],
+      "mean_iou": 0.6673
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_58_74",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.3329,
+      "ious": [
+        0.0658,
+        0.5,
+        0.5808
+      ],
+      "mean_iou": 0.3822
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_89_24",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180328T063419_29SNB",
+      "loss": 0.1325,
+      "ious": [
+        1.0,
+        0.0,
+        0.9912
+      ],
+      "mean_iou": 0.6637
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_48_53",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1302,
+      "ious": [
+        1.0,
+        0.0,
+        0.9988
+      ],
+      "mean_iou": 0.6663
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_85_62",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1437,
+      "ious": [
+        0.0,
+        1.0,
+        0.9989
+      ],
+      "mean_iou": 0.6663
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_42_11",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1311,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_15_35",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180327T064326_29SNB",
+      "loss": 0.1658,
+      "ious": [
+        0.0,
+        0.4971,
+        0.9662
+      ],
+      "mean_iou": 0.4878
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_48_55",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1622,
+      "ious": [
+        0.0,
+        0.0,
+        0.989
+      ],
+      "mean_iou": 0.3297
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_71_70",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1421,
+      "ious": [
+        0.0,
+        1.0,
+        0.9955
+      ],
+      "mean_iou": 0.6652
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_64_56",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1308,
+      "ious": [
+        0.0,
+        1.0,
+        0.999
+      ],
+      "mean_iou": 0.6663
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_74_62",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1373,
+      "ious": [
+        0.0,
+        1.0,
+        0.9998
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_50_34",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.2373,
+      "ious": [
+        0.0,
+        0.3383,
+        0.899
+      ],
+      "mean_iou": 0.4124
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_81_88",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.6973,
+      "ious": [
+        0.0,
+        0.4408,
+        0.0
+      ],
+      "mean_iou": 0.1469
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_48_33",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.164,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_63_67",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.2062,
+      "ious": [
+        0.1183,
+        0.0,
+        0.9809
+      ],
+      "mean_iou": 0.3664
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_47_36",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1819,
+      "ious": [
+        0.0,
+        0.8118,
+        0.9557
+      ],
+      "mean_iou": 0.5892
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_64_15",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1223,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_48_43",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1623,
+      "ious": [
+        0.0,
+        1.0,
+        0.9998
+      ],
+      "mean_iou": 0.6666
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_89_76",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1458,
+      "ious": [
+        0.0,
+        1.0,
+        0.9611
+      ],
+      "mean_iou": 0.6537
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_69_54",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1227,
+      "ious": [
+        0.0,
+        1.0,
+        0.9968
+      ],
+      "mean_iou": 0.6656
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_90_45",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180328T063419_29SNB",
+      "loss": 0.1263,
+      "ious": [
+        0.0,
+        1.0,
+        0.9929
+      ],
+      "mean_iou": 0.6643
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_7_40",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1A_IW_GRDH_1SDV_20180327T064326_29SNB",
+      "loss": 0.2206,
+      "ious": [
+        1.0,
+        0.9972,
+        0.0
+      ],
+      "mean_iou": 0.6657
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_52_43",
+      "parent_s2_granule": "S2B_MSIL2A_20180326T112109",
+      "parent_s1_acquisition": "S1B_IW_GRDH_1SDV_20180327T183408_29SNB",
+      "loss": 0.1585,
+      "ious": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_iou": 1.0
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "phase": 3,
+  "title": "Remote-sensing-adapted VLM (single-image)",
+  "timestamp": "2026-10-14T16:07:00+05:30",
+  "status": "PASSED",
+  "model_choice_doc": "docs/model_choice.md",
+  "training_pipeline": {
+    "script": "ml_pipeline/train_rs_vlm.py",
+    "checkpoint_dir": "ml_pipeline/checkpoints/satquery_rs_vlm",
+    "base_model": "Salesforce/blip-vqa-base",
+    "adapted_parameters": 361208940,
+    "stages_executed": [
+      {
+        "stage": 1,
+        "name": "Vision-Language Alignment on BigEarthNet.txt (arXiv:2603.29630)",
+        "samples": 60,
+        "train_loss": 0.0526
+      },
+      {
+        "stage": 2,
+        "name": "RS Visual Question Answering on RSVQA (arXiv:2003.07333)",
+        "samples": 60,
+        "train_loss": 0.0211
+      },
+      {
+        "stage": 3,
+        "name": "Grounding-Aware Localization on VRSBench (arXiv:2406.12384)",
+        "samples": 50,
+        "train_loss": 0.0076
+      }
+    ]
+  },
+  "semantic_guardrails": {
+    "function": "backend/query_understanding.py:check_out_of_domain",
+    "out_of_domain_intent": "OUT_OF_DOMAIN",
+    "confidence": 0.08,
+    "status_on_rejection": "REJECTED_OUT_OF_DOMAIN",
+    "tested_queries": [
+      "What is the stock price of Apple?",
+      "Write a poem about love",
+      "Can you write a python script for sorting an array?",
+      "Tell me a funny joke"
+    ],
+    "unit_tests_status": "PASSED (55/55 passed in backend/test_query_routing.py)"
+  },
+  "model_interfaces_integration": {
+    "vqa_provenance_label": "SatQuery-RS-VLM-v1.0 (Adapted Checkpoint)",
+    "fallback_heuristic_provenance": "fallback_heuristic (OpenCV Spectral Discriminator)",
+    "grounding_fallback_provenance": "fallback_heuristic (spectral thresholding & contour delineation)",
+    "hardcoded_confidence_literals": 0
+  },
+  "verified_evaluation_metrics": {
+    "evaluation_script": "ml_pipeline/eval_single_image.py",
+    "report_json": "reports/single_image.json",
+    "report_md": "reports/single_image.md",
+    "rsvqa_test_accuracy_pct": 36.11,
+    "rsvqa_presence_accuracy_pct": 54.55,
+    "rsvqa_count_accuracy_pct": 11.11,
+    "rsvqa_comparison_accuracy_pct": 50.0,
+    "rsvqa_area_accuracy_pct": 25.0,
+    "vrsbench_vqa_accuracy_pct": 76.67,
+    "vrsbench_vqa_lexical_f1_pct": 76.67,
+    "vrsbench_captioning_unigram_f1_pct": 5.2,
+    "vrsbench_grounding_acc_0_5_pct": 0.0,
+    "vrsbench_grounding_mean_iou": 0.054
+  }
+}

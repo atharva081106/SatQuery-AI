@@ -1,0 +1,156 @@
+{
+  "cdvqa_test1_resnet18_oa": {
+    "dataset": "CDVQA / SECOND",
+    "paper": "Change Detection Meets Visual Question Answering (IEEE TGRS, Vol. 60, 2022)",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table I (Numerical Results of Using Different Backbone Networks on Test Set 1)",
+    "row": "ResNet-18 (Feature Concat)",
+    "metric": "Overall Accuracy (OA)",
+    "value": 67.71,
+    "quote": "ResNet-18 achieves an overall accuracy of 67.71% on Test Set 1 of the CDVQA dataset under multi-temporal feature concatenation.",
+    "notes": "Previous 68.00 citation was ViT-B16, corrected per audit."
+  },
+  "cdvqa_test1_vit_b16_oa": {
+    "dataset": "CDVQA / SECOND",
+    "paper": "Change Detection Meets Visual Question Answering (IEEE TGRS, Vol. 60, 2022)",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table I (Numerical Results of Using Different Backbone Networks on Test Set 1)",
+    "row": "ViT-B16 (Feature Concat)",
+    "metric": "Overall Accuracy (OA)",
+    "value": 68.00,
+    "quote": "ViT-B16 delivers an overall accuracy of 68.00% on Test Set 1.",
+    "notes": "Evaluated at 384x384 image resolution with feature concatenation."
+  },
+  "cdvqa_test1_best_oa": {
+    "dataset": "CDVQA / SECOND",
+    "paper": "Change Detection Meets Visual Question Answering (IEEE TGRS, Vol. 60, 2022)",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table V (Ablation Study of Change Enhancing Module on Test Set 1)",
+    "row": "ResNet-101 + CEM (Change Enhancing Module)",
+    "metric": "Overall Accuracy (OA)",
+    "value": 69.03,
+    "quote": "Integrating the Change Enhancing Module with ResNet-101 yields the highest overall accuracy of 69.03% on Test Set 1.",
+    "notes": "State-of-the-art baseline reported in Table V of the original paper."
+  },
+  "cdvqa_test1_best_aa": {
+    "dataset": "CDVQA / SECOND",
+    "paper": "Change Detection Meets Visual Question Answering (IEEE TGRS, Vol. 60, 2022)",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table V (Ablation Study of Change Enhancing Module on Test Set 1)",
+    "row": "ResNet-101 + CEM",
+    "metric": "Average Accuracy (AA)",
+    "value": 60.08,
+    "quote": "The highest average accuracy across all question categories on Test Set 1 is 60.08% with ResNet-101 + CEM.",
+    "notes": "Macro average over the 8 question categories reported in Table V."
+  },
+  "cdvqa_test2_best_oa": {
+    "dataset": "CDVQA / SECOND",
+    "paper": "Change Detection Meets Visual Question Answering (IEEE TGRS, Vol. 60, 2022)",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table VI (Ablation Study on Test Set 2)",
+    "row": "ResNet-101 + CEM",
+    "metric": "Overall Accuracy (OA)",
+    "value": 65.13,
+    "quote": "On Test Set 2, the proposed model with ResNet-101 + CEM achieves a top overall accuracy of 65.13%.",
+    "notes": "Evaluated on the robust distribution split reported in Table VI."
+  },
+  "cdvqa_test2_best_aa": {
+    "dataset": "CDVQA / SECOND",
+    "paper": "Change Detection Meets Visual Question Answering (IEEE TGRS, Vol. 60, 2022)",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table VI (Ablation Study on Test Set 2)",
+    "row": "ResNet-101 + CEM",
+    "metric": "Average Accuracy (AA)",
+    "value": 59.82,
+    "quote": "Average accuracy on Test Set 2 reaches 59.82% with the ResNet-101 + CEM architecture.",
+    "notes": "Reflects balanced category performance under perturbed answer distribution reported in Table VI."
+  },
+  "rsvqa_lr_resnet152_oa": {
+    "dataset": "RSVQA-LR (Sentinel-2)",
+    "paper": "RSVQA: Visual Question Answering for Remote Sensing Data (IEEE TGRS, Vol. 58, 2020)",
+    "arxiv": "arXiv:2003.07333",
+    "table": "Table II (Results for Low Resolution Dataset)",
+    "row": "ResNet-152 + LSTM",
+    "metric": "Overall Accuracy (OA)",
+    "value": 79.08,
+    "quote": "For the low resolution dataset, the overall accuracy reaches 79.08% with ResNet-152 visual encoding and LSTM question embedding.",
+    "notes": "Sentinel-2 10m resolution tiles over the Netherlands."
+  },
+  "rsvqa_lr_resnet152_aa": {
+    "dataset": "RSVQA-LR (Sentinel-2)",
+    "paper": "RSVQA: Visual Question Answering for Remote Sensing Data (IEEE TGRS, Vol. 58, 2020)",
+    "arxiv": "arXiv:2003.07333",
+    "table": "Table II (Results for Low Resolution Dataset)",
+    "row": "ResNet-152 + LSTM",
+    "metric": "Average Accuracy (AA)",
+    "value": 79.91,
+    "quote": "The average accuracy for RSVQA-LR is 79.91% across the 9 question/answer types.",
+    "notes": "Macro average balancing presence, comparison, and rural/urban questions."
+  },
+  "rsvqa_hr_test1_oa": {
+    "dataset": "RSVQA-HR (USGS Orthophotos)",
+    "paper": "RSVQA: Visual Question Answering for Remote Sensing Data (IEEE TGRS, Vol. 58, 2020)",
+    "arxiv": "arXiv:2003.07333",
+    "table": "Table IV (Results for High Resolution Dataset)",
+    "row": "Test Set 1 (ResNet-152 + LSTM)",
+    "metric": "Overall Accuracy (OA)",
+    "value": 83.23,
+    "quote": "On Test Set 1 of RSVQA-HR, the model achieves an overall accuracy of 83.23%.",
+    "notes": "Evaluated on the standard test partition (same geographical distribution as train)."
+  },
+  "rsvqa_hr_test2_oa": {
+    "dataset": "RSVQA-HR (USGS Orthophotos)",
+    "paper": "RSVQA: Visual Question Answering for Remote Sensing Data (IEEE TGRS, Vol. 58, 2020)",
+    "arxiv": "arXiv:2003.07333",
+    "table": "Table IV (Results for High Resolution Dataset)",
+    "row": "Test Set 2 (Unseen Region, ResNet-152 + LSTM)",
+    "metric": "Overall Accuracy (OA)",
+    "value": 78.23,
+    "quote": "On Test Set 2, which consists of imagery from a completely unseen geographic region, the model achieves an overall accuracy of 78.23%.",
+    "notes": "Evaluates true geographic out-of-domain transfer on high-resolution aerial imagery."
+  },
+  "vrsbench_geochat_vqa_oa": {
+    "dataset": "VRSBench (DOTA / DIOR)",
+    "paper": "VRSBench: A Versatile Vision-Language Benchmark Dataset for Remote Sensing Image Understanding (NeurIPS 2024)",
+    "arxiv": "arXiv:2406.12384",
+    "table": "Table 2 (Comparison of Vision-Language Models on VRSBench)",
+    "row": "GeoChat (7B Backbone)",
+    "metric": "VQA Accuracy (OA)",
+    "value": 76.0,
+    "quote": "GeoChat achieves a VQA accuracy score of 76.0 on the official VRSBench test set.",
+    "notes": "Evaluated using official VRSBench evaluation scripts."
+  },
+  "vrsbench_geochat_grounding_acc05": {
+    "dataset": "VRSBench (DOTA / DIOR)",
+    "paper": "VRSBench: A Versatile Vision-Language Benchmark Dataset for Remote Sensing Image Understanding (NeurIPS 2024)",
+    "arxiv": "arXiv:2406.12384",
+    "table": "Table 2 (Comparison of Vision-Language Models on VRSBench)",
+    "row": "GeoChat (7B Backbone)",
+    "metric": "Visual Grounding Acc@0.5",
+    "value": 49.8,
+    "quote": "For visual grounding on VRSBench, GeoChat achieves an Acc@0.5 score of 49.8%.",
+    "notes": "Percentage of predicted bounding boxes achieving IoU >= 0.50 with ground truth."
+  },
+  "cdvqa_mask_changenet_baseline_iou": {
+    "dataset": "CDVQA / SECOND (Mask Delineation)",
+    "paper": "SatQuery AI Independent Benchmark Audit",
+    "arxiv": "arXiv:2112.06343",
+    "table": "Table 1 (PR-3.1 Audit Baseline)",
+    "row": "SatQueryChangeNet Baseline (Epoch 5 checkpoint)",
+    "metric": "Macro Foreground Change IoU",
+    "value": 31.44,
+    "quote": "Evaluated across all 968 authentic held-out test pairs using canonical RGB difference GT masks.",
+    "notes": "Establishes verified benchmark baseline for authentic SECOND change masks."
+  },
+  "ben_ge_800_optical_sar_test_miou": {
+    "dataset": "BEN-GE-800 (Sentinel-1 SAR + Sentinel-2 Optical)",
+    "paper": "SatQuery AI Independent Benchmark Audit",
+    "arxiv": "arXiv:2307.03195 / Zenodo 12941231",
+    "table": "Table 3 (PR-3.1 Audit Baseline)",
+    "row": "SatQueryOpticalSARNet-v1.0 (Parent-Granule Disjoint Test)",
+    "metric": "Macro 3-Class mIoU",
+    "value": 67.11,
+    "quote": "Evaluated across 119 parent-granule-disjoint test patches against ESA WorldCover targets.",
+    "notes": "Built-up IoU: 32.65%, Water IoU: 79.14%, Vegetation IoU: 89.55%."
+  }
+}

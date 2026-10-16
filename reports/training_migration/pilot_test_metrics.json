@@ -1,0 +1,4628 @@
+{
+  "evaluation_name": "Held-Out Test Set Evaluation (SatQueryOpticalSARNet-AuthenticPilot-v1)",
+  "timestamp": "2026-10-15 10:49:31Z",
+  "checkpoint": {
+    "path": "D:\\sih26167\\ml_pipeline\\checkpoints\\satquery_optical_sar_net_authentic_pilot\\optical_sar_net.pth",
+    "sha256": "93ec9d95d0a0d5217356626633d52491005dba7e61a02097e580d86c0d5f1dc2",
+    "architecture": "SatQueryOpticalSARNet",
+    "parameters": 849603,
+    "trained_epochs": 3
+  },
+  "dataset": {
+    "name": "BEN-GE-800 (BigEarthNet-MM subset)",
+    "split": "test",
+    "sample_count": 129,
+    "provenance": "Zenodo DOI 10.5281/zenodo.12941231; Mommert et al 2023; ESA WorldCover 10m v100",
+    "split_method": "MD5-hash deterministic 70/15/15"
+  },
+  "system": {
+    "python_version": "3.10.11",
+    "pytorch_version": "2.13.0+cpu",
+    "device": "cpu",
+    "runtime_seconds": 4.97,
+    "latency_ms_per_sample": 38.5
+  },
+  "preprocessing": {
+    "optical": "Sentinel-2 B04/B03/B02 uint8 normalized to [0, 1], resized to (128, 128)",
+    "sar": "Sentinel-1 VV float32 backscatter in dB, resized to (128, 128)",
+    "target": "ESA WorldCover 10m raster ground truth binary masks (128, 128)",
+    "threshold": 0.5
+  },
+  "aggregate_metrics": {
+    "test_bce_loss": 0.2718,
+    "global_mean_iou": 0.6326,
+    "global_mean_dice_f1": 0.754,
+    "global_mean_precision": 0.7689,
+    "global_mean_recall": 0.7504,
+    "sample_macro_iou_present_only": 0.4374,
+    "sample_macro_iou_all_samples": 0.5611
+  },
+  "class_level_metrics": {
+    "Built-up": {
+      "tp_pixels": 50560,
+      "fp_pixels": 52000,
+      "fn_pixels": 37379,
+      "tn_pixels": 1973597,
+      "pixel_total": 2113536,
+      "global_iou": 0.3613,
+      "global_dice_f1": 0.5308,
+      "precision": 0.493,
+      "recall": 0.5749,
+      "specificity": 0.9743,
+      "sample_macro_iou_present_only": 0.1184,
+      "sample_macro_iou_all_samples": 0.4017,
+      "samples_with_class_present": 83
+    },
+    "Water": {
+      "tp_pixels": 290921,
+      "fp_pixels": 25759,
+      "fn_pixels": 115294,
+      "tn_pixels": 1681562,
+      "pixel_total": 2113536,
+      "global_iou": 0.6735,
+      "global_dice_f1": 0.8049,
+      "precision": 0.9187,
+      "recall": 0.7162,
+      "specificity": 0.9849,
+      "sample_macro_iou_present_only": 0.3629,
+      "sample_macro_iou_all_samples": 0.4802,
+      "samples_with_class_present": 77
+    },
+    "Vegetation": {
+      "tp_pixels": 1530910,
+      "fp_pixels": 179553,
+      "fn_pixels": 63685,
+      "tn_pixels": 339388,
+      "pixel_total": 2113536,
+      "global_iou": 0.8629,
+      "global_dice_f1": 0.9264,
+      "precision": 0.895,
+      "recall": 0.9601,
+      "specificity": 0.654,
+      "sample_macro_iou_present_only": 0.831,
+      "sample_macro_iou_all_samples": 0.8014,
+      "samples_with_class_present": 122
+    }
+  },
+  "split_comparison_val_vs_test": {
+    "val_loss": 0.5151,
+    "test_loss": 0.2718,
+    "val_mean_iou": 0.6426,
+    "test_mean_iou": 0.6326,
+    "delta_mean_iou": -0.01,
+    "val_iou_built_up": 0.4524,
+    "test_iou_built_up": 0.3613,
+    "val_iou_water": 0.6243,
+    "test_iou_water": 0.6735,
+    "val_iou_vegetation": 0.851,
+    "test_iou_vegetation": 0.8629
+  },
+  "per_sample_results": [
+    {
+      "patch_id": "S2A_MSIL2A_20170613T101031_52_57",
+      "loss": 0.3481,
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Arable land",
+        "Complex cultivation patterns",
+        "Coniferous forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 4348,
+          "fp": 3298,
+          "fn": 519,
+          "tn": 8219,
+          "iou": 0.5325,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "tn": 16383,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 8783,
+          "fp": 638,
+          "fn": 2727,
+          "tn": 4236,
+          "iou": 0.723,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170613T101032_43_77",
+      "loss": 0.156,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 13,
+          "fp": 129,
+          "fn": 15,
+          "tn": 16227,
+          "iou": 0.0828,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 295,
+          "tn": 16089,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15955,
+          "fp": 313,
+          "fn": 105,
+          "tn": 11,
+          "iou": 0.9745,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170617T113321_44_6",
+      "loss": 0.1434,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 6,
+          "fp": 39,
+          "fn": 85,
+          "tn": 16254,
+          "iou": 0.0462,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16240,
+          "fp": 86,
+          "fn": 53,
+          "tn": 5,
+          "iou": 0.9915,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170617T113321_46_27",
+      "loss": 0.2031,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Pastures",
+        "Complex cultivation patterns"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 43,
+          "fp": 185,
+          "fn": 452,
+          "tn": 15704,
+          "iou": 0.0632,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 392,
+          "fn": 0,
+          "tn": 15992,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15393,
+          "fp": 464,
+          "fn": 496,
+          "tn": 31,
+          "iou": 0.9413,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170701T093031_14_46",
+      "loss": 0.2892,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 9,
+          "fp": 25,
+          "fn": 121,
+          "tn": 16229,
+          "iou": 0.0581,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 4872,
+          "fp": 63,
+          "fn": 1788,
+          "tn": 9661,
+          "iou": 0.7247,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 9533,
+          "fp": 1936,
+          "fn": 61,
+          "tn": 4854,
+          "iou": 0.8268,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170704T112111_28_12",
+      "loss": 0.5345,
+      "clc_labels": [
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Moors, heathland and sclerophyllous vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 1258,
+          "fp": 8246,
+          "fn": 81,
+          "tn": 6799,
+          "iou": 0.1312,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 7929,
+          "fp": 197,
+          "fn": 7063,
+          "tn": 1195,
+          "iou": 0.522,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170704T112111_35_6",
+      "loss": 0.2257,
+      "clc_labels": [
+        "Urban fabric",
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 572,
+          "fp": 1379,
+          "fn": 380,
+          "tn": 14053,
+          "iou": 0.2454,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 14406,
+          "fp": 453,
+          "fn": 1026,
+          "tn": 499,
+          "iou": 0.9069,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_43_18",
+      "loss": 0.1407,
+      "clc_labels": [
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 8,
+          "fp": 10,
+          "fn": 85,
+          "tn": 16281,
+          "iou": 0.0777,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 44,
+          "fp": 0,
+          "fn": 49,
+          "tn": 16291,
+          "iou": 0.4731,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16181,
+          "fp": 141,
+          "fn": 17,
+          "tn": 45,
+          "iou": 0.9903,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170717T113321_53_58",
+      "loss": 0.2108,
+      "clc_labels": [
+        "Arable land",
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 115,
+          "fp": 210,
+          "fn": 620,
+          "tn": 15439,
+          "iou": 0.1217,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 515,
+          "fn": 0,
+          "tn": 15869,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15018,
+          "fp": 622,
+          "fn": 631,
+          "tn": 113,
+          "iou": 0.923,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170803T094031_43_37",
+      "loss": 0.4777,
+      "clc_labels": [
+        "Arable land",
+        "Transitional woodland, shrub",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 5,
+          "fp": 1183,
+          "fn": 6,
+          "tn": 15190,
+          "iou": 0.0042,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 4648,
+          "fp": 3366,
+          "fn": 469,
+          "tn": 7901,
+          "iou": 0.5479,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 6981,
+          "fp": 483,
+          "fn": 4275,
+          "tn": 4645,
+          "iou": 0.5947,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170813T112121_27_42",
+      "loss": 0.1745,
+      "clc_labels": [
+        "Agro-forestry areas",
+        "Coniferous forest",
+        "Mixed forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 16,
+          "fn": 16,
+          "tn": 16352,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16220,
+          "fp": 157,
+          "fn": 7,
+          "tn": 0,
+          "iou": 0.99,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170905T95032_21_58",
+      "loss": 0.1688,
+      "clc_labels": [
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 529,
+          "tn": 15855,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15731,
+          "fp": 653,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9601,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170905T95032_3_3",
+      "loss": 0.1845,
+      "clc_labels": [
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Coniferous forest",
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 9,
+          "tn": 16375,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 2470,
+          "fp": 233,
+          "fn": 435,
+          "tn": 13246,
+          "iou": 0.7871,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 13251,
+          "fp": 467,
+          "fn": 213,
+          "tn": 2453,
+          "iou": 0.9512,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_44_4",
+      "loss": 0.3815,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 4315,
+          "fp": 3559,
+          "fn": 968,
+          "tn": 7542,
+          "iou": 0.488,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 8136,
+          "fp": 1284,
+          "fn": 2965,
+          "tn": 3999,
+          "iou": 0.6569,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_80_74",
+      "loss": 0.2502,
+      "clc_labels": [
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 415,
+          "fp": 181,
+          "fn": 1493,
+          "tn": 14295,
+          "iou": 0.1987,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 5,
+          "tn": 16379,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 14272,
+          "fp": 1668,
+          "fn": 117,
+          "tn": 327,
+          "iou": 0.8888,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T094031_90_70",
+      "loss": 0.3968,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Complex cultivation patterns"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 8679,
+          "fp": 1511,
+          "fn": 2252,
+          "tn": 3942,
+          "iou": 0.6976,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 54,
+          "tn": 16330,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 4310,
+          "fp": 2982,
+          "fn": 1086,
+          "tn": 8006,
+          "iou": 0.5144,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T112112_33_28",
+      "loss": 0.1506,
+      "clc_labels": [
+        "Arable land",
+        "Broad-leaved forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16365,
+          "fp": 19,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9988,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T112112_44_36",
+      "loss": 0.1773,
+      "clc_labels": [
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 65,
+          "tn": 16319,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 25,
+          "tn": 16359,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16283,
+          "fp": 101,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9938,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171002T112112_86_85",
+      "loss": 0.9444,
+      "clc_labels": [
+        "Coastal wetlands",
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "tn": 16383,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 5950,
+          "fp": 76,
+          "fn": 9679,
+          "tn": 679,
+          "iou": 0.3789,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 627,
+          "fp": 9837,
+          "fn": 30,
+          "tn": 5890,
+          "iou": 0.0597,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171015T095031_14_66",
+      "loss": 0.2262,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Complex cultivation patterns"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 86,
+          "fp": 378,
+          "fn": 592,
+          "tn": 15328,
+          "iou": 0.0814,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 54,
+          "fp": 30,
+          "fn": 209,
+          "tn": 16091,
+          "iou": 0.1843,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15116,
+          "fp": 668,
+          "fn": 327,
+          "tn": 273,
+          "iou": 0.9382,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171015T095031_8_70",
+      "loss": 0.2164,
+      "clc_labels": [
+        "Arable land"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171101T94132_23_44",
+      "loss": 0.2412,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 19,
+          "fp": 240,
+          "fn": 1162,
+          "tn": 14963,
+          "iou": 0.0134,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 14728,
+          "fp": 1443,
+          "fn": 197,
+          "tn": 16,
+          "iou": 0.8998,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171101T94132_43_56",
+      "loss": 0.1964,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 115,
+          "fn": 4,
+          "tn": 16265,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 3243,
+          "fp": 673,
+          "fn": 131,
+          "tn": 12337,
+          "iou": 0.8013,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12309,
+          "fp": 127,
+          "fn": 697,
+          "tn": 3251,
+          "iou": 0.9373,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171104T095201_22_1",
+      "loss": 1.1603,
+      "clc_labels": [
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 16375,
+          "tn": 9,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 9,
+          "fp": 16375,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.0005,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171121T112351_15_23",
+      "loss": 0.1516,
+      "clc_labels": [
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Moors, heathland and sclerophyllous vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 8,
+          "fp": 105,
+          "fn": 243,
+          "tn": 16028,
+          "iou": 0.0225,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16030,
+          "fp": 252,
+          "fn": 93,
+          "tn": 9,
+          "iou": 0.9789,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171121T112351_24_23",
+      "loss": 0.2625,
+      "clc_labels": [
+        "Urban fabric",
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 1930,
+          "fp": 1689,
+          "fn": 912,
+          "tn": 11853,
+          "iou": 0.426,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 12184,
+          "fp": 980,
+          "fn": 1344,
+          "tn": 1876,
+          "iou": 0.8398,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171121T112351_65_81",
+      "loss": 0.239,
+      "clc_labels": [
+        "Agro-forestry areas",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 99,
+          "fn": 0,
+          "tn": 16285,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16286,
+          "fp": 0,
+          "fn": 98,
+          "tn": 0,
+          "iou": 0.994,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_18_73",
+      "loss": 0.1737,
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 22,
+          "fp": 29,
+          "fn": 310,
+          "tn": 16023,
+          "iou": 0.0609,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 20,
+          "tn": 16364,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16017,
+          "fp": 341,
+          "fn": 12,
+          "tn": 14,
+          "iou": 0.9784,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_26_28",
+      "loss": 0.1576,
+      "clc_labels": [
+        "Arable land",
+        "Permanent crops",
+        "Agro-forestry areas",
+        "Broad-leaved forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 11,
+          "fn": 6,
+          "tn": 16367,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16375,
+          "fp": 6,
+          "fn": 3,
+          "tn": 0,
+          "iou": 0.9995,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_43_74",
+      "loss": 0.2211,
+      "clc_labels": [
+        "Arable land",
+        "Permanent crops",
+        "Complex cultivation patterns"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 47,
+          "fp": 299,
+          "fn": 727,
+          "tn": 15311,
+          "iou": 0.0438,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 5,
+          "fn": 0,
+          "tn": 16379,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15414,
+          "fp": 740,
+          "fn": 189,
+          "tn": 41,
+          "iou": 0.9432,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_54_24",
+      "loss": 0.2341,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 19,
+          "tn": 16365,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 570,
+          "fn": 0,
+          "tn": 15814,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15831,
+          "fp": 19,
+          "fn": 534,
+          "tn": 0,
+          "iou": 0.9662,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_64_48",
+      "loss": 0.1277,
+      "clc_labels": [
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_73_71",
+      "loss": 0.1666,
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Moors, heathland and sclerophyllous vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 77,
+          "fp": 238,
+          "fn": 129,
+          "tn": 15940,
+          "iou": 0.1734,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15970,
+          "fp": 137,
+          "fn": 201,
+          "tn": 76,
+          "iou": 0.9793,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_81_35",
+      "loss": 0.2305,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 60,
+          "tn": 16324,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 66,
+          "fn": 17,
+          "tn": 16301,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16164,
+          "fp": 83,
+          "fn": 137,
+          "tn": 0,
+          "iou": 0.9866,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171201T112431_88_57",
+      "loss": 0.1458,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 11,
+          "tn": 16373,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 13,
+          "fn": 0,
+          "tn": 16371,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16330,
+          "fp": 18,
+          "fn": 36,
+          "tn": 0,
+          "iou": 0.9967,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171208T093351_15_69",
+      "loss": 0.292,
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 249,
+          "fp": 1318,
+          "fn": 731,
+          "tn": 14086,
+          "iou": 0.1084,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 69,
+          "fn": 45,
+          "tn": 16270,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 13208,
+          "fp": 1909,
+          "fn": 641,
+          "tn": 626,
+          "iou": 0.8382,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20171208T093351_55_6",
+      "loss": 0.2535,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Transitional woodland, shrub",
+        "Inland wetlands",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 286,
+          "fp": 791,
+          "fn": 11,
+          "tn": 15296,
+          "iou": 0.2629,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 8,
+          "fp": 10,
+          "fn": 985,
+          "tn": 15381,
+          "iou": 0.008,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 14325,
+          "fp": 1071,
+          "fn": 528,
+          "tn": 460,
+          "iou": 0.8996,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180225T114351_36_24",
+      "loss": 0.1836,
+      "clc_labels": [
+        "Arable land",
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 80,
+          "fp": 166,
+          "fn": 426,
+          "tn": 15712,
+          "iou": 0.119,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15754,
+          "fp": 427,
+          "fn": 124,
+          "tn": 79,
+          "iou": 0.9662,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180228T101021_42_47",
+      "loss": 0.1623,
+      "clc_labels": [
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Coniferous forest",
+        "Mixed forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 5,
+          "fp": 221,
+          "fn": 98,
+          "tn": 16060,
+          "iou": 0.0154,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 7,
+          "tn": 16377,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16097,
+          "fp": 113,
+          "fn": 169,
+          "tn": 5,
+          "iou": 0.9828,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180228T101021_70_33",
+      "loss": 0.3142,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3528,
+          "tn": 12856,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12851,
+          "fp": 3528,
+          "fn": 5,
+          "tn": 0,
+          "iou": 0.7844,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180318T093031_23_13",
+      "loss": 0.1901,
+      "clc_labels": [
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Coniferous forest",
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 4006,
+          "fp": 22,
+          "fn": 368,
+          "tn": 11988,
+          "iou": 0.9113,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 11977,
+          "fp": 355,
+          "fn": 33,
+          "tn": 4019,
+          "iou": 0.9686,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180318T093031_28_31",
+      "loss": 0.1706,
+      "clc_labels": [
+        "Pastures",
+        "Complex cultivation patterns",
+        "Broad-leaved forest",
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 116,
+          "tn": 16268,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 1,
+          "fp": 1,
+          "fn": 53,
+          "tn": 16329,
+          "iou": 0.0182,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16211,
+          "fp": 170,
+          "fn": 3,
+          "tn": 0,
+          "iou": 0.9894,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180413T095031_12_40",
+      "loss": 0.4348,
+      "clc_labels": [
+        "Urban fabric",
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Inland wetlands",
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 7,
+          "tn": 16374,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 4317,
+          "fp": 51,
+          "fn": 3090,
+          "tn": 8926,
+          "iou": 0.5788,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 8898,
+          "fp": 3250,
+          "fn": 72,
+          "tn": 4164,
+          "iou": 0.7282,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180413T095031_19_10",
+      "loss": 0.1852,
+      "clc_labels": [
+        "Arable land",
+        "Complex cultivation patterns",
+        "Broad-leaved forest",
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 17,
+          "tn": 16367,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16367,
+          "fp": 17,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.999,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180413T95032_67_15",
+      "loss": 0.3945,
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 6068,
+          "fp": 4042,
+          "fn": 860,
+          "tn": 5414,
+          "iou": 0.5531,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 6357,
+          "fp": 1328,
+          "fn": 3041,
+          "tn": 5658,
+          "iou": 0.5927,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180413T95032_68_11",
+      "loss": 0.3513,
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Mixed forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 1255,
+          "fp": 1611,
+          "fn": 1516,
+          "tn": 12002,
+          "iou": 0.2864,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 336,
+          "tn": 16048,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12042,
+          "fp": 1924,
+          "fn": 1214,
+          "tn": 1204,
+          "iou": 0.7933,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180413T95032_70_4",
+      "loss": 0.3987,
+      "clc_labels": [
+        "Industrial or commercial units",
+        "Arable land",
+        "Broad-leaved forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 7,
+          "fp": 280,
+          "fn": 870,
+          "tn": 15227,
+          "iou": 0.0061,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 8240,
+          "fp": 7902,
+          "fn": 0,
+          "tn": 242,
+          "iou": 0.5105,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180506T100031_89_53",
+      "loss": 0.5359,
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 6633,
+          "fp": 1395,
+          "fn": 4938,
+          "tn": 3418,
+          "iou": 0.5116,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "tn": 16369,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 3822,
+          "fp": 6147,
+          "fn": 973,
+          "tn": 5442,
+          "iou": 0.3493,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180508T104031_9_80",
+      "loss": 0.1195,
+      "clc_labels": [
+        "Urban fabric",
+        "Coniferous forest",
+        "Mixed forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180510T94032_22_60",
+      "loss": 0.4471,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 210,
+          "fp": 1,
+          "fn": 4075,
+          "tn": 12098,
+          "iou": 0.049,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12099,
+          "fp": 4126,
+          "fn": 0,
+          "tn": 159,
+          "iou": 0.7457,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180526T100031_89_59",
+      "loss": 0.4388,
+      "clc_labels": [
+        "Coniferous forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4774,
+          "tn": 11610,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 11610,
+          "fp": 4774,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.7086,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180527T093041_16_42",
+      "loss": 0.3494,
+      "clc_labels": [
+        "Arable land",
+        "Coniferous forest",
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 27,
+          "fp": 52,
+          "fn": 195,
+          "tn": 16110,
+          "iou": 0.0985,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 956,
+          "fp": 304,
+          "fn": 1845,
+          "tn": 13279,
+          "iou": 0.3079,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12396,
+          "fp": 2707,
+          "fn": 289,
+          "tn": 992,
+          "iou": 0.8054,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180527T093041_26_71",
+      "loss": 0.1464,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 10928,
+          "fp": 231,
+          "fn": 39,
+          "tn": 5186,
+          "iou": 0.9759,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 5115,
+          "fp": 21,
+          "fn": 302,
+          "tn": 10946,
+          "iou": 0.9406,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20180527T093041_35_57",
+      "loss": 0.1011,
+      "clc_labels": [
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170709T094029_18_5",
+      "loss": 0.1349,
+      "clc_labels": [
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 17,
+          "tn": 16367,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16367,
+          "fp": 17,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.999,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170709T094029_62_40",
+      "loss": 0.1548,
+      "clc_labels": [
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 408,
+          "tn": 15976,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15976,
+          "fp": 408,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9751,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_17_54",
+      "loss": 0.505,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 16382,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 11884,
+          "fp": 0,
+          "fn": 3248,
+          "tn": 1252,
+          "iou": 0.7854,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 1175,
+          "fp": 4073,
+          "fn": 0,
+          "tn": 11136,
+          "iou": 0.2239,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_23_56",
+      "loss": 0.2986,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16365,
+          "fp": 0,
+          "fn": 19,
+          "tn": 0,
+          "iou": 0.9988,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 20,
+          "fn": 0,
+          "tn": 16364,
+          "iou": 0.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170817T101019_26_40",
+      "loss": 0.3752,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16003,
+          "fp": 0,
+          "fn": 381,
+          "tn": 0,
+          "iou": 0.9767,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 617,
+          "fn": 0,
+          "tn": 15767,
+          "iou": 0.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_20_34",
+      "loss": 0.243,
+      "clc_labels": [
+        "Permanent crops",
+        "Pastures",
+        "Complex cultivation patterns",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 65,
+          "fp": 191,
+          "fn": 254,
+          "tn": 15874,
+          "iou": 0.1275,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 201,
+          "fn": 11,
+          "tn": 16172,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15531,
+          "fp": 332,
+          "fn": 450,
+          "tn": 71,
+          "iou": 0.9521,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_23_69",
+      "loss": 0.1673,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 0,
+          "tn": 16382,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 24,
+          "fp": 0,
+          "fn": 222,
+          "tn": 16138,
+          "iou": 0.0976,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16128,
+          "fp": 239,
+          "fn": 2,
+          "tn": 15,
+          "iou": 0.9853,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_32_21",
+      "loss": 0.1523,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_76_81",
+      "loss": 0.3917,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 3842,
+          "fp": 4839,
+          "fn": 421,
+          "tn": 7282,
+          "iou": 0.4221,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 8077,
+          "fp": 712,
+          "fn": 3808,
+          "tn": 3787,
+          "iou": 0.6412,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_81_82",
+      "loss": 0.3522,
+      "clc_labels": [
+        "Permanent crops",
+        "Complex cultivation patterns"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 689,
+          "fp": 3173,
+          "fn": 505,
+          "tn": 12017,
+          "iou": 0.1578,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 12695,
+          "fp": 576,
+          "fn": 2461,
+          "tn": 652,
+          "iou": 0.807,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_82_86",
+      "loss": 1.1516,
+      "clc_labels": [
+        "Arable land",
+        "Coastal wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 77,
+          "fn": 0,
+          "tn": 16307,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 1761,
+          "fp": 0,
+          "fn": 14608,
+          "tn": 15,
+          "iou": 0.1076,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15,
+          "fp": 14193,
+          "fn": 0,
+          "tn": 2176,
+          "iou": 0.0011,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170818T112109_84_72",
+      "loss": 0.3133,
+      "clc_labels": [
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 895,
+          "fp": 2987,
+          "fn": 323,
+          "tn": 12179,
+          "iou": 0.2128,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 12818,
+          "fp": 474,
+          "fn": 2342,
+          "tn": 750,
+          "iou": 0.8199,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170829T105019_79_30",
+      "loss": 0.189,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 130,
+          "tn": 16254,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16254,
+          "fp": 130,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9921,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170906T101019_12_80",
+      "loss": 0.443,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 13534,
+          "fp": 0,
+          "fn": 2850,
+          "tn": 0,
+          "iou": 0.826,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 3734,
+          "fn": 0,
+          "tn": 12650,
+          "iou": 0.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170906T101020_43_56",
+      "loss": 0.2047,
+      "clc_labels": [
+        "Coniferous forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 629,
+          "tn": 15755,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15755,
+          "fp": 629,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9616,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170911T092019_8_88",
+      "loss": 0.1446,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Natural grassland and sparsely vegetated areas"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 16,
+          "fn": 0,
+          "tn": 16368,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16375,
+          "fp": 0,
+          "fn": 9,
+          "tn": 0,
+          "iou": 0.9995,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170911T092019_9_16",
+      "loss": 0.1235,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Natural grassland and sparsely vegetated areas"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170914T093029_12_70",
+      "loss": 0.1877,
+      "clc_labels": [
+        "Arable land",
+        "Complex cultivation patterns"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 29,
+          "fp": 1,
+          "fn": 36,
+          "tn": 16318,
+          "iou": 0.4394,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "tn": 16383,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16318,
+          "fp": 54,
+          "fn": 0,
+          "tn": 12,
+          "iou": 0.9967,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170914T093029_27_37",
+      "loss": 0.1306,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170914T093029_75_47",
+      "loss": 0.1568,
+      "clc_labels": [
+        "Pastures",
+        "Complex cultivation patterns",
+        "Broad-leaved forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 21,
+          "fn": 0,
+          "tn": 16363,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16354,
+          "fp": 0,
+          "fn": 30,
+          "tn": 0,
+          "iou": 0.9982,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170914T93030_55_81",
+      "loss": 0.2686,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 762,
+          "tn": 15622,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 18,
+          "fn": 0,
+          "tn": 16366,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15597,
+          "fp": 760,
+          "fn": 24,
+          "tn": 3,
+          "iou": 0.9521,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170924T093019_53_27",
+      "loss": 0.6181,
+      "clc_labels": [
+        "Industrial or commercial units",
+        "Arable land"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 1162,
+          "fp": 564,
+          "fn": 5680,
+          "tn": 8978,
+          "iou": 0.1569,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 14,
+          "fp": 190,
+          "fn": 1035,
+          "tn": 15145,
+          "iou": 0.0113,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 6888,
+          "fp": 8014,
+          "fn": 248,
+          "tn": 1234,
+          "iou": 0.4547,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170924T093019_89_24",
+      "loss": 0.5522,
+      "clc_labels": [
+        "Coniferous forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6166,
+          "tn": 10218,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 10218,
+          "fp": 6166,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.6237,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170924T93021_44_39",
+      "loss": 0.3109,
+      "clc_labels": [
+        "Coniferous forest",
+        "Inland wetlands",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 3925,
+          "fp": 14,
+          "fn": 2717,
+          "tn": 9728,
+          "iou": 0.5897,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 9725,
+          "fp": 2735,
+          "fn": 17,
+          "tn": 3907,
+          "iou": 0.7794,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170927T094019_14_89",
+      "loss": 0.1503,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 147,
+          "tn": 16237,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 273,
+          "fp": 19,
+          "fn": 118,
+          "tn": 15974,
+          "iou": 0.6659,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15829,
+          "fp": 273,
+          "fn": 17,
+          "tn": 265,
+          "iou": 0.982,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170927T094019_2_17",
+      "loss": 0.1938,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 95,
+          "tn": 16289,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16289,
+          "fp": 95,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9942,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170927T094019_47_72",
+      "loss": 0.1702,
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 50,
+          "tn": 16334,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16334,
+          "fp": 50,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9969,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170927T094019_90_10",
+      "loss": 0.1596,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Complex cultivation patterns",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Mixed forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 51,
+          "fn": 190,
+          "tn": 16143,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "tn": 16369,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16130,
+          "fp": 197,
+          "fn": 49,
+          "tn": 8,
+          "iou": 0.985,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170927T94020_20_57",
+      "loss": 0.1811,
+      "clc_labels": [
+        "Arable land"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170927T94020_82_87",
+      "loss": 0.1949,
+      "clc_labels": [
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 300,
+          "fn": 0,
+          "tn": 16084,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 21,
+          "tn": 16363,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16166,
+          "fp": 21,
+          "fn": 197,
+          "tn": 0,
+          "iou": 0.9867,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20170930T095019_23_62",
+      "loss": 0.5261,
+      "clc_labels": [
+        "Pastures",
+        "Transitional woodland, shrub",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8,
+          "tn": 16376,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 3453,
+          "fp": 2784,
+          "fn": 2670,
+          "tn": 7477,
+          "iou": 0.3877,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 7574,
+          "fp": 2698,
+          "fn": 2679,
+          "tn": 3433,
+          "iou": 0.5848,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171016T101009_37_42",
+      "loss": 0.1804,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16021,
+          "fp": 25,
+          "fn": 183,
+          "tn": 155,
+          "iou": 0.9872,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 140,
+          "fp": 148,
+          "fn": 37,
+          "tn": 16059,
+          "iou": 0.4308,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171016T101009_60_4",
+      "loss": 0.1369,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16282,
+          "fp": 88,
+          "fn": 4,
+          "tn": 10,
+          "iou": 0.9944,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 2,
+          "fp": 1,
+          "fn": 91,
+          "tn": 16290,
+          "iou": 0.0213,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171107T105229_70_45",
+      "loss": 0.3749,
+      "clc_labels": [
+        "Industrial or commercial units",
+        "Arable land",
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 1309,
+          "fp": 154,
+          "fn": 3147,
+          "tn": 11774,
+          "iou": 0.2839,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 227,
+          "fn": 127,
+          "tn": 16030,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 10929,
+          "fp": 4022,
+          "fn": 144,
+          "tn": 1289,
+          "iou": 0.724,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171112T114339_68_18",
+      "loss": 0.2076,
+      "clc_labels": [
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Broad-leaved forest",
+        "Coniferous forest",
+        "Moors, heathland and sclerophyllous vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 2,
+          "fp": 134,
+          "fn": 75,
+          "tn": 16173,
+          "iou": 0.0095,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 14,
+          "fn": 0,
+          "tn": 16370,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16180,
+          "fp": 75,
+          "fn": 127,
+          "tn": 2,
+          "iou": 0.9877,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171219T095409_22_0",
+      "loss": 0.6717,
+      "clc_labels": [
+        "Pastures",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 4627,
+          "fp": 4,
+          "fn": 11213,
+          "tn": 540,
+          "iou": 0.292,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 540,
+          "fp": 12063,
+          "fn": 4,
+          "tn": 3777,
+          "iou": 0.0428,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171219T095409_28_5",
+      "loss": 0.4027,
+      "clc_labels": [
+        "Arable land",
+        "Permanent crops",
+        "Complex cultivation patterns",
+        "Natural grassland and sparsely vegetated areas",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 29,
+          "tn": 16355,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 94,
+          "fp": 178,
+          "fn": 3876,
+          "tn": 12236,
+          "iou": 0.0227,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12183,
+          "fp": 3947,
+          "fn": 30,
+          "tn": 224,
+          "iou": 0.7539,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20171219T095409_72_53",
+      "loss": 0.193,
+      "clc_labels": [
+        "Arable land",
+        "Complex cultivation patterns",
+        "Broad-leaved forest",
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 552,
+          "fp": 385,
+          "fn": 626,
+          "tn": 14821,
+          "iou": 0.3532,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 13,
+          "tn": 16371,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 14617,
+          "fp": 664,
+          "fn": 429,
+          "tn": 674,
+          "iou": 0.9304,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180204T94160_65_36",
+      "loss": 0.1858,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 105,
+          "fn": 33,
+          "tn": 16246,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 689,
+          "tn": 15690,
+          "iou": 0.0072,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15596,
+          "fp": 725,
+          "fn": 61,
+          "tn": 2,
+          "iou": 0.952,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180204T94161_18_72",
+      "loss": 0.3501,
+      "clc_labels": [
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 11214,
+          "fp": 0,
+          "fn": 1972,
+          "tn": 3198,
+          "iou": 0.8504,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 3198,
+          "fp": 1812,
+          "fn": 0,
+          "tn": 11374,
+          "iou": 0.6383,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180220T114339_38_69",
+      "loss": 0.1885,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 207,
+          "fp": 756,
+          "fn": 7,
+          "tn": 15414,
+          "iou": 0.2134,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15430,
+          "fp": 8,
+          "fn": 740,
+          "tn": 206,
+          "iou": 0.9538,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_30_3",
+      "loss": 0.1685,
+      "clc_labels": [
+        "Agro-forestry areas",
+        "Broad-leaved forest",
+        "Mixed forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 44,
+          "tn": 16340,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 113,
+          "fp": 28,
+          "fn": 204,
+          "tn": 16039,
+          "iou": 0.3275,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15991,
+          "fp": 252,
+          "fn": 26,
+          "tn": 115,
+          "iou": 0.9829,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_58_61",
+      "loss": 0.1472,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Agro-forestry areas",
+        "Broad-leaved forest",
+        "Coniferous forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 19,
+          "fp": 0,
+          "fn": 66,
+          "tn": 16299,
+          "iou": 0.2235,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 16299,
+          "fp": 68,
+          "fn": 0,
+          "tn": 17,
+          "iou": 0.9958,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_5_44",
+      "loss": 0.2727,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16372,
+          "fp": 0,
+          "fn": 12,
+          "tn": 0,
+          "iou": 0.9993,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 11,
+          "fn": 0,
+          "tn": 16373,
+          "iou": 0.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180224T112109_75_17",
+      "loss": 0.1282,
+      "clc_labels": [
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8,
+          "tn": 16376,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16375,
+          "fp": 8,
+          "fn": 1,
+          "tn": 0,
+          "iou": 0.9995,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180225T105019_63_13",
+      "loss": 0.1901,
+      "clc_labels": [
+        "Arable land",
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 65,
+          "tn": 16319,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 383,
+          "fn": 0,
+          "tn": 16001,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16049,
+          "fp": 65,
+          "fn": 270,
+          "tn": 0,
+          "iou": 0.9796,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180225T105019_76_22",
+      "loss": 0.3211,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 58,
+          "fp": 15,
+          "fn": 346,
+          "tn": 15965,
+          "iou": 0.1384,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 3020,
+          "fn": 0,
+          "tn": 13364,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 13388,
+          "fp": 142,
+          "fn": 2592,
+          "tn": 262,
+          "iou": 0.8304,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_15_35",
+      "loss": 0.2073,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 526,
+          "fp": 430,
+          "fn": 606,
+          "tn": 14822,
+          "iou": 0.3367,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 14751,
+          "fp": 750,
+          "fn": 236,
+          "tn": 647,
+          "iou": 0.9373,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_47_36",
+      "loss": 0.2355,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Transitional woodland, shrub",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 22,
+          "fn": 15,
+          "tn": 16347,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 931,
+          "fp": 124,
+          "fn": 1541,
+          "tn": 13788,
+          "iou": 0.3586,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 13605,
+          "fp": 1684,
+          "fn": 149,
+          "tn": 946,
+          "iou": 0.8813,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_64_56",
+      "loss": 0.1454,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Moors, heathland and sclerophyllous vegetation",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 0,
+          "tn": 16381,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16368,
+          "fp": 16,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.999,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180326T112109_89_76",
+      "loss": 0.1643,
+      "clc_labels": [
+        "Permanent crops",
+        "Moors, heathland and sclerophyllous vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 5,
+          "fn": 595,
+          "tn": 15784,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 15743,
+          "fp": 638,
+          "fn": 3,
+          "tn": 0,
+          "iou": 0.9609,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180417T102019_20_57",
+      "loss": 0.273,
+      "clc_labels": [
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 38,
+          "tn": 16346,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 1035,
+          "fp": 1259,
+          "fn": 691,
+          "tn": 13399,
+          "iou": 0.3467,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 13151,
+          "fp": 573,
+          "fn": 1469,
+          "tn": 1191,
+          "iou": 0.8656,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180417T102019_40_6",
+      "loss": 0.2332,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "tn": 16369,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 2847,
+          "fp": 238,
+          "fn": 1068,
+          "tn": 12231,
+          "iou": 0.6855,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12151,
+          "fp": 928,
+          "fn": 300,
+          "tn": 3005,
+          "iou": 0.9082,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180417T102019_55_3",
+      "loss": 0.2153,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 101,
+          "fn": 448,
+          "tn": 15835,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 69,
+          "fp": 286,
+          "fn": 124,
+          "tn": 15905,
+          "iou": 0.1441,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15130,
+          "fp": 589,
+          "fn": 184,
+          "tn": 481,
+          "iou": 0.9514,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180417T102019_66_11",
+      "loss": 0.385,
+      "clc_labels": [
+        "Mixed forest",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 14417,
+          "fp": 687,
+          "fn": 217,
+          "tn": 1063,
+          "iou": 0.941,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 1016,
+          "fp": 142,
+          "fn": 734,
+          "tn": 14492,
+          "iou": 0.537,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180421T100029_25_16",
+      "loss": 0.139,
+      "clc_labels": [
+        "Pastures",
+        "Coniferous forest",
+        "Mixed forest",
+        "Moors, heathland and sclerophyllous vegetation"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 53,
+          "fn": 1,
+          "tn": 16330,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 0,
+          "tn": 16381,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16340,
+          "fp": 1,
+          "fn": 43,
+          "tn": 0,
+          "iou": 0.9973,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180421T100029_49_21",
+      "loss": 0.2458,
+      "clc_labels": [
+        "Urban fabric",
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Coniferous forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 932,
+          "fp": 1856,
+          "fn": 484,
+          "tn": 13112,
+          "iou": 0.2848,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 13549,
+          "fp": 630,
+          "fn": 1419,
+          "tn": 786,
+          "iou": 0.8686,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180421T114349_37_80",
+      "loss": 0.1626,
+      "clc_labels": [
+        "Arable land",
+        "Pastures",
+        "Coniferous forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 17,
+          "tn": 16367,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 41,
+          "fn": 0,
+          "tn": 16343,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16350,
+          "fp": 17,
+          "fn": 17,
+          "tn": 0,
+          "iou": 0.9979,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180421T114349_78_49",
+      "loss": 0.1087,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16383,
+          "fp": 0,
+          "fn": 1,
+          "tn": 0,
+          "iou": 0.9999,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "tn": 16383,
+          "iou": 0.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180422T093029_60_67",
+      "loss": 0.3814,
+      "clc_labels": [
+        "Industrial or commercial units",
+        "Broad-leaved forest"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 6,
+          "fp": 1408,
+          "fn": 94,
+          "tn": 14876,
+          "iou": 0.004,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 349,
+          "fn": 21,
+          "tn": 16014,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 7542,
+          "fp": 7310,
+          "fn": 393,
+          "tn": 1139,
+          "iou": 0.4947,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180428T095029_30_10",
+      "loss": 0.3408,
+      "clc_labels": [
+        "Arable land",
+        "Permanent crops",
+        "Natural grassland and sparsely vegetated areas",
+        "Inland wetlands"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 62,
+          "fn": 69,
+          "tn": 16253,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 367,
+          "fp": 77,
+          "fn": 2374,
+          "tn": 13566,
+          "iou": 0.1302,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 13266,
+          "fp": 2615,
+          "fn": 40,
+          "tn": 463,
+          "iou": 0.8332,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180506T105029_78_22",
+      "loss": 0.4547,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Pastures"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 822,
+          "fp": 548,
+          "fn": 528,
+          "tn": 14486,
+          "iou": 0.4331,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 5205,
+          "fn": 0,
+          "tn": 11179,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 9672,
+          "fp": 522,
+          "fn": 5362,
+          "tn": 828,
+          "iou": 0.6218,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180509T092029_20_87",
+      "loss": 0.1636,
+      "clc_labels": [
+        "Broad-leaved forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180515T094029_76_39",
+      "loss": 0.1332,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 18,
+          "tn": 16366,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 3352,
+          "fp": 121,
+          "fn": 36,
+          "tn": 12875,
+          "iou": 0.9553,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 12846,
+          "fp": 54,
+          "fn": 132,
+          "tn": 3352,
+          "iou": 0.9857,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180515T112110_21_71",
+      "loss": 0.2107,
+      "clc_labels": [
+        "Arable land",
+        "Complex cultivation patterns",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 11,
+          "tn": 16371,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 107,
+          "fn": 0,
+          "tn": 16277,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16239,
+          "fp": 53,
+          "fn": 92,
+          "tn": 0,
+          "iou": 0.9911,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180515T112110_22_52",
+      "loss": 0.2589,
+      "clc_labels": [
+        "Arable land",
+        "Complex cultivation patterns",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 3914,
+          "fp": 296,
+          "fn": 812,
+          "tn": 11362,
+          "iou": 0.7794,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 11354,
+          "fp": 745,
+          "fn": 219,
+          "tn": 4066,
+          "iou": 0.9217,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180515T112110_23_56",
+      "loss": 0.3333,
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Permanent crops"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 3347,
+          "fp": 710,
+          "fn": 753,
+          "tn": 11574,
+          "iou": 0.6958,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 232,
+          "fn": 9,
+          "tn": 16143,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 10975,
+          "fp": 923,
+          "fn": 1283,
+          "tn": 3203,
+          "iou": 0.8326,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180515T112110_53_20",
+      "loss": 0.2318,
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Broad-leaved forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 28,
+          "tn": 16356,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "tn": 16383,
+          "iou": 0.0,
+          "has_ground_truth": false
+        },
+        "Vegetation": {
+          "tp": 16348,
+          "fp": 36,
+          "fn": 0,
+          "tn": 0,
+          "iou": 0.9978,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180521T100029_19_79",
+      "loss": 0.2218,
+      "clc_labels": [
+        "Arable land",
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 27,
+          "fp": 75,
+          "fn": 11,
+          "tn": 16271,
+          "iou": 0.2389,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 1273,
+          "fp": 22,
+          "fn": 1558,
+          "tn": 13531,
+          "iou": 0.4462,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 13406,
+          "fp": 1525,
+          "fn": 107,
+          "tn": 1346,
+          "iou": 0.8915,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180521T100029_23_89",
+      "loss": 0.1518,
+      "clc_labels": [
+        "Arable land",
+        "Coniferous forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 28,
+          "fp": 170,
+          "fn": 47,
+          "tn": 16139,
+          "iou": 0.1143,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 204,
+          "tn": 16180,
+          "iou": 0.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 15918,
+          "fp": 249,
+          "fn": 187,
+          "tn": 30,
+          "iou": 0.9733,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180521T100029_52_2",
+      "loss": 0.1143,
+      "clc_labels": [
+        "Marine waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 16384,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "iou": 1.0,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180521T100029_64_15",
+      "loss": 0.1884,
+      "clc_labels": [
+        "Industrial or commercial units",
+        "Coniferous forest",
+        "Mixed forest",
+        "Transitional woodland, shrub"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 3,
+          "fp": 297,
+          "fn": 96,
+          "tn": 15988,
+          "iou": 0.0076,
+          "has_ground_truth": true
+        },
+        "Water": {
+          "tp": 96,
+          "fp": 19,
+          "fn": 224,
+          "tn": 16045,
+          "iou": 0.2832,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 14314,
+          "fp": 1713,
+          "fn": 24,
+          "tn": 333,
+          "iou": 0.8918,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180522T093029_25_33",
+      "loss": 0.2483,
+      "clc_labels": [
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 14552,
+          "fp": 10,
+          "fn": 361,
+          "tn": 1461,
+          "iou": 0.9751,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 1460,
+          "fp": 400,
+          "fn": 11,
+          "tn": 14513,
+          "iou": 0.7803,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180522T093029_30_1",
+      "loss": 0.2426,
+      "clc_labels": [
+        "Inland wetlands",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 14414,
+          "fp": 289,
+          "fn": 504,
+          "tn": 1177,
+          "iou": 0.9479,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 1176,
+          "fp": 553,
+          "fn": 290,
+          "tn": 14365,
+          "iou": 0.5825,
+          "has_ground_truth": true
+        }
+      }
+    },
+    {
+      "patch_id": "S2B_MSIL2A_20180525T94031_23_64",
+      "loss": 0.4254,
+      "clc_labels": [
+        "Coniferous forest",
+        "Mixed forest",
+        "Inland waters"
+      ],
+      "class_metrics": {
+        "Built-up": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 16384,
+          "iou": 1.0,
+          "has_ground_truth": false
+        },
+        "Water": {
+          "tp": 10287,
+          "fp": 1942,
+          "fn": 2208,
+          "tn": 1947,
+          "iou": 0.7125,
+          "has_ground_truth": true
+        },
+        "Vegetation": {
+          "tp": 1917,
+          "fp": 2199,
+          "fn": 1972,
+          "tn": 10296,
+          "iou": 0.3149,
+          "has_ground_truth": true
+        }
+      }
+    }
+  ]
+}

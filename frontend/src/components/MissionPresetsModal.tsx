@@ -61,15 +61,15 @@ const FALLBACK_MISSIONS: SampleMission[] = [
     title: "Mumbai Harbor & Docks Strategic Recon",
     category: "maritime",
     categoryLabel: "Maritime Recon",
-    tag: "HIGH-RES VQA & GROUNDING",
+    tag: "HIGH-RES VQA & SECTOR DELINEATION",
     location: "Jawaharlal Nehru Port, Navi Mumbai, India",
     coordinates: "18.9490° N, 72.9510° E",
     sensors: "Cartosat-2S Panchromatic + Multispectral",
     resolution: "0.65m Sub-Meter GSD",
-    pipeline: "SatSegNet Grounding Head + Bounding Boxes",
+    pipeline: "SatQuery Heuristic Delineator + Sector Bounding Boxes",
     query: "Describe the land-cover and major objects visible in this image.",
-    description: "Deep-water seaport terminal evaluation. Isolates commercial container ships, docking berths, and cylindrical petroleum liquid storage clusters with sub-meter spatial precision.",
-    technicalNote: "Validates high-resolution panchromatic spatial grounding with zero false alarms across ocean-land boundaries.",
+    description: "Port and coastal sector evaluation. Delineates maritime boundaries, docking berths, and coastal land sectors via spectral and morphological thresholding.",
+    technicalNote: "Heuristic spatial sector delineation across water-land boundaries (neural object grounding pending authentic checkpoint).",
     images: [
       { name: "mumbai_cartosat2s_optical.png", base64: "/demo/mumbai_cartosat2s_optical.png", label: "CARTOSAT-2S PANCHROMATIC" }
     ]

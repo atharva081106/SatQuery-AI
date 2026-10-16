@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-14T20:32:52Z",
+  "image": "mumbai_cartosat2s_optical.png",
+  "model_id": "google/owlvit-base-patch32",
+  "checkpoint": "cbc355fb364588351c5d51c7f74465e8e7ec6f72",
+  "model_load_ms": 20118.41,
+  "memory_peak_tracemalloc_mb": 204.97,
+  "process_rss_final_mb": 1024.57,
+  "runs": [
+    {
+      "query": "building or urban structure",
+      "threshold": 0.01,
+      "execution_path": "NEURAL_OWLVIT",
+      "status": "SUCCESS",
+      "confidence": 0.0228,
+      "forward_latency_ms": 714.22,
+      "total_latency_ms": 873.1594000128098,
+      "box_count": 13,
+      "sample_boxes": [
+        [
+          429,
+          205,
+          330,
+          285
+        ],
+        [
+          302,
+          544,
+          180,
+          184
+        ],
+        [
+          13,
+          86,
+          905,
+          938
+        ]
+      ]
+    },
+    {
+      "query": "airport runway",
+      "threshold": 0.15,
+      "execution_path": "NEURAL_OWLVIT",
+      "status": "NO_DETECTION",
+      "confidence": 0.0,
+      "forward_latency_ms": 644.79,
+      "total_latency_ms": 731.2753000296652,
+      "box_count": 0,
+      "sample_boxes": []
+    }
+  ],
+  "heuristic_fallback_verified": {
+    "execution_path": "HEURISTIC_FALLBACK",
+    "provenance": "fallback_heuristic (spectral thresholding & contour delineation)",
+    "latency_ms": 527.79,
+    "box_count": 0
+  }
+}

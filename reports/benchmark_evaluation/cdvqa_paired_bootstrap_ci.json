@@ -1,0 +1,118 @@
+{
+  "benchmark": "Phase 1 CDVQA Paired Cluster-Bootstrap Analysis (ChangeNet vs Blind)",
+  "timestamp": "2026-10-16T09:57:28Z",
+  "description": "Paired cluster-bootstrap 95% confidence intervals evaluating whether ChangeNet visual features provide statistically significant improvement over language prior alone.",
+  "n_bootstrap": 1000,
+  "cluster_level": "scene_pair (400 validation scene pairs)",
+  "n_validation_questions": 16441,
+  "statistical_procedure_details": {
+    "statistic": "Paired difference in accuracy (Delta = ChangeNet - Blind)",
+    "resampling_procedure": "1,000 cluster-bootstrap resamples over 400 validation scene pairs with replacement (all QAs per sampled pair concatenated)",
+    "confidence_interval_method": "Empirical percentile interval [2.5th, 97.5th percentiles]",
+    "p_value_calculation": "Non-numeric heuristic (statistically_significant = true iff 95% percentile interval excludes 0.0)",
+    "multiple_comparison_correction": "None applied. Per-category intervals are uncorrected nominal 95% CIs (alpha=0.05). Bonferroni control across 8 categories would require a 99.375% interval [0.3125%, 99.6875%].",
+    "uncertainty_scope": "Measures finite-sample evaluation uncertainty across geospatial scenes for a single model checkpoint (Seed 42). Distinct from 3-seed Student's t-test which evaluates training/optimization variance."
+  },
+  "results": {
+    "point_estimates": {
+      "model_oa": 68.91,
+      "blind_oa": 67.7,
+      "delta_oa": 1.21,
+      "model_aa": 60.18,
+      "blind_aa": 57.94,
+      "delta_aa": 2.24
+    },
+    "paired_delta_oa_ci_95": [
+      0.54,
+      1.91
+    ],
+    "delta_oa_significant": true,
+    "paired_delta_aa_ci_95": [
+      1.2,
+      3.34
+    ],
+    "delta_aa_significant": true,
+    "per_category_delta": {
+      "change_or_not": {
+        "model_acc": 82.96,
+        "blind_acc": 82.54,
+        "delta": 0.42,
+        "ci_95": [
+          -0.35,
+          1.12
+        ],
+        "statistically_significant": false
+      },
+      "increase_or_not": {
+        "model_acc": 73.23,
+        "blind_acc": 73.12,
+        "delta": 0.1,
+        "ci_95": [
+          -1.39,
+          1.58
+        ],
+        "statistically_significant": false
+      },
+      "decrease_or_not": {
+        "model_acc": 74.4,
+        "blind_acc": 72.27,
+        "delta": 2.13,
+        "ci_95": [
+          0.16,
+          3.95
+        ],
+        "statistically_significant": true
+      },
+      "change_to_what": {
+        "model_acc": 56.74,
+        "blind_acc": 56.58,
+        "delta": 0.16,
+        "ci_95": [
+          -1.85,
+          2.14
+        ],
+        "statistically_significant": false
+      },
+      "smallest_change": {
+        "model_acc": 29.67,
+        "blind_acc": 30.5,
+        "delta": -0.83,
+        "ci_95": [
+          -3.17,
+          1.67
+        ],
+        "statistically_significant": false
+      },
+      "largest_change": {
+        "model_acc": 51.5,
+        "blind_acc": 48.75,
+        "delta": 2.75,
+        "ci_95": [
+          -0.5,
+          5.83
+        ],
+        "statistically_significant": false
+      },
+      "change_ratio": {
+        "model_acc": 42.0,
+        "blind_acc": 28.88,
+        "delta": 13.12,
+        "ci_95": [
+          8.12,
+          18.88
+        ],
+        "statistically_significant": true
+      },
+      "change_ratio_types": {
+        "model_acc": 70.94,
+        "blind_acc": 70.86,
+        "delta": 0.08,
+        "ci_95": [
+          -1.3,
+          1.35
+        ],
+        "statistically_significant": false
+      }
+    }
+  }
+}

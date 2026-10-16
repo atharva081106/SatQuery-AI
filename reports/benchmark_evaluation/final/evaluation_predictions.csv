@@ -1,0 +1,251 @@
+Evaluation_Track,Sample_ID,Category_or_Type,Input_Details,Ground_Truth,Prediction,Outcome_or_IoU,Numeric_Error_or_Loss
+Change VQA,pair_07308_q0,change_or_not,Did the areas of non-vegetated ground surface change?,yes,yes,CORRECT,N/A
+Change VQA,pair_07308_q1,change_or_not,Did the regions of trees change?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q2,change_or_not,Have the areas of low vegetation changed?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q3,change_or_not,Have the regions of water changed?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q4,change_or_not,Have the regions of playgrounds changed?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q5,change_or_not,Did the regions of non-vegetated ground surface change in the pre-event image?,yes,yes,CORRECT,N/A
+Change VQA,pair_07308_q6,change_or_not,Did the areas of trees change in the pre-change image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q7,change_or_not,Have the areas of low vegetation changed in the first image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q8,change_or_not,Did the areas of water change in the pre-change image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q9,change_or_not,Have the regions of buildings changed in the first image?,yes,yes,CORRECT,N/A
+Change VQA,pair_07308_q10,change_or_not,Have the areas of non-vegetated ground surface changed in the second image?,yes,yes,CORRECT,N/A
+Change VQA,pair_07308_q11,change_or_not,Have the regions of trees changed in the second image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q12,change_or_not,Did the areas of low vegetation change in the post-change image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q13,change_or_not,Did the regions of water change in the post-event image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q14,change_or_not,Did the areas of buildings change in the post-change image?,yes,yes,CORRECT,N/A
+Change VQA,pair_07308_q15,change_or_not,Have the regions of playgrounds changed in the second image?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q16,change_or_not,Have the areas of non-vegetated ground surface changed?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q17,change_or_not,Have the regions of buildings changed?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q18,change_or_not,Have the areas of playgrounds changed?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q19,change_or_not,Did the areas of non-vegetated ground surface change in the pre-change image?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q20,change_or_not,Did the regions of trees change in the pre-event image?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q21,change_or_not,Did the regions of low vegetation change in the pre-event image?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q22,change_or_not,Did the areas of water change in the pre-change image?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q23,change_or_not,Have the regions of buildings changed in the first image?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q24,change_or_not,Have the areas of playgrounds changed in the first image?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q25,change_ratio,What is the percentage of changed regions?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_07308_q26,change_ratio,What is the percentage of unchanged areas?,90_to_100,50_to_60,INCORRECT,40.0
+Change VQA,pair_08311_q27,change_ratio,What is the percentage of changed regions?,20_to_30,90_to_100,INCORRECT,70.0
+Change VQA,pair_08311_q28,change_ratio,What is the non-change ratio of the imagery?,70_to_80,10_to_20,INCORRECT,60.0
+Change VQA,pair_07197_q29,change_ratio,How much of the area has changed?,10_to_20,0,INCORRECT,15.0
+Change VQA,pair_07197_q30,change_ratio,What is the percentage of non-change regions?,80_to_90,90_to_100,INCORRECT,10.0
+Change VQA,pair_04221_q31,change_ratio,What is the percentage of changed areas?,20_to_30,90_to_100,INCORRECT,70.0
+Change VQA,pair_04221_q32,change_ratio,What is the percentage of unchanged areas?,70_to_80,90_to_100,INCORRECT,20.0
+Change VQA,pair_02765_q33,change_ratio,What is the percentage of changed regions?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_02765_q34,change_ratio,What is the percentage of unchanged areas?,90_to_100,0,INCORRECT,95.0
+Change VQA,pair_04580_q35,change_ratio,What is the percentage of changed areas?,0_to_10,0,INCORRECT,5.0
+Change VQA,pair_04580_q36,change_ratio,How much of the area has not changed?,90_to_100,0,INCORRECT,95.0
+Change VQA,pair_02814_q37,change_ratio,What is the percentage of changed regions?,10_to_20,90_to_100,INCORRECT,80.0
+Change VQA,pair_02814_q38,change_ratio,What is the non-change ratio of the imagery?,80_to_90,10_to_20,INCORRECT,70.0
+Change VQA,pair_01661_q39,change_ratio,What is the percentage of changed areas?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_01661_q40,change_ratio,What is the percentage of non-change regions?,90_to_100,90_to_100,CORRECT,0.0
+Change VQA,pair_00751_q41,change_ratio,What is the percentage of changed regions?,10_to_20,90_to_100,INCORRECT,80.0
+Change VQA,pair_00751_q42,change_ratio,How much of the area has not changed?,80_to_90,0,INCORRECT,85.0
+Change VQA,pair_00374_q43,change_ratio,What is the percentage of changed areas?,10_to_20,90_to_100,INCORRECT,80.0
+Change VQA,pair_00374_q44,change_ratio,What is the non-change ratio of the imagery?,80_to_90,10_to_20,INCORRECT,70.0
+Change VQA,pair_03691_q45,change_ratio,What is the percentage of changed regions?,30_to_40,90_to_100,INCORRECT,60.0
+Change VQA,pair_03691_q46,change_ratio,What is the percentage of unchanged areas?,60_to_70,0,INCORRECT,65.0
+Change VQA,pair_01527_q47,change_ratio,What is the percentage of changed areas?,30_to_40,90_to_100,INCORRECT,60.0
+Change VQA,pair_01527_q48,change_ratio,What is the percentage of unchanged areas?,60_to_70,50_to_60,INCORRECT,10.0
+Change VQA,pair_02193_q49,change_ratio,What is the change ratio of the imagery?,30_to_40,10_to_20,INCORRECT,20.0
+Change VQA,pair_07308_q50,change_ratio_types,How much area of trees has changed in the first image?,0,0,CORRECT,0.0
+Change VQA,pair_07308_q51,change_ratio_types,How much area of low vegetation has changed in the pre-change image?,0,0,CORRECT,0.0
+Change VQA,pair_07308_q52,change_ratio_types,What is the change proportion of water in the post-event image?,0,20_to_30,INCORRECT,25.0
+Change VQA,pair_07308_q53,change_ratio_types,What is the change proportion of buildings in the second image?,0_to_10,20_to_30,INCORRECT,20.0
+Change VQA,pair_08311_q54,change_ratio_types,What is the change ratio of trees in the first image?,0,10_to_20,INCORRECT,15.0
+Change VQA,pair_08311_q55,change_ratio_types,What is the change ratio of water in the first image?,0_to_10,10_to_20,INCORRECT,10.0
+Change VQA,pair_08311_q56,change_ratio_types,What is the change ratio of non-vegetated ground surface in the second image?,20_to_30,30_to_40,INCORRECT,10.0
+Change VQA,pair_08311_q57,change_ratio_types,How much area of trees has changed in the post-change image?,0,0,CORRECT,0.0
+Change VQA,pair_08311_q58,change_ratio_types,How much area of low vegetation has changed in the second image?,0_to_10,0,INCORRECT,5.0
+Change VQA,pair_08311_q59,change_ratio_types,What is the change proportion of water in the second image?,0_to_10,20_to_30,INCORRECT,20.0
+Change VQA,pair_08311_q60,change_ratio_types,What is the change percentage of buildings in the post-change image?,0,40_to_50,INCORRECT,45.0
+Change VQA,pair_07197_q61,change_ratio_types,What is the change percentage of non-vegetated ground surface in the pre-change image?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_07197_q62,change_ratio_types,What is the change ratio of trees in the pre-event image?,0,20_to_30,INCORRECT,25.0
+Change VQA,pair_07197_q63,change_ratio_types,What is the change proportion of low vegetation in the pre-event image?,0_to_10,20_to_30,INCORRECT,20.0
+Change VQA,pair_07197_q64,change_ratio_types,What is the change ratio of water in the pre-event image?,0,10_to_20,INCORRECT,15.0
+Change VQA,pair_07197_q65,change_ratio_types,What is the change ratio of playgrounds in the pre-change image?,0_to_10,10_to_20,INCORRECT,10.0
+Change VQA,pair_07197_q66,change_ratio_types,What is the change percentage of non-vegetated ground surface in the second image?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_07197_q67,change_ratio_types,What is the change percentage of trees in the second image?,0_to_10,0,INCORRECT,5.0
+Change VQA,pair_04221_q68,change_ratio_types,What is the change proportion of water in the pre-event image?,0_to_10,20_to_30,INCORRECT,20.0
+Change VQA,pair_04221_q69,change_ratio_types,How much area of buildings has changed in the first image?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_04221_q70,change_ratio_types,How much area of non-vegetated ground surface has changed in the post-change image?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_04221_q71,change_ratio_types,What is the change ratio of trees in the post-change image?,0,10_to_20,INCORRECT,15.0
+Change VQA,pair_04221_q72,change_ratio_types,What is the change proportion of buildings in the post-event image?,0_to_10,90_to_100,INCORRECT,90.0
+Change VQA,pair_02765_q73,change_ratio_types,What is the change ratio of non-vegetated ground surface in the pre-change image?,0_to_10,30_to_40,INCORRECT,30.0
+Change VQA,pair_02765_q74,change_ratio_types,What is the change ratio of low vegetation in the pre-event image?,0_to_10,10_to_20,INCORRECT,10.0
+Change VQA,pair_07308_q75,change_to_what,What have the regions of non-vegetated ground surface in the pre-change image mainly changed to?,buildings,buildings,CORRECT,N/A
+Change VQA,pair_07308_q76,change_to_what,What have the areas of buildings in the pre-event image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_08311_q77,change_to_what,What have the regions of non-vegetated ground surface in the first image mainly changed to?,low_vegetation,buildings,INCORRECT,N/A
+Change VQA,pair_08311_q78,change_to_what,What have the regions of low vegetation in the pre-event image mainly changed to?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_08311_q79,change_to_what,What have the regions of water in the pre-event image mainly changed to?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_08311_q80,change_to_what,What have the regions of buildings in the first image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_07197_q81,change_to_what,What have the regions of non-vegetated ground surface in the pre-event image mainly changed to?,buildings,buildings,CORRECT,N/A
+Change VQA,pair_07197_q82,change_to_what,What have the areas of low vegetation in the pre-change image mainly changed to?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_07197_q83,change_to_what,What have the areas of buildings in the first image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_07197_q84,change_to_what,What have the regions of playgrounds in the first image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_04221_q85,change_to_what,What have the areas of low vegetation in the pre-change image mainly changed to?,buildings,buildings,CORRECT,N/A
+Change VQA,pair_04221_q86,change_to_what,What have the regions of water in the first image mainly changed to?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_04221_q87,change_to_what,What have the regions of buildings in the pre-change image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_02765_q88,change_to_what,What have the areas of non-vegetated ground surface in the pre-event image mainly changed to?,buildings,buildings,CORRECT,N/A
+Change VQA,pair_02765_q89,change_to_what,What have the regions of trees in the pre-event image mainly changed to?,buildings,trees,INCORRECT,N/A
+Change VQA,pair_02765_q90,change_to_what,What have the areas of low vegetation in the pre-change image mainly changed to?,buildings,water,INCORRECT,N/A
+Change VQA,pair_04580_q91,change_to_what,What have the areas of non-vegetated ground surface in the pre-change image mainly changed to?,low_vegetation,buildings,INCORRECT,N/A
+Change VQA,pair_04580_q92,change_to_what,What have the regions of low vegetation in the pre-change image mainly changed to?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_02814_q93,change_to_what,What have the areas of non-vegetated ground surface in the pre-change image mainly changed to?,buildings,buildings,CORRECT,N/A
+Change VQA,pair_02814_q94,change_to_what,What have the regions of trees in the pre-event image mainly changed to?,low_vegetation,trees,INCORRECT,N/A
+Change VQA,pair_02814_q95,change_to_what,What have the areas of low vegetation in the pre-event image mainly changed to?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_02814_q96,change_to_what,What have the regions of buildings in the pre-event image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_01661_q97,change_to_what,What have the regions of non-vegetated ground surface in the pre-event image mainly changed to?,trees,buildings,INCORRECT,N/A
+Change VQA,pair_01661_q98,change_to_what,What have the regions of buildings in the pre-change image mainly changed to?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_00751_q99,change_to_what,What have the areas of non-vegetated ground surface in the pre-change image mainly changed to?,buildings,buildings,CORRECT,N/A
+Change VQA,pair_07308_q100,decrease_or_not,Did the regions of trees decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q101,decrease_or_not,Did the areas of low vegetation decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q102,decrease_or_not,Have the areas of water decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q103,decrease_or_not,Have the regions of buildings decreased?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q104,decrease_or_not,Have the regions of non-vegetated ground surface decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q105,decrease_or_not,Did the regions of trees decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q106,decrease_or_not,Have the areas of low vegetation decreased?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q107,decrease_or_not,Have the regions of water decreased?,yes,yes,CORRECT,N/A
+Change VQA,pair_08311_q108,decrease_or_not,Have the areas of playgrounds decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07197_q109,decrease_or_not,Have the regions of non-vegetated ground surface decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07197_q110,decrease_or_not,Have the regions of water decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07197_q111,decrease_or_not,Did the areas of playgrounds decrease?,yes,yes,CORRECT,N/A
+Change VQA,pair_04221_q112,decrease_or_not,Did the areas of non-vegetated ground surface decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_04221_q113,decrease_or_not,Have the regions of trees decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_04221_q114,decrease_or_not,Have the regions of low vegetation decreased?,yes,yes,CORRECT,N/A
+Change VQA,pair_04221_q115,decrease_or_not,Did the areas of water decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_04221_q116,decrease_or_not,Have the regions of buildings decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_04221_q117,decrease_or_not,Have the areas of playgrounds decreased?,no,yes,INCORRECT,N/A
+Change VQA,pair_02765_q118,decrease_or_not,Did the areas of non-vegetated ground surface decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_02765_q119,decrease_or_not,Have the areas of trees decreased?,yes,yes,CORRECT,N/A
+Change VQA,pair_02765_q120,decrease_or_not,Have the areas of low vegetation decreased?,yes,yes,CORRECT,N/A
+Change VQA,pair_02765_q121,decrease_or_not,Did the regions of water decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_02765_q122,decrease_or_not,Did the regions of buildings decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_02765_q123,decrease_or_not,Did the areas of playgrounds decrease?,no,yes,INCORRECT,N/A
+Change VQA,pair_04580_q124,decrease_or_not,Did the regions of non-vegetated ground surface decrease?,yes,yes,CORRECT,N/A
+Change VQA,pair_07308_q125,increase_or_not,Did the areas of low vegetation increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q126,increase_or_not,Have the regions of water increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07308_q127,increase_or_not,Did the regions of playgrounds increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q128,increase_or_not,Have the areas of trees increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q129,increase_or_not,Did the regions of low vegetation increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q130,increase_or_not,Have the areas of water increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_08311_q131,increase_or_not,Have the areas of buildings increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07197_q132,increase_or_not,Have the regions of non-vegetated ground surface increased?,yes,yes,CORRECT,N/A
+Change VQA,pair_07197_q133,increase_or_not,Did the regions of trees increase?,yes,yes,CORRECT,N/A
+Change VQA,pair_07197_q134,increase_or_not,Have the areas of low vegetation increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07197_q135,increase_or_not,Have the regions of water increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_07197_q136,increase_or_not,Did the areas of buildings increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_04221_q137,increase_or_not,Have the regions of low vegetation increased?,no,yes,INCORRECT,N/A
+Change VQA,pair_04221_q138,increase_or_not,Did the regions of buildings increase?,yes,yes,CORRECT,N/A
+Change VQA,pair_04221_q139,increase_or_not,Did the regions of playgrounds increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_02765_q140,increase_or_not,Did the areas of non-vegetated ground surface increase?,yes,yes,CORRECT,N/A
+Change VQA,pair_02765_q141,increase_or_not,Have the areas of trees increased?,no,no,CORRECT,N/A
+Change VQA,pair_02765_q142,increase_or_not,Did the regions of low vegetation increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_02765_q143,increase_or_not,Have the areas of buildings increased?,yes,yes,CORRECT,N/A
+Change VQA,pair_02765_q144,increase_or_not,Did the regions of playgrounds increase?,no,no,CORRECT,N/A
+Change VQA,pair_04580_q145,increase_or_not,Did the areas of non-vegetated ground surface increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_04580_q146,increase_or_not,Did the regions of trees increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_04580_q147,increase_or_not,Did the areas of low vegetation increase?,yes,yes,CORRECT,N/A
+Change VQA,pair_04580_q148,increase_or_not,Did the areas of water increase?,no,yes,INCORRECT,N/A
+Change VQA,pair_04580_q149,increase_or_not,Did the areas of buildings increase?,yes,no,INCORRECT,N/A
+Change VQA,pair_07308_q150,largest_change,What is the largest change?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_07308_q151,largest_change,What is the largest change in the pre-change image?,buildings,water,INCORRECT,N/A
+Change VQA,pair_07308_q152,largest_change,What is the largest change in the second image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_08311_q153,largest_change,What is the largest change?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_08311_q154,largest_change,What type of change is the largest in the first image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_08311_q155,largest_change,What is the largest change in the post-event image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_07197_q156,largest_change,What is the largest change?,buildings,water,INCORRECT,N/A
+Change VQA,pair_07197_q157,largest_change,What is the largest change in the first image?,buildings,water,INCORRECT,N/A
+Change VQA,pair_07197_q158,largest_change,What type of change is the largest in the second image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_04221_q159,largest_change,What is the largest change?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_04221_q160,largest_change,What is the largest change in the first image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_04221_q161,largest_change,What is the largest change in the post-change image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_02765_q162,largest_change,What type of change is the largest?,buildings,water,INCORRECT,N/A
+Change VQA,pair_02765_q163,largest_change,What is the largest change in the pre-change image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_02765_q164,largest_change,What is the largest change in the post-event image?,buildings,water,INCORRECT,N/A
+Change VQA,pair_04580_q165,largest_change,What is the largest change?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_04580_q166,largest_change,What type of change is the largest in the first image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_04580_q167,largest_change,What type of change is the largest in the post-change image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_02814_q168,largest_change,What is the largest change?,buildings,water,INCORRECT,N/A
+Change VQA,pair_02814_q169,largest_change,What is the largest change in the pre-change image?,buildings,water,INCORRECT,N/A
+Change VQA,pair_02814_q170,largest_change,What is the largest change in the second image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_01661_q171,largest_change,What is the largest change?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_01661_q172,largest_change,What type of change is the largest in the pre-change image?,buildings,water,INCORRECT,N/A
+Change VQA,pair_01661_q173,largest_change,What is the largest change in the post-event image?,NVG_surface,buildings,INCORRECT,N/A
+Change VQA,pair_00751_q174,largest_change,What is the largest change?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_07308_q175,smallest_change,What type of change is the smallest?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_07308_q176,smallest_change,What is the smallest change in the first image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_07308_q177,smallest_change,What type of change is the smallest in the post-change image?,buildings,water,INCORRECT,N/A
+Change VQA,pair_08311_q178,smallest_change,What is the smallest change?,water,water,CORRECT,N/A
+Change VQA,pair_08311_q179,smallest_change,What type of change is the smallest in the pre-event image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_08311_q180,smallest_change,What type of change is the smallest in the second image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_07197_q181,smallest_change,What type of change is the smallest?,playgrounds,water,INCORRECT,N/A
+Change VQA,pair_07197_q182,smallest_change,What is the smallest change in the first image?,playgrounds,water,INCORRECT,N/A
+Change VQA,pair_07197_q183,smallest_change,What is the smallest change in the post-event image?,trees,water,INCORRECT,N/A
+Change VQA,pair_04221_q184,smallest_change,What type of change is the smallest?,water,water,CORRECT,N/A
+Change VQA,pair_04221_q185,smallest_change,What is the smallest change in the pre-change image?,water,water,CORRECT,N/A
+Change VQA,pair_04221_q186,smallest_change,What is the smallest change in the second image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_02765_q187,smallest_change,What type of change is the smallest?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_02765_q188,smallest_change,What is the smallest change in the pre-event image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_02765_q189,smallest_change,What type of change is the smallest in the post-change image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_04580_q190,smallest_change,What is the smallest change?,buildings,water,INCORRECT,N/A
+Change VQA,pair_04580_q191,smallest_change,What type of change is the smallest in the pre-event image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_04580_q192,smallest_change,What type of change is the smallest in the post-event image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_02814_q193,smallest_change,What is the smallest change?,trees,water,INCORRECT,N/A
+Change VQA,pair_02814_q194,smallest_change,What type of change is the smallest in the pre-change image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_02814_q195,smallest_change,What is the smallest change in the post-event image?,low_vegetation,buildings,INCORRECT,N/A
+Change VQA,pair_01661_q196,smallest_change,What type of change is the smallest?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_01661_q197,smallest_change,What type of change is the smallest in the pre-event image?,NVG_surface,water,INCORRECT,N/A
+Change VQA,pair_01661_q198,smallest_change,What type of change is the smallest in the post-change image?,low_vegetation,water,INCORRECT,N/A
+Change VQA,pair_00751_q199,smallest_change,What is the smallest change?,trees,water,INCORRECT,N/A
+Change Detection,pair_07308,Binary Change Mask,512x512 SECOND scene pair 07308,GT Changed Pixels: 1130,Pred Changed Pixels: 20956,Change IoU: 4.15%,2-Class mIoU: 36.36%
+Change Detection,pair_08311,Binary Change Mask,512x512 SECOND scene pair 08311,GT Changed Pixels: 16510,Pred Changed Pixels: 16432,Change IoU: 57.45%,2-Class mIoU: 70.41%
+Change Detection,pair_07197,Binary Change Mask,512x512 SECOND scene pair 07197,GT Changed Pixels: 9654,Pred Changed Pixels: 36265,Change IoU: 20.17%,2-Class mIoU: 33.71%
+Change Detection,pair_04221,Binary Change Mask,512x512 SECOND scene pair 04221,GT Changed Pixels: 13910,Pred Changed Pixels: 11863,Change IoU: 70.26%,2-Class mIoU: 81.03%
+Change Detection,pair_02765,Binary Change Mask,512x512 SECOND scene pair 02765,GT Changed Pixels: 4522,Pred Changed Pixels: 11680,Change IoU: 25.27%,2-Class mIoU: 54.87%
+Change Detection,pair_04580,Binary Change Mask,512x512 SECOND scene pair 04580,GT Changed Pixels: 6166,Pred Changed Pixels: 26720,Change IoU: 17.14%,2-Class mIoU: 39.41%
+Change Detection,pair_02814,Binary Change Mask,512x512 SECOND scene pair 02814,GT Changed Pixels: 6791,Pred Changed Pixels: 3314,Change IoU: 21.24%,2-Class mIoU: 55.47%
+Change Detection,pair_01661,Binary Change Mask,512x512 SECOND scene pair 01661,GT Changed Pixels: 3923,Pred Changed Pixels: 4697,Change IoU: 14.28%,2-Class mIoU: 52.12%
+Change Detection,pair_00751,Binary Change Mask,512x512 SECOND scene pair 00751,GT Changed Pixels: 12111,Pred Changed Pixels: 9656,Change IoU: 19.92%,2-Class mIoU: 48.22%
+Change Detection,pair_00374,Binary Change Mask,512x512 SECOND scene pair 00374,GT Changed Pixels: 7777,Pred Changed Pixels: 8557,Change IoU: 53.89%,2-Class mIoU: 72.85%
+Change Detection,pair_03691,Binary Change Mask,512x512 SECOND scene pair 03691,GT Changed Pixels: 20935,Pred Changed Pixels: 16515,Change IoU: 34.80%,2-Class mIoU: 51.19%
+Change Detection,pair_01527,Binary Change Mask,512x512 SECOND scene pair 01527,GT Changed Pixels: 19867,Pred Changed Pixels: 19610,Change IoU: 63.65%,2-Class mIoU: 73.09%
+Change Detection,pair_02193,Binary Change Mask,512x512 SECOND scene pair 02193,GT Changed Pixels: 26172,Pred Changed Pixels: 12457,Change IoU: 16.14%,2-Class mIoU: 34.89%
+Change Detection,pair_08405,Binary Change Mask,512x512 SECOND scene pair 08405,GT Changed Pixels: 5242,Pred Changed Pixels: 10558,Change IoU: 2.38%,2-Class mIoU: 39.63%
+Change Detection,pair_05066,Binary Change Mask,512x512 SECOND scene pair 05066,GT Changed Pixels: 1267,Pred Changed Pixels: 506,Change IoU: 24.51%,2-Class mIoU: 61.43%
+Change Detection,pair_10257,Binary Change Mask,512x512 SECOND scene pair 10257,GT Changed Pixels: 6527,Pred Changed Pixels: 11791,Change IoU: 39.93%,2-Class mIoU: 63.44%
+Change Detection,pair_02489,Binary Change Mask,512x512 SECOND scene pair 02489,GT Changed Pixels: 10267,Pred Changed Pixels: 6054,Change IoU: 37.01%,2-Class mIoU: 62.37%
+Change Detection,pair_00031,Binary Change Mask,512x512 SECOND scene pair 00031,GT Changed Pixels: 27059,Pred Changed Pixels: 17841,Change IoU: 52.45%,2-Class mIoU: 62.25%
+Change Detection,pair_05174,Binary Change Mask,512x512 SECOND scene pair 05174,GT Changed Pixels: 12357,Pred Changed Pixels: 8039,Change IoU: 29.24%,2-Class mIoU: 55.45%
+Change Detection,pair_00961,Binary Change Mask,512x512 SECOND scene pair 00961,GT Changed Pixels: 29438,Pred Changed Pixels: 12875,Change IoU: 33.21%,2-Class mIoU: 47.31%
+Change Detection,pair_04313,Binary Change Mask,512x512 SECOND scene pair 04313,GT Changed Pixels: 12931,Pred Changed Pixels: 5171,Change IoU: 24.87%,2-Class mIoU: 53.64%
+Change Detection,pair_05519,Binary Change Mask,512x512 SECOND scene pair 05519,GT Changed Pixels: 15619,Pred Changed Pixels: 5690,Change IoU: 29.08%,2-Class mIoU: 54.90%
+Change Detection,pair_00098,Binary Change Mask,512x512 SECOND scene pair 00098,GT Changed Pixels: 23284,Pred Changed Pixels: 22111,Change IoU: 32.81%,2-Class mIoU: 45.27%
+Change Detection,pair_05074,Binary Change Mask,512x512 SECOND scene pair 05074,GT Changed Pixels: 4097,Pred Changed Pixels: 1896,Change IoU: 29.16%,2-Class mIoU: 62.02%
+Change Detection,pair_02162,Binary Change Mask,512x512 SECOND scene pair 02162,GT Changed Pixels: 8829,Pred Changed Pixels: 5225,Change IoU: 6.84%,2-Class mIoU: 43.94%
+Change Detection,pair_05227,Binary Change Mask,512x512 SECOND scene pair 05227,GT Changed Pixels: 23146,Pred Changed Pixels: 26360,Change IoU: 55.38%,2-Class mIoU: 62.85%
+Change Detection,pair_02276,Binary Change Mask,512x512 SECOND scene pair 02276,GT Changed Pixels: 1351,Pred Changed Pixels: 2430,Change IoU: 2.88%,2-Class mIoU: 48.71%
+Change Detection,pair_09326,Binary Change Mask,512x512 SECOND scene pair 09326,GT Changed Pixels: 15779,Pred Changed Pixels: 20716,Change IoU: 18.00%,2-Class mIoU: 37.85%
+Change Detection,pair_09633,Binary Change Mask,512x512 SECOND scene pair 09633,GT Changed Pixels: 7760,Pred Changed Pixels: 15133,Change IoU: 20.71%,2-Class mIoU: 48.15%
+Change Detection,pair_03831,Binary Change Mask,512x512 SECOND scene pair 03831,GT Changed Pixels: 8320,Pred Changed Pixels: 22479,Change IoU: 33.09%,2-Class mIoU: 53.17%
+Change Detection,pair_04213,Binary Change Mask,512x512 SECOND scene pair 04213,GT Changed Pixels: 36438,Pred Changed Pixels: 45479,Change IoU: 53.66%,2-Class mIoU: 43.38%
+Change Detection,pair_02560,Binary Change Mask,512x512 SECOND scene pair 02560,GT Changed Pixels: 15314,Pred Changed Pixels: 14351,Change IoU: 24.02%,2-Class mIoU: 46.81%
+Change Detection,pair_03106,Binary Change Mask,512x512 SECOND scene pair 03106,GT Changed Pixels: 3728,Pred Changed Pixels: 4480,Change IoU: 23.99%,2-Class mIoU: 58.06%
+Change Detection,pair_08975,Binary Change Mask,512x512 SECOND scene pair 08975,GT Changed Pixels: 13917,Pred Changed Pixels: 4698,Change IoU: 26.60%,2-Class mIoU: 54.54%
+Change Detection,pair_00912,Binary Change Mask,512x512 SECOND scene pair 00912,GT Changed Pixels: 10555,Pred Changed Pixels: 4266,Change IoU: 34.43%,2-Class mIoU: 61.36%
+Change Detection,pair_09577,Binary Change Mask,512x512 SECOND scene pair 09577,GT Changed Pixels: 13397,Pred Changed Pixels: 27564,Change IoU: 37.65%,2-Class mIoU: 51.75%
+Change Detection,pair_03186,Binary Change Mask,512x512 SECOND scene pair 03186,GT Changed Pixels: 2185,Pred Changed Pixels: 2729,Change IoU: 6.78%,2-Class mIoU: 50.10%
+Change Detection,pair_09053,Binary Change Mask,512x512 SECOND scene pair 09053,GT Changed Pixels: 19071,Pred Changed Pixels: 19365,Change IoU: 59.72%,2-Class mIoU: 70.39%
+Change Detection,pair_08447,Binary Change Mask,512x512 SECOND scene pair 08447,GT Changed Pixels: 14020,Pred Changed Pixels: 10609,Change IoU: 36.36%,2-Class mIoU: 58.43%
+Change Detection,pair_06871,Binary Change Mask,512x512 SECOND scene pair 06871,GT Changed Pixels: 2763,Pred Changed Pixels: 3981,Change IoU: 33.49%,2-Class mIoU: 64.11%
+Change Detection,pair_08964,Binary Change Mask,512x512 SECOND scene pair 08964,GT Changed Pixels: 10213,Pred Changed Pixels: 15075,Change IoU: 37.05%,2-Class mIoU: 58.63%
+Change Detection,pair_07022,Binary Change Mask,512x512 SECOND scene pair 07022,GT Changed Pixels: 9411,Pred Changed Pixels: 11322,Change IoU: 29.17%,2-Class mIoU: 55.24%
+Change Detection,pair_03469,Binary Change Mask,512x512 SECOND scene pair 03469,GT Changed Pixels: 15049,Pred Changed Pixels: 13513,Change IoU: 42.87%,2-Class mIoU: 61.41%
+Change Detection,pair_11310,Binary Change Mask,512x512 SECOND scene pair 11310,GT Changed Pixels: 8266,Pred Changed Pixels: 14087,Change IoU: 38.63%,2-Class mIoU: 60.97%
+Change Detection,pair_00193,Binary Change Mask,512x512 SECOND scene pair 00193,GT Changed Pixels: 30625,Pred Changed Pixels: 11007,Change IoU: 31.09%,2-Class mIoU: 45.88%
+Change Detection,pair_01795,Binary Change Mask,512x512 SECOND scene pair 01795,GT Changed Pixels: 3492,Pred Changed Pixels: 397,Change IoU: 5.77%,2-Class mIoU: 50.23%
+Change Detection,pair_04119,Binary Change Mask,512x512 SECOND scene pair 04119,GT Changed Pixels: 6713,Pred Changed Pixels: 6822,Change IoU: 69.55%,2-Class mIoU: 82.75%
+Change Detection,pair_09005,Binary Change Mask,512x512 SECOND scene pair 09005,GT Changed Pixels: 4096,Pred Changed Pixels: 6805,Change IoU: 27.16%,2-Class mIoU: 58.64%
+Change Detection,pair_10267,Binary Change Mask,512x512 SECOND scene pair 10267,GT Changed Pixels: 2880,Pred Changed Pixels: 13143,Change IoU: 7.62%,2-Class mIoU: 43.13%
+Change Detection,pair_04629,Binary Change Mask,512x512 SECOND scene pair 04629,GT Changed Pixels: 42792,Pred Changed Pixels: 30723,Change IoU: 50.85%,2-Class mIoU: 46.04%

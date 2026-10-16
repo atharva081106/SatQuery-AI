@@ -1,0 +1,81 @@
+{
+  "mission": "SatQuery AI Single-Image Remote Sensing Benchmark",
+  "problem_statement": "ISRO / SAC \u2014 PS 26167",
+  "evaluated_checkpoint": "SatQuery-RS-VLM-v1.0 (Adapted Checkpoint)",
+  "runtime_device": "cpu",
+  "timestamp": "2026-10-14T20:05:45Z",
+  "datasets": {
+    "rsvqa": {
+      "dataset": "RSVQA (arXiv:2003.07333)",
+      "split": "test",
+      "total_samples": 36,
+      "overall_accuracy_pct": 36.11,
+      "breakdown_by_type": {
+        "presence": {
+          "total_questions": 11,
+          "correct": 6,
+          "accuracy_pct": 54.55
+        },
+        "count": {
+          "total_questions": 9,
+          "correct": 1,
+          "accuracy_pct": 11.11
+        },
+        "comparison": {
+          "total_questions": 8,
+          "correct": 4,
+          "accuracy_pct": 50.0
+        },
+        "area": {
+          "total_questions": 8,
+          "correct": 2,
+          "accuracy_pct": 25.0
+        }
+      },
+      "latency_sec": 41.69
+    },
+    "vrsbench_vqa": {
+      "dataset": "VRSBench VQA (arXiv:2406.12384)",
+      "split": "test",
+      "total_samples": 30,
+      "accuracy_pct": 76.67,
+      "mean_lexical_f1_pct": 76.67,
+      "latency_sec": 29.08
+    },
+    "vrsbench_captioning": {
+      "dataset": "VRSBench Captioning (arXiv:2406.12384)",
+      "split": "test",
+      "total_samples": 15,
+      "unigram_precision_pct": 3.9,
+      "unigram_recall_pct": 7.78,
+      "unigram_f1_pct": 5.2,
+      "latency_sec": 23.63
+    },
+    "vrsbench_grounding": {
+      "dataset": "VRSBench Grounding (Synthetic Schema Subset)",
+      "evaluation_scope": "SYNTHETIC_SCHEMA_PROTOTYPE",
+      "evaluation_method": "HEURISTIC_CONTOUR_BASELINE",
+      "reference_type": "SYNTHETIC_ARITHMETIC_BOUNDING_BOX",
+      "split": "test",
+      "total_samples": 15,
+      "missed_detections": 14,
+      "acc_at_0_5_pct": 0.0,
+      "mean_iou": 0.0113,
+      "hits_at_0_5": 0,
+      "historical_diagnostic_miou": 0.054,
+      "latency_sec": 0.1,
+      "note": "Evaluated on 15 synthetic Gaussian noise samples using heuristic OpenCV spectral/contour delineation without full-canvas fallback. Missed detections explicitly receive IoU = 0.0. Historical 0.0540 mIoU was a diagnostic artifact caused by canvas-spanning fallback boxes. This is a synthetic schema prototype baseline, NOT empirical VRSBench model accuracy."
+    }
+  },
+  "summary": {
+    "rsvqa_overall_accuracy": "36.11%",
+    "rsvqa_presence_accuracy": "54.55%",
+    "rsvqa_count_accuracy": "11.11%",
+    "vrsbench_vqa_accuracy": "76.67%",
+    "vrsbench_captioning_f1": "5.2%",
+    "vrsbench_grounding_acc_0_5": "0.0%",
+    "vrsbench_grounding_miou": "0.0113",
+    "vrsbench_grounding_historical_diagnostic_miou": "0.0540",
+    "vrsbench_grounding_evaluation_scope": "SYNTHETIC_SCHEMA_PROTOTYPE"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "experiment": "Authentic CDVQA ChangeNet Training",
+  "benchmark": "CDVQA / SECOND (arXiv:2112.06343)",
+  "model_architecture": "SatQueryChangeNet (Siamese U-Net)",
+  "parameters": 1709873,
+  "hardware": "cpu",
+  "train_samples": 400,
+  "val_samples": 80,
+  "epochs": 5,
+  "best_epoch": 3,
+  "best_val_iou_pct": 28.99,
+  "total_duration_seconds": 820.38,
+  "checkpoint_path": "ml_pipeline\\checkpoints\\satquery_change_net_authentic\\best_change_net.pth",
+  "checkpoint_sha256": "9b94320837db808ed284da285568a29b2cca52d2bb51d89d97a479895b11b332",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.8848,
+      "val_loss": 0.8783,
+      "val_mean_iou": 0.2781,
+      "val_mean_f1": 0.4107,
+      "duration_seconds": 171.6
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.7766,
+      "val_loss": 0.7784,
+      "val_mean_iou": 0.2879,
+      "val_mean_f1": 0.4158,
+      "duration_seconds": 163.25
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.7369,
+      "val_loss": 0.7507,
+      "val_mean_iou": 0.2899,
+      "val_mean_f1": 0.4173,
+      "duration_seconds": 161.54
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.7127,
+      "val_loss": 0.7042,
+      "val_mean_iou": 0.2864,
+      "val_mean_f1": 0.4081,
+      "duration_seconds": 163.45
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.6938,
+      "val_loss": 0.6933,
+      "val_mean_iou": 0.2777,
+      "val_mean_f1": 0.3975,
+      "duration_seconds": 160.49
+    }
+  ]
+}

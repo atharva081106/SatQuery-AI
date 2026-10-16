@@ -4,25 +4,19 @@ Write-Host "======================================" -ForegroundColor Cyan
 
 # 1. Stop existing processes if any (optional, keeping it simple for now)
 
-# 2. Setup Data and Train ML Model
-Write-Host "`n[1/4] Generating Dummy Data and Training VLM for 1 Epoch..." -ForegroundColor Yellow
+# 2. Setup Data and Verify Real Remote Sensing Datasets
+Write-Host "`n[1/4] Verifying Real Remote Sensing Datasets (BigEarthNet, RSVQA, VRSBench, CDVQA)..." -ForegroundColor Yellow
 cd d:\sih26167\ml_pipeline
 & "d:\sih26167\backend\venv\Scripts\activate.ps1"
 
 # Ensure ML requirements are installed in the venv
 pip install -r requirements.txt accelerate>=1.1.0
 
-# Set HuggingFace cache to D: drive because C: drive is out of space!
+# Set HuggingFace cache to D: drive
 $env:HF_HOME = "d:\sih26167\.huggingface_cache"
 
-Write-Host "Running PyTorch Training Loop (This will download the BLIP model if not cached)..." -ForegroundColor Yellow
-# Run for just 1 epoch on the 10-image dummy dataset
-python generate_dummy_data.py
-python train_vqa.py --data_dir d:\sih26167\ml_pipeline\dummy_dataset --output_dir d:\sih26167\ml_pipeline\satquery_finetuned_model --epochs 1 --batch_size 2
-
-# 3. Evaluate the Model
-Write-Host "`n[2/4] Evaluating the fine-tuned model..." -ForegroundColor Yellow
-python evaluate.py --model_path d:\sih26167\ml_pipeline\satquery_finetuned_model --test_data d:\sih26167\ml_pipeline\isro_evaluation_set.json
+Write-Host "Running Data Sanity Verification on Real Benchmarks..." -ForegroundColor Yellow
+python data_sanity.py
 
 # 4. Start Backend
 Write-Host "`n[3/4] Starting FastAPI Backend Agentic Controller..." -ForegroundColor Yellow

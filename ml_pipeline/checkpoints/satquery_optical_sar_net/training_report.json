@@ -1,0 +1,30 @@
+{
+  "model_name": "SatQueryOpticalSARNet-v1.0",
+  "reference": "arXiv:2603.29630",
+  "parameters": 849603,
+  "device": "cpu",
+  "epochs": 3,
+  "total_time_seconds": 91.11,
+  "final_val_loss": 1.1046,
+  "final_val_iou": 0.3442,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3646,
+      "val_loss": 1.3953,
+      "val_iou": 0.207
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.2933,
+      "val_loss": 1.2776,
+      "val_iou": 0.2541
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.1952,
+      "val_loss": 1.1046,
+      "val_iou": 0.3442
+    }
+  ]
+}

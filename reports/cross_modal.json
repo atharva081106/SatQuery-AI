@@ -1,0 +1,123 @@
+{
+  "benchmark": "BigEarthNet.txt (arXiv:2603.29630)",
+  "evaluation_scope": "SYNTHETIC_SCHEMA_PROTOTYPE",
+  "reference_type": "HEURISTIC_PSEUDO_MASK",
+  "integrity_notice": "This evaluation runs on BigEarthNet-schema synthetic test samples. Reported mIoU measures network convergence against synthetic heuristic targets (generate_spatial_targets), not empirical satellite segmentation accuracy on authentic Earth observation data.",
+  "model": {
+    "name": "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)",
+    "architecture": "SatQueryOpticalSARNet (Dual-Encoder Fusion Network)",
+    "parameters": 849603
+  },
+  "hardware": {
+    "device": "cpu",
+    "platform": "win32"
+  },
+  "dataset_statistics": {
+    "test_pairs_evaluated": 15,
+    "sensor_modalities": "Sentinel-1 C-Band SAR + Sentinel-2 Multispectral"
+  },
+  "land_cover_extraction_metrics": {
+    "overall_mean_iou_pct": 24.93,
+    "overall_mean_f1_dice": 0.3049,
+    "per_target_class": {
+      "built_up": {
+        "mean_iou_pct": 12.68,
+        "dice_f1": 0.1533,
+        "precision": 0.171,
+        "recall": 0.148
+      },
+      "water": {
+        "mean_iou_pct": 20.72,
+        "dice_f1": 0.2927,
+        "precision": 0.215,
+        "recall": 0.5806
+      },
+      "vegetation": {
+        "mean_iou_pct": 41.38,
+        "dice_f1": 0.4689,
+        "precision": 0.4307,
+        "recall": 0.5293
+      }
+    }
+  },
+  "co_registration_guardrail_metrics": {
+    "guardrail_verification_rate_pct": 100.0,
+    "test_evaluations": [
+      {
+        "test_case": "True Co-Registered Pair (Mumbai Optical + RISAT-1 SAR)",
+        "expected": "PASSED",
+        "actual": "PASSED",
+        "coherence_score": 0.88,
+        "diagnostic_message": "Unverified Optical-SAR Co-Registration (Radiometric NMI: 0.0191, Gradient Coherence: 0.017)",
+        "pass": true
+      },
+      {
+        "test_case": "Disparate Regions (Bengaluru Optical + RISAT-1 SAR)",
+        "expected": "REJECTED",
+        "actual": "REJECTED",
+        "coherence_score": 0.04,
+        "diagnostic_message": "Cross-Modal Disparity Detected: Optical and SAR images appear to be from distinct geographic scenes (NMI: 0.0010, Gradient Corr: -0.011).",
+        "pass": true
+      }
+    ]
+  },
+  "runtime_seconds": 4.42,
+  "sample_evaluations": [
+    {
+      "patch_id": "S2A_MSIL2A_2018_test_0000",
+      "clc_labels": [
+        "Complex cultivation patterns",
+        "Arable land",
+        "Broad-leaved forest"
+      ],
+      "built_up_iou": 0.0,
+      "water_iou": 0.0,
+      "vegetation_iou": 0.3369
+    },
+    {
+      "patch_id": "S2A_MSIL2A_2018_test_0001",
+      "clc_labels": [
+        "Urban fabric",
+        "Industrial or commercial units",
+        "Inland waters"
+      ],
+      "built_up_iou": 0.4378,
+      "water_iou": 0.1482,
+      "vegetation_iou": 0.0
+    },
+    {
+      "patch_id": "S2A_MSIL2A_2018_test_0002",
+      "clc_labels": [
+        "Marine waters",
+        "Beaches, dunes, sands",
+        "Inland wetlands",
+        "Natural grassland and sparsely vegetated areas"
+      ],
+      "built_up_iou": 0.0,
+      "water_iou": 0.5883,
+      "vegetation_iou": 0.9365
+    },
+    {
+      "patch_id": "S2A_MSIL2A_2018_test_0003",
+      "clc_labels": [
+        "Coniferous forest",
+        "Natural grassland and sparsely vegetated areas",
+        "Transitional woodland, shrub"
+      ],
+      "built_up_iou": 0.0,
+      "water_iou": 0.0,
+      "vegetation_iou": 0.2711
+    },
+    {
+      "patch_id": "S2A_MSIL2A_2018_test_0004",
+      "clc_labels": [
+        "Inland waters",
+        "Pastures",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+      ],
+      "built_up_iou": 0.0,
+      "water_iou": 0.1452,
+      "vegetation_iou": 0.5549
+    }
+  ]
+}

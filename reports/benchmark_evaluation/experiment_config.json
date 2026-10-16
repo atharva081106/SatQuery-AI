@@ -1,0 +1,109 @@
+{
+  "project": "SatQuery AI",
+  "problem_statement": "SIH 2026 PS26167",
+  "evaluator": "Aminur Hossain (ISRO / Space Applications Centre (SAC), Ahmedabad)",
+  "execution_date": "2026-10-16",
+  "system_environment": {
+    "os": "Windows 11 (64-bit)",
+    "cpu": "Intel Core (8 physical cores, 12 logical threads)",
+    "total_ram_gb": 15.71,
+    "cuda_available": false,
+    "python_executable": "D:\\sih26167\\backend\\venv\\Scripts\\python.exe",
+    "python_version": "3.10.11",
+    "dependencies": {
+      "torch": "2.13.0+cpu",
+      "torchvision": "0.28.0+cpu",
+      "transformers": "5.16.1",
+      "opencv_python": "5.0.0",
+      "rasterio": "1.4.4",
+      "pillow": "12.3.0",
+      "numpy": "1.26.4"
+    }
+  },
+  "benchmarks": {
+    "cdvqa_change_detection": {
+      "dataset": "Wuhan University SECOND / CDVQA (arXiv:2112.06343)",
+      "modality": "Bi-temporal aerial imagery (0.1524m GSD) + semantic land-cover masks",
+      "partitions": {
+        "train": {
+          "samples_questions": 65967,
+          "unique_physical_pairs": 1600,
+          "pairs_used_in_training": 300
+        },
+        "val": {
+          "samples_questions": 16441,
+          "unique_physical_pairs": 400,
+          "pairs_used_in_validation": 60
+        },
+        "test": {
+          "samples_questions": 39686,
+          "unique_physical_pairs": 968,
+          "quarantine_status": "Strictly held-out; 100% evaluated"
+        },
+        "test2": {
+          "samples_questions": 31036,
+          "unique_physical_pairs": 968,
+          "quarantine_status": "Strictly held-out additional test set; 100% evaluated"
+        }
+      },
+      "model": {
+        "name": "SatQueryChangeNet-Authentic",
+        "architecture": "Siamese Feature Difference U-Net",
+        "parameters": 1709873,
+        "input_resolution": [256, 256],
+        "checkpoint_path": "ml_pipeline/checkpoints/satquery_change_net_authentic/best_change_net.pth",
+        "checkpoint_sha256": "45dc24b47aa265478b4f29ba7939673337b2bb0725aa53e9337dc7bd2d6ee39b",
+        "decision_threshold": 0.5
+      },
+      "training_hyperparameters": {
+        "loss": "BCEWithLogitsLoss + 0.5 * SoftDiceLoss",
+        "optimizer": "AdamW",
+        "learning_rate": 0.001,
+        "lr_schedule": "CosineAnnealingLR (eta_min=1e-5)",
+        "batch_size": 8,
+        "epochs": 3,
+        "early_stopping_metric": "val_mean_iou"
+      }
+    },
+    "bigearthnet_optical_sar": {
+      "dataset": "BEN-GE-800 / BigEarthNet-MM (Zenodo DOI: 10.5281/zenodo.12941231)",
+      "modality": "Sentinel-1 GRD SAR (VV) + Sentinel-2 Level-2A (RGB) + ESA WorldCover 10m",
+      "partitions": {
+        "protocol": "parent_granule_disjoint (connected-component graph)",
+        "train_patches": 561,
+        "val_patches": 120,
+        "test_patches": 119,
+        "parent_granule_leakage": "0.00%"
+      },
+      "model": {
+        "name": "SatQueryOpticalSARNet-Disjoint",
+        "architecture": "Dual-Encoder Fusion (ResNet18 Optical + 4-Layer SAR CNN + SpeckleFilter)",
+        "parameters": 849603,
+        "input_resolution": [128, 128],
+        "checkpoint_path": "ml_pipeline/checkpoints/satquery_optical_sar_net_disjoint/optical_sar_net.pth",
+        "checkpoint_sha256": "66544ff8249c692ed46c072c221e922c0544241874cc1b92a3701fb5a767faa3",
+        "classes": ["Built-up", "Water", "Vegetation"]
+      }
+    },
+    "cdvqa_change_vqa": {
+      "dataset": "CDVQA (arXiv:2112.06343 / IEEE TGRS 2022)",
+      "question_categories": [
+        "change_or_not",
+        "increase_or_not",
+        "decrease_or_not",
+        "smallest_change",
+        "largest_change",
+        "change_to_what",
+        "change_ratio",
+        "change_ratio_types"
+      ],
+      "model": {
+        "name": "SatQuery-RS-VLM-v1.0",
+        "architecture": "Salesforce BLIP ViT-B/16 Vision-Language Model",
+        "parameters": 360999936,
+        "conditioning": "Visual bi-temporal difference |T2 - T1| + text query",
+        "max_new_tokens": 32
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "phase": 6,
+  "title": "Agentic Controller with Typed Tool Registry",
+  "timestamp": "2026-10-14T17:46:13+05:30",
+  "status": "PASSED",
+  "typed_tool_registry": {
+    "architecture": "Pydantic v2 Typed Tool Registry (backend/tool_registry.py)",
+    "specialist_tools_registered_count": 8,
+    "specialist_tools": [
+      "single_image_vqa",
+      "single_image_captioning",
+      "single_image_grounding",
+      "land_cover_segmentation",
+      "bi_temporal_change",
+      "optical_sar_fusion",
+      "spatial_compatibility_verifier",
+      "heuristic_fallback"
+    ],
+    "specifications_enforced": [
+      "Input counts bounds (min/max images)",
+      "Sensor modality compatibility (OPTICAL, SAR, MULTISPECTRAL)",
+      "Permitted raster file formats (GEOTIFF, TIFF, PNG, JPEG)",
+      "Georeferencing prerequisite verification (CRS + affine transform)",
+      "Typed parameter bound and enum enforcement",
+      "Output schemas (RFC 7946 GeoJSON, visual evidence, text answer)"
+    ]
+  },
+  "six_stage_lifecycle": {
+    "stage1_classification": "Semantic query intent parsing, keyword target extraction, and out-of-domain guardrailing",
+    "stage2_input_verification": "Modality classification (inter-channel variance, speckle CV) and raster format inspection",
+    "stage3_parameter_validation": "Strict validation of tool parameters against Pydantic schema",
+    "stage4_tool_execution": "Sequencing and execution with sub-millisecond per-step latency logging",
+    "stage5_output_synthesis": "Unified multi-output synthesis (GeoJSON RFC 7946 polygons, bounding boxes, text)",
+    "stage6_trace_generation": "Execution trace logging with provenance, confidence derivation, and per-step latency"
+  },
+  "benchmark_evaluation": {
+    "dataset": "tests/routing_cases.jsonl",
+    "evaluation_script": "ml_pipeline/eval_routing.py",
+    "report_json": "reports/routing.json",
+    "report_md": "reports/routing.md",
+    "total_cases_evaluated": 167,
+    "valid_cases_count": 145,
+    "adversarial_cases_count": 22,
+    "task_classification_accuracy_pct": 91.02,
+    "tool_selection_accuracy_pct": 91.02,
+    "valid_sequence_rate_pct": 99.31,
+    "invalid_call_rejection_rate_pct": 90.91,
+    "structured_error_code_match_rate_pct": 86.36,
+    "overall_accuracy_pct": 90.42
+  },
+  "category_metrics": {
+    "single_image_vqa": {
+      "total": 30,
+      "task_acc_pct": 93.33,
+      "tool_acc_pct": 93.33,
+      "accuracy_pct": 93.33
+    },
+    "single_image_captioning": {
+      "total": 20,
+      "task_acc_pct": 70.0,
+      "tool_acc_pct": 70.0,
+      "accuracy_pct": 70.0
+    },
+    "single_image_grounding": {
+      "total": 25,
+      "task_acc_pct": 88.0,
+      "tool_acc_pct": 88.0,
+      "accuracy_pct": 88.0
+    },
+    "land_cover": {
+      "total": 25,
+      "task_acc_pct": 96.0,
+      "tool_acc_pct": 96.0,
+      "accuracy_pct": 96.0
+    },
+    "change": {
+      "total": 25,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0,
+      "accuracy_pct": 100.0
+    },
+    "cross_modal": {
+      "total": 20,
+      "task_acc_pct": 100.0,
+      "tool_acc_pct": 100.0,
+      "accuracy_pct": 100.0
+    },
+    "adversarial_ood": {
+      "total": 8,
+      "rejection_rate_pct": 75.0
+    },
+    "adversarial_count": {
+      "total": 6,
+      "rejection_rate_pct": 83.33
+    },
+    "adversarial_modality": {
+      "total": 4,
+      "rejection_rate_pct": 100.0
+    },
+    "adversarial_format": {
+      "total": 1,
+      "rejection_rate_pct": 100.0
+    },
+    "adversarial_param": {
+      "total": 3,
+      "rejection_rate_pct": 100.0
+    }
+  },
+  "regression_tests": {
+    "test_files": [
+      "backend/test_tool_registry.py",
+      "backend/test_change_pipeline.py",
+      "backend/test_cross_modal.py",
+      "backend/test_query_routing.py"
+    ],
+    "total_tests": 71,
+    "passed_tests": 71,
+    "pass_rate_pct": 100.0
+  },
+  "claims_audit": {
+    "script": "scripts/audit_claims.py",
+    "violations_found": 0,
+    "hardcoded_confidence_literals": 0,
+    "status": "ALL CHECKS PASSED"
+  }
+}

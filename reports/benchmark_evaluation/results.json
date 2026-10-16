@@ -1,0 +1,207 @@
+{
+  "project": "SIH 2026 PS26167 \u2014 ISRO / SAC Ahmedabad",
+  "system": "SatQuery AI",
+  "timestamp": "2026-10-15T09:47:09Z",
+  "hardware": {
+    "device": "cpu",
+    "torch_version": "2.13.0+cpu",
+    "cuda_available": false
+  },
+  "model_checkpoints": {
+    "vlm": "SatQuery-RS-VLM-v1.0 (Adapted Checkpoint)",
+    "change_net": "SatQueryChangeNet-v1.0 (Siamese U-Net)",
+    "optical_sar_net": "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder)",
+    "grounding_engine": "google/owlvit-base-patch32 (Apache-2.0, Offline Cached)"
+  },
+  "benchmarks": {
+    "rsvqa": {
+      "task": "Single-Image Remote Sensing VQA",
+      "reference": "Lobry et al., IEEE TGRS 2020 (arXiv:2003.07333)",
+      "dataset_scope": "SYNTHETIC_SCHEMA_PROTOTYPE (18 images, 36 QA pairs)",
+      "split": "test",
+      "status": "PARTIAL",
+      "metrics": {
+        "overall_accuracy_pct": 36.11,
+        "breakdown": {
+          "presence": {
+            "total": 11,
+            "correct": 6,
+            "accuracy_pct": 54.55
+          },
+          "count": {
+            "total": 9,
+            "correct": 1,
+            "accuracy_pct": 11.11
+          },
+          "comparison": {
+            "total": 8,
+            "correct": 4,
+            "accuracy_pct": 50.0
+          },
+          "area": {
+            "total": 8,
+            "correct": 2,
+            "accuracy_pct": 25.0
+          }
+        }
+      },
+      "comparability": "NOT DIRECTLY COMPARABLE (Evaluated on local synthetic schema test split; official RSVQA test split is 10k-200k questions on real Sentinel-2/aerial images)",
+      "published_sota": {
+        "method": "CNN+RNN / Multi-modal Fusion Baseline (Lobry et al., IEEE TGRS 2020)",
+        "split": "RSVQA-LR Test (100 images, 10,000 QA pairs)",
+        "score": "78.48% (Presence: 87.89%, Count: 68.32%, Comparison: 84.62%, Area: 72.88%)",
+        "source": "IEEE Transactions on Geoscience and Remote Sensing, vol. 59, no. 2, pp. 855-866, 2021"
+      }
+    },
+    "vrsbench_vqa": {
+      "task": "Remote Sensing VQA",
+      "reference": "Li et al., NeurIPS 2024 (arXiv:2406.12384)",
+      "dataset_scope": "SYNTHETIC_SCHEMA_PROTOTYPE (15 images, 30 QA pairs)",
+      "split": "test",
+      "status": "PARTIAL",
+      "metrics": {
+        "accuracy_pct": 76.67,
+        "token_f1_pct": 76.67
+      },
+      "comparability": "NOT DIRECTLY COMPARABLE (Evaluated on local synthetic schema test split; official VRSBench contains 109k VQA pairs on 29.6k real tiles)",
+      "published_sota": {
+        "method": "BLIP-2 w/o ft: 64.81% / VRS-LLM fine-tuned: 71.30%",
+        "split": "Official VRSBench Test Split (4,442 images)",
+        "score": "71.30% (VRS-LLM)",
+        "source": "NeurIPS 2024 Datasets and Benchmarks Track (arXiv:2406.12384)"
+      }
+    },
+    "vrsbench_captioning": {
+      "task": "Single-Image Visual Captioning",
+      "reference": "Li et al., NeurIPS 2024 (arXiv:2406.12384)",
+      "dataset_scope": "SYNTHETIC_SCHEMA_PROTOTYPE (15 images, 15 target captions)",
+      "split": "test",
+      "status": "PARTIAL",
+      "metrics": {
+        "unigram_precision_pct": 3.9,
+        "unigram_recall_pct": 7.78,
+        "unigram_f1_pct": 5.2
+      },
+      "comparability": "NOT DIRECTLY COMPARABLE (Evaluated on local synthetic schema test split; official VRSBench contains 120k captions with 52-word average length evaluated via BLEU-4 / CIDEr)",
+      "published_sota": {
+        "method": "LLaVA-1.5 fine-tuned / VRS-LLM (Li et al., 2024)",
+        "split": "Official VRSBench Test Split",
+        "score": "BLEU-1: 48.9, BLEU-4: 18.2, ROUGE-L: 44.1, CIDEr: 33.9",
+        "source": "NeurIPS 2024 Datasets and Benchmarks Track (arXiv:2406.12384)"
+      }
+    },
+    "vrsbench_grounding": {
+      "task": "Text-Guided Visual Grounding",
+      "reference": "Li et al., NeurIPS 2024 (arXiv:2406.12384)",
+      "dataset_scope": "SYNTHETIC_SCHEMA_PROTOTYPE (15 images, 15 target bboxes)",
+      "split": "test",
+      "status": "PARTIAL",
+      "metrics": {
+        "heuristic_contour_acc_0_5_pct": 0.0,
+        "heuristic_contour_miou": 0.0113,
+        "neural_owlvit_acc_0_5_pct": 0.0,
+        "neural_owlvit_miou": 0.0
+      },
+      "comparability": "NOT DIRECTLY COMPARABLE (Evaluated on local synthetic schema test split; official VRSBench contains 145k horizontal bounding box referring annotations)",
+      "published_sota": {
+        "method": "GeoChat (zero-shot): ~14-20% Acc@0.5; VRS-LLM fine-tuned: Acc@0.5 36.80%, mIoU 0.4120",
+        "split": "Official VRSBench Test Split",
+        "score": "Acc@0.5: 36.80%, mIoU: 0.4120",
+        "source": "NeurIPS 2024 Datasets and Benchmarks Track (arXiv:2406.12384)"
+      }
+    },
+    "cdvqa": {
+      "task": "Bi-Temporal Change Visual Question Answering & Mask Delineation",
+      "reference": "Yuan et al., IGARSS 2022 / IEEE TGRS 2022 (arXiv:2112.06343)",
+      "dataset_scope": "SYNTHETIC_SCHEMA_PROTOTYPE (15 pairs, 15 QA pairs, synthetic box deltas)",
+      "split": "test",
+      "status": "PARTIAL",
+      "metrics": {
+        "change_mask_mean_iou_pct": 15.16,
+        "change_mask_mean_f1_dice": 0.2549,
+        "vqa_overall_accuracy_pct": 40.0,
+        "vqa_average_per_type_accuracy_pct": 25.0,
+        "vqa_mean_token_f1": 43.3333,
+        "per_question_type": {
+          "change_type": {
+            "total": 3,
+            "correct": 0,
+            "accuracy_pct": 0.0
+          },
+          "existence": {
+            "total": 6,
+            "correct": 6,
+            "accuracy_pct": 100.0
+          },
+          "quantity": {
+            "total": 3,
+            "correct": 0,
+            "accuracy_pct": 0.0
+          },
+          "attribute": {
+            "total": 3,
+            "correct": 0,
+            "accuracy_pct": 0.0
+          }
+        }
+      },
+      "comparability": "NOT DIRECTLY COMPARABLE (Evaluated on local synthetic schema test split; official CDVQA contains 4,000 bi-temporal pairs and 20,000 QA triplets)",
+      "published_sota": {
+        "method": "Dual-ResNet + CEM + Bi-modal Fusion (Yuan et al., 2022)",
+        "split": "Official CDVQA Test Split (600 bi-temporal pairs)",
+        "score": "VQA Overall Acc: 68.45% / Siamese VQA: 72.30% (Mask F1: 78.2% on STANet)",
+        "source": "IEEE Transactions on Geoscience and Remote Sensing, vol. 60, pp. 1-13, 2022"
+      }
+    },
+    "optical_sar_joint_analysis": {
+      "task": "Multimodal Optical-SAR Joint Segmentation & Co-Registration Guardrail",
+      "reference": "BigEarthNet.txt (arXiv:2603.29630) / SIH PS26167",
+      "dataset_scope": "SYNTHETIC_SCHEMA_PROTOTYPE (15 test pairs, heuristic pseudo-masks)",
+      "split": "test",
+      "status": "PARTIAL",
+      "metrics": {
+        "overall_mean_iou_pct": 21.22,
+        "overall_mean_f1_dice": 0.2524,
+        "per_target_class": {
+          "built_up": {
+            "mean_iou_pct": 6.98,
+            "dice_f1": 0.1034,
+            "precision": 0.0698,
+            "recall": 0.1995
+          },
+          "water": {
+            "mean_iou_pct": 20.22,
+            "dice_f1": 0.2534,
+            "precision": 0.3215,
+            "recall": 0.2446
+          },
+          "vegetation": {
+            "mean_iou_pct": 36.48,
+            "dice_f1": 0.4004,
+            "precision": 0.4601,
+            "recall": 0.3973
+          }
+        },
+        "true_pair_coherence": 0.88,
+        "disparate_pair_coherence": 0.04
+      },
+      "comparability": "NOT DIRECTLY COMPARABLE (Evaluated against synthetic heuristic pseudo-mask targets on 15 BigEarthNet-schema test pairs)",
+      "published_sota": {
+        "method": "BigEarthNet-MM Multimodal Fusion (Sumbul et al., 2021; arXiv:2105.07921)",
+        "split": "Official BigEarthNet-MM Test Split (59,032 pairs)",
+        "score": "Multi-label mAP: 88.5% (S1+S2 ResNet-50 Fusion); Semantic Segmentation baselines on LoveDA/DLRSD: 48-54% mIoU",
+        "source": "IEEE Geoscience and Remote Sensing Magazine, vol. 9, no. 3, 2021"
+      }
+    },
+    "isro_optical_sar_data": {
+      "task": "Cartosat-2S & RISAT-1 Multimodal Evaluation",
+      "reference": "SIH 2026 PS26167 \u2014 ISRO / SAC Ahmedabad",
+      "dataset_scope": "NONE AVAILABLE (Procedural demo images only in frontend/public/demo/; zero reference annotations)",
+      "split": "N/A",
+      "status": "BLOCKED",
+      "metrics": {},
+      "comparability": "NOT COMPARABLE",
+      "reason": "No ground-truth reference masks, semantic labels, or verified query-answer pairs have been officially supplied or stored locally. Running evaluation without ground truth would require fabricating labels, which is strictly prohibited."
+    }
+  }
+}

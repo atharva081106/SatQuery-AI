@@ -1,0 +1,104 @@
+{
+  "benchmark": "SatQuery-Latency-Profiling-v1.0",
+  "timestamp": "2026-10-14T18:00:23+0530",
+  "hardware": {
+    "device": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+    "cuda_available": false,
+    "torch_version": "2.13.0+cpu",
+    "cpu_cores": 12,
+    "os": "Windows 10"
+  },
+  "tools_profiled": 9,
+  "benchmarks": {
+    "single_image_vqa": {
+      "iterations": 15,
+      "mean_ms": 17.71,
+      "p50_ms": 15.01,
+      "p95_ms": 29.17,
+      "min_ms": 13.32,
+      "max_ms": 35.7,
+      "std_ms": 5.89,
+      "throughput_qps": 56.46
+    },
+    "single_image_captioning": {
+      "iterations": 15,
+      "mean_ms": 14.13,
+      "p50_ms": 13.72,
+      "p95_ms": 16.35,
+      "min_ms": 13.3,
+      "max_ms": 19.1,
+      "std_ms": 1.41,
+      "throughput_qps": 70.79
+    },
+    "single_image_grounding": {
+      "iterations": 15,
+      "mean_ms": 13.26,
+      "p50_ms": 13.24,
+      "p95_ms": 14.13,
+      "min_ms": 12.55,
+      "max_ms": 14.18,
+      "std_ms": 0.51,
+      "throughput_qps": 75.44
+    },
+    "land_cover_segmentation": {
+      "iterations": 15,
+      "mean_ms": 14.97,
+      "p50_ms": 13.76,
+      "p95_ms": 21.31,
+      "min_ms": 12.25,
+      "max_ms": 25.42,
+      "std_ms": 3.39,
+      "throughput_qps": 66.8
+    },
+    "bi_temporal_change": {
+      "iterations": 15,
+      "mean_ms": 50.55,
+      "p50_ms": 51.76,
+      "p95_ms": 58.05,
+      "min_ms": 40.26,
+      "max_ms": 58.35,
+      "std_ms": 5.19,
+      "throughput_qps": 19.78
+    },
+    "optical_sar_fusion": {
+      "iterations": 15,
+      "mean_ms": 7.16,
+      "p50_ms": 7.07,
+      "p95_ms": 8.59,
+      "min_ms": 5.98,
+      "max_ms": 8.6,
+      "std_ms": 0.77,
+      "throughput_qps": 139.75
+    },
+    "spatial_compatibility_verifier": {
+      "iterations": 15,
+      "mean_ms": 28.54,
+      "p50_ms": 27.76,
+      "p95_ms": 34.66,
+      "min_ms": 25.95,
+      "max_ms": 35.84,
+      "std_ms": 2.8,
+      "throughput_qps": 35.04
+    },
+    "large_raster_tiling_stitching": {
+      "iterations": 10,
+      "mean_ms": 236.86,
+      "p50_ms": 229.29,
+      "p95_ms": 274.93,
+      "min_ms": 215.93,
+      "max_ms": 291.6,
+      "std_ms": 22.67,
+      "throughput_qps": 4.22
+    },
+    "raster_ingestion_decode": {
+      "iterations": 15,
+      "mean_ms": 13.31,
+      "p50_ms": 13.29,
+      "p95_ms": 14.58,
+      "min_ms": 11.86,
+      "max_ms": 14.65,
+      "std_ms": 0.85,
+      "throughput_qps": 75.11
+    }
+  }
+}

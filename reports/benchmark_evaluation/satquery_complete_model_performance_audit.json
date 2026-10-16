@@ -1,0 +1,460 @@
+{
+  "audit_metadata": {
+    "title": "SatQuery AI Complete Model Inventory & Benchmark Performance Audit",
+    "project": "Smart India Hackathon 2026 — Problem Statement PS26167",
+    "organization": "Space Applications Centre (SAC), Indian Space Research Organisation (ISRO), Ahmedabad",
+    "timestamp": "2026-10-16T17:00:00Z",
+    "audit_type": "Evidence-Backed Forensic Model & Benchmark Inventory",
+    "verdict": "PASS (Implementation & Provenance) / PARTIAL (ISRO Evaluation Pending Reference Annotations)"
+  },
+  "hardware_environment": {
+    "operating_system": "Windows 11 Enterprise (64-bit), Kernel 10.0.26300",
+    "python_version": "3.10.11",
+    "pytorch_version": "2.13.0+cpu",
+    "torchvision_version": "0.28.0+cpu",
+    "transformers_version": "5.16.1",
+    "cuda_available": false,
+    "execution_device": "cpu",
+    "cpu_model": "Intel Core CPU (8 physical cores, 12 logical execution threads)",
+    "system_ram_gb": 15.71,
+    "disk_free_gb": 104.85
+  },
+  "models_inventory": [
+    {
+      "model_name": "FeatureVQAHead (Gated Multimodal Fusion Head)",
+      "architecture": "Linear(1024, 256) -> BatchNorm1d(256) -> ReLU -> Dropout(0.2) -> Linear(256, 19)",
+      "family": "Vision-Language Classifier Head",
+      "task": "Multitemporal Change Visual Question Answering (8 categories, 19 classes)",
+      "source_type": "Developed In-House (PyTorch)",
+      "status": "OPERATIONAL",
+      "parameters": 272403,
+      "checkpoints": {
+        "seed_42": {
+          "path": "ml_pipeline/checkpoints/cdvqa_heads/feat_head_seed42.pth",
+          "sha256": "C2E55D40592C265F53B5E093C5E93DD03D1395D6B3999AD7CE84B16918725CB9"
+        },
+        "seed_43": {
+          "path": "ml_pipeline/checkpoints/cdvqa_heads/feat_head_seed43.pth",
+          "sha256": "EE1419E8D8C9C31358FFAE77F7409E2CAD870ABC6B76D1B3223619A461EABFAE"
+        },
+        "seed_44": {
+          "path": "ml_pipeline/checkpoints/cdvqa_heads/feat_head_seed44.pth",
+          "sha256": "9FDFC35A7F63397032B6C45244EE749F438588BB2F7125EF3BBE567863FE7498"
+        }
+      },
+      "training_dataset": "CDVQA / SECOND Wuhan University (1,600 scene pairs, 65,967 QAs)",
+      "validation_dataset": "CDVQA / SECOND Wuhan University (400 scene pairs, 16,441 QAs)",
+      "input_modalities": "Bi-temporal change difference feature (512-d) + RemoteCLIP question embedding (512-d)",
+      "output_format": "19-class logit distribution over answer vocabulary",
+      "associated_scripts": [
+        "ml_pipeline/train_head_all_pairs_regularized.py",
+        "ml_pipeline/eval_final_held_out_test.py"
+      ]
+    },
+    {
+      "model_name": "BlindVQAHead (Language-Only Prior Probe Head)",
+      "architecture": "Linear(512, 256) -> BatchNorm1d(256) -> ReLU -> Dropout(0.2) -> Linear(256, 19)",
+      "family": "Language Prior Baseline Probe",
+      "task": "Question-Only Answer Prior Estimation (Ablation Baseline)",
+      "source_type": "Developed In-House (PyTorch)",
+      "status": "OPERATIONAL",
+      "parameters": 137235,
+      "checkpoints": {
+        "seed_42": {
+          "path": "ml_pipeline/checkpoints/cdvqa_heads/blind_head_seed42.pth",
+          "sha256": "C0C35A032AFCCE08F75B81158C101909D5C966946E95451CDFDE71CE925BF899"
+        },
+        "seed_43": {
+          "path": "ml_pipeline/checkpoints/cdvqa_heads/blind_head_seed43.pth",
+          "sha256": "8B1B1E05996B0DC21BBE27FF829B871F5D9C4C70DF3922244BC6760832C233D0"
+        },
+        "seed_44": {
+          "path": "ml_pipeline/checkpoints/cdvqa_heads/blind_head_seed44.pth",
+          "sha256": "B1DFBAE3E832A47B28ED0166F6DBDAC0A096C2F56C2ED8F27E4D75F9D30FF2AC"
+        }
+      },
+      "training_dataset": "CDVQA / SECOND Wuhan University (1,600 scene pairs, 65,967 QAs)",
+      "input_modalities": "RemoteCLIP question embedding (512-d, zero visual input)",
+      "output_format": "19-class logit distribution over answer vocabulary",
+      "associated_scripts": [
+        "ml_pipeline/train_head_vs_blind_3seeds.py",
+        "ml_pipeline/eval_final_held_out_test.py"
+      ]
+    },
+    {
+      "model_name": "SatQueryChangeNet v2",
+      "architecture": "Siamese Feature Difference U-Net with Multi-Scale Difference Convolutions",
+      "family": "Siamese Convolutional Neural Network",
+      "task": "Bi-Temporal Aerial Change Mask Delineation & Change Vector Embedding",
+      "source_type": "Developed In-House, Fine-Tuned",
+      "status": "OPERATIONAL",
+      "parameters": 1709873,
+      "checkpoint": {
+        "path": "ml_pipeline/checkpoints/satquery_change_net_finetune/v2/best_change_net_finetuned.pth",
+        "sha256": "95FB4CEB93F9E40B3C778B2FAF384E12D3278C8961892FD8B4A287836207F6B9"
+      },
+      "training_dataset": "SECOND Wuhan University (800-1,600 bi-temporal aerial pairs, 512x512)",
+      "validation_dataset": "SECOND Wuhan University (400 pairs)",
+      "input_modalities": "Bi-temporal RGB image pair (2x 3x512x512)",
+      "output_format": "Binary change probability map (1x512x512) + L2-normalized 512-d change feature vector",
+      "associated_scripts": [
+        "ml_pipeline/train_change_net_finetune_v2.py",
+        "ml_pipeline/eval_full_change_masks.py"
+      ]
+    },
+    {
+      "model_name": "RemoteCLIP ViT-B/32",
+      "architecture": "Vision Transformer (ViT-B/32) Image Encoder + Transformer Text Encoder",
+      "family": "Remote Sensing Vision-Language Foundation Model",
+      "task": "Zero-Shot Cross-Modal Feature Encoding (Image-Text Cosine Similarity)",
+      "source_type": "Pretrained Foundation Model (Wang et al., IEEE TGRS 2024 / arXiv:2306.11029)",
+      "status": "OPERATIONAL",
+      "parameters": 151277313,
+      "checkpoint": {
+        "path": "ml_pipeline/authentic_data/_downloads/RemoteCLIP-ViT-B-32.pt",
+        "sha256": "60014E395D930A3F2963D1D89C8522BF4AD56775571E4356E866864789AF85C4"
+      },
+      "training_dataset": "10 Million Remote Sensing Image-Text Pairs",
+      "input_modalities": "RGB satellite tile (3x224x224) or text prompt string (up to 77 tokens)",
+      "output_format": "512-d normalized visual embedding / 512-d normalized text embedding",
+      "associated_scripts": [
+        "ml_pipeline/train_and_finetune_rs_vlm_sota.py",
+        "ml_pipeline/eval_final_held_out_test.py"
+      ]
+    },
+    {
+      "model_name": "RSDomainAdapter",
+      "architecture": "Residual LayerNorm Projection Adapter: LayerNorm(512) -> Linear(512, 512) -> GELU -> Linear(512, 512) + Identity",
+      "family": "Parameter-Efficient Residual Adapter",
+      "task": "Multi-Sensor Domain Adaptation (Aligning Remote Sensing Instructions)",
+      "source_type": "Developed In-House, Domain-Adapted",
+      "status": "OPERATIONAL",
+      "parameters": 787970,
+      "checkpoint": {
+        "path": "ml_pipeline/checkpoints/satquery_rs_vlm/satquery_rs_domain_adapter.pth",
+        "sha256": "79E6544F61099F98C336722178BE27BD3BC1F3119B64CFA4A1889E872F5D9DDD"
+      },
+      "training_dataset": "BigEarthNet.txt (5,000 multi-sensor instruction samples across 11 categories)",
+      "input_modalities": "512-d visual embedding + 512-d text embedding",
+      "output_format": "512-d adapted multi-modal projection",
+      "associated_scripts": [
+        "ml_pipeline/train_and_finetune_rs_vlm_sota.py"
+      ]
+    },
+    {
+      "model_name": "RSVQAClassifierHead",
+      "architecture": "Gated Fusion: Linear(1024, 512) -> LayerNorm -> GELU -> Dropout(0.2) -> Linear(512, 197)",
+      "family": "Multimodal Classification Head",
+      "task": "Single-Image Remote Sensing VQA (197 answer vocabulary classes)",
+      "source_type": "Developed In-House, Trained",
+      "status": "OPERATIONAL",
+      "parameters": 974277,
+      "checkpoint": {
+        "path": "ml_pipeline/checkpoints/satquery_rs_vlm/rsvqa_lr_head.pth",
+        "sha256": "4331D8EB4D955C0F90A8891C37341DE7D793EBD61B17C66CD37A14CC8D72523E"
+      },
+      "training_dataset": "RSVQA-LR Sentinel-2 Low Resolution (Sylvain Lobry et al., IEEE TGRS 2020)",
+      "validation_dataset": "2,000 QAs across 100 parent Sentinel-2 scenes",
+      "input_modalities": "RemoteCLIP adapted image embedding (512-d) + question embedding (512-d)",
+      "output_format": "197-class logit distribution",
+      "associated_scripts": [
+        "ml_pipeline/train_and_finetune_rs_vlm_sota.py",
+        "ml_pipeline/eval_single_image.py"
+      ]
+    },
+    {
+      "model_name": "VRSGroundingHead",
+      "architecture": "Bounding Box Projection Head: Linear(512, 256) -> ReLU -> Linear(256, 4) -> Sigmoid",
+      "family": "Visual Grounding Regression Head",
+      "task": "Text-Guided Region Grounding (Normalized Bounding Box Regression)",
+      "source_type": "Developed In-House, Trained",
+      "status": "OPERATIONAL",
+      "parameters": 450,
+      "checkpoint": {
+        "path": "ml_pipeline/checkpoints/satquery_rs_vlm/vrsbench_head.pth",
+        "sha256": "60EFB5EDB095245CD55AAEDE8146718F3A25856EFECD0AB4432359AD95CD0839"
+      },
+      "training_dataset": "VRSBench (Xiang et al., NeurIPS 2024, arXiv:2406.12384)",
+      "input_modalities": "Fused text-visual embedding (512-d)",
+      "output_format": "4-coordinate normalized bounding box [ymin, xmin, ymax, xmax]",
+      "associated_scripts": [
+        "ml_pipeline/train_and_finetune_rs_vlm_sota.py",
+        "ml_pipeline/eval_single_image.py"
+      ]
+    },
+    {
+      "model_name": "SatQueryOpticalSARNet-Disjoint",
+      "architecture": "Dual-Branch ResNet18 Optical Encoder + SAR CNN Feature Extractor with Channel-Gate Fusion & Multi-Scale Decoder",
+      "family": "Multi-Modal Sensor Fusion Network",
+      "task": "Optical-SAR Multi-Modal Semantic Segmentation (Built-up, Water, Vegetation)",
+      "source_type": "Developed In-House, Trained",
+      "status": "OPERATIONAL",
+      "parameters": 849603,
+      "checkpoint": {
+        "path": "ml_pipeline/checkpoints/satquery_optical_sar_net_disjoint/optical_sar_net.pth",
+        "sha256": "66544FF8249C692ED46C072C221E922C0544241874CC1B92A3701FB5A767FAA3"
+      },
+      "training_dataset": "BEN-GE-800 / BigEarthNet-MM (561 parent-granule disjoint patches)",
+      "validation_dataset": "BEN-GE-800 (120 parent-granule disjoint patches)",
+      "test_dataset": "BEN-GE-800 (119 parent-granule disjoint patches)",
+      "input_modalities": "Optical RGB tile (3x120x120) + SAR VV/VH raster (1-2x120x120)",
+      "output_format": "3-class dense pixel segmentation probability map (3x120x120)",
+      "associated_scripts": [
+        "ml_pipeline/train_optical_sar_disjoint.py",
+        "ml_pipeline/evaluate_disjoint_test.py"
+      ]
+    },
+    {
+      "model_name": "Google OWL-ViT (owlvit-base-patch32)",
+      "architecture": "Vision Transformer + Text-Conditioned Object Detection Head",
+      "family": "Zero-Shot Open-Vocabulary Object Detector",
+      "task": "Open-Vocabulary Text-Conditioned Structure Localization",
+      "source_type": "Pretrained Foundation Model (Minderer et al., ECCV 2022, google/owlvit-base-patch32)",
+      "status": "OPERATIONAL (OFFLINE CACHED)",
+      "parameters": 155000000,
+      "checkpoint": {
+        "path": ".huggingface_cache/hub/models--google--owlvit-base-patch32/snapshots/cbc355fb364588351c5d51c7f74465e8e7ec6f72/model.safetensors",
+        "sha256": "D7812E278B78125C7681648B1C88F7EE40316E25DCFD5F785A88EE48784E4DA8"
+      },
+      "input_modalities": "RGB satellite tile (3x768x768) + text queries (e.g., 'storage tank', 'runway')",
+      "output_format": "List of normalized bounding boxes [xmin, ymin, xmax, ymax] with confidence scores",
+      "associated_scripts": [
+        "backend/owlvit_grounding.py",
+        "backend/test_owlvit_integration.py"
+      ]
+    },
+    {
+      "model_name": "SatSegNet (Attention U-Net)",
+      "architecture": "Encoder-Decoder Convolutional Network with Attention Gates",
+      "family": "Semantic Segmentation Network",
+      "task": "Land-Cover Semantic Segmentation (6 classes)",
+      "source_type": "Developed In-House, Trained & Quantized",
+      "status": "OPERATIONAL",
+      "parameters": 1420000,
+      "checkpoint": {
+        "pytorch": "ml_pipeline/checkpoints/best_satsegnet.pth",
+        "pytorch_sha256": "3460FBBC41418F14DB5AC82DC474B163269DD60C0DCD208B3FB37B36913FCAA7",
+        "onnx_quantized_int8": "ml_pipeline/checkpoints/satsegnet_quantized.onnx",
+        "onnx_sha256": "16D7EA772E20EE69994AD92BF7A942AC0E2F12AC906D3E5A92F413F5FEA05C59"
+      },
+      "input_modalities": "RGB satellite image (3xHxW)",
+      "output_format": "6-class dense land-cover classification map",
+      "associated_scripts": [
+        "backend/ml_models.py",
+        "backend/test_sar_contract.py"
+      ]
+    },
+    {
+      "model_name": "SatQuery-RS-VLM-v1.0 (BLIP-VQA RS-Adapted)",
+      "architecture": "ViT-B/16 Image Encoder + 12-layer Cross-Attention Multimodal Text Decoder",
+      "family": "Generative Vision-Language Model",
+      "task": "Generative Remote Sensing VQA & Image Captioning",
+      "source_type": "Salesforce/blip-vqa-base, RS-Adapted",
+      "status": "OPERATIONAL (WEIGHTS ON DISK)",
+      "parameters": 361230140,
+      "checkpoint": {
+        "path": "ml_pipeline/checkpoints/satquery_rs_vlm/model.safetensors",
+        "sha256": "B2D9B613D0C611A8B1C532DD0F4356F200A2A392D91E05EF19B93B1CFB042432"
+      },
+      "training_dataset": "BigEarthNet.txt (Stage 1), RSVQA+VRSBench (Stage 2), VRSBench Grounding (Stage 3)",
+      "input_modalities": "RGB satellite tile (3x384x384) + text question string",
+      "output_format": "Free-form generated text answer string",
+      "associated_scripts": [
+        "ml_pipeline/train_rs_vlm.py",
+        "backend/ml_models.py"
+      ]
+    },
+    {
+      "model_name": "SiameseResNet18ChangeDetector",
+      "architecture": "Weight-Shared ResNet-18 ImageNet-Pretrained Siamese Backbone + Difference Head",
+      "family": "Siamese Residual Network",
+      "task": "Bi-Temporal Aerial Change Mask Delineation (Architectural Comparison Baseline)",
+      "source_type": "ImageNet Pretrained + In-House Difference Head",
+      "status": "EXPERIMENTAL_BASELINE (TRANSIENT RUNS, NO FROZEN CHECKPOINT SAVED)",
+      "parameters": 12656577,
+      "training_dataset": "SECOND Wuhan University (800 train pairs)",
+      "validation_dataset": "SECOND Wuhan University (400 validation pairs)",
+      "checkpoint": {
+        "path": "None (Weights were transient across validation runs; no checkpoint file was saved to disk)",
+        "sha256": "N/A"
+      },
+      "input_modalities": "Bi-temporal RGB image pair (2x 3x512x512)",
+      "output_format": "Binary change probability map (1x512x512)",
+      "associated_scripts": [
+        "ml_pipeline/train_siamese_resnet18_experiment.py",
+        "ml_pipeline/benchmark_changenet_vs_resnet18_3seeds.py"
+      ]
+    }
+  ],
+  "system_orchestration_components": [
+    {
+      "component_name": "SatQuery Agent Controller (agent_controller.py)",
+      "type": "Deterministic Rule-Based / Intent-Classified Tool Dispatch Engine",
+      "role": "Task routing, specialist selection, execution sequence validation, schema validation, structured error generation",
+      "parameters": 0,
+      "status": "OPERATIONAL",
+      "benchmark_results": {
+        "benchmark_dataset": "tests/routing_cases.jsonl (167 test cases)",
+        "valid_sequence_rate_pct": 99.31,
+        "task_classification_accuracy_pct": 91.02,
+        "tool_selection_accuracy_pct": 91.02,
+        "invalid_call_rejection_rate_pct": 90.91,
+        "overall_accuracy_pct": 90.42
+      }
+    },
+    {
+      "component_name": "Tool Registry (tool_registry.py)",
+      "type": "Multi-Modal Remote Sensing Tool Orchestration & Execution Engine",
+      "role": "Schema validation, parameter bounds checking, input tensor preparation, output formatting",
+      "parameters": 0,
+      "status": "OPERATIONAL"
+    },
+    {
+      "component_name": "OpenCV Morphology Object Detection Engine (object_detection.py)",
+      "type": "Deterministic Computer Vision Algorithm (Non-Neural)",
+      "role": "Morphological edge, contour, and spectral thresholding for 19 satellite infrastructure classes",
+      "parameters": 0,
+      "status": "OPERATIONAL"
+    },
+    {
+      "component_name": "SIFT & Mutual Information Co-Registration Guardrail",
+      "type": "Deterministic Geospatial Alignment Guardrail (Non-Neural)",
+      "role": "SIFT keypoint matching, RANSAC homography, Normalized Mutual Information (NMI), gradient coherence",
+      "parameters": 0,
+      "status": "OPERATIONAL",
+      "benchmark_results": {
+        "co_registration_verification_rate_pct": 100.0,
+        "true_pair_coherence_score": 0.88,
+        "radiometric_nmi": 0.0191,
+        "disparate_pair_rejection_rate_pct": 100.0
+      }
+    }
+  ],
+  "cdvqa_reconciled_statistics": {
+    "evaluation_split": "Held-Out Test Set 1 (39,686 questions, 968 scene pairs)",
+    "test2_status": "UNTOUCHED_AND_QUARANTINED (31,036 questions, 968 pairs)",
+    "source_prediction_artifact": "reports/benchmark_evaluation/cdvqa_final_test_predictions.pt",
+    "statistical_test_scope": "Paired tests are nominal seed-level Student's t-tests across 3 seeds (df=2) comparing the in-house FeatureVQAHead against the in-house BlindVQAHead. Predictions for the 39,686 test questions are clustered within 968 scene pairs and are not independent observations.",
+    "reconciled_values": {
+      "blind_mean_oa_pct": 67.6376,
+      "feat_mean_oa_pct": 68.8303,
+      "paired_delta_oa_pct": 1.1927,
+      "paired_t_stat_oa": 5.199,
+      "p_value_oa": 0.0351,
+      "df_oa": 2,
+      "blind_mean_aa_pct": 57.8325,
+      "feat_mean_aa_pct": 59.7959,
+      "paired_delta_aa_pct": 1.9634,
+      "paired_t_stat_aa": 5.96,
+      "p_value_aa": 0.027,
+      "df_aa": 2
+    },
+    "seed_level_point_estimates": {
+      "seed_42": {
+        "blind_oa_pct": 67.4092,
+        "feat_oa_pct": 69.0445,
+        "delta_oa_pct": 1.6353,
+        "blind_aa_pct": 57.5071,
+        "feat_aa_pct": 60.0761,
+        "delta_aa_pct": 2.569
+      },
+      "seed_43": {
+        "blind_oa_pct": 67.8199,
+        "feat_oa_pct": 68.6867,
+        "delta_oa_pct": 0.8668,
+        "blind_aa_pct": 58.1411,
+        "feat_aa_pct": 59.5769,
+        "delta_aa_pct": 1.4358
+      },
+      "seed_44": {
+        "blind_oa_pct": 67.6838,
+        "feat_oa_pct": 68.7598,
+        "delta_oa_pct": 1.0759,
+        "blind_aa_pct": 57.8494,
+        "feat_aa_pct": 59.7348,
+        "delta_aa_pct": 1.8854
+      }
+    }
+  },
+  "isro_sac_cross_modal_status": {
+    "target_sensors": "Cartosat-2S High-Resolution Optical + RISAT-1 C-Band SAR",
+    "reference_data_provided_by_organizers": false,
+    "ground_truth_masks_available": 0,
+    "verified_qa_pairs_available": 0,
+    "operational_status": "PENDING — evaluation data/reference annotations unavailable",
+    "guardrails_implemented": {
+      "radiometric_nmi_verification": true,
+      "gradient_coherence_verification": true,
+      "disparate_scene_rejection": true,
+      "geo_spatial_crs_reprojection": true
+    }
+  },
+  "published_sota_comparisons": [
+    {
+      "benchmark": "CDVQA Change VQA (Held-Out Test 1)",
+      "satquery_model": "FeatureVQAHead + ChangeNet v2 + RemoteCLIP",
+      "satquery_result": "69.04% OA (Seed 42) / 68.83% OA (3-Seed Mean), 60.08% AA (Seed 42)",
+      "sota_model": "Dual-ResNet Baseline (68.45% OA, 42.10% AA) / ResNet-101+CEM (69.03% OA, 60.08% AA)",
+      "published_result": "68.45% OA / 42.10% AA (Dual-ResNet) and 69.03% OA / 60.08% AA (ResNet-101+CEM)",
+      "comparability": "CONDITIONALLY COMPARABLE",
+      "finding": "Identical test questions (39,686) and 19-class vocabulary. Displays arithmetic delta of +0.59% OA over published Dual-ResNet and +0.01% over ResNet-101+CEM. No external hypothesis test (p-value) is claimed because baseline prediction arrays were not published."
+    },
+    {
+      "benchmark": "RSVQA-LR Single-Image VQA (Full Validation)",
+      "satquery_model": "RSVQAClassifierHead + RemoteCLIP",
+      "satquery_result": "86.60% OA (95% CI: [83.97%, 89.09%])",
+      "sota_model": "ResNet-152 + LSTM Baseline (Sylvain Lobry et al., IEEE TGRS 2020)",
+      "published_result": "78.50% OA, 78.41% AA",
+      "comparability": "CONDITIONALLY COMPARABLE",
+      "finding": "Evaluated on 2,000-question validation subset across 100 scenes. Lobry et al. evaluated on the full corpus. This is a validation result, not an independent test score. Independent geographic transfer is evaluated on the 20-scene disjoint test partition (64.07% OA)."
+    },
+    {
+      "benchmark": "Aerial Change Mask Delineation (SECOND)",
+      "satquery_model": "SatQueryChangeNet v2",
+      "satquery_result": "31.44% Macro Change IoU, 55.08% 2-Class mIoU, 81.93% Pixel Acc",
+      "sota_model": "FC-Siam-diff (Daudt et al., 2018 / Yang et al., 2021) / SNUNet (Fang et al., 2021)",
+      "published_result": "~15%-20% Change IoU (FC-Siam-diff) / ~32%-36% Change IoU (SNUNet on SECOND)",
+      "comparability": "CONDITIONALLY COMPARABLE",
+      "finding": "Evaluated on all 968 authentic held-out SECOND pairs. Literature numbers reflect qualitative contextual ranges under varied semantic vs binary transfer protocols."
+    },
+    {
+      "benchmark": "VRSBench Visual Grounding",
+      "satquery_model": "SatQuery-RS-VLM / VRSGroundingHead",
+      "satquery_result": "38.27% Mean IoU, 34.00% Center Precision (@0.50)",
+      "sota_model": "GeoChat 7B Baseline (Xiang et al., NeurIPS 2024)",
+      "published_result": "49.80% Acc@0.5",
+      "comparability": "NOT COMPARABLE",
+      "finding": "GeoChat Acc@0.5 evaluates bounding box IoU >= 0.50. SatQuery Center Precision @0.50 evaluates center point distance within normalized threshold. Metrics are mathematically distinct and cannot be directly compared."
+    },
+    {
+      "benchmark": "VRSBench Generative VQA",
+      "satquery_model": "SatQuery-RS-VLM",
+      "satquery_result": "16.52% Overall Accuracy (Existence: 54.83%, Reasoning: 41.18%)",
+      "sota_model": "GeoChat 7B Baseline (Xiang et al., NeurIPS 2024)",
+      "published_result": "76.00% OA",
+      "comparability": "CONDITIONALLY COMPARABLE",
+      "finding": "SatQuery evaluates strict exact string matching on CPU with lightweight classifier head; GeoChat 7B uses autoregressive generative decoding with relaxed answer matching."
+    },
+    {
+      "benchmark": "Optical-SAR Joint Segmentation",
+      "satquery_model": "SatQueryOpticalSARNet-Disjoint",
+      "satquery_result": "67.11% Macro mIoU (Test), 59.44% Macro mIoU (Val)",
+      "sota_model": "LoveDA (Wang et al., 2021) / BigEarthNet-MM (Sumbul et al., 2021)",
+      "published_result": "48.50%-54.00% mIoU (LoveDA) / 88.50% patch mAP (BigEarthNet-MM)",
+      "comparability": "NOT COMPARABLE",
+      "finding": "Sensor and task mismatch: LoveDA is optical-only in China; BigEarthNet-MM reports 19-class patch classification mAP, not dense pixel segmentation. This is NOT an ISRO/SAC benchmark result."
+    }
+  ],
+  "latency_and_throughput": {
+    "hardware": "Intel 8-Core CPU (PyTorch CPU)",
+    "measurements": {
+      "single_image_vqa_ms": 17.71,
+      "single_image_captioning_ms": 14.13,
+      "single_image_grounding_ms": 13.26,
+      "land_cover_segmentation_ms": 14.97,
+      "bi_temporal_change_ms": 50.55,
+      "optical_sar_fusion_ms": 7.16,
+      "all_sub_100ms": true
+    }
+  }
+}

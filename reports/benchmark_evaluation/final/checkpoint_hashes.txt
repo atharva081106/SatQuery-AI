@@ -1,0 +1,10 @@
+# SatQuery AI — Checkpoint Cryptographic Hash Inventory (SHA-256)
+# Project: SIH 2026 PS26167 — ISRO / SAC Ahmedabad
+# Generated: 2026-10-16T02:06:00Z
+# Verification Tool: Python hashlib.sha256 / PowerShell Get-FileHash
+
+9b94320837db808ed284da285568a29b2cca52d2bb51d89d97a479895b11b332  ml_pipeline/checkpoints/satquery_change_net_authentic/best_change_net.pth  (6,883,005 bytes)
+66544ff8249c692ed46c072c221e922c0544241874cc1b92a3701fb5a767faa3  ml_pipeline/checkpoints/satquery_optical_sar_net_disjoint/optical_sar_net.pth  (3,447,433 bytes)
+b2d9b613d0c611a8b1c532dd0f4356f200a2a392d91e05ef19b93b1cfb042432  ml_pipeline/checkpoints/satquery_rs_vlm/model.safetensors  (1,445,022,200 bytes)
+3460fbbc41418f14db5ac82dc474b163269dd60c0dcd208b3fb37b36913fcaa7  ml_pipeline/checkpoints/best_satsegnet.pth  (5,873,379 bytes)
+23e66fe57b480f96fb151fdb65109c53029efa48c58b672c074698f62b1b5026  ml_pipeline/checkpoints/satsegnet.onnx  (1,938,115 bytes)

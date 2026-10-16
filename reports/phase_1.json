@@ -1,0 +1,40 @@
+{
+  "phase": 1,
+  "title": "Truth baseline and repo hygiene",
+  "timestamp": "2026-10-14T15:28:45+05:30",
+  "audit_status": "PASSED",
+  "script": "scripts/audit_claims.py",
+  "checks": {
+    "hardcoded_confidence_literals": {
+      "status": "PASSED",
+      "count": 0,
+      "details": "All confidence literals in backend/ replaced with dynamic derivations or None."
+    },
+    "health_endpoint_provenance": {
+      "status": "PASSED",
+      "details": "Accurately declares loaded models: SatSegNet (from-scratch 6-class 482k-param U-Net), BLIP-VQA / fallback heuristic, real checkpoint paths."
+    },
+    "frontend_copy_cleanliness": {
+      "status": "PASSED",
+      "details": "Landing page and dashboard metrics purged of unbacked claims ('90.2%', 'Zero FPR', 'millimeter precision', '<10ms'); dynamic reports loader configured."
+    },
+    "root_hygiene_migration": {
+      "status": "PASSED",
+      "moved_files": [
+        "DEMO_SCRIPT_230_PRECISE.md",
+        "DEMO_SCRIPT_2MIN30SEC.md",
+        "DEPLOYMENT_GUIDE.md",
+        "FINAL_DEMO_QUERIES.md",
+        "FINAL_POSTER_CORRECTIONS.md",
+        "FINAL_PROJECT_AUDIT.md",
+        "MODEL_AUDIT_FACTS.json",
+        "MODEL_AUDIT_REPORT.md",
+        "PROJECT_CONTEXT.md",
+        "SIH_2026_PRESENTATION_MASTER_DECK.txt",
+        "VIDEO_PITCH_SCRIPT.md"
+      ],
+      "destination": "docs/",
+      "superseded_notices_applied": true
+    }
+  }
+}

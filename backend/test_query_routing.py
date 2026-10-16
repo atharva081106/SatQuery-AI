@@ -16,7 +16,7 @@ from data_models import (
     INTENT_WATER_BODY, INTENT_VEGETATION, INTENT_AGRICULTURAL, INTENT_ROAD_NETWORK,
     INTENT_SPATIAL_RELATIONSHIP, INTENT_REGION_DIRECTION, INTENT_SCENE_UNDERSTANDING,
     INTENT_CHANGE_DETECTION, INTENT_COMPARISON, INTENT_IMAGE_DESCRIPTION, INTENT_MULTI_TASK,
-    INTENT_TEMPORAL,
+    INTENT_TEMPORAL, INTENT_OUT_OF_DOMAIN,
 )
 from analysis_planner import STEP_OBJECT_DETECTION, STEP_LAND_COVER, STEP_WATER_DETECTION
 
@@ -416,6 +416,34 @@ class TestTargetFiveQuestions:
         qi = query_understanding.analyze(q, num_images=2)
         assert qi.intent in (INTENT_CHANGE_DETECTION, INTENT_COMPARISON, INTENT_TEMPORAL)
         assert any(t in ("urban_area", "building") for t in qi.targets)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OUT-OF-DOMAIN SEMANTIC GUARDRAIL
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestOutOfDomain:
+
+    def test_stock_price_rejection(self):
+        qi = query_understanding.analyze("What is the stock price of Apple?")
+        assert qi.intent == INTENT_OUT_OF_DOMAIN
+        assert getattr(qi, "is_out_of_domain", False) is True
+        assert qi.confidence <= 0.1
+
+    def test_poem_rejection(self):
+        qi = query_understanding.analyze("Write a poem about love")
+        assert qi.intent == INTENT_OUT_OF_DOMAIN
+        assert getattr(qi, "is_out_of_domain", False) is True
+
+    def test_code_rejection(self):
+        qi = query_understanding.analyze("Can you write a python script for sorting an array?")
+        assert qi.intent == INTENT_OUT_OF_DOMAIN
+        assert getattr(qi, "is_out_of_domain", False) is True
+
+    def test_general_chat_rejection(self):
+        qi = query_understanding.analyze("Tell me a funny joke")
+        assert qi.intent == INTENT_OUT_OF_DOMAIN
+        assert getattr(qi, "is_out_of_domain", False) is True
 
 
 if __name__ == "__main__":
