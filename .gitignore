@@ -34,6 +34,32 @@ ml_pipeline/dataset_cache/
 scratch/
 antigravity_prompt_satquery.md
 
+# AI tooling outputs & configs (never commit)
+.agents/
+.archify/
+graphify-out/
+skills-lock.json
+
+# AI-generated presentation & internal docs
+docs/PROJECT_CONTEXT.md
+docs/DEMO_SCRIPT_230_PRECISE.md
+docs/DEMO_SCRIPT_2MIN30SEC.md
+docs/FINAL_DEMO_QUERIES.md
+docs/FINAL_POSTER_CORRECTIONS.md
+docs/FINAL_PROJECT_AUDIT.md
+docs/MODEL_AUDIT_FACTS.json
+docs/MODEL_AUDIT_REPORT.md
+docs/SIH_2026_PRESENTATION_MASTER_DECK.txt
+docs/SIH_2026_PRESENTATION_VERIFIED_DECK.md
+docs/VIDEO_PITCH_SCRIPT.md
+docs/compute_plan.md
+docs/eval_harness_spec.md
+reports/final_release_audit.md
+reports/submission_readiness.md
+
+# Next.js auto-generated agent rules file
+frontend/AGENTS.md
+
 # Node & Next.js
 node_modules/
 .next/
@@ -48,6 +74,3 @@ next-env.d.ts
 *.log
 .env.local
 .env*.local
-.agents/
-  
- 
