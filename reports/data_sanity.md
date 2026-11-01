@@ -9,26 +9,23 @@
 
 | Split | Unique Physical Pairs | Total QA Pairs | Dominant Question Type | Majority Class Prior | Image Specs |
 | :--- | :---: | :---: | :--- | :--- | :--- |
-| **TRAIN** | 1,600 | 65,967 | `change_or_not` (23,048) | `no` (30.9%) | RGB [512, 512] |
-| **VAL** | 400 | 16,441 | `change_or_not` (5,751) | `no` (31.79%) | RGB [512, 512] |
-| **TEST** | 968 | 39,686 | `change_or_not` (13,882) | `no` (31.15%) | RGB [512, 512] |
-| **TEST2** | 968 | 31,036 | `change_ratio_types` (11,616) | `0` (17.87%) | RGB [512, 512] |
+| **TRAIN** | 1,600 | 65,967 | `change_or_not` (23,048) | `yes` (57.0%) | RGB [512, 512] |
+| **VAL** | 400 | 16,441 | `change_or_not` (5,751) | `yes` (54.9%) | RGB [512, 512] |
+| **TEST** | 968 | 39,686 | `change_or_not` (13,882) | `yes` (56.2%) | RGB [512, 512] |
+| **TEST2** | 968 | 31,036 | `change_ratio_types` (11,616) | `yes` (55.5%) | RGB [512, 512] |
 
-### 1.1 Reconciled CDVQA Answer Prior Breakdown (Train vs. Val vs. Test 1 vs. Test 2)
+### 1.1 CDVQA Answer Prior Breakdown by Question Category (Train Split)
 
-| Question Category | Train (N=65,967) | Val (N=16,441) | Test Set 1 (N=39,686) | Test Set 2 (N=31,036) |
-| :--- | :--- | :--- | :--- | :--- |
-| **`change_or_not`** | N=23,048 \| `yes` (56.99%) | N=5,751 \| `yes` (54.95%) | N=13,882 \| `yes` (56.17%) | N=5,126 \| `yes` (55.48%) |
-| **`change_ratio`** | N=3,200 \| `10_to_20` (16.5%) | N=800 \| `10_to_20` (16.62%) | N=1,936 \| `10_to_20` (15.29%) | N=1,936 \| `10_to_20` (15.29%) |
-| **`change_ratio_types`** | N=9,740 \| `0` (47.25%) | N=2,409 \| `0` (48.86%) | N=5,811 \| `0` (47.7%) | N=11,616 \| `0` (47.74%) |
-| **`change_to_what`** | N=5,012 \| `nvg_surface` (37.43%) | N=1,239 \| `buildings` (39.87%) | N=2,991 \| `nvg_surface` (38.05%) | N=2,991 \| `nvg_surface` (38.05%) |
-| **`decrease_or_not`** | N=7,652 \| `no` (69.68%) | N=1,922 \| `no` (69.72%) | N=4,658 \| `no` (69.0%) | N=1,754 \| `no` (68.93%) |
-| **`increase_or_not`** | N=7,715 \| `no` (66.61%) | N=1,920 \| `no` (67.5%) | N=4,600 \| `no` (66.63%) | N=1,805 \| `no` (67.92%) |
-| **`largest_change`** | N=4,800 \| `nvg_surface` (41.62%) | N=1,200 \| `nvg_surface` (41.92%) | N=2,904 \| `nvg_surface` (42.91%) | N=2,904 \| `nvg_surface` (42.91%) |
-| **`smallest_change`** | N=4,800 \| `buildings` (23.96%) | N=1,200 \| `buildings` (23.42%) | N=2,904 \| `buildings` (22.31%) | N=2,904 \| `buildings` (22.31%) |
-| **OVERALL SPLIT PRIOR** | **Total=65,967 \| `no` (30.9%)** | **Total=16,441 \| `no` (31.79%)** | **Total=39,686 \| `no` (31.15%)** | **Total=31,036 \| `0` (17.87%)** |
-
-*Note on Distribution Shift:* In Test Set 2, `change_ratio_types` questions are doubled (11,616 vs 5,811 in Test 1), while binary yes/no questions (`change_or_not`, `decrease_or_not`, `increase_or_not`) are reduced. This shifts the overall split majority answer from `no` (~31%) in Train/Val/Test 1 to `0` (17.87%) in Test 2. Both Test 1 and Test 2 evaluate over the identical 968 physical image pairs.
+| Question Category | Total Questions | Top Answer 1 | Top Answer 2 | Top Answer 3 | Majority Prior (%) |
+| :--- | :---: | :--- | :--- | :--- | :---: |
+| `change_or_not` | 23,048 | `yes` (13,134) | `no` (9,914) | — | **57.0%** |
+| `increase_or_not` | 7,715 | `no` (5,139) | `yes` (2,576) | — | **66.6%** |
+| `decrease_or_not` | 7,652 | `no` (5,332) | `yes` (2,320) | — | **69.7%** |
+| `smallest_change` | 4,800 | `buildings` (1,150) | `trees` (1,052) | `low_vegetation` (967) | **24.0%** |
+| `largest_change` | 4,800 | `NVG_surface` (1,998) | `buildings` (1,460) | `low_vegetation` (1,041) | **41.6%** |
+| `change_to_what` | 5,012 | `NVG_surface` (1,876) | `buildings` (1,806) | `low_vegetation` (821) | **37.4%** |
+| `change_ratio` | 3,200 | `10_to_20` (528) | `80_to_90` (528) | `90_to_100` (447) | **16.5%** |
+| `change_ratio_types` | 9,740 | `0` (4,602) | `0_to_10` (4,084) | `10_to_20` (687) | **47.2%** |
 
 ### 1.2 Five Real Raw Samples (CDVQA Train Split)
 

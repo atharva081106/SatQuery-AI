@@ -9,3 +9,5 @@ Pillow
 tqdm
 pandas
 numpy
+torchgeo
+huggingface_hub

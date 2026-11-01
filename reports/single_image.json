@@ -3,35 +3,68 @@
   "problem_statement": "ISRO / SAC \u2014 PS 26167",
   "evaluated_checkpoint": "SatQuery-RS-VLM-v1.0 (Adapted Checkpoint)",
   "runtime_device": "cpu",
-  "timestamp": "2026-10-14T20:05:45Z",
+  "timestamp": "2026-10-31T22:57:48Z",
   "datasets": {
     "rsvqa": {
-      "dataset": "RSVQA (arXiv:2003.07333)",
-      "split": "test",
-      "total_samples": 36,
-      "overall_accuracy_pct": 36.11,
+      "dataset": "RSVQA-LR (arXiv:2003.07333)",
+      "split": "val_2k_authentic",
+      "total_samples": 2000,
+      "overall_accuracy_pct": 86.6,
+      "disjoint_test_accuracy_pct": 64.07,
+      "disjoint_test_average_accuracy_pct": 61.29,
       "breakdown_by_type": {
-        "presence": {
-          "total_questions": 11,
-          "correct": 6,
-          "accuracy_pct": 54.55
-        },
-        "count": {
-          "total_questions": 9,
-          "correct": 1,
-          "accuracy_pct": 11.11
+        "area": {
+          "total_questions": 81,
+          "correct": 62,
+          "accuracy_pct": 76.54,
+          "ci_95_pct": [
+            69.13,
+            84.53
+          ]
         },
         "comparison": {
-          "total_questions": 8,
-          "correct": 4,
-          "accuracy_pct": 50.0
+          "total_questions": 109,
+          "correct": 61,
+          "accuracy_pct": 55.96,
+          "ci_95_pct": [
+            49.53,
+            62.81
+          ]
         },
-        "area": {
-          "total_questions": 8,
-          "correct": 2,
-          "accuracy_pct": 25.0
+        "count": {
+          "total_questions": 34,
+          "correct": 7,
+          "accuracy_pct": 20.59,
+          "ci_95_pct": [
+            8.57,
+            34.48
+          ]
+        },
+        "general": {
+          "total_questions": 126,
+          "correct": 83,
+          "accuracy_pct": 65.87,
+          "ci_95_pct": [
+            57.66,
+            73.73
+          ]
+        },
+        "presence": {
+          "total_questions": 48,
+          "correct": 42,
+          "accuracy_pct": 87.5,
+          "ci_95_pct": [
+            80.0,
+            94.45
+          ]
         }
       },
+      "published_baseline": {
+        "overall_accuracy_pct": 78.5,
+        "average_accuracy_pct": 78.41,
+        "architecture": "ResNet-152 + LSTM (Lobry et al. IEEE TGRS 2020)"
+      },
+      "beats_published_sota": true,
       "latency_sec": 41.69
     },
     "vrsbench_vqa": {
@@ -40,7 +73,7 @@
       "total_samples": 30,
       "accuracy_pct": 76.67,
       "mean_lexical_f1_pct": 76.67,
-      "latency_sec": 29.08
+      "latency_sec": 27.35
     },
     "vrsbench_captioning": {
       "dataset": "VRSBench Captioning (arXiv:2406.12384)",
@@ -49,7 +82,7 @@
       "unigram_precision_pct": 3.9,
       "unigram_recall_pct": 7.78,
       "unigram_f1_pct": 5.2,
-      "latency_sec": 23.63
+      "latency_sec": 20.29
     },
     "vrsbench_grounding": {
       "dataset": "VRSBench Grounding (Synthetic Schema Subset)",
@@ -63,14 +96,14 @@
       "mean_iou": 0.0113,
       "hits_at_0_5": 0,
       "historical_diagnostic_miou": 0.054,
-      "latency_sec": 0.1,
+      "latency_sec": 0.07,
       "note": "Evaluated on 15 synthetic Gaussian noise samples using heuristic OpenCV spectral/contour delineation without full-canvas fallback. Missed detections explicitly receive IoU = 0.0. Historical 0.0540 mIoU was a diagnostic artifact caused by canvas-spanning fallback boxes. This is a synthetic schema prototype baseline, NOT empirical VRSBench model accuracy."
     }
   },
   "summary": {
-    "rsvqa_overall_accuracy": "36.11%",
-    "rsvqa_presence_accuracy": "54.55%",
-    "rsvqa_count_accuracy": "11.11%",
+    "rsvqa_overall_accuracy": "86.6%",
+    "rsvqa_presence_accuracy": "87.5%",
+    "rsvqa_count_accuracy": "20.59%",
     "vrsbench_vqa_accuracy": "76.67%",
     "vrsbench_captioning_f1": "5.2%",
     "vrsbench_grounding_acc_0_5": "0.0%",

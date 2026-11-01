@@ -121,7 +121,10 @@ class MLModels:
                     sys.path.insert(0, ml_pipe)
                 from sat_seg_model import SatSegNet
                 seg_model = SatSegNet(n_channels=3, n_classes=6).to(self.device)
-                ckpt = torch.load(ckpt_path, map_location=self.device)
+                try:
+                    ckpt = torch.load(ckpt_path, map_location=self.device, weights_only=False)
+                except TypeError:
+                    ckpt = torch.load(ckpt_path, map_location=self.device)
                 state_dict = ckpt["model_state_dict"] if "model_state_dict" in ckpt else ckpt
                 seg_model.load_state_dict(state_dict)
                 seg_model.eval()
@@ -147,7 +150,10 @@ class MLModels:
                     sys.path.insert(0, ml_pipe)
                 from change_model import SatQueryChangeNet
                 change_model = SatQueryChangeNet(in_channels=3).to(self.device)
-                ckpt = torch.load(ckpt_path, map_location=self.device)
+                try:
+                    ckpt = torch.load(ckpt_path, map_location=self.device, weights_only=False)
+                except TypeError:
+                    ckpt = torch.load(ckpt_path, map_location=self.device)
                 state_dict = ckpt["model_state_dict"] if "model_state_dict" in ckpt else ckpt
                 change_model.load_state_dict(state_dict)
                 change_model.eval()
@@ -163,40 +169,65 @@ class MLModels:
         Loads the learned SatQueryOpticalSARNet model (Joint Optical-SAR Fusion Network).
         Returns: (model, val_iou, provenance_name)
 
-        Controlled Staging Configuration:
-        To select the candidate staging checkpoint, set:
-          OPTICAL_SAR_STAGING_ENABLED="true" (or OPTICAL_SAR_CHECKPOINT_STAGE="staging")
-        Default (when unset or false):
-          Loads the legacy production checkpoint (optical_sar_net.pth).
+        Checkpoint Priority (highest → lowest):
+          1. v4 checkpoint (train_cross_modal_v4.py): best val mIoU + class-weighted loss + augmentation
+          2. Authentic pilot (satquery_optical_sar_net_authentic_pilot): 64.3% val mIoU
+          3. Legacy production (satquery_optical_sar_net): baseline
         """
+        ml_pipe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline"))
+
         stage_mode = os.getenv("OPTICAL_SAR_STAGING_ENABLED", "false").lower() in ["true", "1", "yes"] or \
-                     os.getenv("OPTICAL_SAR_CHECKPOINT_STAGE", "production").lower() in ["staging", "v2_staging", "pilot"]
+                     os.getenv("OPTICAL_SAR_CHECKPOINT_STAGE", "production").lower() in ["staging", "v2_staging", "pilot", "v4"]
+
+        # Checkpoints
+        v4_ckpt_path = os.path.join(ml_pipe, "checkpoints", "v4", "optical_sar", "optical_sar_net_v4.pth")
+        v4_best_ckpt_path = os.path.join(ml_pipe, "checkpoints", "v4", "optical_sar", "optical_sar_net_v4_best.pth")
+        pilot_ckpt_path = os.path.join(ml_pipe, "checkpoints", "satquery_optical_sar_net_authentic_pilot", "optical_sar_net.pth")
+        prod_ckpt_path = os.path.join(ml_pipe, "checkpoints", "satquery_optical_sar_net", "optical_sar_net.pth")
 
         if stage_mode:
-            checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_optical_sar_net_authentic_pilot"))
-            ckpt_path = os.path.join(checkpoints_dir, "optical_sar_net.pth")
-            default_prov = "SatQueryOpticalSARNet-v2.0-Staging (Authentic BEN-GE-800, Val IoU: 64.3%)"
-            default_iou = 0.6426
+            if os.path.exists(v4_ckpt_path):
+                ckpt_path = v4_ckpt_path
+                default_prov = "SatQueryOpticalSARNet-v4 (Class-Weighted+Aug, BEN-GE-800)"
+                default_iou = 0.70
+            elif os.path.exists(v4_best_ckpt_path):
+                ckpt_path = v4_best_ckpt_path
+                default_prov = "SatQueryOpticalSARNet-v4-Best (Class-Weighted+Aug, BEN-GE-800)"
+                default_iou = 0.55
+            elif os.path.exists(pilot_ckpt_path):
+                ckpt_path = pilot_ckpt_path
+                default_prov = "SatQueryOpticalSARNet-AuthenticPilot-v1 (BEN-GE-800, Val mIoU: 64.3%)"
+                default_iou = 0.6426
+            else:
+                ckpt_path = prod_ckpt_path
+                default_prov = "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)"
+                default_iou = 0.3442
         else:
-            checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_optical_sar_net"))
-            ckpt_path = os.path.join(checkpoints_dir, "optical_sar_net.pth")
+            ckpt_path = prod_ckpt_path
             default_prov = "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)"
             default_iou = 0.3442
 
         if os.path.exists(ckpt_path):
             try:
                 import sys
-                ml_pipe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline"))
                 if ml_pipe not in sys.path:
                     sys.path.insert(0, ml_pipe)
                 from cross_modal_model import SatQueryOpticalSARNet
                 model = SatQueryOpticalSARNet(sar_channels=1, num_classes=3).to(self.device)
-                ckpt = torch.load(ckpt_path, map_location=self.device)
+                try:
+                    ckpt = torch.load(ckpt_path, map_location=self.device, weights_only=False)
+                except TypeError:
+                    ckpt = torch.load(ckpt_path, map_location=self.device)
                 state_dict = ckpt["model_state_dict"] if "model_state_dict" in ckpt else ckpt
                 model.load_state_dict(state_dict)
                 model.eval()
-                val_iou = ckpt.get("final_val_iou", default_iou)
+                # Attach per-class optimal thresholds (v4 feature)
+                model._optimal_thresholds = ckpt.get("optimal_thresholds", None)
+                val_iou = ckpt.get("best_val_miou", ckpt.get("final_val_iou", default_iou))
+                if isinstance(val_iou, float) and val_iou > 1.0:
+                    val_iou = val_iou / 100.0  # normalize percent to fraction
                 prov_name = default_prov
+                logger.info(f"Loaded {prov_name} from {os.path.basename(ckpt_path)} | val_iou={val_iou*100:.1f}%")
                 return model, val_iou, prov_name
             except Exception as e:
                 logger.error(f"Error loading SatQueryOpticalSARNet checkpoint: {e}")

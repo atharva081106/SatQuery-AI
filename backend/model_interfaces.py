@@ -2220,8 +2220,12 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 t2_t = torch.from_numpy(t2_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
 
                 with torch.no_grad():
-                    logits = change_model(t1_t, t2_t)
-                    prob = torch.sigmoid(logits).squeeze().cpu().numpy()
+                    # 4-Fold Dihedral Test-Time Augmentation (TTA)
+                    p0 = torch.sigmoid(change_model(t1_t, t2_t))
+                    ph = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-1]), torch.flip(t2_t, [-1]))), [-1])
+                    pv = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-2]), torch.flip(t2_t, [-2]))), [-2])
+                    phv = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-2, -1]), torch.flip(t2_t, [-2, -1]))), [-2, -1])
+                    prob = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
 
                 prob_full = cv2.resize(prob, (w_img, h_img), interpolation=cv2.INTER_LINEAR)
                 thresh = (prob_full > 0.45).astype(np.uint8) * 255
@@ -2646,19 +2650,25 @@ class CrossModalAnalysis(SpecialistModel):
 
                 t_fwd_start = time.perf_counter()
                 with torch.no_grad():
-                    logits = cross_model(opt_t, sar_t)
-                    probs = torch.sigmoid(logits).squeeze().cpu().numpy()
+                    # 4-Fold Dihedral Test-Time Augmentation (TTA) to suppress radar speckle
+                    p0 = torch.sigmoid(cross_model(opt_t, sar_t))
+                    ph = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-1]), torch.flip(sar_t, [-1]))), [-1])
+                    pv = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-2]), torch.flip(sar_t, [-2]))), [-2])
+                    phv = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-2, -1]), torch.flip(sar_t, [-2, -1]))), [-2, -1])
+                    probs = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
                 forward_latency_ms = round((time.perf_counter() - t_fwd_start) * 1000.0, 2)
 
                 p_built = cv2.resize(probs[0], (w, h), interpolation=cv2.INTER_LINEAR)
                 p_water = cv2.resize(probs[1], (w, h), interpolation=cv2.INTER_LINEAR)
                 p_veg   = cv2.resize(probs[2], (w, h), interpolation=cv2.INTER_LINEAR)
 
-                # Remediated: Independent multi-label binary segmentation thresholds
-                # Calibrated for SatQueryOpticalSARNet operating points (BCEWithLogitsLoss formulation)
-                th_built = 0.25
-                th_water = 0.58
-                th_veg   = 0.46
+                # Calibrated per-class segmentation thresholds
+                if hasattr(cross_model, '_optimal_thresholds') and cross_model._optimal_thresholds is not None:
+                    th_built, th_water, th_veg = cross_model._optimal_thresholds
+                else:
+                    th_built = 0.25
+                    th_water = 0.58
+                    th_veg   = 0.46
                 fused_built_mask = (p_built > th_built).astype(np.uint8) * 255
                 fused_water_mask = (p_water > th_water).astype(np.uint8) * 255
                 fused_veg_mask   = (p_veg > th_veg).astype(np.uint8) * 255

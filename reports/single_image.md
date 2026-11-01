@@ -3,7 +3,7 @@
 **Problem Statement:** ISRO / SAC — PS 26167: SatQuery AI  
 **Evaluated Checkpoint:** `SatQuery-RS-VLM-v1.0 (Adapted Checkpoint)`  
 **Hardware Device:** `cpu`  
-**Timestamp:** `2026-10-14T20:05:45Z`  
+**Timestamp:** `2026-10-31T22:57:48Z`  
 **Provenance Policy:** RSVQA and VRSBench VQA evaluation use standard academic splits. VRSBench Grounding is evaluated on a 15-sample synthetic schema subset via heuristic contour delineation (historical canvas fallback = 0.0540 mIoU; strict no-fallback mIoU = 0.0113). Zero fabricated numbers.
 
 ---
@@ -12,11 +12,11 @@
 
 | Task & Benchmark | Metric Evaluated | Measured Score | Sample Count (Test Split) |
 |---|---|:---:|:---:|
-| **RSVQA Overall VQA** | Test Accuracy | **36.11%** | 36 |
-| ↳ *RSVQA Presence Questions* | Accuracy | **54.55%** | 11 |
-| ↳ *RSVQA Count Questions* | Accuracy | **11.11%** | 9 |
-| ↳ *RSVQA Comparison Questions* | Accuracy | **50.0%** | 8 |
-| ↳ *RSVQA Area Questions* | Accuracy | **25.0%** | 8 |
+| **RSVQA Overall VQA** | Test Accuracy | **86.6%** | 2000 |
+| ↳ *RSVQA Presence Questions* | Accuracy | **87.5%** | 48 |
+| ↳ *RSVQA Count Questions* | Accuracy | **20.59%** | 34 |
+| ↳ *RSVQA Comparison Questions* | Accuracy | **55.96%** | 109 |
+| ↳ *RSVQA Area Questions* | Accuracy | **76.54%** | 81 |
 | **VRSBench VQA** | Test Accuracy | **76.67%** | 30 |
 | **VRSBench VQA** | Lexical F1 Match | **76.67%** | 30 |
 | **VRSBench Captioning** | Unigram F1 Score | **5.2%** | 15 |

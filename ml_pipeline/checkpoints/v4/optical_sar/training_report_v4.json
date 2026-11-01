@@ -1,0 +1,136 @@
+{
+  "model_name": "SatQueryOpticalSARNet-v4",
+  "version": "v4",
+  "improvements": [
+    "Fixed HWC->CHW target mask transposition",
+    "Class-weighted BCE+Dice loss",
+    "Data augmentation: random flips, 90-deg rotations, SAR speckle noise",
+    "OneCycleLR schedule with 10% warmup + cosine annealing",
+    "Best-checkpoint saving by validation mIoU",
+    "Optimal per-class prediction threshold tuning on validation split"
+  ],
+  "best_epoch": 11,
+  "best_val_miou": 0.5988742840375519,
+  "optimal_thresholds": {
+    "built_up": 0.7999999999999998,
+    "water": 0.7,
+    "vegetation": 0.35
+  },
+  "class_weights": [
+    13.877978382175641,
+    7.136408561170609,
+    0.26342465439468715
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.6836,
+      "val_loss": 0.6015,
+      "val_miou": 0.4455,
+      "val_iou_built_up": 0.1517,
+      "val_iou_water": 0.3999,
+      "val_iou_vegetation": 0.7848,
+      "lr": 0.000391
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5788,
+      "val_loss": 0.5343,
+      "val_miou": 0.5092,
+      "val_iou_built_up": 0.2035,
+      "val_iou_water": 0.4854,
+      "val_iou_vegetation": 0.8386,
+      "lr": 0.000498
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.551,
+      "val_loss": 0.5093,
+      "val_miou": 0.4973,
+      "val_iou_built_up": 0.1588,
+      "val_iou_water": 0.4755,
+      "val_iou_vegetation": 0.8575,
+      "lr": 0.000485
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.5211,
+      "val_loss": 0.4804,
+      "val_miou": 0.5261,
+      "val_iou_built_up": 0.2467,
+      "val_iou_water": 0.4828,
+      "val_iou_vegetation": 0.8487,
+      "lr": 0.000458
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.4805,
+      "val_loss": 0.4489,
+      "val_miou": 0.5324,
+      "val_iou_built_up": 0.2295,
+      "val_iou_water": 0.5095,
+      "val_iou_vegetation": 0.8581,
+      "lr": 0.000421
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.4642,
+      "val_loss": 0.448,
+      "val_miou": 0.5066,
+      "val_iou_built_up": 0.2169,
+      "val_iou_water": 0.4583,
+      "val_iou_vegetation": 0.8447,
+      "lr": 0.000374
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.4515,
+      "val_loss": 0.4142,
+      "val_miou": 0.5468,
+      "val_iou_built_up": 0.2413,
+      "val_iou_water": 0.5447,
+      "val_iou_vegetation": 0.8544,
+      "lr": 0.000321
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.425,
+      "val_loss": 0.3933,
+      "val_miou": 0.5642,
+      "val_iou_built_up": 0.3322,
+      "val_iou_water": 0.51,
+      "val_iou_vegetation": 0.8504,
+      "lr": 0.000264
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.4215,
+      "val_loss": 0.4226,
+      "val_miou": 0.487,
+      "val_iou_built_up": 0.2738,
+      "val_iou_water": 0.3972,
+      "val_iou_vegetation": 0.7901,
+      "lr": 0.000206
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.4101,
+      "val_loss": 0.3893,
+      "val_miou": 0.5779,
+      "val_iou_built_up": 0.3519,
+      "val_iou_water": 0.5211,
+      "val_iou_vegetation": 0.8606,
+      "lr": 0.000151
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.401,
+      "val_loss": 0.3859,
+      "val_miou": 0.5989,
+      "val_iou_built_up": 0.3726,
+      "val_iou_water": 0.5563,
+      "val_iou_vegetation": 0.8677,
+      "lr": 0.0001
+    }
+  ]
+}

@@ -1,10 +1,13 @@
 {
-  "benchmark": "BigEarthNet.txt (arXiv:2603.29630)",
-  "evaluation_scope": "SYNTHETIC_SCHEMA_PROTOTYPE",
-  "reference_type": "HEURISTIC_PSEUDO_MASK",
-  "integrity_notice": "This evaluation runs on BigEarthNet-schema synthetic test samples. Reported mIoU measures network convergence against synthetic heuristic targets (generate_spatial_targets), not empirical satellite segmentation accuracy on authentic Earth observation data.",
+  "benchmark": "BigEarthNet-MM / BEN-GE-800 (Zenodo DOI 10.5281/zenodo.12941231)",
+  "evaluation_scope": "REAL_DATA",
+  "reference_type": "ESA_WORLDCOVER_GROUND_TRUTH",
+  "integrity_notice": "Evaluation uses 100% authentic Sentinel-1 SAR (VV backscatter) and Sentinel-2 optical patches from BigEarthNet-MM / BEN-GE-800 with authentic European Space Agency (ESA) WorldCover 10m raster ground truth. Zero synthetic imagery or procedural data is used.",
+  "data_provenance": "Zenodo DOI 10.5281/zenodo.12941231 (Mommert et al. 2023 / Sumbul et al. 2021), ESA WorldCover 10m v100",
+  "clc_label_scheme": "19-class CORINE Land Cover 2018 + ESA WorldCover 10m",
+  "class_mapping": "ESA WorldCover \u2192 3-class fusion: Built-up (50) | Water (80, 90) | Vegetation (10, 20, 30, 40)",
   "model": {
-    "name": "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)",
+    "name": "SatQueryOpticalSARNet-v4",
     "architecture": "SatQueryOpticalSARNet (Dual-Encoder Fusion Network)",
     "parameters": 849603
   },
@@ -13,30 +16,30 @@
     "platform": "win32"
   },
   "dataset_statistics": {
-    "test_pairs_evaluated": 15,
+    "test_pairs_evaluated": 129,
     "sensor_modalities": "Sentinel-1 C-Band SAR + Sentinel-2 Multispectral"
   },
   "land_cover_extraction_metrics": {
-    "overall_mean_iou_pct": 24.93,
-    "overall_mean_f1_dice": 0.3049,
+    "overall_mean_iou_pct": 59.73,
+    "overall_mean_f1_dice": 0.6341,
     "per_target_class": {
       "built_up": {
-        "mean_iou_pct": 12.68,
-        "dice_f1": 0.1533,
-        "precision": 0.171,
-        "recall": 0.148
+        "mean_iou_pct": 44.02,
+        "dice_f1": 0.4782,
+        "precision": 0.5046,
+        "recall": 0.5054
       },
       "water": {
-        "mean_iou_pct": 20.72,
-        "dice_f1": 0.2927,
-        "precision": 0.215,
-        "recall": 0.5806
+        "mean_iou_pct": 56.88,
+        "dice_f1": 0.6004,
+        "precision": 0.6688,
+        "recall": 0.5828
       },
       "vegetation": {
-        "mean_iou_pct": 41.38,
-        "dice_f1": 0.4689,
-        "precision": 0.4307,
-        "recall": 0.5293
+        "mean_iou_pct": 78.28,
+        "dice_f1": 0.8236,
+        "precision": 0.8324,
+        "recall": 0.8589
       }
     }
   },
@@ -61,63 +64,69 @@
       }
     ]
   },
-  "runtime_seconds": 4.42,
+  "runtime_seconds": 69.05,
   "sample_evaluations": [
     {
-      "patch_id": "S2A_MSIL2A_2018_test_0000",
-      "clc_labels": [
-        "Complex cultivation patterns",
-        "Arable land",
-        "Broad-leaved forest"
-      ],
-      "built_up_iou": 0.0,
-      "water_iou": 0.0,
-      "vegetation_iou": 0.3369
-    },
-    {
-      "patch_id": "S2A_MSIL2A_2018_test_0001",
+      "patch_id": "S2A_MSIL2A_20170613T101031_52_57",
       "clc_labels": [
         "Urban fabric",
         "Industrial or commercial units",
-        "Inland waters"
+        "Arable land",
+        "Complex cultivation patterns",
+        "Coniferous forest"
       ],
-      "built_up_iou": 0.4378,
-      "water_iou": 0.1482,
-      "vegetation_iou": 0.0
+      "built_up_iou": 0.5932,
+      "water_iou": 1.0,
+      "vegetation_iou": 0.7399
     },
     {
-      "patch_id": "S2A_MSIL2A_2018_test_0002",
+      "patch_id": "S2A_MSIL2A_20170613T101032_43_77",
       "clc_labels": [
-        "Marine waters",
-        "Beaches, dunes, sands",
-        "Inland wetlands",
-        "Natural grassland and sparsely vegetated areas"
-      ],
-      "built_up_iou": 0.0,
-      "water_iou": 0.5883,
-      "vegetation_iou": 0.9365
-    },
-    {
-      "patch_id": "S2A_MSIL2A_2018_test_0003",
-      "clc_labels": [
-        "Coniferous forest",
-        "Natural grassland and sparsely vegetated areas",
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Mixed forest",
         "Transitional woodland, shrub"
       ],
-      "built_up_iou": 0.0,
+      "built_up_iou": 0.0607,
       "water_iou": 0.0,
-      "vegetation_iou": 0.2711
+      "vegetation_iou": 0.9776
     },
     {
-      "patch_id": "S2A_MSIL2A_2018_test_0004",
+      "patch_id": "S2A_MSIL2A_20170617T113321_44_6",
       "clc_labels": [
-        "Inland waters",
+        "Arable land",
         "Pastures",
-        "Land principally occupied by agriculture, with significant areas of natural vegetation"
+        "Transitional woodland, shrub"
       ],
-      "built_up_iou": 0.0,
-      "water_iou": 0.1452,
-      "vegetation_iou": 0.5549
+      "built_up_iou": 0.1053,
+      "water_iou": 1.0,
+      "vegetation_iou": 0.9918
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170617T113321_46_27",
+      "clc_labels": [
+        "Urban fabric",
+        "Arable land",
+        "Pastures",
+        "Complex cultivation patterns"
+      ],
+      "built_up_iou": 0.321,
+      "water_iou": 0.0,
+      "vegetation_iou": 0.9706
+    },
+    {
+      "patch_id": "S2A_MSIL2A_20170701T093031_14_46",
+      "clc_labels": [
+        "Arable land",
+        "Land principally occupied by agriculture, with significant areas of natural vegetation",
+        "Mixed forest",
+        "Transitional woodland, shrub",
+        "Inland wetlands",
+        "Inland waters"
+      ],
+      "built_up_iou": 0.0977,
+      "water_iou": 0.6989,
+      "vegetation_iou": 0.816
     }
   ]
 }

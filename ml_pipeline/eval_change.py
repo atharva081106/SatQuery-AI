@@ -40,6 +40,8 @@ if sys.platform == "win32":
         pass
 
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 # Paths
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -105,22 +107,56 @@ def compute_mask_metrics(pred_bin: np.ndarray, target_bin: np.ndarray) -> Dict[s
     }
 
 def load_models(device: str):
-    """Loads SatQueryChangeNet and VQA model."""
+    """Loads SatQueryChangeNet (best available ckpt) and VQA model with v3 CDVQA heads."""
+    # ── Change Detection Model: Production SatQueryChangeNet checkpoint ──
     change_ckpt = ML_DIR / "checkpoints" / "satquery_change_net" / "change_net.pth"
+
     change_net = SatQueryChangeNet().to(device)
     if change_ckpt.exists():
-        state = torch.load(change_ckpt, map_location=device)
-        if isinstance(state, dict) and "model_state_dict" in state:
-            change_net.load_state_dict(state["model_state_dict"])
-        else:
-            change_net.load_state_dict(state)
+        state = torch.load(change_ckpt, map_location=device, weights_only=False)
+        sd = state["model_state_dict"] if isinstance(state, dict) and "model_state_dict" in state else state
+        change_net.load_state_dict(sd)
         change_net.eval()
         change_prov = "SatQueryChangeNet-v1.0 (Siamese U-Net, CDVQA trained)"
     else:
         change_net.eval()
         change_prov = "SatQueryChangeNet (Untrained Baseline)"
 
-    # Load RS-VLM for CDVQA
+    # ── VQA: v3 CDVQA Feature Head (ensemble of 3 seeds) > BLIP fallback ──
+    v3_feat_heads = []
+    v3_cdvqa_dir = ML_DIR / "checkpoints" / "v3" / "cdvqa_heads"
+    VOCAB = [
+        "0", "0_to_10", "10_to_20", "20_to_30", "30_to_40", "40_to_50",
+        "50_to_60", "60_to_70", "70_to_80", "80_to_90", "90_to_100",
+        "buildings", "low_vegetation", "no", "nvg_surface", "playgrounds",
+        "trees", "water", "yes"
+    ]
+
+
+
+    class FeatureVQAHead(nn.Module):
+        def __init__(self, change_dim=512, q_dim=512, hidden_dim=256, num_classes=19):
+            super().__init__()
+            self.net = nn.Sequential(
+                nn.Linear(change_dim + q_dim, hidden_dim),
+                nn.BatchNorm1d(hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(hidden_dim, num_classes)
+            )
+        def forward(self, c_feat, q_feat):
+            return self.net(torch.cat([c_feat, q_feat], dim=-1))
+
+    for seed in [42, 43, 44]:
+        ckpt_path = v3_cdvqa_dir / f"feat_head_seed{seed}_v3.pth"
+        if ckpt_path.exists():
+            head = FeatureVQAHead().to(device)
+            state = torch.load(ckpt_path, map_location=device)
+            head.load_state_dict(state["model_state_dict"])
+            head.eval()
+            v3_feat_heads.append(head)
+
+    # Load RS-VLM (for question/image feature extraction + fallback for open questions)
     from transformers import BlipProcessor, BlipForQuestionAnswering
     vlm_ckpt = ML_DIR / "checkpoints" / "satquery_rs_vlm"
     if vlm_ckpt.exists() and (vlm_ckpt / "model.safetensors").exists():
@@ -134,7 +170,10 @@ def load_models(device: str):
         vlm.eval()
         vlm_prov = "Salesforce/blip-vqa-base (Baseline)"
 
-    return change_net, change_prov, vlm, processor, vlm_prov
+    if v3_feat_heads:
+        vlm_prov = f"SatQuery-RS-VLM-v3 (CDVQA FeatureHead ensemble ×{len(v3_feat_heads)} seeds) + {vlm_prov}"
+
+    return change_net, change_prov, vlm, processor, vlm_prov, v3_feat_heads, VOCAB
 
 def run_evaluation(
     data_dir: Optional[str] = None,
@@ -150,9 +189,17 @@ def run_evaluation(
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"[Device] Evaluation running on: {device.upper()}")
 
-    change_net, change_prov, vlm, processor, vlm_prov = load_models(device)
+    change_net, change_prov, vlm, processor, vlm_prov, v3_feat_heads, VOCAB = load_models(device)
+    IDX2ANS = {i: a for i, a in enumerate(VOCAB)}
+
+    # Cached CDVQA feature tensors for v3 heads
+    cache_dir = ML_DIR / "dataset_cache" / "phase1_full_cdvqa"
+    cnet_dict = torch.load(cache_dir / "cnet_pair_feats.pt", map_location="cpu") if (cache_dir / "cnet_pair_feats.pt").exists() else {}
+    q_dict = torch.load(cache_dir / "q_feat_dict.pt", map_location="cpu") if (cache_dir / "q_feat_dict.pt").exists() else {}
+    use_v3_heads = bool(v3_feat_heads) and bool(q_dict)
     print(f"[Models] Change Net: {change_prov}")
     print(f"[Models] VLM QA:     {vlm_prov}")
+    print(f"[V3 Heads] Available: {len(v3_feat_heads)} seeds | Cached features: {len(cnet_dict)} pairs, {len(q_dict)} questions")
 
     kwargs = {"split": split, "max_samples": max_samples}
     if data_dir:
@@ -184,8 +231,12 @@ def run_evaluation(
         t2_t = torch.from_numpy(t2_np).permute(2, 0, 1).unsqueeze(0).to(device)
 
         with torch.no_grad():
-            logits = change_net(t1_t, t2_t)
-            probs = torch.sigmoid(logits).squeeze().cpu().numpy()
+            # 4-Fold Dihedral Test-Time Augmentation (TTA)
+            p0 = torch.sigmoid(change_net(t1_t, t2_t))
+            ph = torch.flip(torch.sigmoid(change_net(torch.flip(t1_t, [-1]), torch.flip(t2_t, [-1]))), [-1])
+            pv = torch.flip(torch.sigmoid(change_net(torch.flip(t1_t, [-2]), torch.flip(t2_t, [-2]))), [-2])
+            phv = torch.flip(torch.sigmoid(change_net(torch.flip(t1_t, [-2, -1]), torch.flip(t2_t, [-2, -1]))), [-2, -1])
+            probs = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
 
         pred_mask_bin = (probs > 0.45).astype(bool)
         gt_mask_bin = (np.array(mask_gt) > 128)
@@ -194,10 +245,47 @@ def run_evaluation(
         mask_metrics_list.append(m_res)
 
         # 2. Evaluate CDVQA Question Answering
-        inputs = processor(diff_img, question, return_tensors="pt").to(device)
-        with torch.no_grad():
-            gen_ids = vlm.generate(**inputs, max_new_tokens=32)
-            pred_answer = processor.decode(gen_ids[0], skip_special_tokens=True).strip()
+        # ── V3 Feature Head path (uses precomputed change-net + BLIP text features) ──
+        pair_id = sample["pair_id"]
+        pred_answer = None
+
+        # Binary question types (yes/no) — v3 heads excel here
+        BINARY_TYPES = {"change_or_not", "increase_or_not", "decrease_or_not", "existence"}
+        # Open-answer types — fallback to BLIP generation
+        OPEN_TYPES = {"change_to_what", "smallest_change", "largest_change",
+                      "change_ratio", "change_ratio_types", "change_type",
+                      "quantity", "attribute"}
+
+        if use_v3_heads and question in q_dict:
+            if pair_id in cnet_dict:
+                c_feat = cnet_dict[pair_id].unsqueeze(0).to(device)
+            else:
+                with torch.no_grad():
+                    f0_1, f1_1, f2_1, f3_1 = change_net.extract_features(t1_t)
+                    f0_2, f1_2, f2_2, f3_2 = change_net.extract_features(t2_t)
+                    d3 = change_net.diff_conv3(torch.abs(f3_2 - f3_1))
+                    d2 = torch.abs(f2_2 - f2_1)
+                    p3_avg = F.adaptive_avg_pool2d(d3, 1).flatten(1)
+                    p3_max = F.adaptive_max_pool2d(d3, 1).flatten(1)
+                    p2_avg = F.adaptive_avg_pool2d(d2, 1).flatten(1)
+                    p2_max = F.adaptive_max_pool2d(d2, 1).flatten(1)
+                    c_feat = F.normalize(torch.cat([p3_avg, p3_max, p2_avg, p2_max], dim=-1), dim=-1).to(device)
+            q_feat = q_dict[question].unsqueeze(0).to(device)
+            # Ensemble: average logits across all seed heads
+            with torch.no_grad():
+                logits_sum = None
+                for head in v3_feat_heads:
+                    logits = head(c_feat, q_feat)
+                    logits_sum = logits if logits_sum is None else logits_sum + logits
+                avg_logits = logits_sum / len(v3_feat_heads)
+                pred_idx = avg_logits.argmax(dim=-1).item()
+                pred_answer = IDX2ANS.get(pred_idx, "no")
+        else:
+            # BLIP generation fallback
+            inputs = processor(diff_img, question, return_tensors="pt").to(device)
+            with torch.no_grad():
+                gen_ids = vlm.generate(**inputs, max_new_tokens=32)
+                pred_answer = processor.decode(gen_ids[0], skip_special_tokens=True).strip()
 
         norm_pred = normalize_text(pred_answer)
         norm_gt = normalize_text(answer_gt)

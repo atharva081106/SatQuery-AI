@@ -172,11 +172,15 @@ def test_cross_modal_and_isro_evaluation_scope_metadata():
     assert rep_cross.exists()
     with open(rep_cross, "r", encoding="utf-8") as f:
         data = json.load(f)
-    assert data["evaluation_scope"] == "SYNTHETIC_SCHEMA_PROTOTYPE"
-    assert data["reference_type"] == "HEURISTIC_PSEUDO_MASK"
-    assert data["model"]["name"] == "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)"
-    assert "heuristic" in data["integrity_notice"].lower()
-    assert "synthetic" in data["integrity_notice"].lower()
+    assert data["evaluation_scope"] in ["REAL_DATA", "SYNTHETIC_SCHEMA_PROTOTYPE"]
+    if data["evaluation_scope"] == "REAL_DATA":
+        assert data["reference_type"] in ["ESA_WORLDCOVER_GROUND_TRUTH", "CLC_LABEL_DERIVED"]
+        assert "authentic" in data["integrity_notice"].lower() or "real" in data["integrity_notice"].lower()
+    else:
+        assert data["reference_type"] == "HEURISTIC_PSEUDO_MASK"
+        assert data["model"]["name"] == "SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype)"
+        assert "heuristic" in data["integrity_notice"].lower()
+        assert "synthetic" in data["integrity_notice"].lower()
 
     rep_isro = Path(__file__).resolve().parent.parent / "reports" / "isro_evaluation.json"
     assert rep_isro.exists()

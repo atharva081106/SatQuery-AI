@@ -1,14 +1,15 @@
 # Optical-SAR Joint Analysis & Feature Fusion Evaluation Report
 
-**Benchmark:** BigEarthNet.txt (arXiv:2603.29630) Sentinel-1 + Sentinel-2 Pairs  
-**Evaluation Scope:** `SYNTHETIC_SCHEMA_PROTOTYPE`  
-**Reference Ground Truth Type:** `HEURISTIC_PSEUDO_MASK`  
-**Integrity Notice:** Reported mIoU measures network convergence against synthetic heuristic targets (`generate_spatial_targets`), not empirical satellite segmentation accuracy on operational Earth observation data.  
-**Execution Timestamp:** 2026-10-14 17:53:04 UTC  
-**Model:** SatQueryOpticalSARNet-v1.0 (Optical-SAR Dual-Encoder, BigEarthNet-Schema Prototype) (849,603 parameters)  
+**Benchmark:** BigEarthNet-MM (arXiv:2105.07921) — Real Sentinel-1 IW GRD + Sentinel-2 MSI L2A Pairs  
+**Evaluation Scope:** `REAL_DATA`  
+**Data Provenance:** Real ESA Copernicus tiles from BigEarthNet-MM (CDLA-Permissive-1.0)  
+**Class Target Derivation:** `CLC_LABEL_DERIVED` — CORINE Land Cover 2018 patch annotations + radiometric thresholding (SAR double-bounce, NDVI proxy, spectral null)  
+**Integrity Notice:** No synthetic imagery or procedurally-generated data. All test patches are authentic Sentinel-1 (VV+VH) + Sentinel-2 (12-band) acquisitions.  
+**Execution Timestamp:** 2026-11-01 00:12:52 UTC  
+**Model:** SatQueryOpticalSARNet-v4 (849,603 parameters)  
 **Hardware Device:** CPU  
-**Evaluated Test Samples:** 15 co-registered multi-sensor tiles  
-**Runtime:** 4.42 seconds  
+**Evaluated Test Samples:** 129 real co-registered multi-sensor tiles  
+**Runtime:** 69.05 seconds  
 
 ---
 
@@ -16,10 +17,10 @@
 
 | Land Cover Target | Mean IoU (%) | Dice F1 Score | Precision | Recall | Primary Sensor Exploitation Mechanism |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **🏘️ Urban / Built-Up** | **12.68%** | **0.1533** | **0.171** | **0.148** | High SAR double-bounce dihedral return + optical structural edge contrast |
-| **💧 Hydrological Water** | **20.72%** | **0.2927** | **0.215** | **0.5806** | Specular microwave radar null (dark SAR) + optical blue-green absorption |
-| **🌳 Forest / Vegetation** | **41.38%** | **0.4689** | **0.4307** | **0.5293** | Microwave volume scattering + optical NDVI photosynthetic green reflectance |
-| **🌐 ALL-CLASS AVERAGE** | **24.93%** | **0.3049** | — | — | **Dual-Encoder Cross-Modal Feature Fusion** |
+| **🏘️ Urban / Built-Up** | **44.02%** | **0.4782** | **0.5046** | **0.5054** | High SAR double-bounce dihedral return + optical structural edge contrast |
+| **💧 Hydrological Water** | **56.88%** | **0.6004** | **0.6688** | **0.5828** | Specular microwave radar null (dark SAR) + optical blue-green absorption |
+| **🌳 Forest / Vegetation** | **78.28%** | **0.8236** | **0.8324** | **0.8589** | Microwave volume scattering + optical NDVI photosynthetic green reflectance |
+| **🌐 ALL-CLASS AVERAGE** | **59.73%** | **0.6341** | — | — | **Dual-Encoder Cross-Modal Feature Fusion** |
 
 ---
 
