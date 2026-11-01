@@ -252,23 +252,32 @@ export default function LandingPage() {
         <div className="relative z-10 flex flex-col items-center justify-end h-full pb-32 px-4 safe-x text-center pointer-events-none">
 
           <FadeInScroll delay={200}>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-4 text-[10px] font-mono tracking-widest text-white/90">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>ISRO / SAC PS 26167 • MULTIMODAL EARTH OBSERVATION</span>
+            </div>
             <h1 className="display-xxl mb-4">
               MAKING SENSE<br/>OF THE EARTH.
             </h1>
           </FadeInScroll>
           <FadeInScroll delay={400}>
-            <p className="body-md uppercase tracking-[4px] opacity-70 mb-12 text-xs sm:text-base px-2 max-w-lg">
+            <p className="body-md uppercase tracking-[4px] opacity-70 mb-8 text-xs sm:text-base px-2 max-w-lg">
               Multimodal Remote Sensing Image Analysis
             </p>
           </FadeInScroll>
           <FadeInScroll delay={600}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none pointer-events-auto">
-              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm">
+              <a href="/query" onClick={(e) => handleEnterSystem(e, '/query')} className="button-ghost-on-dark w-full sm:w-auto sm:min-w-[190px] text-center hover:bg-white hover:text-black cursor-pointer font-bold tracking-[2px] uppercase py-3 sm:py-2 text-xs sm:text-sm shadow-[0_0_20px_rgba(255,255,255,0.15)]">
                 TRY DEMO
               </a>
               <Link href="/acquire" className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white hover:text-black transition-all text-center text-xs font-mono font-bold tracking-widest uppercase text-white/80 backdrop-blur-sm">
                 SATELLITE MAP &rarr;
               </Link>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[10px] font-mono text-white/50">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10">🛰️ Cartosat-3 (0.28m)</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10">📡 RISAT-1 C-Band SAR</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10">🇪🇺 Sentinel-2 MSI</span>
             </div>
           </FadeInScroll>
         </div>

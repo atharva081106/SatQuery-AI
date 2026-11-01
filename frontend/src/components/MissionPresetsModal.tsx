@@ -36,7 +36,7 @@ let globalMissionsCache: SampleMission[] | null = null;
 let isPreloadingMissions = false;
 
 // Pre-packaged demo queries
-const FALLBACK_MISSIONS: SampleMission[] = [
+export const FALLBACK_MISSIONS: SampleMission[] = [
   {
     id: "uttarakhand_flood",
     title: "Uttarakhand Flash Flood Change Detection",

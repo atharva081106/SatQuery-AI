@@ -19,7 +19,36 @@ import jsPDF from 'jspdf';
 import SwipeSlider from '@/components/SwipeSlider';
 import MapExplorer from '@/components/MapExplorer';
 import TiffPreview from '@/components/TiffPreview';
-import MissionPresetsModal, { SampleMission } from '@/components/MissionPresetsModal';
+import MissionPresetsModal, { SampleMission, FALLBACK_MISSIONS } from '@/components/MissionPresetsModal';
+import MultiModalInspector from '@/components/MultiModalInspector';
+
+function getLegendClasses(task?: string, prov?: string) {
+  const t = (task || '').toLowerCase();
+  const p = (prov || '').toLowerCase();
+  if (t.includes('optical_sar') || p.includes('optical') || p.includes('sar')) {
+    return [
+      { name: 'Water Bodies', color: '#06b6d4', percentage: 'Dynamic' },
+      { name: 'Built-up Infrastructure', color: '#ef4444', percentage: 'Dynamic' },
+      { name: 'Vegetation & Canopy', color: '#10b981', percentage: 'Dynamic' },
+    ];
+  }
+  if (t.includes('change') || p.includes('change')) {
+    return [
+      { name: 'Detected Change', color: '#f59e0b', percentage: 'Dynamic' },
+      { name: 'Unchanged Baseline', color: '#64748b', percentage: 'Dynamic' },
+    ];
+  }
+  if (t.includes('seg') || p.includes('seg') || t.includes('surface') || p.includes('satseg')) {
+    return [
+      { name: 'Urban / Built-up', color: '#ef4444' },
+      { name: 'Water Bodies', color: '#06b6d4' },
+      { name: 'Tree Canopy', color: '#10b981' },
+      { name: 'Agricultural', color: '#eab308' },
+      { name: 'Barren / Soil', color: '#d97706' },
+    ];
+  }
+  return undefined;
+}
 
 function renderInline(text: string) {
   if (!text) return null;
@@ -1061,19 +1090,52 @@ export default function Home() {
           
           <div data-lenis-prevent className={`overflow-y-auto mb-2 sm:mb-4 custom-scrollbar pr-2 sm:pr-4 flex flex-col gap-4 sm:gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-2 sm:p-4 my-auto z-20 pointer-events-auto animate-in fade-in duration-300">
-                <h2 className="text-base sm:text-xl md:text-2xl font-bold font-mono tracking-wider uppercase text-white mb-3 max-w-md drop-shadow-md">
-                  WHAT WOULD YOU LIKE TO ANALYZE?
-                </h2>
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-2 sm:p-4 my-auto z-20 pointer-events-auto animate-in fade-in duration-300 max-w-2xl mx-auto">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/20 backdrop-blur-md mb-3 text-[10px] font-mono text-white/80">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>NEURAL RECON ENGINES ONLINE</span>
+                  <span className="text-white/30">•</span>
+                  <span className="text-white/60">ISRO / SAC PS 26167</span>
+                </div>
 
-                {/* Quick Action Shortcuts */}
-                <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] font-mono text-white/60">
-                  <a href="/acquire" className="hover:text-white underline flex items-center gap-1">
-                    <span>🗺️</span> Acquire from Satellite Map
+                <h2 className="text-base sm:text-xl md:text-2xl font-extrabold font-mono tracking-wider uppercase text-white mb-2 drop-shadow-md">
+                  MISSION CONTROL COCKPIT
+                </h2>
+                <p className="text-xs text-white/60 font-mono mb-4 max-w-lg">
+                  Select a live tactical reconnaissance mission below or upload high-resolution satellite rasters to begin.
+                </p>
+
+                {/* Tactical Mission Quick-Launch Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full text-left mb-4">
+                  {FALLBACK_MISSIONS.slice(0, 4).map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => handleSelectMission(m, false)}
+                      className="group p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 hover:border-white/40 transition-all cursor-pointer flex flex-col gap-1.5 shadow-lg backdrop-blur-md"
+                    >
+                      <div className="flex items-center justify-between text-[9px] font-mono text-white/50">
+                        <span className="uppercase text-white/70 font-semibold tracking-wider">{m.categoryLabel}</span>
+                        <span className="text-white/40 group-hover:text-white group-hover:translate-x-0.5 transition-all">&rarr;</span>
+                      </div>
+                      <div className="text-xs font-bold text-white font-mono group-hover:text-cyan-300 transition-colors line-clamp-1">
+                        {m.title}
+                      </div>
+                      <div className="text-[10px] text-white/50 font-mono line-clamp-1">
+                        {m.sensors} • {m.resolution}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Secondary Action Shortcuts */}
+                <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] font-mono text-white/60">
+                  <a href="/acquire" className="hover:text-white underline flex items-center gap-1.5">
+                    <span>🗺️</span> Acquire Custom Bounding Box (Map)
                   </a>
                   <span>•</span>
-                  <button type="button" onClick={() => setShowMissionPresets(true)} className="hover:text-white underline flex items-center gap-1 cursor-pointer">
-                    <span>⚡</span> 6 Demo Queries
+                  <button type="button" onClick={() => setShowMissionPresets(true)} className="hover:text-white underline flex items-center gap-1.5 cursor-pointer">
+                    <span>⚡</span> View All {FALLBACK_MISSIONS.length} Mission Presets
                   </button>
                 </div>
               </div>
@@ -1582,24 +1644,46 @@ export default function Home() {
 
               {latestResult.visual_evidence && latestResult.visual_evidence.length > 0 ? (
                 <div className="flex flex-col gap-4">
-                  {latestResult.visual_evidence.map((ev: any, idx: number) => (
-                    <div key={idx} className="relative rounded-sm overflow-hidden border border-[#3a3a3f]">
-                      {ev.image_base64 ? (
-                        <>
-                          <div className="absolute top-2 left-2 bg-black/80 px-2 py-1 micro-cap z-10 rounded-sm text-[10px]">
-                            {ev.description}
-                          </div>
-                          <img 
-                            src={ev.image_base64} 
-                            alt={ev.description} 
-                            className="w-full h-auto" 
-                          />
-                        </>
-                      ) : (
-                        <pre className="micro-cap text-white/60 p-2 overflow-x-auto">{JSON.stringify(ev, null, 2)}</pre>
-                      )}
-                    </div>
-                  ))}
+                  {latestResult.visual_evidence.map((ev: any, idx: number) => {
+                    const rawImg = latestResult.pair_comparison?.before_image || 
+                      (images.length > idx ? URL.createObjectURL(images[idx]) : images.length > 0 ? URL.createObjectURL(images[0]) : null);
+                    const classes = getLegendClasses(
+                      latestResult.execution_summary?.selected_task,
+                      latestResult.model_provenance || latestResult.execution_summary?.model_provenance
+                    );
+                    return (
+                      <div key={idx} className="w-full">
+                        {ev.image_base64 ? (
+                          rawImg ? (
+                            <MultiModalInspector
+                              rawImage={rawImg}
+                              maskImage={ev.image_base64}
+                              rawLabel="RAW INPUT SENSOR"
+                              maskLabel={ev.description || "NEURAL PREDICTION OVERLAY"}
+                              modelProvenance={latestResult.model_provenance || latestResult.execution_summary?.model_provenance}
+                              latencyMs={latestResult.inference_metadata?.forward_latency_ms || latestResult.execution_trace?.total_latency_ms}
+                              confidence={latestResult.confidence}
+                              executionPath={latestResult.inference_metadata?.execution_path || "NEURAL"}
+                              classes={classes}
+                            />
+                          ) : (
+                            <div className="relative rounded-xl overflow-hidden border border-white/20 bg-black/80 shadow-2xl">
+                              <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded border border-white/20 text-[10px] font-mono z-10 text-white/90">
+                                {ev.description}
+                              </div>
+                              <img 
+                                src={ev.image_base64} 
+                                alt={ev.description} 
+                                className="w-full h-auto" 
+                              />
+                            </div>
+                          )
+                        ) : (
+                          <pre className="micro-cap text-white/60 p-2 overflow-x-auto">{JSON.stringify(ev, null, 2)}</pre>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="micro-cap text-white/40">NO VISUALS</div>
