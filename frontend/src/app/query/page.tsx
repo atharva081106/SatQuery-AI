@@ -19,7 +19,7 @@ import jsPDF from 'jspdf';
 import SwipeSlider from '@/components/SwipeSlider';
 import MapExplorer from '@/components/MapExplorer';
 import TiffPreview from '@/components/TiffPreview';
-import MissionPresetsModal, { SampleMission, FALLBACK_MISSIONS } from '@/components/MissionPresetsModal';
+import MissionPresetsModal, { SampleMission } from '@/components/MissionPresetsModal';
 import MultiModalInspector from '@/components/MultiModalInspector';
 
 function getLegendClasses(task?: string, prov?: string) {
@@ -995,9 +995,6 @@ export default function Home() {
           <a href="/" className="text-sm sm:text-xl lg:display-lg tracking-widest text-white hover:opacity-70 transition-opacity pointer-events-auto flex items-center gap-1.5 font-mono font-bold">
             <span>SATQUERY AI.</span>
           </a>
-          <span className="hidden md:inline-block text-[10px] px-2 py-0.5 rounded-full bg-white/15 text-white/80 font-mono font-bold tracking-wider border border-white/30">
-            ISRO / SAC — PS 26167
-          </span>
         </div>
 
         <div className="flex gap-2 sm:gap-3 items-center">
@@ -1090,52 +1087,19 @@ export default function Home() {
           
           <div data-lenis-prevent className={`overflow-y-auto mb-2 sm:mb-4 custom-scrollbar pr-2 sm:pr-4 flex flex-col gap-4 sm:gap-6 w-full min-h-0 relative z-10 ${messages.length > 0 ? 'pointer-events-auto' : ''}`}>
             {messages.length === 0 && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-2 sm:p-4 my-auto z-20 pointer-events-auto animate-in fade-in duration-300 max-w-2xl mx-auto">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/20 backdrop-blur-md mb-3 text-[10px] font-mono text-white/80">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>NEURAL RECON ENGINES ONLINE</span>
-                  <span className="text-white/30">•</span>
-                  <span className="text-white/60">ISRO / SAC PS 26167</span>
-                </div>
-
-                <h2 className="text-base sm:text-xl md:text-2xl font-extrabold font-mono tracking-wider uppercase text-white mb-2 drop-shadow-md">
-                  MISSION CONTROL COCKPIT
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-2 sm:p-4 my-auto z-20 pointer-events-auto animate-in fade-in duration-300">
+                <h2 className="text-base sm:text-xl md:text-2xl font-bold font-mono tracking-wider uppercase text-white mb-3 max-w-md drop-shadow-md">
+                  WHAT WOULD YOU LIKE TO ANALYZE?
                 </h2>
-                <p className="text-xs text-white/60 font-mono mb-4 max-w-lg">
-                  Select a live tactical reconnaissance mission below or upload high-resolution satellite rasters to begin.
-                </p>
 
-                {/* Tactical Mission Quick-Launch Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full text-left mb-4">
-                  {FALLBACK_MISSIONS.slice(0, 4).map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => handleSelectMission(m, false)}
-                      className="group p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 hover:border-white/40 transition-all cursor-pointer flex flex-col gap-1.5 shadow-lg backdrop-blur-md"
-                    >
-                      <div className="flex items-center justify-between text-[9px] font-mono text-white/50">
-                        <span className="uppercase text-white/70 font-semibold tracking-wider">{m.categoryLabel}</span>
-                        <span className="text-white/40 group-hover:text-white group-hover:translate-x-0.5 transition-all">&rarr;</span>
-                      </div>
-                      <div className="text-xs font-bold text-white font-mono group-hover:text-cyan-300 transition-colors line-clamp-1">
-                        {m.title}
-                      </div>
-                      <div className="text-[10px] text-white/50 font-mono line-clamp-1">
-                        {m.sensors} • {m.resolution}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Secondary Action Shortcuts */}
-                <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] font-mono text-white/60">
-                  <a href="/acquire" className="hover:text-white underline flex items-center gap-1.5">
-                    <span>🗺️</span> Acquire Custom Bounding Box (Map)
+                {/* Quick Action Shortcuts */}
+                <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] font-mono text-white/60">
+                  <a href="/acquire" className="hover:text-white underline flex items-center gap-1">
+                    <span>🗺️</span> Acquire from Satellite Map
                   </a>
                   <span>•</span>
-                  <button type="button" onClick={() => setShowMissionPresets(true)} className="hover:text-white underline flex items-center gap-1.5 cursor-pointer">
-                    <span>⚡</span> View All {FALLBACK_MISSIONS.length} Mission Presets
+                  <button type="button" onClick={() => setShowMissionPresets(true)} className="hover:text-white underline flex items-center gap-1 cursor-pointer">
+                    <span>⚡</span> 6 Demo Queries
                   </button>
                 </div>
               </div>
