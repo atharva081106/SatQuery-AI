@@ -15,6 +15,11 @@ ml_pipeline/checkpoints/*
 !ml_pipeline/checkpoints/*/
 ml_pipeline/checkpoints/**/*.pth
 !ml_pipeline/checkpoints/best_satsegnet.pth
+!ml_pipeline/checkpoints/satquery_optical_sar_net/optical_sar_net.pth
+!ml_pipeline/checkpoints/satquery_change_net/change_net.pth
+!ml_pipeline/checkpoints/satquery_rs_vlm/*.pth
+!ml_pipeline/checkpoints/satquery_optical_sar_net_authentic_pilot/optical_sar_net.pth
+!ml_pipeline/checkpoints/v4/**/*.pth
 !ml_pipeline/checkpoints/**/*.json
 !ml_pipeline/checkpoints/*.onnx
 ml_pipeline/satquery_finetuned_model/
