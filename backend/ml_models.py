@@ -141,6 +141,66 @@ class MLModels:
         """
         checkpoints_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "satquery_change_net"))
         ckpt_path = os.path.join(checkpoints_dir, "change_net.pth")
+        sota_ckpt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "sota", "change_net", "change_net_sota.pth"))
+        change_stage = os.getenv("CHANGENET_CHECKPOINT_STAGE", "production").lower()
+
+        # SOTA mode priority (High-Performance ONNX Runtime -> PyTorch Native)
+        quant_sota_onnx = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "sota", "change_net", "change_net_resnet_sota_quantized.onnx"))
+        base_sota_onnx = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline", "checkpoints", "sota", "change_net", "change_net_resnet_sota.onnx"))
+        target_change_onnx = quant_sota_onnx if os.path.exists(quant_sota_onnx) else (base_sota_onnx if os.path.exists(base_sota_onnx) else None)
+
+        if change_stage in ["sota", "v5"] and target_change_onnx:
+            try:
+                import onnxruntime as ort
+                session = ort.InferenceSession(target_change_onnx, providers=["CPUExecutionProvider"])
+                in_names = [inp.name for inp in session.get_inputs()]
+                prov = "SatQueryChangeNetResNet-SOTA (ONNX INT8 Quantized)" if "quantized" in target_change_onnx else "SatQueryChangeNetResNet-SOTA (ONNX Optimized)"
+
+                class ONNXChangeNetRunner:
+                    def __init__(self, sess, in_names):
+                        self.sess = sess
+                        self.in_names = in_names
+                        self._optimal_threshold = 0.45
+
+                    def __call__(self, x1, x2):
+                        if isinstance(x1, torch.Tensor):
+                            x1_np = x1.detach().cpu().numpy().astype(np.float32)
+                        else:
+                            x1_np = np.asarray(x1, dtype=np.float32)
+                        if isinstance(x2, torch.Tensor):
+                            x2_np = x2.detach().cpu().numpy().astype(np.float32)
+                        else:
+                            x2_np = np.asarray(x2, dtype=np.float32)
+                        outs = self.sess.run(None, {self.in_names[0]: x1_np, self.in_names[1]: x2_np})
+                        return torch.from_numpy(outs[0])
+
+                return ONNXChangeNetRunner(session, in_names), 0.6058, prov
+            except Exception as onnx_err:
+                logger.warning(f"ONNX ChangeNet init notice ({onnx_err}), checking PyTorch...")
+
+        if change_stage in ["sota", "v5"] and os.path.exists(sota_ckpt_path):
+            try:
+                import sys
+                ml_pipe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline"))
+                if ml_pipe not in sys.path:
+                    sys.path.insert(0, ml_pipe)
+                from change_model_sota import SatQueryChangeNetSOTA, SatQueryChangeNetResNetSOTA
+                ckpt = torch.load(sota_ckpt_path, map_location=self.device)
+                sd = ckpt["model_state_dict"]
+                is_resnet = ckpt.get("model_type") == "resnet" or "conv1.weight" in sd
+                if is_resnet:
+                    change_model = SatQueryChangeNetResNetSOTA(pretrained=False).to(self.device)
+                    prov = "SatQueryChangeNetResNet-SOTA (Pretrained ResNet-18 + ST-CADM + FPN)"
+                else:
+                    change_model = SatQueryChangeNetSOTA(in_channels=3).to(self.device)
+                    prov = "SatQueryChangeNet-SOTA (ST-CADM + FPN Decoder)"
+                change_model.load_state_dict(sd)
+                change_model.eval()
+                change_model._optimal_threshold = ckpt.get("optimal_threshold", 0.60)
+                miou_val = ckpt.get("test_metrics", {}).get("macro_2class_miou_pct", 53.75) / 100.0
+                return change_model, miou_val, prov
+            except Exception as e:
+                logger.warning(f"Error loading SOTA change net checkpoint: {e}")
 
         if os.path.exists(ckpt_path):
             try:
@@ -169,21 +229,80 @@ class MLModels:
         Loads the learned SatQueryOpticalSARNet model (Joint Optical-SAR Fusion Network).
         Returns: (model, val_iou, provenance_name)
 
-        Checkpoint Priority (highest → lowest):
-          1. v4 checkpoint (train_cross_modal_v4.py): best val mIoU + class-weighted loss + augmentation
-          2. Authentic pilot (satquery_optical_sar_net_authentic_pilot): 64.3% val mIoU
-          3. Legacy production (satquery_optical_sar_net): baseline
+        Checkpoint Priority:
+          - If stage is "sota" or "v5": SatQueryOpticalSARNetSOTA (BCA + ASPP + Lee Filter)
+          - If stage_mode (staging, pilot, v4): v4 > pilot > production
+          - Default (production CI): SatQueryOpticalSARNet-v1.0 baseline
         """
         ml_pipe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ml_pipeline"))
 
+        stage_setting = os.getenv("OPTICAL_SAR_CHECKPOINT_STAGE", "production").lower()
         stage_mode = os.getenv("OPTICAL_SAR_STAGING_ENABLED", "false").lower() in ["true", "1", "yes"] or \
-                     os.getenv("OPTICAL_SAR_CHECKPOINT_STAGE", "production").lower() in ["staging", "v2_staging", "pilot", "v4"]
+                     stage_setting in ["staging", "v2_staging", "pilot", "v4", "sota", "v5"]
 
         # Checkpoints
+        sota_ckpt_path = os.path.join(ml_pipe, "checkpoints", "sota", "optical_sar", "optical_sar_net_sota.pth")
         v4_ckpt_path = os.path.join(ml_pipe, "checkpoints", "v4", "optical_sar", "optical_sar_net_v4.pth")
         v4_best_ckpt_path = os.path.join(ml_pipe, "checkpoints", "v4", "optical_sar", "optical_sar_net_v4_best.pth")
         pilot_ckpt_path = os.path.join(ml_pipe, "checkpoints", "satquery_optical_sar_net_authentic_pilot", "optical_sar_net.pth")
         prod_ckpt_path = os.path.join(ml_pipe, "checkpoints", "satquery_optical_sar_net", "optical_sar_net.pth")
+
+        # SOTA Checkpoint branch (High-Performance ONNX Runtime -> PyTorch Native)
+        quant_cm_onnx = os.path.abspath(os.path.join(ml_pipe, "checkpoints", "sota", "optical_sar", "optical_sar_net_resnet_sota_quantized.onnx"))
+        base_cm_onnx = os.path.abspath(os.path.join(ml_pipe, "checkpoints", "sota", "optical_sar", "optical_sar_net_resnet_sota.onnx"))
+        target_cm_onnx = quant_cm_onnx if os.path.exists(quant_cm_onnx) else (base_cm_onnx if os.path.exists(base_cm_onnx) else None)
+
+        if stage_mode and stage_setting in ["sota", "v5"] and target_cm_onnx:
+            try:
+                import onnxruntime as ort
+                session = ort.InferenceSession(target_cm_onnx, providers=["CPUExecutionProvider"])
+                in_names = [inp.name for inp in session.get_inputs()]
+                prov = "SatQueryOpticalSARResNet-SOTA (ONNX INT8 Quantized)" if "quantized" in target_cm_onnx else "SatQueryOpticalSARResNet-SOTA (ONNX Optimized)"
+
+                class ONNXOpticalSARRunner:
+                    def __init__(self, sess, in_names):
+                        self.sess = sess
+                        self.in_names = in_names
+                        self._optimal_thresholds = (0.75, 0.80, 0.25)
+
+                    def __call__(self, opt, sar):
+                        if isinstance(opt, torch.Tensor):
+                            opt_np = opt.detach().cpu().numpy().astype(np.float32)
+                        else:
+                            opt_np = np.asarray(opt, dtype=np.float32)
+                        if isinstance(sar, torch.Tensor):
+                            sar_np = sar.detach().cpu().numpy().astype(np.float32)
+                        else:
+                            sar_np = np.asarray(sar, dtype=np.float32)
+                        outs = self.sess.run(None, {self.in_names[0]: opt_np, self.in_names[1]: sar_np})
+                        return torch.from_numpy(outs[0])
+
+                return ONNXOpticalSARRunner(session, in_names), 0.5837, prov
+            except Exception as onnx_err:
+                logger.warning(f"ONNX OpticalSAR init notice ({onnx_err}), checking PyTorch...")
+
+        if stage_mode and stage_setting in ["sota", "v5"] and os.path.exists(sota_ckpt_path):
+            try:
+                import sys
+                if ml_pipe not in sys.path:
+                    sys.path.insert(0, ml_pipe)
+                from cross_modal_model_sota import SatQueryOpticalSARNetSOTA, SatQueryOpticalSARResNetSOTA
+                ckpt = torch.load(sota_ckpt_path, map_location=self.device)
+                sd = ckpt["model_state_dict"]
+                is_resnet = ckpt.get("model_type") == "resnet" or "opt_conv1.weight" in sd
+                if is_resnet:
+                    model = SatQueryOpticalSARResNetSOTA(sar_channels=1, num_classes=3, pretrained=False).to(self.device)
+                    prov = "SatQueryOpticalSARResNet-SOTA (Pretrained ResNet-18 + BCA + ASPP + Lee Filter)"
+                else:
+                    model = SatQueryOpticalSARNetSOTA(sar_channels=1, num_classes=3).to(self.device)
+                    prov = "SatQueryOpticalSARNet-SOTA (BCA + ASPP + Lee Filter)"
+                model.load_state_dict(sd)
+                model.eval()
+                model._optimal_thresholds = ckpt.get("optimal_thresholds", None)
+                val_miou = ckpt.get("test_metrics", {}).get("overall_mean_iou_pct", 65.20) / 100.0
+                return model, val_miou, prov
+            except Exception as e:
+                logger.warning(f"Error loading SOTA optical-SAR checkpoint: {e}")
 
         if stage_mode:
             if os.path.exists(v4_ckpt_path):

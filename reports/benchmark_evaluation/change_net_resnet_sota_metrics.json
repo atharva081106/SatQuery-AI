@@ -1,0 +1,18 @@
+{
+  "benchmark": "CDVQA / SECOND SOTA Evaluation",
+  "model": "SatQueryChangeNetResNetSOTA (Pretrained ResNet-18 + ST-CADM + FPN)",
+  "architecture": "Spatial-Temporal Cross-Attention Difference Network with Pretrained Backbone",
+  "parameters": 21046625,
+  "evaluation_protocol": "4-Fold Dihedral Test-Time Augmentation (TTA) + Calibrated Threshold",
+  "threshold": 0.5999999999999999,
+  "metrics": {
+    "macro_change_iou_pct": 39.81,
+    "macro_2class_miou_pct": 61.65,
+    "macro_dice_f1": 0.5396,
+    "macro_precision_pct": 60.62,
+    "macro_recall_pct": 56.43,
+    "pixel_accuracy_pct": 85.58,
+    "total_pairs_evaluated": 50
+  },
+  "timestamp": "2026-11-02T09:13:07Z"
+}

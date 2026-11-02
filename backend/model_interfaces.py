@@ -108,6 +108,8 @@ def decode_satellite_image(
                     if c >= 3:
                         # Check band descriptions if available (e.g., 'red', 'green', 'blue' or 'b4', 'b3', 'b2')
                         r_idx, g_idx, b_idx = 0, 1, 2
+                        nir_idx = None
+                        swir_idx = None
                         descs = [str(d).lower() for d in (ds.descriptions or []) if d]
                         if len(descs) >= 3:
                             for idx, desc in enumerate(descs):
@@ -117,10 +119,17 @@ def decode_satellite_image(
                                     g_idx = idx
                                 elif any(k in desc for k in ["blue", "b2", "b02"]):
                                     b_idx = idx
+                                elif any(k in desc for k in ["nir", "b8", "b08"]):
+                                    nir_idx = idx
+                                elif any(k in desc for k in ["swir", "b11", "b12"]):
+                                    swir_idx = idx
                         elif c in (4, 8, 12, 13):
-                            # Standard Sentinel-2 / Landsat L2A: B4=Red, B3=Green, B2=Blue
+                            # Standard Sentinel-2 / Landsat L2A: B4=Red, B3=Green, B2=Blue, B8=NIR
                             if c >= 4 and ds.dtypes[0] != 'uint8':
                                 r_idx, g_idx, b_idx = min(2, c - 1), min(1, c - 1), 0
+                                nir_idx = min(3, c - 1)
+                                if c >= 6:
+                                    swir_idx = min(5, c - 1)
 
                         bands_selected = np.stack([clean_data[r_idx], clean_data[g_idx], clean_data[b_idx]], axis=0)
                         valid_selected = np.stack([valid_mask[r_idx], valid_mask[g_idx], valid_mask[b_idx]], axis=0)
@@ -142,6 +151,26 @@ def decode_satellite_image(
                                 b_scaled[~v_slice] = 0
                                 scaled_bands.append(b_scaled)
                             rgb = np.dstack(scaled_bands)
+
+                        # Biophysical index calculation for multispectral rasters with NIR band
+                        if nir_idx is not None and nir_idx < c and geo_meta is not None:
+                            try:
+                                r_b = clean_data[r_idx].astype(np.float32)
+                                g_b = clean_data[g_idx].astype(np.float32)
+                                nir_b = clean_data[nir_idx].astype(np.float32)
+                                valid_nir = valid_mask[r_idx] & valid_mask[nir_idx]
+                                if np.any(valid_nir):
+                                    ndvi_arr = (nir_b - r_b) / np.maximum(nir_b + r_b, 1e-5)
+                                    ndwi_arr = (g_b - nir_b) / np.maximum(g_b + nir_b, 1e-5)
+                                    geo_meta["spectral_indices"] = {
+                                        "has_multispectral_indices": True,
+                                        "mean_ndvi": round(float(np.mean(ndvi_arr[valid_nir])), 4),
+                                        "mean_ndwi": round(float(np.mean(ndwi_arr[valid_nir])), 4),
+                                        "vegetation_active": bool(np.mean(ndvi_arr[valid_nir]) > 0.20),
+                                        "water_present": bool(np.mean(ndwi_arr[valid_nir]) > 0.0)
+                                    }
+                            except Exception as spec_err:
+                                logger.debug(f"Spectral index computation note: {spec_err}")
 
                     elif c == 1:
                         # Single-band SAR or panchromatic
@@ -874,9 +903,17 @@ def _analyze_land_cover(cv_img: np.ndarray, geo_meta: Dict[str, Any] = None) -> 
     # 1. Cloud / Snow Mask: high brightness, low saturation
     cloud_mask = cv2.inRange(hsv, np.array([0, 0, 200]), np.array([179, 45, 255]))
     
+    # Optical vegetation & water spectral index discrimination:
+    # Visible Atmospherically Resistant Index: VARI = (Green - Red) / (Green + Red - Blue + 1e-5)
+    r_f = r.astype(np.float32)
+    g_f = g.astype(np.float32)
+    b_f = b.astype(np.float32)
+    vari = (g_f - r_f) / np.maximum(g_f + r_f - b_f, 1e-5)
+    has_high_vari = (vari > 0.12)
+
     # Forest / Terrestrial vegetation discriminator:
-    # Terrestrial vegetation has high Green reflectance over Blue, Red >= Blue, and distinct canopy texture
-    is_forest = (g.astype(int) > b.astype(int) + 4) & (r.astype(int) >= b.astype(int)) & (hue >= 28) & (hue <= 62) & (std_dev >= 1.5)
+    # Terrestrial vegetation has high Green reflectance over Blue, Red >= Blue, distinct canopy texture, or positive VARI
+    is_forest = ((g.astype(int) > b.astype(int) + 4) & (r.astype(int) >= b.astype(int)) & (hue >= 28) & (hue <= 62) & (std_dev >= 1.5)) | (has_high_vari & (std_dev >= 1.2))
 
     # 2. Water Mask:
     # A) Blue/cyan water (open sea, deep reservoirs, coastal waters):
@@ -939,7 +976,12 @@ def _analyze_land_cover(cv_img: np.ndarray, geo_meta: Dict[str, Any] = None) -> 
             resized = cv2.resize(rgb, (128, 128)).astype(np.float32) / 255.0
             tensor_in = torch.from_numpy(resized).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
             with torch.no_grad():
-                logits = seg_model(tensor_in)
+                # 4-Fold Dihedral Test-Time Augmentation (TTA) to eliminate orientation artifacts
+                l0 = seg_model(tensor_in)
+                lh = torch.flip(seg_model(torch.flip(tensor_in, [-1])), [-1])
+                lv = torch.flip(seg_model(torch.flip(tensor_in, [-2])), [-2])
+                lhv = torch.flip(seg_model(torch.flip(tensor_in, [-2, -1])), [-2, -1])
+                logits = (l0 + lh + lv + lhv) / 4.0
                 preds = torch.argmax(logits, dim=1).squeeze(0).cpu().numpy().astype(np.uint8)
             ml_pred = cv2.resize(preds, (w, h), interpolation=cv2.INTER_NEAREST)
             
@@ -2212,22 +2254,53 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 t1_rgb = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
                 t2_rgb = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
 
-                inf_h, inf_w = min(h_img, 512), min(w_img, 512)
-                t1_res = cv2.resize(t1_rgb, (inf_w, inf_h))
-                t2_res = cv2.resize(t2_rgb, (inf_w, inf_h))
+                if h_img > 640 or w_img > 640:
+                    from tiling import sliding_window_tiler
+                    windows = sliding_window_tiler.get_windows(h_img, w_img, geo_meta)
+                    tile_probs = []
+                    with torch.no_grad():
+                        for win in windows:
+                            t1_patch = t1_rgb[win.y_start:win.y_end, win.x_start:win.x_end]
+                            t2_patch = t2_rgb[win.y_start:win.y_end, win.x_start:win.x_end]
+                            if t1_patch.shape[:2] != (512, 512):
+                                t1_inp = cv2.resize(t1_patch, (512, 512))
+                                t2_inp = cv2.resize(t2_patch, (512, 512))
+                            else:
+                                t1_inp, t2_inp = t1_patch, t2_patch
 
-                t1_t = torch.from_numpy(t1_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
-                t2_t = torch.from_numpy(t2_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
+                            p1_t = torch.from_numpy(t1_inp).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
+                            p2_t = torch.from_numpy(t2_inp).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
 
-                with torch.no_grad():
-                    # 4-Fold Dihedral Test-Time Augmentation (TTA)
-                    p0 = torch.sigmoid(change_model(t1_t, t2_t))
-                    ph = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-1]), torch.flip(t2_t, [-1]))), [-1])
-                    pv = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-2]), torch.flip(t2_t, [-2]))), [-2])
-                    phv = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-2, -1]), torch.flip(t2_t, [-2, -1]))), [-2, -1])
-                    prob = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
+                            # 4-Fold Dihedral Test-Time Augmentation (TTA) per tile
+                            p0 = torch.sigmoid(change_model(p1_t, p2_t))
+                            ph = torch.flip(torch.sigmoid(change_model(torch.flip(p1_t, [-1]), torch.flip(p2_t, [-1]))), [-1])
+                            pv = torch.flip(torch.sigmoid(change_model(torch.flip(p1_t, [-2]), torch.flip(p2_t, [-2]))), [-2])
+                            phv = torch.flip(torch.sigmoid(change_model(torch.flip(p1_t, [-2, -1]), torch.flip(p2_t, [-2, -1]))), [-2, -1])
+                            p_out = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
 
-                prob_full = cv2.resize(prob, (w_img, h_img), interpolation=cv2.INTER_LINEAR)
+                            if p_out.shape != (win.tile_h, win.tile_w):
+                                p_out = cv2.resize(p_out, (win.tile_w, win.tile_h), interpolation=cv2.INTER_LINEAR)
+                            tile_probs.append(p_out)
+
+                    prob_full = sliding_window_tiler.stitch_float_maps(tile_probs, windows, h_img, w_img)
+                else:
+                    inf_h, inf_w = min(h_img, 512), min(w_img, 512)
+                    t1_res = cv2.resize(t1_rgb, (inf_w, inf_h))
+                    t2_res = cv2.resize(t2_rgb, (inf_w, inf_h))
+
+                    t1_t = torch.from_numpy(t1_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
+                    t2_t = torch.from_numpy(t2_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
+
+                    with torch.no_grad():
+                        # 4-Fold Dihedral Test-Time Augmentation (TTA)
+                        p0 = torch.sigmoid(change_model(t1_t, t2_t))
+                        ph = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-1]), torch.flip(t2_t, [-1]))), [-1])
+                        pv = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-2]), torch.flip(t2_t, [-2]))), [-2])
+                        phv = torch.flip(torch.sigmoid(change_model(torch.flip(t1_t, [-2, -1]), torch.flip(t2_t, [-2, -1]))), [-2, -1])
+                        prob = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
+
+                    prob_full = cv2.resize(prob, (w_img, h_img), interpolation=cv2.INTER_LINEAR)
+
                 thresh = (prob_full > 0.45).astype(np.uint8) * 255
                 effective_change_prov = change_prov
             except Exception as e:
@@ -2266,6 +2339,88 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 return f"{v} Sector"
             return f"{v}-{h} Quadrant"
 
+        # STEP 5: Pixel-Level Multi-Class Semantic Change Transition Matrix (T1 -> T2)
+        # Land classes: 1: Built-up, 2: Vegetation, 3: Water, 4: Bare Soil, 0: Cloud/Other
+        def _get_discrete_land_class_map(stats_dict, shape_tuple):
+            h_s, w_s = shape_tuple[:2]
+            cmap = np.zeros((h_s, w_s), dtype=np.uint8)
+            if "bare_mask" in stats_dict and stats_dict["bare_mask"] is not None:
+                cmap[stats_dict["bare_mask"] > 0] = 4
+            if "veg_mask" in stats_dict and stats_dict["veg_mask"] is not None:
+                cmap[stats_dict["veg_mask"] > 0] = 2
+            if "built_mask" in stats_dict and stats_dict["built_mask"] is not None:
+                cmap[stats_dict["built_mask"] > 0] = 1
+            if "water_mask" in stats_dict and stats_dict["water_mask"] is not None:
+                cmap[stats_dict["water_mask"] > 0] = 3
+            return cmap
+
+        cmap1 = _get_discrete_land_class_map(stats1, img1.shape)
+        cmap2 = _get_discrete_land_class_map(stats2, img2.shape)
+
+        class_labels = {
+            1: "Built-up & Infrastructure",
+            2: "Vegetation & Canopy",
+            3: "Water Bodies",
+            4: "Bare Soil & Terrain"
+        }
+        class_short = {
+            1: "Built-up",
+            2: "Vegetation",
+            3: "Water",
+            4: "Bare Soil"
+        }
+        transition_trajectories = {
+            (2, 1): "Urban Expansion / Canopy Removal",
+            (4, 1): "New Construction / Land Development",
+            (3, 1): "Reclamation / Waterfront Construction",
+            (2, 4): "Vegetation Depletion / Land Clearing",
+            (4, 2): "Afforestation / Revegetation",
+            (3, 4): "Water Body Desiccation / Reservoir Depletion",
+            (4, 3): "Inundation / Flooding / Reservoir Filling",
+            (2, 3): "Flooding / Submergence of Riparian Canopy",
+            (3, 2): "Wetland Emergence / Aquatic Weed Colonization",
+            (1, 4): "Demolition / Structural Excavation",
+            (1, 3): "Severe Fluvial / Coastal Inundation of Structures",
+            (1, 2): "Urban Greening / Abandonment Revegetation",
+        }
+
+        changed_bool = (thresh > 0)
+        sqm_px = stats2["sqm_per_px"]
+        
+        transition_matrix_stats = {}
+        transition_list = []
+        for c1_code in [1, 2, 3, 4]:
+            for c2_code in [1, 2, 3, 4]:
+                if c1_code == c2_code:
+                    continue
+                pair_mask = changed_bool & (cmap1 == c1_code) & (cmap2 == c2_code)
+                px_count = int(np.count_nonzero(pair_mask))
+                if px_count > 0:
+                    tr_ha = (px_count * sqm_px) / 10_000.0
+                    tr_km2 = (px_count * sqm_px) / 1_000_000.0
+                    tr_pct = (px_count / float(max(1, np.count_nonzero(changed_bool)))) * 100.0
+                    dyn_desc = transition_trajectories.get(
+                        (c1_code, c2_code),
+                        f"Surface Shift: {class_short[c1_code]} → {class_short[c2_code]}"
+                    )
+                    tr_item = {
+                        "from_class": class_labels[c1_code],
+                        "to_class": class_labels[c2_code],
+                        "from_code": c1_code,
+                        "to_code": c2_code,
+                        "pixels": px_count,
+                        "area_ha": round(tr_ha, 2),
+                        "area_km2": round(tr_km2, 4),
+                        "pct_of_change": round(tr_pct, 1),
+                        "trajectory_name": f"{class_short[c1_code]} → {class_short[c2_code]}",
+                        "dynamic_mechanism": dyn_desc
+                    }
+                    transition_list.append(tr_item)
+                    transition_matrix_stats[f"{class_short[c1_code]}_to_{class_short[c2_code]}"] = tr_item
+
+        # Sort transitions by area descending
+        transition_list.sort(key=lambda x: x["pixels"], reverse=True)
+
         change_clusters = []
         change_boxes = []
 
@@ -2288,28 +2443,54 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 cv2.rectangle(annotated_t2, (bx, max(0, by - 20)), (bx + lw + 10, max(20, by)), (0, 0, 180), -1)
                 cv2.putText(annotated_t2, lbl, (bx + 4, max(15, by - 5)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1, cv2.LINE_AA)
 
-                # Analyze ROI transition
+                # Analyze ROI transition rigorously from pixel transition histogram
                 cx_norm = (bx + bw / 2.0) / float(w_img)
                 cy_norm = (by + bh / 2.0) / float(h_img)
                 quad = get_quadrant(cx_norm, cy_norm)
                 cluster_km2 = (area * stats2["sqm_per_px"]) / 1_000_000.0
                 cluster_ha  = (area * stats2["sqm_per_px"]) / 10_000.0
 
-                roi_b1 = np.count_nonzero(stats1["built_mask"][by:by+bh, bx:bx+bw])
-                roi_b2 = np.count_nonzero(stats2["built_mask"][by:by+bh, bx:bx+bw])
-                roi_v1 = np.count_nonzero(stats1["veg_mask"][by:by+bh, bx:bx+bw])
-                roi_v2 = np.count_nonzero(stats2["veg_mask"][by:by+bh, bx:bx+bw])
+                roi_changed = changed_bool[by:by+bh, bx:bx+bw]
+                roi_c1 = cmap1[by:by+bh, bx:bx+bw]
+                roi_c2 = cmap2[by:by+bh, bx:bx+bw]
 
-                if roi_b2 > roi_b1 + 50:
-                    transition_desc = "Urban Expansion / Structural Development"
-                elif roi_v2 < roi_v1 - 50 and roi_b2 > roi_b1:
-                    transition_desc = "Vegetation Clearing → Built-Up Construction"
-                elif roi_v2 < roi_v1 - 50:
-                    transition_desc = "Vegetation Depletion / Land Clearing"
-                elif roi_v2 > roi_v1 + 50:
-                    transition_desc = "Canopy Growth / Revegetation"
-                else:
-                    transition_desc = "Surface Alteration / Terrain Modification"
+                dominant_tr_desc = "Surface Alteration / Terrain Modification"
+                dominant_tr_code = "SURFACE_ALTERATION"
+                best_roi_cnt = 0
+
+                for c1_code in [1, 2, 3, 4]:
+                    for c2_code in [1, 2, 3, 4]:
+                        if c1_code == c2_code:
+                            continue
+                        sub_cnt = int(np.count_nonzero(roi_changed & (roi_c1 == c1_code) & (roi_c2 == c2_code)))
+                        if sub_cnt > best_roi_cnt:
+                            best_roi_cnt = sub_cnt
+                            dyn = transition_trajectories.get((c1_code, c2_code), f"{class_short[c1_code]} → {class_short[c2_code]}")
+                            dominant_tr_desc = f"{class_short[c1_code]} → {class_short[c2_code]} ({dyn})"
+                            dominant_tr_code = f"{class_short[c1_code].upper()}_TO_{class_short[c2_code].upper()}"
+
+                # Robust fallback if bounding box is small
+                if best_roi_cnt < 20:
+                    roi_b1 = np.count_nonzero(stats1["built_mask"][by:by+bh, bx:bx+bw])
+                    roi_b2 = np.count_nonzero(stats2["built_mask"][by:by+bh, bx:bx+bw])
+                    roi_v1 = np.count_nonzero(stats1["veg_mask"][by:by+bh, bx:bx+bw])
+                    roi_v2 = np.count_nonzero(stats2["veg_mask"][by:by+bh, bx:bx+bw])
+
+                    if roi_b2 > roi_b1 + 50:
+                        dominant_tr_desc = "Urban Expansion / Structural Development"
+                        dominant_tr_code = "BUILT_EXPANSION"
+                    elif roi_v2 < roi_v1 - 50 and roi_b2 > roi_b1:
+                        dominant_tr_desc = "Vegetation Clearing → Built-Up Construction"
+                        dominant_tr_code = "VEG_TO_BUILT"
+                    elif roi_v2 < roi_v1 - 50:
+                        dominant_tr_desc = "Vegetation Depletion / Land Clearing"
+                        dominant_tr_code = "VEG_DEPLETION"
+                    elif roi_v2 > roi_v1 + 50:
+                        dominant_tr_desc = "Canopy Growth / Revegetation"
+                        dominant_tr_code = "REVEGETATION"
+                    else:
+                        dominant_tr_desc = "Surface Alteration / Terrain Modification"
+                        dominant_tr_code = "SURFACE_ALTERATION"
 
                 change_clusters.append({
                     "id": cluster_idx,
@@ -2317,7 +2498,8 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                     "bbox": (bx, by, bw, bh),
                     "area_km2": cluster_km2,
                     "area_ha": cluster_ha,
-                    "transition": transition_desc,
+                    "transition": dominant_tr_desc,
+                    "transition_code": dominant_tr_code,
                     "norm_pos": f"x:[{bx/w_img:.2f}–{(bx+bw)/w_img:.2f}], y:[{by/h_img:.2f}–{(by+bh)/h_img:.2f}]"
                 })
                 cluster_idx += 1
@@ -2342,6 +2524,22 @@ class BiTemporalChangeAnalysis(SpecialistModel):
 | 💧 **Water Bodies & Drainage** | **{stats1['water_pct']:.1f}%** ({stats1['water_km2']:.2f} km²) | **{stats2['water_pct']:.1f}%** ({stats2['water_km2']:.2f} km²) | **{d_water_pct:+.1f}%** | **{d_water_km2:+.2f} km²** | {'🔺 Inundation' if d_water_pct > 0.4 else ('🔻 Receded' if d_water_pct < -0.4 else '⚖️ Stable')} |
 | 🪨 **Bare Ground & Open Soil** | **{stats1['bare_pct']:.1f}%** ({stats1['bare_km2']:.2f} km²) | **{stats2['bare_pct']:.1f}%** ({stats2['bare_km2']:.2f} km²) | **{d_bare_pct:+.1f}%** | **{d_bare_km2:+.2f} km²** | {'🔺 Excavation' if d_bare_pct > 0.4 else ('🔻 Developed' if d_bare_pct < -0.4 else '⚖️ Stable')} |
 | 🔍 **TOTAL DETECTED CHANGE EXTENT** | **Baseline (0.0%)** | **Active ({change_pct:.1f}%)** | **{change_pct:.1f}%** | **{change_km2:.2f} km²** ({change_ha:,.0f} ha) | **SSIM Structural Deviation** |"""
+
+        # Transition trajectories Markdown table
+        tr_rows = []
+        for tr in transition_list[:6]:
+            tr_rows.append(
+                f"| **{tr['trajectory_name']}** | {tr['dynamic_mechanism']} | **{tr['area_ha']:.1f} ha** | {tr['area_km2']:.3f} km² | **{tr['pct_of_change']:.1f}%** |"
+            )
+        if tr_rows:
+            tr_table = (
+                f"\n\n### 🔄 Explicit Land-Cover Transition Trajectories (T1 Baseline → T2 Post-Event)\n\n"
+                f"| Transition Pathway | Dynamic Mechanism | Changed Area (ha) | Area (km²) | % of Detected Change |\n"
+                f"| :--- | :--- | :--- | :--- | :--- |\n" +
+                "\n".join(tr_rows)
+            )
+        else:
+            tr_table = ""
 
         # Location Breakdown
         if change_clusters:
@@ -2383,7 +2581,8 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 f"• **Trend Summary:** {trend_explanation}\n"
                 f"• **Overall Surface Shift:** Total detected structural surface deviation across all classes is **~{change_pct:.1f}%** ({change_km2:.2f} km² / {change_ha:,.0f} ha).\n\n"
                 f"---\n\n"
-                f"{comp_table}\n\n"
+                f"{comp_table}"
+                f"{tr_table}\n\n"
                 f"---\n\n"
                 f"### 2. Spatial Localization of Modifications (Where Changes Occurred)\n"
                 f"{locations_text}\n\n"
@@ -2418,7 +2617,8 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                 f"### 2. Direct Answer: WHERE the Changes Occurred\n"
                 f"{locations_text}\n\n"
                 f"---\n\n"
-                f"{comp_table}\n\n"
+                f"{comp_table}"
+                f"{tr_table}\n\n"
                 f"---\n\n"
                 f"### 3. Visual Evidence & Trace Verification\n"
                 f"• In the visual evidence canvas on the right, all change zones are demarcated with **red tactical bounding boxes** and sector IDs.\n"
@@ -2452,6 +2652,7 @@ class BiTemporalChangeAnalysis(SpecialistModel):
                     "change_id": cl["id"],
                     "quadrant": cl["quadrant"],
                     "change_type": cl["transition"],
+                    "transition_code": cl.get("transition_code", "SURFACE_ALTERATION"),
                     "area_km2": round(cl["area_km2"], 2),
                     "area_ha": round(cl["area_ha"], 0),
                     "pixel_bbox": [bx, by, bw, bh]
@@ -2507,7 +2708,13 @@ class BiTemporalChangeAnalysis(SpecialistModel):
             "model_provenance": effective_change_prov,
             "geo_metadata": geo_meta,
             "geojson_data": geojson_data,
-            "pair_comparison": pair_comparison
+            "pair_comparison": pair_comparison,
+            "transition_matrix": {
+                "top_transitions": transition_list,
+                "matrix_stats": transition_matrix_stats,
+                "total_changed_ha": round(change_ha, 2),
+                "total_changed_km2": round(change_km2, 4)
+            }
         }
 
 class CrossModalAnalysis(SpecialistModel):
@@ -2607,6 +2814,85 @@ class CrossModalAnalysis(SpecialistModel):
         fused_water_mask = None
         fused_veg_mask = None
 
+        # ── SAR Input Contract & Radiometric Ingestion with Dual-Polarization Synthesis [VV, VH, VH/VV] ──
+        is_dual_pol = False
+        vv_db = None
+        vh_db = None
+        cr_ratio_db = None
+        wave_clutter_mask = np.zeros((h, w), dtype=bool)
+
+        if sar_contract["contract"] == "CALIBRATED_SIGMA0_DB":
+            # Direct float32 pass-through: preserve true calibrated decibels without lossy uint8 conversion
+            try:
+                with rasterio.MemoryFile(t_sar_bytes) as memfile:
+                    with memfile.open() as ds:
+                        if ds.count >= 2:
+                            is_dual_pol = True
+                            b1 = ds.read(1).astype(np.float32)
+                            b2 = ds.read(2).astype(np.float32)
+                            d1 = (ds.descriptions[0] or "").lower() if len(ds.descriptions) > 0 and ds.descriptions[0] else ""
+                            d2 = (ds.descriptions[1] or "").lower() if len(ds.descriptions) > 1 and ds.descriptions[1] else ""
+                            if "vh" in d1 or "hv" in d1:
+                                vh_raw, vv_raw = b1, b2
+                            else:
+                                vv_raw, vh_raw = b1, b2
+
+                            if ds.nodata is not None:
+                                vv_raw[vv_raw == ds.nodata] = -25.0
+                                vh_raw[vh_raw == ds.nodata] = -30.0
+
+                            vv_raw = np.nan_to_num(vv_raw, nan=-25.0, posinf=0.0, neginf=-35.0)
+                            vh_raw = np.nan_to_num(vh_raw, nan=-30.0, posinf=0.0, neginf=-40.0)
+
+                            vv_raw = np.clip(vv_raw, -50.0, 25.0)
+                            vh_raw = np.clip(vh_raw, -50.0, 25.0)
+
+                            if vv_raw.shape[:2] != (h, w):
+                                vv_db = cv2.resize(vv_raw, (w, h), interpolation=cv2.INTER_LINEAR)
+                                vh_db = cv2.resize(vh_raw, (w, h), interpolation=cv2.INTER_LINEAR)
+                            else:
+                                vv_db, vh_db = vv_raw, vh_raw
+
+                            cr_ratio_db = vh_db - vv_db
+                            # Coastal wave clutter: high co-pol Bragg reflection (VV > -18 dB) with low cross-pol depolarization (CR < -10.5 dB)
+                            wave_clutter_mask = (vv_db > -18.0) & (cr_ratio_db < -10.5)
+                            # Clutter-suppressed SAR backscatter: clamp sea clutter to specular water level (-25.0 dB)
+                            sar_inp = np.where(wave_clutter_mask, -25.0, vv_db).astype(np.float32)
+                        else:
+                            raw_sar = ds.read(1).astype(np.float32)
+                            if ds.nodata is not None:
+                                raw_sar[raw_sar == ds.nodata] = -25.0
+                            raw_sar = np.nan_to_num(raw_sar, nan=-25.0, posinf=0.0, neginf=-35.0)
+                            raw_sar = np.clip(raw_sar, -50.0, 25.0)
+                            if raw_sar.shape[:2] != (h, w):
+                                raw_sar = cv2.resize(raw_sar, (w, h), interpolation=cv2.INTER_LINEAR)
+                            sar_inp = raw_sar
+                            vv_db = sar_inp
+            except Exception as sar_read_err:
+                logger.warning(f"Direct float32 SAR read failed: {sar_read_err}; falling back to surrogate normalization")
+                sar_inp = (sar_gray.astype(np.float32) / 255.0) * 25.0 - 25.0
+                vv_db = sar_inp
+        else:
+            # Check if multi-band RGB array contains distinct polarizations (e.g. False-color SAR composite)
+            if img2.ndim == 3 and img2.shape[2] >= 3:
+                b_c = img2[:, :, 0].astype(np.float32)
+                g_c = img2[:, :, 1].astype(np.float32)
+                r_c = img2[:, :, 2].astype(np.float32)
+                # If red (VV) and green (VH) channels differ significantly, treat as dual-pol composite
+                if float(np.mean(np.abs(r_c - g_c))) > 8.0:
+                    is_dual_pol = True
+                    vv_db = (r_c / 255.0) * 25.0 - 25.0
+                    vh_db = (g_c / 255.0) * 25.0 - 25.0
+                    cr_ratio_db = vh_db - vv_db
+                    wave_clutter_mask = (vv_db > -18.0) & (cr_ratio_db < -10.5)
+                    sar_inp = np.where(wave_clutter_mask, -25.0, vv_db).astype(np.float32)
+                else:
+                    sar_inp = (sar_gray.astype(np.float32) / 255.0) * 25.0 - 25.0
+                    vv_db = sar_inp
+            else:
+                sar_inp = (sar_gray.astype(np.float32) / 255.0) * 25.0 - 25.0
+                vv_db = sar_inp
+
         execution_path = "HEURISTIC_FALLBACK"
         fallback_reason = None
         forward_latency_ms = 0.0
@@ -2619,48 +2905,65 @@ class CrossModalAnalysis(SpecialistModel):
             try:
                 opt_rgb = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
 
-                # ── SAR Input Contract & Radiometric Ingestion ──
-                if sar_contract["contract"] == "CALIBRATED_SIGMA0_DB":
-                    # Direct float32 pass-through: preserve true calibrated decibels without lossy uint8 conversion
-                    try:
-                        with rasterio.MemoryFile(t_sar_bytes) as memfile:
-                            with memfile.open() as ds:
-                                raw_sar = ds.read(1).astype(np.float32)
-                                if ds.nodata is not None:
-                                    raw_sar[raw_sar == ds.nodata] = -25.0
-                                raw_sar = np.nan_to_num(raw_sar, nan=-25.0, posinf=0.0, neginf=-35.0)
-                                raw_sar = np.clip(raw_sar, -50.0, 25.0)
-                                if raw_sar.shape[:2] != (h, w):
-                                    raw_sar = cv2.resize(raw_sar, (w, h), interpolation=cv2.INTER_LINEAR)
-                                sar_inp = raw_sar
-                    except Exception as sar_read_err:
-                        logger.warning(f"Direct float32 SAR read failed: {sar_read_err}; falling back to surrogate normalization")
-                        sar_inp = (sar_gray.astype(np.float32) / 255.0) * 25.0 - 25.0
-                else:
-                    # Surrogate 8-bit visual grayscale, uncalibrated DN, or unknown:
-                    # Apply exact trained surrogate normalization mapping [0, 255] -> [-25.0, 0.0] dB
-                    sar_inp = (sar_gray.astype(np.float32) / 255.0) * 25.0 - 25.0
-
-                inf_h, inf_w = min(h, 256), min(w, 256)
-                opt_res = cv2.resize(opt_rgb, (inf_w, inf_h))
-                sar_res = cv2.resize(sar_inp, (inf_w, inf_h))
-
-                opt_t = torch.from_numpy(opt_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
-                sar_t = torch.from_numpy(sar_res).unsqueeze(0).unsqueeze(0).to(ml_manager.device)
-
                 t_fwd_start = time.perf_counter()
-                with torch.no_grad():
-                    # 4-Fold Dihedral Test-Time Augmentation (TTA) to suppress radar speckle
-                    p0 = torch.sigmoid(cross_model(opt_t, sar_t))
-                    ph = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-1]), torch.flip(sar_t, [-1]))), [-1])
-                    pv = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-2]), torch.flip(sar_t, [-2]))), [-2])
-                    phv = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-2, -1]), torch.flip(sar_t, [-2, -1]))), [-2, -1])
-                    probs = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
-                forward_latency_ms = round((time.perf_counter() - t_fwd_start) * 1000.0, 2)
+                if h > 384 or w > 384:
+                    from tiling import SlidingWindowTiler
+                    tiler_cm = SlidingWindowTiler(tile_size=256, overlap=64)
+                    windows = tiler_cm.get_windows(h, w, geo_meta)
+                    built_tiles, water_tiles, veg_tiles = [], [], []
 
-                p_built = cv2.resize(probs[0], (w, h), interpolation=cv2.INTER_LINEAR)
-                p_water = cv2.resize(probs[1], (w, h), interpolation=cv2.INTER_LINEAR)
-                p_veg   = cv2.resize(probs[2], (w, h), interpolation=cv2.INTER_LINEAR)
+                    with torch.no_grad():
+                        for win in windows:
+                            o_patch = opt_rgb[win.y_start:win.y_end, win.x_start:win.x_end]
+                            s_patch = sar_inp[win.y_start:win.y_end, win.x_start:win.x_end]
+                            if o_patch.shape[:2] != (256, 256):
+                                o_inp = cv2.resize(o_patch, (256, 256))
+                                s_inp = cv2.resize(s_patch, (256, 256))
+                            else:
+                                o_inp, s_inp = o_patch, s_patch
+
+                            o_t = torch.from_numpy(o_inp).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
+                            s_t = torch.from_numpy(s_inp).unsqueeze(0).unsqueeze(0).to(ml_manager.device)
+
+                            # 4-Fold Dihedral Test-Time Augmentation (TTA) per tile
+                            p0 = torch.sigmoid(cross_model(o_t, s_t))
+                            ph = torch.flip(torch.sigmoid(cross_model(torch.flip(o_t, [-1]), torch.flip(s_t, [-1]))), [-1])
+                            pv = torch.flip(torch.sigmoid(cross_model(torch.flip(o_t, [-2]), torch.flip(s_t, [-2]))), [-2])
+                            phv = torch.flip(torch.sigmoid(cross_model(torch.flip(o_t, [-2, -1]), torch.flip(s_t, [-2, -1]))), [-2, -1])
+                            pr = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
+
+                            b_sub = cv2.resize(pr[0], (win.tile_w, win.tile_h), interpolation=cv2.INTER_LINEAR)
+                            w_sub = cv2.resize(pr[1], (win.tile_w, win.tile_h), interpolation=cv2.INTER_LINEAR)
+                            v_sub = cv2.resize(pr[2], (win.tile_w, win.tile_h), interpolation=cv2.INTER_LINEAR)
+
+                            built_tiles.append(b_sub)
+                            water_tiles.append(w_sub)
+                            veg_tiles.append(v_sub)
+
+                    p_built = tiler_cm.stitch_float_maps(built_tiles, windows, h, w)
+                    p_water = tiler_cm.stitch_float_maps(water_tiles, windows, h, w)
+                    p_veg   = tiler_cm.stitch_float_maps(veg_tiles, windows, h, w)
+                else:
+                    inf_h, inf_w = min(h, 256), min(w, 256)
+                    opt_res = cv2.resize(opt_rgb, (inf_w, inf_h))
+                    sar_res = cv2.resize(sar_inp, (inf_w, inf_h))
+
+                    opt_t = torch.from_numpy(opt_res).permute(2, 0, 1).unsqueeze(0).to(ml_manager.device)
+                    sar_t = torch.from_numpy(sar_res).unsqueeze(0).unsqueeze(0).to(ml_manager.device)
+
+                    with torch.no_grad():
+                        # 4-Fold Dihedral Test-Time Augmentation (TTA) to suppress radar speckle
+                        p0 = torch.sigmoid(cross_model(opt_t, sar_t))
+                        ph = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-1]), torch.flip(sar_t, [-1]))), [-1])
+                        pv = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-2]), torch.flip(sar_t, [-2]))), [-2])
+                        phv = torch.flip(torch.sigmoid(cross_model(torch.flip(opt_t, [-2, -1]), torch.flip(sar_t, [-2, -1]))), [-2, -1])
+                        probs = ((p0 + ph + pv + phv) / 4.0).squeeze().cpu().numpy()
+
+                    p_built = cv2.resize(probs[0], (w, h), interpolation=cv2.INTER_LINEAR)
+                    p_water = cv2.resize(probs[1], (w, h), interpolation=cv2.INTER_LINEAR)
+                    p_veg   = cv2.resize(probs[2], (w, h), interpolation=cv2.INTER_LINEAR)
+
+                forward_latency_ms = round((time.perf_counter() - t_fwd_start) * 1000.0, 2)
 
                 # Calibrated per-class segmentation thresholds
                 if hasattr(cross_model, '_optimal_thresholds') and cross_model._optimal_thresholds is not None:
@@ -2672,6 +2975,13 @@ class CrossModalAnalysis(SpecialistModel):
                 fused_built_mask = (p_built > th_built).astype(np.uint8) * 255
                 fused_water_mask = (p_water > th_water).astype(np.uint8) * 255
                 fused_veg_mask   = (p_veg > th_veg).astype(np.uint8) * 255
+
+                # Apply dual-polarization coastal wave clutter suppression
+                if is_dual_pol and np.any(wave_clutter_mask):
+                    clutter_u8 = (wave_clutter_mask.astype(np.uint8) * 255)
+                    fused_built_mask = cv2.bitwise_and(fused_built_mask, cv2.bitwise_not(clutter_u8))
+                    fused_water_mask = cv2.bitwise_or(fused_water_mask, clutter_u8)
+
                 effective_cross_prov = cross_prov
                 execution_path = "NEURAL"
                 fallback_reason = None
@@ -2698,6 +3008,12 @@ class CrossModalAnalysis(SpecialistModel):
             fused_built_mask = cv2.bitwise_or(sar_urban_mask, opt_built_mask)
             fused_built_mask = cv2.bitwise_and(fused_built_mask, cv2.bitwise_not(fused_water_mask))
 
+            # Apply dual-polarization coastal wave clutter suppression
+            if is_dual_pol and np.any(wave_clutter_mask):
+                clutter_u8 = (wave_clutter_mask.astype(np.uint8) * 255)
+                fused_built_mask = cv2.bitwise_and(fused_built_mask, cv2.bitwise_not(clutter_u8))
+                fused_water_mask = cv2.bitwise_or(fused_water_mask, clutter_u8)
+
             # 3. VEGETATION EXTRACTION
             lower_green = np.array([35, 30, 30])
             upper_green = np.array([85, 255, 255])
@@ -2705,6 +3021,9 @@ class CrossModalAnalysis(SpecialistModel):
             fused_veg_mask = cv2.bitwise_and(green_mask, cv2.bitwise_not(fused_water_mask))
             fused_veg_mask = cv2.bitwise_and(fused_veg_mask, cv2.bitwise_not(fused_built_mask))
             effective_cross_prov = "fallback_heuristic (IHS Cross-Modal Fusion Engine)"
+
+        clutter_px = int(np.count_nonzero(wave_clutter_mask)) if wave_clutter_mask is not None else 0
+        clutter_ha = (clutter_px * sqm_per_px) / 10_000.0
 
         inference_metadata = {
             "model_name": model_name,
@@ -2714,7 +3033,13 @@ class CrossModalAnalysis(SpecialistModel):
             "forward_latency_ms": forward_latency_ms,
             "provenance": effective_cross_prov,
             "fallback_reason": fallback_reason,
-            "sar_input_contract": sar_contract
+            "sar_input_contract": sar_contract,
+            "polarization_channels": "DUAL_POL_VV_VH" if is_dual_pol else "SINGLE_POL_VV",
+            "wave_clutter_suppression": {
+                "applied": is_dual_pol and (clutter_px > 0),
+                "suppressed_pixels": clutter_px,
+                "suppressed_area_ha": round(clutter_ha, 2)
+            }
         }
 
         water_px = int(np.count_nonzero(fused_water_mask))
@@ -2854,9 +3179,18 @@ class CrossModalAnalysis(SpecialistModel):
 | 🪨 **Open Ground / Bare Terrain** | **{other_pct:.1f}%** | **{other_km2:.2f} km²** | **{other_ha:,.0f} ha** | Surface roughness microwave scatter + exposed ground reflectance |
 | 🌐 **TOTAL DELINEATED SCENE** | **100.0%** | **{stats_opt['total_km2']:.2f} km²** | **{stats_opt['total_ha']:,.0f} ha** | **Full Optical + Microwave SAR Multi-Modal Fusion** |"""
 
+        dual_pol_bullet = ""
+        if is_dual_pol:
+            dual_pol_bullet = (
+                f"• **Dual-Polarization Feature Synthesis ($VV + VH + VH/VV$):** Dual-polarization radar channels processed. "
+                f"Synthesized cross-polarization ratio ($VH/VV$) to suppress coastal radar wave clutter, "
+                f"eliminating Bragg sea scatter from false-positive urban identification ({clutter_ha:.1f} ha clutter suppressed).\n\n"
+            )
+
         formatted_text = (
             f"🛰️ **Multi-Modal Optical + SAR Joint Extraction Assessment**\n\n"
             f"By combining multispectral optical reflectance with C-band synthetic aperture radar (SAR) microwave backscatter through Intensity-Hue-Saturation (IHS) fusion, we cleanly separated built-up and water-covered regions:\n\n"
+            f"{dual_pol_bullet}"
             f"### 1. 🏘️ Identified Built-Up & Infrastructure Regions\n"
             f"• **Surface Coverage:** Built-up structures cover **~{built_pct:.1f}%** ({built_km2:.2f} km² / {built_ha:,.0f} hectares).\n"
             f"• **SAR Identification Mechanism:** Vertical walls, concrete structures, and metallic port/industrial assets produce strong **double-bounce radar backscatter**, clearly illuminating urban footprints through optical clouds and atmospheric haze.\n"

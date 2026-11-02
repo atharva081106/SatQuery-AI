@@ -218,4 +218,32 @@ def test_requirement_status_integrity():
     assert "VRSBench VQA: 76.67% Acc" in content
 
 
+def test_dual_polarization_clutter_suppression(optical_sar_pair):
+    """Verify dual-polarization SAR channel synthesis [VV, VH, VH/VV] and coastal wave clutter suppression."""
+    b_opt, b_sar = optical_sar_pair
+    sar_cv = cv2.imdecode(np.frombuffer(b_sar, np.uint8), cv2.IMREAD_GRAYSCALE)
+    vv = sar_cv.copy()
+    vh = np.clip(sar_cv.astype(float) * 0.6 + 10, 0, 255).astype(np.uint8)
+
+    # Inject coastal sea clutter into water region
+    vv[:60, :60] = 160  # high VV Bragg sea scatter
+    vh[:60, :60] = 20   # low VH noise floor
+    ratio = np.clip(np.abs(vv.astype(float) - vh.astype(float)) * 2.0, 0, 255).astype(np.uint8)
+
+    dual_sar = cv2.merge([ratio, vh, vv])
+    _, buf = cv2.imencode('.png', dual_sar)
+    b_sar_dual = buf.tobytes()
+
+    pipeline = CrossModalAnalysis()
+    res = pipeline.execute([b_opt, b_sar_dual], "Identify built-up and water bodies through clouds")
+    assert res["compatibility_status"] == "PASSED"
+    meta = res.get("inference_metadata", {})
+    assert meta.get("polarization_channels") == "DUAL_POL_VV_VH"
+    clutter_info = meta.get("wave_clutter_suppression", {})
+    assert clutter_info.get("applied") is True
+    assert clutter_info.get("suppressed_pixels") > 0
+    assert "Dual-Polarization Feature Synthesis" in res["text"]
+
+
+
 

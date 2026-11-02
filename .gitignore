@@ -22,6 +22,7 @@ ml_pipeline/checkpoints/**/*.pth
 !ml_pipeline/checkpoints/v4/**/*.pth
 !ml_pipeline/checkpoints/**/*.json
 !ml_pipeline/checkpoints/*.onnx
+ml_pipeline/checkpoints/sota/
 ml_pipeline/satquery_finetuned_model/
 ml_pipeline/dummy_dataset/
 backend/cache/

@@ -231,3 +231,62 @@ def test_benchmark_mode_format_enforcement():
         benchmark_mode=True
     )
     assert err_ok is None
+
+
+def test_multispectral_geotiff_spectral_indices():
+    """Verify 4-band multispectral GeoTIFF ingestion calculates NDVI/NDWI and extracts spectral indices."""
+    transform = from_bounds(72.8, 18.9, 73.0, 19.1, 128, 128)
+    memfile = rasterio.MemoryFile()
+
+    # 4 Bands: B2 (Blue), B3 (Green), B4 (Red), B8 (NIR)
+    profile = {
+        "driver": "GTiff",
+        "height": 128,
+        "width": 128,
+        "count": 4,
+        "dtype": np.float32,
+        "crs": "EPSG:4326",
+        "transform": transform
+    }
+
+    with memfile.open(**profile) as dst:
+        # Simulate active vegetation: high NIR (3000), low Red (500)
+        dst.write(np.full((128, 128), 600.0, dtype=np.float32), 1)   # Blue
+        dst.write(np.full((128, 128), 1200.0, dtype=np.float32), 2)  # Green
+        dst.write(np.full((128, 128), 500.0, dtype=np.float32), 3)   # Red
+        dst.write(np.full((128, 128), 3500.0, dtype=np.float32), 4)  # NIR
+        dst.descriptions = ("Blue (B2)", "Green (B3)", "Red (B4)", "NIR (B8)")
+
+    b = memfile.read()
+    cv_img, pil_img, geo_meta = decode_satellite_image(b)
+
+    assert cv_img is not None
+    assert pil_img is not None
+    assert geo_meta is not None
+    assert "spectral_indices" in geo_meta
+    spec = geo_meta["spectral_indices"]
+    assert spec["has_multispectral_indices"] is True
+    # NDVI = (3500 - 500) / (3500 + 500) = 3000 / 4000 = 0.75
+    assert spec["mean_ndvi"] > 0.60
+    assert spec["vegetation_active"] is True
+
+
+def test_dihedral_tta_land_cover_execution():
+    """Verify _analyze_land_cover runs with 4-fold dihedral TTA and returns valid area partitions."""
+    from model_interfaces import _analyze_land_cover
+    # Create test synthetic image with distinct land covers
+    img = np.zeros((128, 128, 3), dtype=np.uint8)
+    img[:64, :, 0] = 180  # Blue water region
+    img[64:, :, 1] = 150  # Green vegetation region
+    img[64:, :, 2] = 50
+
+    stats = _analyze_land_cover(img)
+    assert "water_pct" in stats
+    assert "veg_total_pct" in stats
+    assert "built_pct" in stats
+    assert "bare_pct" in stats
+    assert stats["water_pct"] > 0.0
+    assert stats["veg_total_pct"] > 0.0
+    total_pct = stats["water_pct"] + stats["veg_total_pct"] + stats["built_pct"] + stats["bare_pct"]
+    assert total_pct <= 100.1
+

@@ -220,6 +220,37 @@ class SlidingWindowTiler:
             canvas_weights = np.maximum(canvas_weights, 1e-5)
             return np.argmax(canvas_votes, axis=0).astype(np.uint8)
 
+    def stitch_float_maps(
+        self,
+        tile_maps: List[np.ndarray],
+        windows: List[TileWindow],
+        full_height: int,
+        full_width: int
+    ) -> np.ndarray:
+        """
+        Seamlessly stitches 2D single-channel continuous float maps (e.g. change probabilities,
+        distance transforms, confidence fields) using 2D Hann cosine apodization windows.
+        Eliminates tile edge seams and preserves high spatial resolution.
+        """
+        if not tile_maps or not windows:
+            return np.zeros((full_height, full_width), dtype=np.float32)
+
+        import cv2
+        canvas_vals = np.zeros((full_height, full_width), dtype=np.float32)
+        canvas_weights = np.zeros((full_height, full_width), dtype=np.float32)
+
+        for tile, win in zip(tile_maps, windows):
+            h, w = win.tile_h, win.tile_w
+            w_mat = compute_hann_window(h, w, self.overlap // 2, self.overlap // 2)
+            sub_tile = tile[:h, :w]
+            if sub_tile.shape != (h, w):
+                sub_tile = cv2.resize(sub_tile, (w, h), interpolation=cv2.INTER_LINEAR)
+            canvas_vals[win.y_start:win.y_end, win.x_start:win.x_end] += sub_tile * w_mat
+            canvas_weights[win.y_start:win.y_end, win.x_start:win.x_end] += w_mat
+
+        canvas_weights = np.maximum(canvas_weights, 1e-5)
+        return (canvas_vals / canvas_weights).astype(np.float32)
+
     def remap_detections(
         self,
         detections_by_tile: List[List[Dict[str, Any]]],

@@ -74,6 +74,33 @@ def test_uttarakhand_demo_pair_passes(uttarakhand_pair):
     assert "features" in res["geojson_data"]
     assert "Surface Transition Matrix" in res["text"]
     assert "INCREASED" in res["text"] or "DECREASED" in res["text"] or "REMAINED UNCHANGED" in res["text"]
+    assert "transition_matrix" in res
+    assert "top_transitions" in res["transition_matrix"]
+    assert "matrix_stats" in res["transition_matrix"]
+
+def test_transition_matrix_explicit_trajectories(uttarakhand_pair):
+    b1, b2 = uttarakhand_pair
+    pipeline = BiTemporalChangeAnalysis()
+    res = pipeline.execute([b1, b2], "Detect what changed between the two dates")
+    assert res["compatibility_status"] == "PASSED"
+    assert "transition_matrix" in res
+    tm = res["transition_matrix"]
+    assert "total_changed_ha" in tm
+    assert "total_changed_km2" in tm
+    assert isinstance(tm["top_transitions"], list)
+    if len(tm["top_transitions"]) > 0:
+        first_tr = tm["top_transitions"][0]
+        assert "trajectory_name" in first_tr
+        assert "dynamic_mechanism" in first_tr
+        assert "area_ha" in first_tr
+        assert "pct_of_change" in first_tr
+        assert "Explicit Land-Cover Transition Trajectories" in res["text"]
+
+    # Check geojson feature properties
+    if res["geojson_data"] and res["geojson_data"]["features"]:
+        feat0 = res["geojson_data"]["features"][0]
+        assert "transition_code" in feat0["properties"]
+        assert "change_type" in feat0["properties"]
 
 def test_decode_palette_image_preserves_colors(uttarakhand_pair):
     b1, _ = uttarakhand_pair

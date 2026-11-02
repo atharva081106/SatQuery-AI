@@ -1,0 +1,35 @@
+{
+  "benchmark": "BigEarthNet-MM / BEN-GE-800 SOTA Evaluation",
+  "model": "SatQueryOpticalSARResNetSOTA (Pretrained ResNet-18 + BCA + ASPP + Lee Filter)",
+  "architecture": "Bidirectional Cross-Attention + ASPP Dual-Encoder Network with Pretrained Optical Backbone",
+  "parameters": 9666019,
+  "evaluation_protocol": "4-Fold Dihedral Test-Time Augmentation (TTA) + Calibrated Thresholds",
+  "test_pairs_evaluated": 129,
+  "thresholds": [
+    0.7,
+    0.7499999999999998,
+    0.5999999999999999
+  ],
+  "land_cover_extraction_metrics": {
+    "built_up": {
+      "mean_iou_pct": 43.49,
+      "dice_f1": 0.4757,
+      "precision": 0.498,
+      "recall": 0.5196
+    },
+    "water": {
+      "mean_iou_pct": 46.05,
+      "dice_f1": 0.489,
+      "precision": 0.5617,
+      "recall": 0.4714
+    },
+    "vegetation": {
+      "mean_iou_pct": 79.36,
+      "dice_f1": 0.838,
+      "precision": 0.8163,
+      "recall": 0.8984
+    },
+    "overall_mean_iou_pct": 56.3
+  },
+  "timestamp": "2026-11-02T09:25:23Z"
+}
